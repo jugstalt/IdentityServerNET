@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
-    public class ClientsModel : PageModel
+    public class ClientsModel : AdminPageModel
     {
         private IClientDbContextModify _clientDb = null;
         public ClientsModel(IClientDbContext clientDbContext)

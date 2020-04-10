@@ -2,14 +2,14 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-@model IEditClientModel
+@model IEditClientPageModel
 
 <h2>Admin IdentityServer</h2>
-<div>
+<div class="admin-resources">
     <h4>Modify Client: @Model?.CurrentClient?.ClientId</h4>
     <hr />
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-3 sidebar">
             <partial name="_EditClientNav" />
         </div>
         <div class="col-md-9">

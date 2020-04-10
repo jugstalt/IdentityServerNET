@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public class ScopesModel : EditApiResourceModel
+    public class ScopesModel : EditApiResourcePageModel
     {
         public ScopesModel(IResourceDbContext resourceDbContext)
              : base(resourceDbContext)

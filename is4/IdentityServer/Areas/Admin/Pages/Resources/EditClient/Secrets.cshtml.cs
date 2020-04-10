@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class SecretsModel : EditClientModel
+    public class SecretsModel : EditClientPageModel
     {
         public SecretsModel(IClientDbContext clientDbContext)
              : base(clientDbContext)

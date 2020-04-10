@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
-    public class ApisModel : PageModel
+    public class ApisModel : AdminPageModel
     {
         private IResourceDbContextModify _resourceDb = null;
         public ApisModel(IResourceDbContext clientDbContext)

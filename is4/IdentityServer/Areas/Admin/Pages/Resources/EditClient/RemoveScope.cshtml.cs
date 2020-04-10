@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class RemoveScopeModel : EditClientModel
+    public class RemoveScopeModel : EditClientPageModel
     {
         public RemoveScopeModel(IClientDbContext clientDbContext)
              : base(clientDbContext)

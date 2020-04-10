@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class IndexModel : EditClientModel
+    public class IndexModel : EditClientPageModel
     {
         public IndexModel(IClientDbContext clientDbContext)
              : base(clientDbContext)

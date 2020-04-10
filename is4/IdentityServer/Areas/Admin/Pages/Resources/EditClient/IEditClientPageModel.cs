@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public interface IEditClientModel
+    public interface IEditClientPageModel
     {
         public Client CurrentClient { get; set; }
     }

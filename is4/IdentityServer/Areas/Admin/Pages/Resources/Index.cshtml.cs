@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
-    public class IndexModel : PageModel
+    public class IndexModel : AdminPageModel
     {
         public void OnGet()
         {

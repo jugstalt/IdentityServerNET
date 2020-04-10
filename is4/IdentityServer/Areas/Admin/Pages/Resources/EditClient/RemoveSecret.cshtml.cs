@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class RemoveSecretModel : EditClientModel
+    public class RemoveSecretModel : EditClientPageModel
     {
         public RemoveSecretModel(IClientDbContext clientDbContext)
             : base(clientDbContext)

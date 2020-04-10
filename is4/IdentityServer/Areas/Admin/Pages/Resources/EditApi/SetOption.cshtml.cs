@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public class SetOptionModel : EditApiResourceModel
+    public class SetOptionModel : EditApiResourcePageModel
     {
         public SetOptionModel(IResourceDbContext resourceDbContext)
              : base(resourceDbContext)

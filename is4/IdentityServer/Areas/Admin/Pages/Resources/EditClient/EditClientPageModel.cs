@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class EditClientModel : PageModel, IEditClientModel
+    public class EditClientPageModel : AdminPageModel, IEditClientPageModel
     {
-        public EditClientModel(IClientDbContext clientDbContext)
+        public EditClientPageModel(IClientDbContext clientDbContext)
         {
             _clientDb = clientDbContext as IClientDbContextModify;
         }

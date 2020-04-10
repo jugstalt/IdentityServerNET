@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using IdentityServer.Legacy;
-using IdentityServer.Legacy.Stores;
 using IdentityServer4.Configuration;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -40,11 +38,18 @@ namespace IdentityServer
                     )
                     .AddDefaultTokenProviders();
 
-            // uncomment, if you want to add an MVC-based UI
-            //services.AddControllersWithViews();
+            services.AddAuthorization(options =>
+            {
+                //options.AddPolicy("admin-policy",
+                //        policy => policy.RequireUserName("identityserver-administrator"));
+                options.AddPolicy("admin-policy",
+                    policy => policy.RequireUserName("test@xyz.com"));
+            });
+
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/", "admin-policy");
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
                 });

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class ScopesModel : EditClientModel
+    public class ScopesModel : EditClientPageModel
     {
         public ScopesModel(IClientDbContext clientDbContext)
              : base(clientDbContext)

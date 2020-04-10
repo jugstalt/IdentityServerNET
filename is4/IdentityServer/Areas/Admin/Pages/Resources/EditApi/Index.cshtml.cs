@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public class IndexModel : EditApiResourceModel
+    public class IndexModel : EditApiResourcePageModel
     {
         public IndexModel(IResourceDbContext resourceDbContext)
              : base(resourceDbContext)

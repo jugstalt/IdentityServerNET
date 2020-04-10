@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public interface IEditApiResourceModel
+    public interface IEditApiResourcePageModel
     {
         public ApiResource CurrentApiResource { get; set; }
     }

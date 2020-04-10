@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class DeleteClientModel : EditClientModel
+    public class DeleteClientModel : EditClientPageModel
     {
         public DeleteClientModel(IClientDbContext clientDbContext)
              : base(clientDbContext)

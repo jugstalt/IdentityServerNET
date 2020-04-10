@@ -1,0 +1,13 @@
+﻿.admin-resources {
+
+}
+
+    .admin-resources .sidebar {
+        background-color: #f6f6f6;
+        padding: 0px
+    }
+
+    .admin-resources form {
+        box-shadow: 0 1px 4px rgba(0,0,0,0.20);
+        padding: 8px;
+    }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
-    public class SetGrantModel : EditClientModel
+    public class SetGrantModel : EditClientPageModel
     {
         public SetGrantModel(IClientDbContext clientDbContext)
             : base(clientDbContext)
