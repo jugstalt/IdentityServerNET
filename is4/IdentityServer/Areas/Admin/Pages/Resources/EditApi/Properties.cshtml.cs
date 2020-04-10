@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using IdentityServer.Legacy.DbContext;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
+{
+    public class PropertiesModel : EditApiResourceModel
+    {
+        public PropertiesModel(IResourceDbContext resourceDbContext)
+             : base(resourceDbContext)
+        {
+        }
+
+        async public Task<IActionResult> OnGetAsync(string id, string option, bool value)
+        {
+            await LoadCurrentApiResourceAsync(id);
+
+            this.Input = new InputModel()
+            {
+                ApiName = this.CurrentApiResource.Name,
+                ApiResource = this.CurrentApiResource
+            };
+
+            return Page();
+        }
+
+        async public Task<IActionResult> OnPostAsync()
+        {
+            await LoadCurrentApiResourceAsync(Input.ApiName);
+
+            var inputClient = Input.ApiResource;
+            var hasChanges = false;
+
+            foreach (var propertyInfo in typeof(Client).GetProperties())
+            {
+
+                if (!Input.IgnoreProperties.Contains(propertyInfo.Name) &&
+                    propertyInfo.CanWrite &&
+                    propertyInfo.CanRead &&
+                    (propertyInfo.PropertyType == typeof(string) || propertyInfo.PropertyType == typeof(int)))
+                {
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        if (!String.IsNullOrWhiteSpace(propertyInfo.GetValue(this.CurrentApiResource)?.ToString()) &&
+                            !String.IsNullOrWhiteSpace(propertyInfo.GetValue(inputClient)?.ToString()) &&
+                            !propertyInfo.GetValue(this.CurrentApiResource).Equals(propertyInfo.GetValue(inputClient)))
+                        {
+                            propertyInfo.SetValue(this.CurrentApiResource, propertyInfo.GetValue(inputClient));
+                            hasChanges = true;
+                        }
+                    }
+                    if (propertyInfo.PropertyType == typeof(int))
+                    {
+                        if (!propertyInfo.GetValue(this.CurrentApiResource).Equals(propertyInfo.GetValue(inputClient)))
+                        {
+                            propertyInfo.SetValue(this.CurrentApiResource, propertyInfo.GetValue(inputClient));
+                            hasChanges = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasChanges)
+            {
+                await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
+            }
+
+            return Page();
+        }
+
+        [BindProperty]
+        public InputModel Input { get; set; }
+
+        public class InputModel
+        {
+            public string ApiName { get; set; }
+            public ApiResource ApiResource { get; set; }
+            public string[] IgnoreProperties => new string[] { "Name", "DisplayName", "Description" };
+        }
+    }
+}

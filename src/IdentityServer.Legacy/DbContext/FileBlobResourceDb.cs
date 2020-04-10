@@ -110,7 +110,7 @@ namespace IdentityServer.Legacy.DbContext
 
         async public Task UpdateApiResourceAsync(ApiResource apiResource)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.client");
+            FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
 
             if (fi.Exists)
             {

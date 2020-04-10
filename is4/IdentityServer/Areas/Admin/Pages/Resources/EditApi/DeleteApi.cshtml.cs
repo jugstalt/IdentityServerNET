@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public class IndexModel : EditApiResourceModel
+    public class DeleteApiModel : EditApiResourceModel
     {
-        public IndexModel(IResourceDbContext resourceDbContext)
+        public DeleteApiModel(IResourceDbContext resourceDbContext)
              : base(resourceDbContext)
         {
         }
@@ -21,9 +21,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
             Input = new InputModel()
             {
-                Name = CurrentApiResource.Name,
-                DisplayName = CurrentApiResource.DisplayName,
-                Decription = CurrentApiResource.Description
+                ApiName = CurrentApiResource.Name
             };
 
             return Page();
@@ -31,14 +29,15 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.Name);
+            await LoadCurrentApiResourceAsync(Input.ApiName);
 
-            CurrentApiResource.DisplayName = Input.DisplayName;
-            CurrentApiResource.Description = Input.Decription;
+            if (Input.ConfirmApiName == CurrentApiResource.Name)
+            {
+                await _resourceDb.RemoveApiResourceAsync(this.CurrentApiResource);
+                return RedirectToPage("../Apis");
+            }
 
-            await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
-
-            return Page();
+            return RedirectToPage(new { id = this.CurrentApiResource.Name });
         }
 
         [BindProperty]
@@ -46,9 +45,8 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public class InputModel
         {
-            public string Name { get; set; }
-            public string DisplayName { get; set; }
-            public string Decription { get; set; }
+            public string ApiName { get; set; }
+            public string ConfirmApiName { get; set; }
         }
     }
 }

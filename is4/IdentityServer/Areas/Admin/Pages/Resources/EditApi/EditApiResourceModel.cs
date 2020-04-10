@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
-    public class EditClientModel : PageModel, IEditApiResourceModel
+    public class EditApiResourceModel : PageModel, IEditApiResourceModel
     {
-        public EditClientModel(IResourceDbContext resourceDbContext)
+        public EditApiResourceModel(IResourceDbContext resourceDbContext)
         {
             _resourceDb = resourceDbContext as IResourceDbContextModify;
         }
@@ -21,7 +21,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         #endregion
 
-        async public Task LoadCurrentClientAsync(string id)
+        async public Task LoadCurrentApiResourceAsync(string id)
         {
             this.CurrentApiResource = await _resourceDb.FindApiResourceAsync(id);
         }

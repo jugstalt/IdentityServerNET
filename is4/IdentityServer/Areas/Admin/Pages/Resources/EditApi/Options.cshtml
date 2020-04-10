@@ -1,0 +1,35 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Resources.EditApi.OptionsModel
+@{
+    ViewData["Title"] = "Api Options";
+    ViewData["ActivePage"] = EditApiResourceNavPages.Options;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="row">
+    <div class="col-md-6">
+
+        <ul class="nav nav-pills nav-stacked">
+            @foreach (var field in typeof(IdentityServer4.Models.ApiResource).GetProperties())
+            {
+                if (field.CanWrite && field.PropertyType == typeof(bool))
+                {
+                    var name = field.Name;
+                    var hasValue = (bool)field.GetValue(Model.CurrentApiResource);
+
+                    <li style="border-bottom:1px solid #eee">
+                        <a asp-page="./SetOption"
+                           asp-route-id="@Model.CurrentApiResource.Name"
+                           asp-route-option="@name"
+                           asp-route-value="@(!hasValue)">
+                            <div style="width:32px;height:26px;float:left"
+                                 class="@(hasValue ? "glyphicon glyphicon-ok text-success" : "")">
+                            </div>
+                            <div>@(name)</div>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>

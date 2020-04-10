@@ -34,7 +34,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public static string OptionsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Options);
 
-        public static string DeleteClientNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteClient);
+        public static string DeleteApiNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteClient);
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

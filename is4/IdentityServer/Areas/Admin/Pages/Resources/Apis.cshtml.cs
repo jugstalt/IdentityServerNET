@@ -39,7 +39,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
                 await _resourceDb.AddApiResourceAsync(apiResource);
             }
 
-            return RedirectToPage("EditClient/Index", new { id = apiName });
+            return RedirectToPage("EditApi/Index", new { id = apiName });
         }
 
         public IEnumerable<ApiResource> ApiResources { get; set; }
