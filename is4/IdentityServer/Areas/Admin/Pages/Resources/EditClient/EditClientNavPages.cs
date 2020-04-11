@@ -18,6 +18,8 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         public static string Properties => "Properties";
 
+        public static string Collections => "Collections";
+
         public static string Options => "Options";
 
         public static string DeleteClient => "DeleteClient";
@@ -31,6 +33,8 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
         public static string GrantsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Grants);
 
         public static string PropertiesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Properties);
+
+        public static string CollectionsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Collections);
 
         public static string OptionsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Options);
 

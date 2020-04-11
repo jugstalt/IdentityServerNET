@@ -22,6 +22,10 @@
             <a asp-page="./Options"
                asp-route-id="@Model?.CurrentApiResource?.Name">Options</a>
         </li>
+        <li class="@EditApiResourceNavPages.CollectionsNavClass(ViewContext)">
+            <a asp-page="./Collections"
+               asp-route-id="@Model?.CurrentApiResource?.Name">Collections</a>
+        </li>
         @*  // No Properties!?
         <li class="@EditApiResourceNavPages.PropertiesNavClass(ViewContext)">
             <a asp-page="./Properties"

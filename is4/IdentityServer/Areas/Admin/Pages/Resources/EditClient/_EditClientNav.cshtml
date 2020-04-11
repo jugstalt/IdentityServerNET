@@ -25,6 +25,10 @@
             <a asp-page="./Options"
                asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Options</a>
         </li>
+        <li class="@EditClientNavPages.CollectionsNavClass(ViewContext)">
+            <a asp-page="./Collections"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Collections</a>
+        </li>
         <li class="@EditClientNavPages.PropertiesNavClass(ViewContext)">
             <a asp-page="./Properties"
                asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Properties</a>
