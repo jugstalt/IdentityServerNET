@@ -10,21 +10,24 @@
         <div class="col-md-6">
             @if (Model.CurrentClient.AllowedScopes != null)
             {
-            <ul class="nav nav-pills nav-stacked">
-                
-                @foreach (var scope in Model.CurrentClient.AllowedScopes)
-                {
-                <li style="border-bottom:1px solid #eee">
-                    <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope)</div>
-                    <a style="display:inline-block;float:right"
-                       asp-page="./RemoveScope"
-                       asp-route-id="@Model.CurrentClient.ClientId"
-                       asp-route-scopeName="@scope">Remove</a>
-                </li>
-                }
-            </ul>
+                <ul class="nav nav-pills nav-stacked">
+
+                    @foreach (var scope in Model.CurrentClient.AllowedScopes)
+                    {
+                        <li style="border-bottom:1px solid #eee">
+                            <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope)</div>
+                            <a style="display:inline-block;float:right"
+                               asp-page="./RemoveScope"
+                               asp-route-id="@Model.CurrentClient.ClientId"
+                               asp-route-scopeName="@scope">Remove</a>
+                        </li>
+                    }
+                </ul>
             }
+        </div>
+        <div class="col-md-6">
             <form id="-form" method="post">
+                <h4>New Scope</h4>
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <input type="hidden" asp-for="Input.ClientId" />
                 <div class="form-group">

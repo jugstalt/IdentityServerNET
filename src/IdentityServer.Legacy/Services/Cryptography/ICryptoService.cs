@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.Cryptography
+namespace IdentityServer.Legacy.Services.Cryptography
 {
     public interface ICryptoService
     {

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy
+namespace IdentityServer.Legacy.Services.PasswordHasher
 {
     abstract public class PasswordHasher : IPasswordHasher<ApplicationUser>
     {

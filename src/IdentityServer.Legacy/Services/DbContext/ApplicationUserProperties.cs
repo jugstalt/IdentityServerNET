@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DbContext
+namespace IdentityServer.Legacy.Services.DbContext
 {
     public static class ApplicationUserProperties
     {

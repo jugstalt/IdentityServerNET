@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.DbContext;
+﻿using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -58,7 +58,36 @@ namespace IdentityServer.Legacy.DependencyInjection
         }
 
         public static IClientDbContextBuilder AddClientDbContextOptions(this IClientDbContextBuilder builder,
-            Action<UserDbContextConfiguration> setupAction)
+            Action<ClientDbContextConfiguration> setupAction)
+        {
+            builder.Services.Configure(setupAction);
+
+            return builder;
+        }
+
+        #endregion
+
+        #region ExportClientDbContext
+
+        static public IClientDbContextBuilder AddExportClientDbContext<T>(this IServiceCollection services)
+            where T : class, IExportClientDbContext
+        {
+            services.AddTransient<IExportClientDbContext, T>();
+
+            return new ClientDbContextBuilder(services);
+        }
+
+        static public IServiceCollection AddExportClientDbContext<T>(this IServiceCollection services, Action<ExportClientDbContextConfiguration> setupAction)
+            where T : class, IExportClientDbContext
+        {
+            services.Configure(setupAction);
+            services.AddTransient<IExportClientDbContext, T>();
+
+            return services;
+        }
+
+        public static IClientDbContextBuilder AddExportClientDbContextOptions(this IClientDbContextBuilder builder,
+            Action<ExportClientDbContextConfiguration> setupAction)
         {
             builder.Services.Configure(setupAction);
 
@@ -88,6 +117,35 @@ namespace IdentityServer.Legacy.DependencyInjection
 
         public static IResourceDbContextBuilder AddResourceDbContextOptions(this IResourceDbContextBuilder builder,
             Action<ResourceDbContextConfiguration> setupAction)
+        {
+            builder.Services.Configure(setupAction);
+
+            return builder;
+        }
+
+        #endregion
+
+        #region ResourceDbContext
+
+        static public IResourceDbContextBuilder AddExportResourceDbContext<T>(this IServiceCollection services)
+            where T : class, IExportResourceDbContext
+        {
+            services.AddTransient<IExportResourceDbContext, T>();
+
+            return new ResourceDbContextBuilder(services);
+        }
+
+        static public IServiceCollection AddExportResourceDbContext<T>(this IServiceCollection services, Action<ExportResourceDbContextConfiguration> setupAction)
+            where T : class, IExportResourceDbContext
+        {
+            services.Configure(setupAction);
+            services.AddTransient<IExportResourceDbContext, T>();
+
+            return services;
+        }
+
+        public static IResourceDbContextBuilder AddExportResourceDbContextOptions(this IResourceDbContextBuilder builder,
+            Action<ExportResourceDbContextConfiguration> setupAction)
         {
             builder.Services.Configure(setupAction);
 

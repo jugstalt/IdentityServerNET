@@ -1,5 +1,5 @@
 ﻿using IdentityModel;
-using IdentityServer.Legacy.Cryptography;
+using IdentityServer.Legacy.Services.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Text;

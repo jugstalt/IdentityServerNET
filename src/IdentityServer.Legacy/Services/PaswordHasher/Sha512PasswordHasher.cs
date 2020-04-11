@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy
+namespace IdentityServer.Legacy.Services.PasswordHasher
 {
-    public class Sha256PasswordHasher : PasswordHasher
+    public class Sha512PasswordHasher : PasswordHasher
     {
         override public string HashPassword(ApplicationUser user, string password)
         {
-            return password.ToSha256();
+            return password.ToSha512();
         }
     }
 }

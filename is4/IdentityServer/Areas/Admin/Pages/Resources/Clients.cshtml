@@ -7,21 +7,6 @@
 
     <div class="row">
         <div class="col-md-6">
-            
-            <form id="-form" method="post">
-                <h4>New Client</h4>
-                <div asp-validation-summary="All" class="text-danger"></div>
-                <div class="form-group">
-                    <input asp-for="Input.ClientId" class="form-control" placeholder="A unique client id..." />
-                    <span asp-validation-for="Input.ClientId" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input asp-for="Input.ClientName" class="form-control" placeholder="Optional: Client name..." />
-                    <span asp-validation-for="Input.ClientName" class="text-danger"></span>
-                </div>
-                <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
-            </form>
-
             <h4>Clients</h4>
             <ul class="nav nav-pills nav-stacked">
 
@@ -45,4 +30,21 @@
                 }
             </ul>
         </div>
+        <div class="col-md-6">
+
+            <form id="-form" method="post">
+                <h4>New Client</h4>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <input asp-for="Input.ClientId" class="form-control" placeholder="A unique client id..." />
+                    <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.ClientName" class="form-control" placeholder="Optional: Client name..." />
+                    <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+                </div>
+                <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
+            </form>
+        </div>
+        
     </div>

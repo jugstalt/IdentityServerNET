@@ -10,6 +10,7 @@
         <div class="col-md-6">
 
             <ul class="nav nav-pills nav-stacked">
+                @{ var count = 0; }
                 @foreach (var field in typeof(IdentityServer4.Models.Client).GetProperties())
                 {
                     if (field.CanWrite && field.PropertyType == typeof(bool))
@@ -28,6 +29,11 @@
                                 <div>@(name)</div>
                             </a>
                         </li>
+
+                        @if (++count % 7== 0)
+                        {
+                            @Html.Raw("</ul></div><div class='col-md-6'><ul class='nav nav-pills nav-stacked'>");
+                        }
                     }
                 }
             </ul>

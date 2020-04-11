@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace IdentityServer.Legacy.Cryptography
+namespace IdentityServer.Legacy.Services.Cryptography
 {
     public class DefaultCryptoService : ICryptoService
     {

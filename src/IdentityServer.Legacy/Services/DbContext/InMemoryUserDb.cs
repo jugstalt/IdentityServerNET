@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Legacy.DbContext
+namespace IdentityServer.Legacy.Services.DbContext
 {
     public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext
     {

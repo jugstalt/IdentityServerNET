@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using IdentityServer.Legacy.DependencyInjection;
-using IdentityServer.Legacy.DbContext;
-using IdentityServer.Legacy.Cryptography;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer4.Models;
 using static IdentityModel.OidcConstants;
 using IdentityModel;
+using IdentityServer.Legacy.Services.PasswordHasher;
+using IdentityServer.Legacy.Services.Serialize;
 
 [assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -93,6 +95,34 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                             RedirectUris = new string[] { "https://localhost:44356/signin-oidc" },
                             PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
                         }
+                    };
+                });
+
+                #endregion
+
+                #region Add ExportClientDbContext (optional)
+
+                services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
+                {
+                    options.ConnectionString = @"c:\temp\identityserver_legacy\storage-export\clients";
+                    options.CryptoService = new ClearTextCryptoService();
+                    options.BlobSerializer = new JsonBlobSerializer()
+                    {
+                        JsonFormatting = Newtonsoft.Json.Formatting.Indented
+                    };
+                });
+
+                #endregion
+
+                #region Add ExportResourceDbContext (optional)
+
+                services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
+                {
+                    options.ConnectionString = @"c:\temp\identityserver_legacy\storage-export\resources";
+                    options.CryptoService = new ClearTextCryptoService();
+                    options.BlobSerializer = new JsonBlobSerializer()
+                    {
+                        JsonFormatting = Newtonsoft.Json.Formatting.Indented
                     };
                 });
 

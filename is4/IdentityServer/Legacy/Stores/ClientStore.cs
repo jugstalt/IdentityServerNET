@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.DbContext;
+﻿using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using System;

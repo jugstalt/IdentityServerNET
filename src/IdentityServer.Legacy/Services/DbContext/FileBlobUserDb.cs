@@ -1,5 +1,5 @@
 ﻿using IdentityModel;
-using IdentityServer.Legacy.Cryptography;
+using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -11,13 +11,15 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Services.Serialize;
 
-namespace IdentityServer.Legacy.DbContext
+namespace IdentityServer.Legacy.Services.DbContext
 {
     public class FileBlobUserDb : IUserDbContext
     {
         private string _rootPath = null;
         private ICryptoService _cryptoService = null;
+        private IBlobSerializer _blobSerializer;
 
         public FileBlobUserDb(IOptions<UserDbContextConfiguration> options)
         {
@@ -26,6 +28,7 @@ namespace IdentityServer.Legacy.DbContext
 
             _rootPath = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
+            _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
 
             DirectoryInfo di = new DirectoryInfo(_rootPath);
             if(!di.Exists)
@@ -61,7 +64,7 @@ namespace IdentityServer.Legacy.DbContext
             }
 
             byte[] buffer = Encoding.UTF8.GetBytes(
-                _cryptoService.EncryptText(JsonConvert.SerializeObject(user)));
+                _cryptoService.EncryptText(_blobSerializer.SerializeObject(user)));
 
             using (var fs = new FileStream(fi.FullName, FileMode.OpenOrCreate,
                             FileAccess.Write, FileShare.None, buffer.Length, true))
@@ -104,7 +107,7 @@ namespace IdentityServer.Legacy.DbContext
 
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return JsonConvert.DeserializeObject<ApplicationUser>(fileText);
+                return _blobSerializer.DeserializeObject<ApplicationUser>(fileText);
             }
         }
 
@@ -128,7 +131,7 @@ namespace IdentityServer.Legacy.DbContext
             fi.Delete();
 
             byte[] buffer = Encoding.UTF8.GetBytes(
-                _cryptoService.EncryptText(JsonConvert.SerializeObject(user)));
+                _cryptoService.EncryptText(_blobSerializer.SerializeObject(user)));
 
             using (var fs = new FileStream(fi.FullName, FileMode.OpenOrCreate,
                             FileAccess.Write, FileShare.None, buffer.Length, true))

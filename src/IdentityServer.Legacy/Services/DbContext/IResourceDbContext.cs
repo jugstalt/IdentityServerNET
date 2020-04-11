@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Legacy.DbContext
+namespace IdentityServer.Legacy.Services.DbContext
 {
     public interface IResourceDbContext
     {

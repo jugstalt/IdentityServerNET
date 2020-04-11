@@ -4,14 +4,16 @@
 
 @model IEditApiResourcePageModel
 
-
+<h2>Admin Resources</h2>
 <div class="admin-resources">
-   
+    <h4>Modify ApiResource: @Model?.CurrentApiResource?.Name</h4>
+    <hr/>
+
     <div class="row">
         <div class="col-md-3 sidebar">
             <div style="padding:10px">
-                <h2>Admin Resources</h2>
-                <h4>Modify ApiResource: @Model?.CurrentApiResource?.Name</h4>
+                
+                
             </div>
             
             <partial name="_EditApiResourceNav" />

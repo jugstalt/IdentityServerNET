@@ -1,5 +1,5 @@
 ﻿using IdentityModel;
-using IdentityServer.Legacy.DbContext;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Concurrent;

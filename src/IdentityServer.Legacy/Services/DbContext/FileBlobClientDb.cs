@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.Cryptography;
+﻿using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Identity;
@@ -10,13 +10,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Services.Serialize;
 
-namespace IdentityServer.Legacy.DbContext
+namespace IdentityServer.Legacy.Services.DbContext
 {
     public class FileBlobClientDb : IClientDbContext, IClientDbContextModify
     {
-        private string _rootPath = null;
+        protected string _rootPath = null;
         private ICryptoService _cryptoService = null;
+        private IBlobSerializer _blobSerializer = null;
 
         public FileBlobClientDb(IOptions<ClientDbContextConfiguration> options)
         {
@@ -25,6 +27,7 @@ namespace IdentityServer.Legacy.DbContext
 
             _rootPath = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
+            _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
 
             DirectoryInfo di = new DirectoryInfo(_rootPath);
             if (!di.Exists)
@@ -58,7 +61,7 @@ namespace IdentityServer.Legacy.DbContext
                 var fileText = await reader.ReadToEndAsync();
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return JsonConvert.DeserializeObject<Client>(fileText);
+                return _blobSerializer.DeserializeObject<Client>(fileText);
             }
         }
 
@@ -77,7 +80,7 @@ namespace IdentityServer.Legacy.DbContext
             }
 
             byte[] buffer = Encoding.UTF8.GetBytes(
-                _cryptoService.EncryptText(JsonConvert.SerializeObject(client)));
+                _cryptoService.EncryptText(_blobSerializer.SerializeObject(client)));
 
             using (var fs = new FileStream(fi.FullName, FileMode.OpenOrCreate,
                             FileAccess.Write, FileShare.None, buffer.Length, true))
@@ -121,7 +124,7 @@ namespace IdentityServer.Legacy.DbContext
                     var fileText = await reader.ReadToEndAsync();
                     fileText = _cryptoService.DecryptText(fileText);
 
-                    clients.Add(JsonConvert.DeserializeObject<Client>(fileText));
+                    clients.Add(_blobSerializer.DeserializeObject<Client>(fileText));
                 }
             }
 

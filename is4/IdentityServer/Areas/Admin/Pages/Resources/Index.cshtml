@@ -13,4 +13,55 @@
             Create a new Resource or select an existing...
         </p>
     </div>
+
+    @if (Model.HasExports)
+    {
+        <div class="col-md-6">
+            <h4>Export Databases</h4>
+            <ul class="nav nav-pills nav-stacked">
+
+                @if (Model.HasExportClientDbContext)
+                {
+                    <li>
+                        <a asp-page="ExportClientDb">
+                            <div><strong>Export Client Database</strong></div>
+                            <div style="color:#aaa;font-size:.85em">
+                                @Model.ExportClientDbContextType
+                            </div>
+                            <div>
+                                Click to flush target database clients and export...
+                            </div>
+                            @if (!String.IsNullOrEmpty(Model.ExportClientsMessage))
+                            {
+                                <div class="alert alert-info alert-dismissible">
+                                    @Model.ExportClientsMessage
+                                </div>
+                            }
+                        </a>
+                    </li>
+                }
+
+                @if (Model.HasExportResourceDbContext)
+                {
+                    <li>
+                        <a asp-page="ExportResourceDb">
+                            <div>Export Resource Database</div>
+                            <div style="color:#aaa;font-size:.85em">
+                                @Model.ExportResourceDbContextType
+                            </div>
+                            <div>
+                                Click to flush target database resources and export...
+                            </div>
+                            @if (!String.IsNullOrEmpty(Model.ExportResourcesMessage))
+                            {
+                                <div class="alert alert-info alert-dismissible">
+                                    @Model.ExportResourcesMessage
+                                </div>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+     }
 </div>
