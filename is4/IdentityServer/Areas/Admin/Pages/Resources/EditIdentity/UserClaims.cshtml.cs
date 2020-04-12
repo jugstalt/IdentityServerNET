@@ -29,26 +29,29 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentIdentityResourceAsync(Input.IdentityName);
-
-            if (!String.IsNullOrWhiteSpace(Input.UserClaim))
+            return await PostFormHandlerAsync(async () =>
             {
-                List<string> userClaims = new List<string>();
-                if (this.CurrentIdentityResource.UserClaims != null)
+                await LoadCurrentIdentityResourceAsync(Input.IdentityName);
+
+                if (!String.IsNullOrWhiteSpace(Input.UserClaim))
                 {
-                    userClaims.AddRange(this.CurrentIdentityResource.UserClaims);
+                    List<string> userClaims = new List<string>();
+                    if (this.CurrentIdentityResource.UserClaims != null)
+                    {
+                        userClaims.AddRange(this.CurrentIdentityResource.UserClaims);
+                    }
+
+                    if (!userClaims.Contains(Input.UserClaim.ToLower()))
+                    {
+                        userClaims.Add(Input.UserClaim.ToLower());
+                        this.CurrentIdentityResource.UserClaims = userClaims.ToArray();
+
+                        await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource);
+                    }
                 }
 
-                if (!userClaims.Contains(Input.UserClaim.ToLower()))
-                {
-                    userClaims.Add(Input.UserClaim.ToLower());
-                    this.CurrentIdentityResource.UserClaims = userClaims.ToArray();
-
-                    await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource);
-                }
-            }
-
-            return RedirectToPage(new { id = Input.IdentityName });
+                return RedirectToPage(new { id = Input.IdentityName });
+            }, onException: (ex) => RedirectToPage(new { id = Input.IdentityName }));
         }
 
         [BindProperty]

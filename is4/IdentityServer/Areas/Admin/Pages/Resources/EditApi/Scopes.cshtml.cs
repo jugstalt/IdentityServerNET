@@ -33,50 +33,53 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.ApiName);
-
-            string scopeName = Input.Scope?.Name?.Trim().ToLower();
-
-            if (!String.IsNullOrWhiteSpace(scopeName))
+            return await PostFormHandlerAsync(async () =>
             {
-                Input.Scope.Name = scopeName;
+                await LoadCurrentApiResourceAsync(Input.ApiName);
 
-                List<Scope> apiScopes = new List<Scope>();
-                if (this.CurrentApiResource.Scopes != null)
+                string scopeName = Input.Scope?.Name?.Trim().ToLower();
+
+                if (!String.IsNullOrWhiteSpace(scopeName))
                 {
-                    apiScopes.AddRange(this.CurrentApiResource.Scopes);
-                }
+                    Input.Scope.Name = scopeName;
 
-
-                if (CurrentApiResource.Scopes == null)
-                {
-                    CurrentApiResource.Scopes = new Scope[]
+                    List<Scope> apiScopes = new List<Scope>();
+                    if (this.CurrentApiResource.Scopes != null)
                     {
+                        apiScopes.AddRange(this.CurrentApiResource.Scopes);
+                    }
+
+
+                    if (CurrentApiResource.Scopes == null)
+                    {
+                        CurrentApiResource.Scopes = new Scope[]
+                        {
                         Input.Scope
-                    };
+                        };
+                    }
+                    else if (CurrentApiResource.Scopes.Where(s => s.Name == Input.Scope.Name).Count() == 0)
+                    {
+                        // Insert new
+                        List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes);
+                        scopes.Add(Input.Scope);
+
+                        CurrentApiResource.Scopes = scopes.ToArray();
+                    }
+                    else
+                    {
+                        // Replace
+                        List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes
+                            .Where(s => s.Name != Input.Scope.Name && !String.IsNullOrWhiteSpace(s.Name)));
+                        scopes.Add(Input.Scope);
+
+                        CurrentApiResource.Scopes = scopes.ToArray();
+                    }
                 }
-                else if (CurrentApiResource.Scopes.Where(s => s.Name == Input.Scope.Name).Count() == 0)
-                {
-                    // Insert new
-                    List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes);
-                    scopes.Add(Input.Scope);
 
-                    CurrentApiResource.Scopes = scopes.ToArray();
-                }
-                else
-                {
-                    // Replace
-                    List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes
-                        .Where(s => s.Name != Input.Scope.Name && !String.IsNullOrWhiteSpace(s.Name)));
-                    scopes.Add(Input.Scope);
+                await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
 
-                    CurrentApiResource.Scopes = scopes.ToArray();
-                }
-            }
-
-            await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
-
-            return RedirectToPage(new { id = Input.ApiName });
+                return RedirectToPage(new { id = Input.ApiName });
+            }, onException: (ex) => RedirectToPage(new { id = Input.ApiName }));
         }
 
         [BindProperty]

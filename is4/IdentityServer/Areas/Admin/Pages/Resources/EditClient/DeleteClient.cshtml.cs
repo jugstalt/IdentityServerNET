@@ -29,15 +29,19 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
-
-            if (Input.ConfirmClientId == CurrentClient.ClientId)
+            return await PostFormHandlerAsync(async () =>
             {
-                await _clientDb.RemoveClientAsync(this.CurrentClient);
-                return RedirectToPage("../Clients");
-            }
+                await LoadCurrentClientAsync(Input.ClientId);
 
-            return RedirectToPage(new { id = this.CurrentClient.ClientId });
+                if (Input.ConfirmClientId == CurrentClient.ClientId)
+                {
+                    await _clientDb.RemoveClientAsync(this.CurrentClient);
+                    return RedirectToPage("../Clients");
+                } else
+                {
+                    throw new Exception("Please type the correct client id");
+                }
+            }, onException: (ex) => RedirectToPage(new { id = this.CurrentClient.ClientId }));
         }
 
         [BindProperty]

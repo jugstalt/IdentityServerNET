@@ -31,31 +31,34 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.ApiName);
-
-            if (!String.IsNullOrWhiteSpace(Input.Secret))
+            return await PostFormHandlerAsync(async () =>
             {
-                var secret = new Secret()
-                {
-                    Type = Input.SecretType,
-                    Value = Input.Secret.Trim().ToSha256(),
-                    Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
-                    Expiration = Input.Expiration
-                };
+                await LoadCurrentApiResourceAsync(Input.ApiName);
 
-                List<Secret> clientSecrets = new List<Secret>();
-                if (this.CurrentApiResource.ApiSecrets != null)
+                if (!String.IsNullOrWhiteSpace(Input.Secret))
                 {
-                    clientSecrets.AddRange(this.CurrentApiResource.ApiSecrets);
+                    var secret = new Secret()
+                    {
+                        Type = Input.SecretType,
+                        Value = Input.Secret.Trim().ToSha256(),
+                        Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
+                        Expiration = Input.Expiration
+                    };
+
+                    List<Secret> clientSecrets = new List<Secret>();
+                    if (this.CurrentApiResource.ApiSecrets != null)
+                    {
+                        clientSecrets.AddRange(this.CurrentApiResource.ApiSecrets);
+                    }
+                    clientSecrets.Add(secret);
+
+                    this.CurrentApiResource.ApiSecrets = clientSecrets.ToArray();
+
+                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
                 }
-                clientSecrets.Add(secret);
 
-                this.CurrentApiResource.ApiSecrets = clientSecrets.ToArray();
-
-                await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
-            }
-
-            return RedirectToPage(new { id = Input.ApiName });
+                return RedirectToPage(new { id = Input.ApiName });
+            }, onException: (ex) => RedirectToPage(new { id = Input.ApiName }));
         }
 
         [BindProperty]

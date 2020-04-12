@@ -29,15 +29,19 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentIdentityResourceAsync(Input.IdentityName);
-
-            if (Input.ConfirmIdentityName == CurrentIdentityResource.Name)
+            return await PostFormHandlerAsync(async () =>
             {
-                await _resourceDb.RemoveIdentityResourceAsync(this.CurrentIdentityResource);
-                return RedirectToPage("../Identities");
-            }
+                await LoadCurrentIdentityResourceAsync(Input.IdentityName);
 
-            return RedirectToPage(new { id = this.CurrentIdentityResource.Name });
+                if (Input.ConfirmIdentityName == CurrentIdentityResource.Name)
+                {
+                    await _resourceDb.RemoveIdentityResourceAsync(this.CurrentIdentityResource);
+                    return RedirectToPage("../Identities");
+                } else
+                {
+                    throw new Exception("Please type the correct identity resource name");
+                }
+            }, onException: (ex)=> RedirectToPage(new { id = this.CurrentIdentityResource.Name }));
         }
 
         [BindProperty]

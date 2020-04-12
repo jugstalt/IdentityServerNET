@@ -32,14 +32,18 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentClientAsync(Input.ClientId);
 
-            CurrentClient.ClientName = Input.ClientName;
-            CurrentClient.Description = Input.ClientDescription;
+                CurrentClient.ClientName = Input.ClientName;
+                CurrentClient.Description = Input.ClientDescription;
 
-            await _clientDb.UpdateClientAsync(CurrentClient);
+                await _clientDb.UpdateClientAsync(CurrentClient);
+                StatusMessage = "The client has been updated";
 
-            return Page();
+                return Page();
+            });   
         }
 
         [BindProperty]

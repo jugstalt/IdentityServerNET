@@ -31,21 +31,24 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         async public Task<IActionResult> OnPostAsync()
         {
-            // is valid client id
-            string identityName = Input.IdentityResourceName.Trim().ToLower();
-
-            if (_resourceDb != null)
+            return await PostFormHandlerAsync(async () =>
             {
-                var identityResource = new IdentityResource()
+                // is valid client id
+                string identityName = Input.IdentityResourceName.Trim().ToLower();
+
+                if (_resourceDb != null)
                 {
-                    Name=Input.IdentityResourceName,
-                    DisplayName = Input.IdentityResourceDisplayName
-                };
+                    var identityResource = new IdentityResource()
+                    {
+                        Name = Input.IdentityResourceName,
+                        DisplayName = Input.IdentityResourceDisplayName
+                    };
 
-                await _resourceDb.AddIdentityResourceAsync(identityResource);
-            }
+                    await _resourceDb.AddIdentityResourceAsync(identityResource);
+                }
 
-            return RedirectToPage("EditIdentity/Index", new { id = identityName });
+                return RedirectToPage("EditIdentity/Index", new { id = identityName });
+            });
         }
 
         public IEnumerable<IdentityResource> IdentityResources { get; set; }

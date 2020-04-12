@@ -31,31 +31,34 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
-
-            if(!String.IsNullOrWhiteSpace(Input.Secret))
+            return await PostFormHandlerAsync(async () =>
             {
-                var secret = new Secret()
-                {
-                    Type = Input.SecretType,
-                    Value = Input.Secret.Trim().ToSha256(),
-                    Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
-                    Expiration = Input.Expiration
-                };
+                await LoadCurrentClientAsync(Input.ClientId);
 
-                List<Secret> clientSecrets = new List<Secret>();
-                if(this.CurrentClient.ClientSecrets!=null)
+                if (!String.IsNullOrWhiteSpace(Input.Secret))
                 {
-                    clientSecrets.AddRange(this.CurrentClient.ClientSecrets);
+                    var secret = new Secret()
+                    {
+                        Type = Input.SecretType,
+                        Value = Input.Secret.Trim().ToSha256(),
+                        Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
+                        Expiration = Input.Expiration
+                    };
+
+                    List<Secret> clientSecrets = new List<Secret>();
+                    if (this.CurrentClient.ClientSecrets != null)
+                    {
+                        clientSecrets.AddRange(this.CurrentClient.ClientSecrets);
+                    }
+                    clientSecrets.Add(secret);
+
+                    this.CurrentClient.ClientSecrets = clientSecrets.ToArray();
+
+                    await _clientDb.UpdateClientAsync(this.CurrentClient);
                 }
-                clientSecrets.Add(secret);
 
-                this.CurrentClient.ClientSecrets = clientSecrets.ToArray();
-
-                await _clientDb.UpdateClientAsync(this.CurrentClient);
-            }
-
-            return RedirectToPage(new { id = Input.ClientId });
+                return RedirectToPage(new { id = Input.ClientId });
+            }, onException: (ex) => RedirectToPage(new { id = Input.ClientId }));
         }
 
         [BindProperty]

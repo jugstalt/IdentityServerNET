@@ -29,17 +29,20 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         async public Task<IActionResult> OnPostAsync()
         {
-            // is valid client id
-            string apiName = Input.ApiResourceName.Trim().ToLower();
-
-            if (_resourceDb != null)
+            return await PostFormHandlerAsync(async () =>
             {
-                var apiResource = new ApiResource(apiName, Input.ApiResourceDisplayName);
+                // is valid client id
+                string apiName = Input.ApiResourceName.Trim().ToLower();
 
-                await _resourceDb.AddApiResourceAsync(apiResource);
-            }
+                if (_resourceDb != null)
+                {
+                    var apiResource = new ApiResource(apiName, Input.ApiResourceDisplayName);
 
-            return RedirectToPage("EditApi/Index", new { id = apiName });
+                    await _resourceDb.AddApiResourceAsync(apiResource);
+                }
+
+                return RedirectToPage("EditApi/Index", new { id = apiName });
+            });
         }
 
         public IEnumerable<ApiResource> ApiResources { get; set; }

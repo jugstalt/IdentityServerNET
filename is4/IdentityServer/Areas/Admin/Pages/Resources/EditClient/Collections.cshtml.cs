@@ -30,25 +30,28 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
-
-            string[] values = Input.PropertyValue == null ?
-                               new string[0] :
-                               Input.PropertyValue
-                                   .Replace("\r", "")
-                                   .Split('\n')
-                                   .Select(v => v.Trim())
-                                   .Where(v => !String.IsNullOrEmpty(v))
-                                   .ToArray();
-
-            var propertyInfo = typeof(Client).GetProperty(Input.PropertyName);
-            if(propertyInfo!=null)
+            return await PostFormHandlerAsync(async () =>
             {
-                propertyInfo.SetValue(this.CurrentClient, values);
-                await _clientDb.UpdateClientAsync(this.CurrentClient);
-            }
+                await LoadCurrentClientAsync(Input.ClientId);
 
-            return Page();
+                string[] values = Input.PropertyValue == null ?
+                                   new string[0] :
+                                   Input.PropertyValue
+                                       .Replace("\r", "")
+                                       .Split('\n')
+                                       .Select(v => v.Trim())
+                                       .Where(v => !String.IsNullOrEmpty(v))
+                                       .ToArray();
+
+                var propertyInfo = typeof(Client).GetProperty(Input.PropertyName);
+                if (propertyInfo != null)
+                {
+                    propertyInfo.SetValue(this.CurrentClient, values);
+                    await _clientDb.UpdateClientAsync(this.CurrentClient);
+                }
+
+                return Page();
+            });
         }
 
         [BindProperty]

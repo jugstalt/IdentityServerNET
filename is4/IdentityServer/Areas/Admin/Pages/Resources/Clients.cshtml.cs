@@ -31,21 +31,24 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         async public Task<IActionResult> OnPostAsync()
         {
-            // is valid client id
-            string clientId = Input.ClientId.Trim().ToLower();
-
-            if (_clientDb != null)
+            return await PostFormHandlerAsync(async () =>
             {
-                var client = new Client()
+                // is valid client id
+                string clientId = Input.ClientId.Trim().ToLower();
+
+                if (_clientDb != null)
                 {
-                    ClientId = clientId,
-                    ClientName = Input.ClientName.Trim()
-                };
+                    var client = new Client()
+                    {
+                        ClientId = clientId,
+                        ClientName = Input.ClientName?.Trim()
+                    };
 
-                await _clientDb.AddClientAsync(client);
-            }
+                    await _clientDb.AddClientAsync(client);
+                }
 
-            return RedirectToPage("EditClient/Index", new { id = clientId });
+                return RedirectToPage("EditClient/Index", new { id = clientId });
+            });
         }
 
         public IEnumerable<Client> Clients { get; set; }

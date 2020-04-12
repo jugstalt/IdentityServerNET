@@ -31,46 +31,49 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
-
-            var inputClient = Input.Client;
-            var hasChanges = false;
-
-            foreach (var propertyInfo in typeof(Client).GetProperties())
+            return await PostFormHandlerAsync(async () =>
             {
-               
-                if (!Input.IgnoreProperties.Contains(propertyInfo.Name) && 
-                    propertyInfo.CanWrite &&
-                    propertyInfo.CanRead &&
-                    (propertyInfo.PropertyType == typeof(string) || propertyInfo.PropertyType == typeof(int)))
+                await LoadCurrentClientAsync(Input.ClientId);
+
+                var inputClient = Input.Client;
+                var hasChanges = false;
+
+                foreach (var propertyInfo in typeof(Client).GetProperties())
                 {
-                    if (propertyInfo.PropertyType == typeof(string))
+
+                    if (!Input.IgnoreProperties.Contains(propertyInfo.Name) &&
+                        propertyInfo.CanWrite &&
+                        propertyInfo.CanRead &&
+                        (propertyInfo.PropertyType == typeof(string) || propertyInfo.PropertyType == typeof(int)))
                     {
-                        if (!String.IsNullOrWhiteSpace(propertyInfo.GetValue(this.CurrentClient)?.ToString()) &&
-                            !String.IsNullOrWhiteSpace(propertyInfo.GetValue(inputClient)?.ToString()) &&
-                            !propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
+                        if (propertyInfo.PropertyType == typeof(string))
                         {
-                            propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
-                            hasChanges = true;
+                            if (!String.IsNullOrWhiteSpace(propertyInfo.GetValue(this.CurrentClient)?.ToString()) &&
+                                !String.IsNullOrWhiteSpace(propertyInfo.GetValue(inputClient)?.ToString()) &&
+                                !propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
+                            {
+                                propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
+                                hasChanges = true;
+                            }
                         }
-                    }
-                    if (propertyInfo.PropertyType == typeof(int))
-                    {
-                        if(!propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
+                        if (propertyInfo.PropertyType == typeof(int))
                         {
-                            propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
-                            hasChanges = true;
+                            if (!propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
+                            {
+                                propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
+                                hasChanges = true;
+                            }
                         }
                     }
                 }
-            }
 
-            if(hasChanges)
-            {
-                await _clientDb.UpdateClientAsync(this.CurrentClient);
-            }
+                if (hasChanges)
+                {
+                    await _clientDb.UpdateClientAsync(this.CurrentClient);
+                }
 
-            return Page();
+                return Page();
+            });
         }
 
         [BindProperty]

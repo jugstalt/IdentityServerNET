@@ -29,15 +29,23 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.ApiName);
-
-            if (Input.ConfirmApiName == CurrentApiResource.Name)
+            return await PostFormHandlerAsync(async () =>
             {
-                await _resourceDb.RemoveApiResourceAsync(this.CurrentApiResource);
-                return RedirectToPage("../Apis");
-            }
+                await LoadCurrentApiResourceAsync(Input.ApiName);
 
-            return RedirectToPage(new { id = this.CurrentApiResource.Name });
+                if (Input.ConfirmApiName == CurrentApiResource.Name)
+                {
+                    await _resourceDb.RemoveApiResourceAsync(this.CurrentApiResource);
+                    return RedirectToPage("../Apis");
+                }
+                else
+                {
+                    throw new Exception("Please type the correct api resource name");
+                }
+            }, onException: (ex) =>
+            {
+                return RedirectToPage(new { id = this.CurrentApiResource.Name });
+            });
         }
 
         [BindProperty]

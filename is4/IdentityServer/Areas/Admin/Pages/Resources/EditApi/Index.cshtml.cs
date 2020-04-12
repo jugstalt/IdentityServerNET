@@ -31,14 +31,17 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.Name);
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentApiResourceAsync(Input.Name);
 
-            CurrentApiResource.DisplayName = Input.DisplayName;
-            CurrentApiResource.Description = Input.Decription;
+                CurrentApiResource.DisplayName = Input.DisplayName;
+                CurrentApiResource.Description = Input.Decription;
 
-            await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
+                await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
 
-            return Page();
+                return Page();
+            });
         }
 
         [BindProperty]

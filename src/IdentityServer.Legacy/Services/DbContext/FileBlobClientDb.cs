@@ -97,6 +97,10 @@ namespace IdentityServer.Legacy.Services.DbContext
             {
                 fi.Delete();
             }
+            else
+            {
+                throw new Exception("Client not exists");
+            }
 
             return Task.CompletedTask;
         }
@@ -108,6 +112,10 @@ namespace IdentityServer.Legacy.Services.DbContext
             if (fi.Exists)
             {
                 fi.Delete();
+            } 
+            else
+            {
+                throw new Exception("Client not exists");
             }
 
             await AddClientAsync(client);

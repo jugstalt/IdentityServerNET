@@ -30,25 +30,28 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentApiResourceAsync(Input.ApiName);
-
-            string[] values = Input.PropertyValue == null ?
-                                new string[0] :
-                                Input.PropertyValue
-                                    .Replace("\r", "")
-                                    .Split('\n')
-                                    .Select(v => v.Trim())
-                                    .Where(v => !String.IsNullOrEmpty(v))
-                                    .ToArray();
-
-            var propertyInfo = typeof(ApiResource).GetProperty(Input.PropertyName);
-            if (propertyInfo != null)
+            return await PostFormHandlerAsync(async () =>
             {
-                propertyInfo.SetValue(this.CurrentApiResource, values);
-                await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
-            }
+                await LoadCurrentApiResourceAsync(Input.ApiName);
 
-            return Page();
+                string[] values = Input.PropertyValue == null ?
+                                    new string[0] :
+                                    Input.PropertyValue
+                                        .Replace("\r", "")
+                                        .Split('\n')
+                                        .Select(v => v.Trim())
+                                        .Where(v => !String.IsNullOrEmpty(v))
+                                        .ToArray();
+
+                var propertyInfo = typeof(ApiResource).GetProperty(Input.PropertyName);
+                if (propertyInfo != null)
+                {
+                    propertyInfo.SetValue(this.CurrentApiResource, values);
+                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
+                }
+
+                return Page();
+            });
         }
 
         [BindProperty]

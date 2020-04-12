@@ -31,14 +31,17 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentIdentityResourceAsync(Input.Name);
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentIdentityResourceAsync(Input.Name);
 
-            CurrentIdentityResource.DisplayName = Input.DisplayName;
-            CurrentIdentityResource.Description = Input.Decription;
+                CurrentIdentityResource.DisplayName = Input.DisplayName;
+                CurrentIdentityResource.Description = Input.Decription;
 
-            await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource);
+                await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource);
 
-            return Page();
+                return Page();
+            });
         }
 
         [BindProperty]

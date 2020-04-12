@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 {
-    public class EditIdentityResourcePageModel : PageModel, IEditIdentityResourcePageModel
+    public class EditIdentityResourcePageModel : AdminPageModel, IEditIdentityResourcePageModel
     {
         public EditIdentityResourcePageModel(IResourceDbContext resourceDbContext)
         {

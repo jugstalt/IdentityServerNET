@@ -29,27 +29,30 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            await LoadCurrentClientAsync(Input.ClientId);
-
-            if(!String.IsNullOrWhiteSpace(Input.ScopeName))
+            return await PostFormHandlerAsync(async () =>
             {
-                List<string> allowedScopes = new List<string>();
-                if(this.CurrentClient.AllowedScopes!=null)
+                await LoadCurrentClientAsync(Input.ClientId);
+
+                if (!String.IsNullOrWhiteSpace(Input.ScopeName))
                 {
-                    allowedScopes.AddRange(this.CurrentClient.AllowedScopes);
+                    List<string> allowedScopes = new List<string>();
+                    if (this.CurrentClient.AllowedScopes != null)
+                    {
+                        allowedScopes.AddRange(this.CurrentClient.AllowedScopes);
+                    }
+
+                    if (!allowedScopes.Contains(Input.ScopeName.ToLower()))
+                    {
+                        allowedScopes.Add(Input.ScopeName.ToLower());
+                        this.CurrentClient.AllowedScopes = allowedScopes.ToArray();
+
+                        await _clientDb.UpdateClientAsync(this.CurrentClient);
+                        //await SetCurrentClient(Input.ClientId); // Reload
+                    }
                 }
 
-                if(!allowedScopes.Contains(Input.ScopeName.ToLower()))
-                {
-                    allowedScopes.Add(Input.ScopeName.ToLower());
-                    this.CurrentClient.AllowedScopes = allowedScopes.ToArray();
-
-                    await _clientDb.UpdateClientAsync(this.CurrentClient);
-                    //await SetCurrentClient(Input.ClientId); // Reload
-                }
-            } 
-
-            return RedirectToPage(new { id = Input.ClientId });
+                return RedirectToPage(new { id = Input.ClientId });
+            }, onException: (ex) => RedirectToPage(new { id = Input.ClientId }));
         }
 
         [BindProperty]
