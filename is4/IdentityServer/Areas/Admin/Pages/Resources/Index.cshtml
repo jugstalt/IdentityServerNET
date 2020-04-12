@@ -5,19 +5,48 @@
     ViewData["ActivePage"] = "Index";
 }
 
-<h4>@ViewData["Title"]</h4>
 <div class="row">
     <div class="col-md-6">
+        <h4>@ViewData["Title"]</h4>
         <p>
             From this page you can admin IdentityServer Resources.
-            Create a new Resource or select an existing...
+            Create a new Resource or select an existing.
+        </p>
+        <h4>Identity Resources</h4>
+        <p>
+            Identity resources are data like user ID, name, or email address of a user. 
+            An identity resource has a unique name, and you can assign arbitrary claim types to it.
+            These claims will then be included in the identity token for the user. 
+            The client will use the <i>scope</i> parameter to request access to an identity resource.
+        </p>
+        <h4>Api Resources</h4>
+        <p>
+            To allow clients to request access tokens for APIs, 
+            API resources as to be defined.
+
+            To get access tokens for APIs, you also need to register them as a scope.
+        </p>
+        <h4>Clients</h4>
+        <p>
+            Clients represent applications that can request tokens from your identityserver.
+
+            The details vary, but typically this are the common settings for a client:
+
+            <ul>
+                <li>a unique client ID</li>
+                <li>a secret if needed</li>
+                <li>the allowed interactions with the token service (called a grant type)</li>
+                <li>a network location where identity and/or access token gets sent to (called a redirect URI)</li>
+                <li>a list of scopes (aka resources) the client is allowed to access</li>
+            </ul>
+
         </p>
     </div>
 
     @if (Model.HasExports)
     {
         <div class="col-md-6">
-            <h4>Export Databases</h4>
+            <h4>Export/Backup Databases</h4>
             <ul class="nav nav-pills nav-stacked">
 
                 @if (Model.HasExportClientDbContext)
@@ -26,7 +55,7 @@
                         <a asp-page="ExportClientDb">
                             <div><strong>Export Client Database</strong></div>
                             <div style="color:#aaa;font-size:.85em">
-                                @Model.ExportClientDbContextType
+                                to @Model.ExportClientDbContextType
                             </div>
                             <div>
                                 Click to flush target database clients and export...
@@ -47,7 +76,7 @@
                         <a asp-page="ExportResourceDb">
                             <div>Export Resource Database</div>
                             <div style="color:#aaa;font-size:.85em">
-                                @Model.ExportResourceDbContextType
+                                to @Model.ExportResourceDbContextType
                             </div>
                             <div>
                                 Click to flush target database resources and export...

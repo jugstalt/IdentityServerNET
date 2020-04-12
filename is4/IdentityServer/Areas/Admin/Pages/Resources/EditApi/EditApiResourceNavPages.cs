@@ -22,7 +22,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public static string Options => "Options";
 
-        public static string DeleteClient => "DeleteClient";
+        public static string DeleteApi => "DeleteApi";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
@@ -38,7 +38,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         public static string OptionsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Options);
 
-        public static string DeleteApiNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteClient);
+        public static string DeleteApiNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteApi);
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

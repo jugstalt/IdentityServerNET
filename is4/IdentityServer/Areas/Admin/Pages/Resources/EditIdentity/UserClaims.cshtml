@@ -1,0 +1,40 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Resources.EditIdentity.UserClaimsModel
+@{
+    ViewData["Title"] = "User Claims";
+    ViewData["ActivePage"] = EditIdentityResourceNavPages.UserClaims;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="row">
+    <div class="col-md-6">
+        @if (Model.CurrentIdentityResource.UserClaims != null)
+        {
+            <ul class="nav nav-pills nav-stacked">
+
+                @foreach (var userClaim in Model.CurrentIdentityResource.UserClaims)
+                {
+                    <li style="border-bottom:1px solid #eee">
+                        <div style="display:inline-block;padding:10px 15px 10px 5px">@(userClaim)</div>
+                        <a style="display:inline-block;float:right"
+                           asp-page="./RemoveUserClaim"
+                           asp-route-id="@Model.CurrentIdentityResource.Name"
+                           asp-route-userClaim="@userClaim">Remove</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    <div class="col-md-6">
+        <form id="-form" method="post">
+            <h4>New Scope</h4>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" asp-for="Input.IdentityName" />
+            <div class="form-group">
+                <input asp-for="Input.UserClaim" class="form-control" placeholder="New scope name" />
+                <span asp-validation-for="Input.UserClaim" class="text-danger"></span>
+            </div>
+            <button id="add-scope-button" type="submit" class="btn btn-default">Add</button>
+        </form>
+    </div>
+</div>

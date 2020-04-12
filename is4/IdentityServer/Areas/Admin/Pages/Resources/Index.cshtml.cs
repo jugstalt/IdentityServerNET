@@ -21,9 +21,9 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
         }
 
         public bool HasExportClientDbContext => _exportClientDb != null;
-        public string ExportClientDbContextType => _exportClientDb?.GetType().ToString();
+        public string ExportClientDbContextType => _exportClientDb?.GetType().ToString().Split('.').Last();
         public bool HasExportResourceDbContext => _exportResourceDb != null;
-        public string ExportResourceDbContextType => _exportResourceDb?.GetType().ToString();
+        public string ExportResourceDbContextType => _exportResourceDb?.GetType().ToString().Split('.').Last();
 
         public bool HasExports => HasExportClientDbContext || HasExportResourceDbContext;
 

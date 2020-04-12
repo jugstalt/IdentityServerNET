@@ -1,0 +1,24 @@
+﻿@model IEditIdentityResourcePageModel
+
+    <ul class="nav nav-pills nav-stacked">
+        <li class="">
+            <a asp-page="../Identities"
+               asp-route-id="@Model?.CurrentIdentityResource?.Name">..</a>
+        </li>
+        <li class="@EditIdentityResourceNavPages.IndexNavClass(ViewContext)">
+            <a asp-page="./Index"
+               asp-route-id="@Model?.CurrentIdentityResource?.Name">Name</a>
+        </li>
+        <li class="@EditIdentityResourceNavPages.UserClaimsNavClass(ViewContext)">
+            <a asp-page="./UserClaims"
+               asp-route-id="@Model?.CurrentIdentityResource?.Name">User Claims</a>
+        </li>
+        <li class="@EditIdentityResourceNavPages.OptionsNavClass(ViewContext)">
+            <a asp-page="./Options"
+               asp-route-id="@Model?.CurrentIdentityResource?.Name">Options</a>
+        </li>
+        <li class="@EditIdentityResourceNavPages.DeleteIdentityNavClass(ViewContext)">
+            <a asp-page="./DeleteIdentity"
+               asp-route-id="@Model?.CurrentIdentityResource?.Name">Delete</a>
+        </li>
+    </ul>

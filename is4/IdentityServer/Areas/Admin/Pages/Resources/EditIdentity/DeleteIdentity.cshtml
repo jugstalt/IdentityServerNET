@@ -1,0 +1,22 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Resources.EditIdentity.DeleteIdentityModel
+@{
+    ViewData["Title"] = "Delete Identity Resource";
+    ViewData["ActivePage"] = EditIdentityResourceNavPages.DeleteIdentity;
+}
+
+    <div class="row">
+        <div class="col-md-6">
+            <form id="-form" method="post">
+                <h4>@ViewData["Title"]</h4>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <input type="hidden" asp-for="Input.IdentityName" />
+                <div class="form-group">
+                    <label>Type identity name</label>
+                    <input asp-for="Input.ConfirmIdentityName" class="form-control" />
+                    <span asp-validation-for="Input.ConfirmIdentityName" class="text-danger"></span>
+                </div>
+                <button id="delete-client-button" type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>

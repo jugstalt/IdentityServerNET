@@ -41,10 +41,14 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                 {
                     options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
                     options.CryptoService = new Base64CryptoService();
-                    options.IntialApiResources = new ApiResource[]
+                    options.InitialApiResources = new ApiResource[]
                     {
                         new ApiResource("api1","My Api1"),
                         new ApiResource("api2","My Api2")
+                    };
+                    options.InitialIdentityResources = new IdentityResource[]
+                    {
+
                     };
                 });
 

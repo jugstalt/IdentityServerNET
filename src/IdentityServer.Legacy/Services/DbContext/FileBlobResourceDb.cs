@@ -33,13 +33,18 @@ namespace IdentityServer.Legacy.Services.DbContext
             {
                 di.Create();
 
-                // Initialize Api Clients
-                if (options.Value.IntialApiResources != null)
+                // Initialize Api Resources
+                if (options.Value.InitialApiResources != null)
                 {
-                    foreach (var apiResource in options.Value.IntialApiResources)
+                    foreach (var apiResource in options.Value.InitialApiResources)
                     {
                         AddApiResourceAsync(apiResource).Wait();
                     }
+                }
+                // Initialize Identity Resources
+                if(options.Value.InitialIdentityResources !=null)
+                {
+
                 }
             }
         }
@@ -139,6 +144,86 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
 
             return apiResources;
+        }
+
+        async public Task<IdentityResource> FindIdentityResource(string name)
+        {
+            FileInfo fi = new FileInfo($"{ _rootPath }/{ name.NameToHexId(_cryptoService) }.identity");
+
+            if (!fi.Exists)
+            {
+                return null;
+            }
+
+            using (var reader = File.OpenText(fi.FullName))
+            {
+                var fileText = await reader.ReadToEndAsync();
+                fileText = _cryptoService.DecryptText(fileText);
+
+                return _blobSerializer.DeserializeObject<IdentityResource>(fileText);
+            }
+        }
+
+        async public Task<IEnumerable<IdentityResource>> GetAllIdentityResources()
+        {
+            List<IdentityResource> identityResources = new List<IdentityResource>();
+
+            foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.identity"))
+            {
+                using (var reader = File.OpenText(fi.FullName))
+                {
+                    var fileText = await reader.ReadToEndAsync();
+                    fileText = _cryptoService.DecryptText(fileText);
+
+                    identityResources.Add(_blobSerializer.DeserializeObject<IdentityResource>(fileText));
+                }
+            }
+
+            return identityResources;
+        }
+
+        async public Task AddIdentityResourceAsync(IdentityResource identityResource)
+        {
+            string id = identityResource.Name.NameToHexId(_cryptoService);
+            FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.identity");
+
+            if (fi.Exists)
+            {
+                throw new Exception("Identity resource already exists");
+            }
+
+            byte[] buffer = Encoding.UTF8.GetBytes(
+                _cryptoService.EncryptText(_blobSerializer.SerializeObject(identityResource)));
+
+            using (var fs = new FileStream(fi.FullName, FileMode.OpenOrCreate,
+                            FileAccess.Write, FileShare.None, buffer.Length, true))
+            {
+                await fs.WriteAsync(buffer, 0, buffer.Length);
+            }
+        }
+
+        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource)
+        {
+            FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            await AddIdentityResourceAsync(identityResource);
+        }
+
+        public Task RemoveIdentityResourceAsync(IdentityResource identityResource)
+        {
+            FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
+
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            return Task.CompletedTask;
         }
 
         #endregion

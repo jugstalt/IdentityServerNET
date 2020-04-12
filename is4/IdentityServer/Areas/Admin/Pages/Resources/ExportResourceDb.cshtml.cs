@@ -24,7 +24,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
         async public Task<IActionResult> OnGetAsync()
         {
             var apiResources = await _resourcetDb.GetAllApiResources();
-            var count = apiResources.Count();
+            var identityResources = await _resourcetDb.GetAllIdentityResources();
+            
+            var count = apiResources.Count() + identityResources.Count();
+
             string msg = String.Empty;
 
             try
@@ -36,6 +39,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
                     foreach (var apiResource in apiResources)
                     {
                         await _exportResourceDb.AddApiResourceAsync(apiResource);
+                    }
+
+                    foreach(var indentityResource in identityResources)
+                    {
+                        await _exportResourceDb.AddIdentityResourceAsync(indentityResource);
                     }
 
                     msg = $"Flushed target Db and exported { count } resources";

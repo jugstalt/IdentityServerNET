@@ -9,7 +9,8 @@ namespace IdentityServer.Legacy.DependencyInjection
 {
     public class ResourceDbContextConfiguration
     {
-        public IEnumerable<ApiResource> IntialApiResources { get; set; }
+        public IEnumerable<ApiResource> InitialApiResources { get; set; }
+        public IEnumerable<IdentityResource> InitialIdentityResources { get; set; }
 
         public string ConnectionString { get; set; }
         public ICryptoService CryptoService { get; set; }

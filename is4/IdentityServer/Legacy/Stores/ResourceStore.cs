@@ -60,7 +60,7 @@ namespace IdentityServer.Legacy
             return Task.FromResult<IEnumerable<IdentityResource>>(identityResources.ToArray());
         }
 
-        public Task<Resources> GetAllResourcesAsync()
+        async public Task<Resources> GetAllResourcesAsync()
         {
             var resources = new Resources();
 
@@ -78,7 +78,12 @@ namespace IdentityServer.Legacy
                 //new IdentityResources.Phone(),
             };
 
-            return Task.FromResult(resources);
+            if(_resourcedbContext is IResourceDbContextModify)
+            {
+                resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources()).ToArray();
+            }
+
+            return resources;
         }
     }
 }

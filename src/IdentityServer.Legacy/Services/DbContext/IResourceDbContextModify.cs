@@ -12,6 +12,8 @@ namespace IdentityServer.Legacy.Services.DbContext
         Task UpdateApiResourceAsync(ApiResource apiResource);
         Task RemoveApiResourceAsync(ApiResource apiResource);
 
-        Task<IEnumerable<ApiResource>> GetAllApiResources();
+        Task AddIdentityResourceAsync(IdentityResource identityResource);
+        Task UpdateIdentityResourceAsync(IdentityResource identityResource);
+        Task RemoveIdentityResourceAsync(IdentityResource identityResource);
     }
 }

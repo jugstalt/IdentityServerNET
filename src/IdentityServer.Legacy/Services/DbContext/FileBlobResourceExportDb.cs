@@ -30,6 +30,11 @@ namespace IdentityServer.Legacy.Services.DbContext
                 fi.Delete();
             }
 
+            foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.identity").ToArray())
+            {
+                fi.Delete();
+            }
+
             return Task.CompletedTask;
         }
 

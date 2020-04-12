@@ -2,11 +2,11 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-@model IEditApiResourcePageModel
+@model IEditIdentityResourcePageModel
 
 <h2>Admin Resources</h2>
 <div class="admin-resources">
-    <h4>Modify API Resource: @Model?.CurrentApiResource?.Name</h4>
+    <h4>Modify Identity Resource: @Model?.CurrentIdentityResource?.Name</h4>
     <hr/>
 
     <div class="row">
@@ -16,7 +16,7 @@
                 
             </div>
             
-            <partial name="_EditApiResourceNav" />
+            <partial name="_EditIdentityResourceNav" />
         </div>
         <div class="col-md-9">
             @RenderBody()
