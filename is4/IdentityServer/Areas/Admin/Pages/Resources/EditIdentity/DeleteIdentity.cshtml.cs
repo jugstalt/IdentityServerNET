@@ -36,12 +36,15 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
                 if (Input.ConfirmIdentityName == CurrentIdentityResource.Name)
                 {
                     await _resourceDb.RemoveIdentityResourceAsync(this.CurrentIdentityResource);
-                    return RedirectToPage("../Identities");
-                } else
+                }
+                else
                 {
                     throw new Exception("Please type the correct identity resource name");
                 }
-            }, onException: (ex)=> RedirectToPage(new { id = this.CurrentIdentityResource.Name }));
+            }
+            , onFinally: () => RedirectToPage("../Identities")
+            , successMessage: "Identity resource successfully deleted"
+            , onException: (ex) => RedirectToPage(new { id = Input.IdentityName }));
         }
 
         [BindProperty]

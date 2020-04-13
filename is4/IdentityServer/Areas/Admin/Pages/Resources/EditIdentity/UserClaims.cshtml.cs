@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
@@ -27,8 +28,30 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
             return Page();
         }
 
+        async public Task<IActionResult> OnGetRemoveAsync(string id, string userClaim)
+        {
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentIdentityResourceAsync(id);
+
+                this.CurrentIdentityResource.UserClaims = this.CurrentIdentityResource
+                                                        .UserClaims
+                                                        .Where(c => c != userClaim)
+                                                        .ToArray();
+
+                await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource, new[] { "UserClaims" });
+            }
+            , onFinally: () => RedirectToPage(new { id = id })
+            , successMessage: $"Successfully removed user claim '{ userClaim }'");
+        }
+
         async public Task<IActionResult> OnPostAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             return await PostFormHandlerAsync(async () =>
             {
                 await LoadCurrentIdentityResourceAsync(Input.IdentityName);
@@ -46,12 +69,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
                         userClaims.Add(Input.UserClaim.ToLower());
                         this.CurrentIdentityResource.UserClaims = userClaims.ToArray();
 
-                        await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource);
+                        await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource, new[] { "UserClaims" });
                     }
                 }
-
-                return RedirectToPage(new { id = Input.IdentityName });
-            }, onException: (ex) => RedirectToPage(new { id = Input.IdentityName }));
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.IdentityName })
+            , successMessage: "User claims successfully updated");
         }
 
         [BindProperty]
@@ -60,6 +83,8 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
         public class NewUserClaimModel
         {
             public string IdentityName { get; set; }
+
+            [Required, MinLength(3), RegularExpression(@"^[a-z0-9_\-\.]+$", ErrorMessage = "Only lowercase letters, numbers,-,_,.")]
             public string UserClaim { get; set; }
         }
     }

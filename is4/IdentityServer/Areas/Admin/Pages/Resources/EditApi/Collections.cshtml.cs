@@ -47,11 +47,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 if (propertyInfo != null)
                 {
                     propertyInfo.SetValue(this.CurrentApiResource, values);
-                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
+                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { Input.PropertyName });
                 }
-
-                return Page();
-            });
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ApiName })
+            , successMessage: $"{ Input.PropertyName } successfully updated");
         }
 
         [BindProperty]

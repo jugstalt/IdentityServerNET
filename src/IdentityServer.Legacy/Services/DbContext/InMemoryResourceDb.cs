@@ -76,7 +76,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task UpdateApiResourceAsync(ApiResource resource)
+        public Task UpdateApiResourceAsync(ApiResource resource, IEnumerable<string> propertyNames = null)
         {
             if (!_apiResources.ContainsKey(resource.Name))
             {
@@ -135,7 +135,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task UpdateIdentityResourceAsync(IdentityResource identityResource)
+        public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames)
         {
             if (!_identityResources.ContainsKey(identityResource.Name))
             {

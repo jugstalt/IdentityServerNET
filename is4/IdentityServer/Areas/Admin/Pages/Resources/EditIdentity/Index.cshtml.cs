@@ -38,10 +38,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
                 CurrentIdentityResource.DisplayName = Input.DisplayName;
                 CurrentIdentityResource.Description = Input.Decription;
 
-                await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource);
-
-                return Page();
-            });
+                await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource, new[] { "DisplayName", "Description" });
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.Name })
+            , successMessage: "Identity resource successfully updated");
         }
 
         [BindProperty]

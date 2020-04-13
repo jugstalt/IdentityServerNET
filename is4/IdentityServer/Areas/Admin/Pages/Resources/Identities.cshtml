@@ -6,6 +6,7 @@
 }
 
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
         <h4>Identity Resources</h4>
         <ul class="nav nav-pills nav-stacked">
@@ -27,7 +28,7 @@
         </ul>
     </div>
     <div class="col-md-6">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
+
         <form id="-form" method="post">
             <h4>New Api Resource</h4>
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -64,3 +65,7 @@
     </div>
 
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

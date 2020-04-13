@@ -116,7 +116,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        async public Task UpdateApiResourceAsync(ApiResource apiResource)
+        async public Task UpdateApiResourceAsync(ApiResource apiResource, IEnumerable<string> propertyNames = null)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
 
@@ -202,7 +202,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
         }
 
-        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource)
+        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
 

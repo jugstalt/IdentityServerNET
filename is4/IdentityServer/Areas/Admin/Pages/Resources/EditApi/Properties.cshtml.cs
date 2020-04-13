@@ -31,12 +31,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnPostAsync()
         {
+            List<string> propertyNames = new List<string>();
             return await PostFormHandlerAsync(async () =>
             {
                 await LoadCurrentApiResourceAsync(Input.ApiName);
 
                 var inputClient = Input.ApiResource;
-                var hasChanges = false;
 
                 foreach (var propertyInfo in typeof(Client).GetProperties())
                 {
@@ -48,12 +48,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     {
                         if (propertyInfo.PropertyType == typeof(string))
                         {
-                            if (!String.IsNullOrWhiteSpace(propertyInfo.GetValue(this.CurrentApiResource)?.ToString()) &&
-                                !String.IsNullOrWhiteSpace(propertyInfo.GetValue(inputClient)?.ToString()) &&
-                                !propertyInfo.GetValue(this.CurrentApiResource).Equals(propertyInfo.GetValue(inputClient)))
+                            if ((propertyInfo.GetValue(inputClient) == null && !String.IsNullOrEmpty((string)propertyInfo.GetValue(this.CurrentApiResource))) ||
+                                (propertyInfo.GetValue(inputClient) != null && !propertyInfo.GetValue(inputClient).Equals(propertyInfo.GetValue(this.CurrentApiResource))))
                             {
                                 propertyInfo.SetValue(this.CurrentApiResource, propertyInfo.GetValue(inputClient));
-                                hasChanges = true;
+                                propertyNames.Add(propertyInfo.Name);
                             }
                         }
                         if (propertyInfo.PropertyType == typeof(int))
@@ -61,19 +60,24 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                             if (!propertyInfo.GetValue(this.CurrentApiResource).Equals(propertyInfo.GetValue(inputClient)))
                             {
                                 propertyInfo.SetValue(this.CurrentApiResource, propertyInfo.GetValue(inputClient));
-                                hasChanges = true;
+                                propertyNames.Add(propertyInfo.Name);
                             }
                         }
                     }
                 }
 
-                if (hasChanges)
+                if (propertyNames.Count > 0)
                 {
-                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
+                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, propertyNames);
+                    this.StatusMessage = $"Properties '{ String.Join(", ", propertyNames) }' updated successfully";
                 }
-
-                return Page();
-            });
+                else
+                {
+                    throw new Exception("No changes found...");
+                }
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ApiName })
+            , successMessage: "");
         }
 
         [BindProperty]

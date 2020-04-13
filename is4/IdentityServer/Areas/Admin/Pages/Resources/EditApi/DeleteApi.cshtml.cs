@@ -36,16 +36,15 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 if (Input.ConfirmApiName == CurrentApiResource.Name)
                 {
                     await _resourceDb.RemoveApiResourceAsync(this.CurrentApiResource);
-                    return RedirectToPage("../Apis");
                 }
                 else
                 {
                     throw new Exception("Please type the correct api resource name");
                 }
-            }, onException: (ex) =>
-            {
-                return RedirectToPage(new { id = this.CurrentApiResource.Name });
-            });
+            }
+            , onFinally: () => RedirectToPage("../Apis")
+            , successMessage: "Api resource successfully deleted"
+            , onException: (ex) => RedirectToPage(new { id = Input.ApiName }));
         }
 
         [BindProperty]

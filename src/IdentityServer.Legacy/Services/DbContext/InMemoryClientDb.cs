@@ -59,7 +59,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult(0);
         }
 
-        public Task UpdateClientAsync(Client client)
+        public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
         {
             if (!_clients.ContainsKey(client.ClientId))
             {

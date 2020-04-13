@@ -22,5 +22,22 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
             return Page();
         }
+
+        async public Task<IActionResult> OnGetSetAsync(string id, string option, bool value)
+        {
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentClientAsync(id);
+
+                var property = this.CurrentClient.GetType().GetProperty(option);
+                if (property != null)
+                {
+                    property.SetValue(this.CurrentClient, value);
+                    await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { option });
+                }
+            }
+            , onFinally: () => RedirectToPage(new { id = id })
+            , "");
+        }
     }
 }

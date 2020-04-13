@@ -31,12 +31,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
+            List<string> propertyNames = new List<string>();
             return await PostFormHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(Input.ClientId);
 
                 var inputClient = Input.Client;
-                var hasChanges = false;
 
                 foreach (var propertyInfo in typeof(Client).GetProperties())
                 {
@@ -48,12 +48,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                     {
                         if (propertyInfo.PropertyType == typeof(string))
                         {
-                            if (!String.IsNullOrWhiteSpace(propertyInfo.GetValue(this.CurrentClient)?.ToString()) &&
-                                !String.IsNullOrWhiteSpace(propertyInfo.GetValue(inputClient)?.ToString()) &&
-                                !propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
+                            if ((propertyInfo.GetValue(inputClient) == null && !String.IsNullOrEmpty((string)propertyInfo.GetValue(this.CurrentClient))) ||
+                                (propertyInfo.GetValue(inputClient) != null && !propertyInfo.GetValue(inputClient).Equals(propertyInfo.GetValue(this.CurrentClient))))
                             {
                                 propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
-                                hasChanges = true;
+                                propertyNames.Add(propertyInfo.Name);
                             }
                         }
                         if (propertyInfo.PropertyType == typeof(int))
@@ -61,19 +60,24 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                             if (!propertyInfo.GetValue(this.CurrentClient).Equals(propertyInfo.GetValue(inputClient)))
                             {
                                 propertyInfo.SetValue(this.CurrentClient, propertyInfo.GetValue(inputClient));
-                                hasChanges = true;
+                                propertyNames.Add(propertyInfo.Name);
                             }
                         }
                     }
                 }
 
-                if (hasChanges)
+                if (propertyNames.Count > 0)
                 {
-                    await _clientDb.UpdateClientAsync(this.CurrentClient);
+                    await _clientDb.UpdateClientAsync(this.CurrentClient, propertyNames);
+                    this.StatusMessage = $"Properties '{ String.Join(", ", propertyNames) }' updated successfully";
                 }
-
-                return Page();
-            });
+                else
+                {
+                    throw new Exception("No properties found to update");
+                }
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+            , successMessage: "");
         }
 
         [BindProperty]

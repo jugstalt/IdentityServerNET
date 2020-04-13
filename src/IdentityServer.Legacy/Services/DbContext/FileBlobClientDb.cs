@@ -105,7 +105,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        async public Task UpdateClientAsync(Client client)
+        async public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ client.ClientId.NameToHexId(_cryptoService) }.client");
 

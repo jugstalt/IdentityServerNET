@@ -36,12 +36,15 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                 if (Input.ConfirmClientId == CurrentClient.ClientId)
                 {
                     await _clientDb.RemoveClientAsync(this.CurrentClient);
-                    return RedirectToPage("../Clients");
-                } else
+                } 
+                else
                 {
                     throw new Exception("Please type the correct client id");
                 }
-            }, onException: (ex) => RedirectToPage(new { id = this.CurrentClient.ClientId }));
+            }
+            , onFinally: () => RedirectToPage("../Clients")
+            , "Successfully deleted client"
+            , onException: (ex) => RedirectToPage(new { id = Input.ClientId }));
         }
 
         [BindProperty]

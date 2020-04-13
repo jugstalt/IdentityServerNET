@@ -6,30 +6,30 @@
 }
 
 
-<div class="row">
-    <div class="col-md-6">
+    <div class="row">
         <partial name="_StatusMessage" model="Model.StatusMessage" />
-        <form id="-form" method="post">
-            <h4>@ViewData["Title"]</h4>
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <input type="hidden" asp-for="Input.ClientId" />
-            <div class="form-group">
-                <label>Client Id</label>
-                <input value="@Model.Input.ClientId" class="form-control" disabled />
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.ClientName"></label>
-                <input asp-for="Input.ClientName" class="form-control" />
-                <span asp-validation-for="Input.ClientName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.ClientDescription"></label>
-                <textarea asp-for="Input.ClientDescription" class="form-control" rows="5">
+        <div class="col-md-6">
+            <form id="-form" method="post">
+                <h4>@ViewData["Title"]</h4>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <input type="hidden" asp-for="Input.ClientId" />
+                <div class="form-group">
+                    <label>Client Id</label>
+                    <input value="@Model.Input.ClientId" class="form-control" disabled />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.ClientName"></label>
+                    <input asp-for="Input.ClientName" class="form-control" />
+                    <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.ClientDescription"></label>
+                    <textarea asp-for="Input.ClientDescription" class="form-control" rows="5">
 
                 </textarea>
-                <span asp-validation-for="Input.ClientDescription" class="text-danger"></span>
-            </div>
-            <button id="update-client-button" type="submit" class="btn btn-default">Save</button>
-        </form>
+                    <span asp-validation-for="Input.ClientDescription" class="text-danger"></span>
+                </div>
+                <button id="update-client-button" type="submit" class="btn btn-default">Save</button>
+            </form>
+        </div>
     </div>
-</div>

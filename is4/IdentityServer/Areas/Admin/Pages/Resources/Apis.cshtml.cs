@@ -3,6 +3,7 @@ using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
@@ -29,20 +30,25 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         async public Task<IActionResult> OnPostAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            string apiName = Input.ApiResourceName.Trim().ToLower();
+
             return await PostFormHandlerAsync(async () =>
             {
-                // is valid client id
-                string apiName = Input.ApiResourceName.Trim().ToLower();
-
                 if (_resourceDb != null)
                 {
                     var apiResource = new ApiResource(apiName, Input.ApiResourceDisplayName);
 
                     await _resourceDb.AddApiResourceAsync(apiResource);
                 }
-
-                return RedirectToPage("EditApi/Index", new { id = apiName });
-            });
+            }
+            , onFinally: () => RedirectToPage("EditApi/Index", new { id = apiName })
+            , successMessage: "Api resource successfully created"
+            , onException: (ex) => RedirectToPage());
         }
 
         public IEnumerable<ApiResource> ApiResources { get; set; }
@@ -52,6 +58,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         public class NewApiResource
         {
+            [Required, MinLength(3), RegularExpression(@"^[a-z0-9_\-\.]+$", ErrorMessage = "Only lowercase letters, numbers,-,_,.")]
             public string ApiResourceName { get; set; }
             public string ApiResourceDisplayName { get; set; }
         }

@@ -7,8 +7,9 @@
 
 
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        
         <form id="-form" method="post">
             <h4>@ViewData["Title"]</h4>
             <div asp-validation-summary="All" class="text-danger"></div>

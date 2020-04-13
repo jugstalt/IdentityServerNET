@@ -47,11 +47,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                 if (propertyInfo != null)
                 {
                     propertyInfo.SetValue(this.CurrentClient, values);
-                    await _clientDb.UpdateClientAsync(this.CurrentClient);
+                    await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { Input.PropertyName });
                 }
-
-                return Page();
-            });
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+            , successMessage: $"{ Input.PropertyName } successfully updated");
         }
 
         [BindProperty]

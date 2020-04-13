@@ -7,6 +7,7 @@
 
 <h4>@ViewData["Title"]</h4>
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     @foreach (var field in typeof(IdentityServer4.Models.ApiResource).GetProperties())
     {
         if (!Model.Input.IgnoreProperties.Contains(field.Name) &&
@@ -18,7 +19,7 @@
             var name = field.Name;
             var count = field.GetValue(Model.CurrentApiResource) == null ? 0 : ((IEnumerable<string>)field.GetValue(Model.CurrentApiResource)).Count();
     <div class="col-md-6">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        
         <form id="-form" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="Input.ApiName" />

@@ -5,9 +5,10 @@
     ViewData["ActivePage"] = EditIdentityResourceNavPages.UserClaims;
 }
 
-<h4>@ViewData["Title"]</h4>
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
+        <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentIdentityResource.UserClaims != null)
         {
             <ul class="nav nav-pills nav-stacked">
@@ -17,7 +18,7 @@
                     <li style="border-bottom:1px solid #eee">
                         <div style="display:inline-block;padding:10px 15px 10px 5px">@(userClaim)</div>
                         <a style="display:inline-block;float:right"
-                           asp-page="./RemoveUserClaim"
+                           asp-page-handler="Remove"
                            asp-route-id="@Model.CurrentIdentityResource.Name"
                            asp-route-userClaim="@userClaim">Remove</a>
                     </li>
@@ -26,7 +27,6 @@
         }
     </div>
     <div class="col-md-6">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
         <form id="-form" method="post">
             <h4>New Scope</h4>
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -39,3 +39,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -29,6 +29,29 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
             return Page();
         }
 
+        async public Task<IActionResult> OnGetRemoveAsync(string id, int secretIndex, string secretHash)
+        {
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentApiResourceAsync(id);
+
+                if (this.CurrentApiResource.ApiSecrets != null && secretIndex >= 0 && this.CurrentApiResource.ApiSecrets.Count() > secretIndex)
+                {
+                    var deleteSecret = this.CurrentApiResource.ApiSecrets.ToArray()[secretIndex];
+                    if (deleteSecret.Value.ToSha256().StartsWith(secretHash))
+                    {
+                        this.CurrentApiResource.ApiSecrets = this.CurrentApiResource.ApiSecrets
+                                                                    .Where(s => s != deleteSecret)
+                                                                    .ToArray();
+
+                        await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { "ApiSecrets" });
+                    }
+                }
+            }
+            , onFinally: () => RedirectToPage(new { id = id })
+            , successMessage: "Successfully removed secret");
+        }
+
         async public Task<IActionResult> OnPostAsync()
         {
             return await PostFormHandlerAsync(async () =>
@@ -54,11 +77,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
                     this.CurrentApiResource.ApiSecrets = clientSecrets.ToArray();
 
-                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource);
+                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { "ApiSecrets" });
                 }
-
-                return RedirectToPage(new { id = Input.ApiName });
-            }, onException: (ex) => RedirectToPage(new { id = Input.ApiName }));
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ApiName })
+            , successMessage: "Secret successfully added"
+            , onException: (ex) => RedirectToPage(new { id = Input.ApiName }));
         }
 
         [BindProperty]

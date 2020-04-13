@@ -38,10 +38,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 CurrentApiResource.DisplayName = Input.DisplayName;
                 CurrentApiResource.Description = Input.Decription;
 
-                await _resourceDb.UpdateApiResourceAsync(CurrentApiResource);
-
-                return Page();
-            });
+                await _resourceDb.UpdateApiResourceAsync(CurrentApiResource, new[] { "DisplayName", "Description" });
+            }
+            , onFinally: ()=> RedirectToPage(new { id = Input.Name })
+            , successMessage: "Api resource successfully updated");
         }
 
         [BindProperty]

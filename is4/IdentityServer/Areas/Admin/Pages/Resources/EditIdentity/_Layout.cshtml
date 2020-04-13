@@ -7,15 +7,15 @@
 <h2>Admin Resources</h2>
 <div class="admin-resources">
     <h4>Modify Identity Resource: @Model?.CurrentIdentityResource?.Name</h4>
-    <hr/>
+    <hr />
 
     <div class="row">
         <div class="col-md-3 sidebar">
             <div style="padding:10px">
-                
-                
+
+
             </div>
-            
+
             <partial name="_EditIdentityResourceNav" />
         </div>
         <div class="col-md-9">
@@ -24,4 +24,8 @@
     </div>
 
 </div>
+
+@section Scripts {
+    @RenderSection("scripts", required: false)
+}
 

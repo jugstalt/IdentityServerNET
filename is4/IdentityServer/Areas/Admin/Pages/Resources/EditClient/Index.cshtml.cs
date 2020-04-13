@@ -39,11 +39,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                 CurrentClient.ClientName = Input.ClientName;
                 CurrentClient.Description = Input.ClientDescription;
 
-                await _clientDb.UpdateClientAsync(CurrentClient);
-                StatusMessage = "The client has been updated";
-
-                return Page();
-            });   
+                await _clientDb.UpdateClientAsync(CurrentClient, new[] { "ClientName", "Description" });
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+            , successMessage: "The client has been updated successfully");   
         }
 
         [BindProperty]

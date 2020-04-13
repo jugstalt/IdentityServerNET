@@ -6,6 +6,7 @@
 }
 
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
         <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentApiResource.Scopes != null)
@@ -16,30 +17,31 @@
                 {
 
                     <li style="border-bottom:1px solid #eee;@(scope.Name == Model.Input.Scope?.Name ? ";font-weight:bold;background-color:#eee":"")">
-                        <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope.Name)
+                        <div style="display:inline-block;padding:10px 15px 10px 5px">
+                            @(scope.Name)
                         </div>
 
-                            @if (scope.Name != Model.Input.Scope?.Name)
-                            {
-                                <a style="display:inline-block;float:right"
-                                   asp-page="./RemoveScope"
-                                   asp-route-id="@Model.CurrentApiResource.Name"
-                                   asp-route-scopeName="@scope.Name">Remove</a>
-                                <a style="display:inline-block;float:right"
-                                   asp-page="./Scopes"
-                                   asp-route-id="@Model.CurrentApiResource.Name"
-                                   asp-route-scopeName="@scope.Name">Edit</a>
-                            }
+                        @if (scope.Name != Model.Input.Scope?.Name)
+                        {
+                            <a style="display:inline-block;float:right"
+                               asp-page-handler="Remove"
+                               asp-route-id="@Model.CurrentApiResource.Name"
+                               asp-route-scopeName="@scope.Name">Remove</a>
+                            <a style="display:inline-block;float:right"
+                               asp-page="./Scopes"
+                               asp-route-id="@Model.CurrentApiResource.Name"
+                               asp-route-scopeName="@scope.Name">Edit</a>
+                        }
                     </li>
 
-                 
+
                 }
             </ul>
-         }
+        }
 
     </div>
     <div class="col-md-6">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
+
         <form id="-form" method="post">
             <h4>@(Model.Input.Scope!=null ? $"Update" : "New") Scope</h4>
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -80,5 +82,9 @@
             <button id="add-scope-button" type="submit" class="btn btn-default">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
         </form>
     </div>
-    
+
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

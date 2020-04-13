@@ -9,7 +9,7 @@ namespace IdentityServer.Legacy.Services.DbContext
     public interface IClientDbContextModify : IClientDbContext
     {
         Task AddClientAsync(Client client);
-        Task UpdateClientAsync(Client client);
+        Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null);
         Task RemoveClientAsync(Client client);
 
         Task<IEnumerable<Client>> GetAllClients();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
@@ -31,11 +32,14 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         async public Task<IActionResult> OnPostAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            string identityName = Input.IdentityResourceName.Trim().ToLower();
+            
             return await PostFormHandlerAsync(async () =>
             {
-                // is valid client id
-                string identityName = Input.IdentityResourceName.Trim().ToLower();
-
                 if (_resourceDb != null)
                 {
                     var identityResource = new IdentityResource()
@@ -46,9 +50,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
                     await _resourceDb.AddIdentityResourceAsync(identityResource);
                 }
-
-                return RedirectToPage("EditIdentity/Index", new { id = identityName });
-            });
+            }
+            , onFinally: () => RedirectToPage("EditIdentity/Index", new { id = identityName })
+            , successMessage: "Identity resource successfully created"
+            , onException: (ex) => RedirectToPage());
         }
 
         public IEnumerable<IdentityResource> IdentityResources { get; set; }
@@ -58,6 +63,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
         public class NewIdentityResource
         {
+            [Required, MinLength(3), RegularExpression(@"^[a-z0-9_\-\.]+$", ErrorMessage = "Only lowercase letters, numbers,-,_,.")]
             public string IdentityResourceName { get; set; }
             public string IdentityResourceDisplayName { get; set; }
         }

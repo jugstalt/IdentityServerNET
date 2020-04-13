@@ -53,12 +53,34 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                     clientSecrets.Add(secret);
 
                     this.CurrentClient.ClientSecrets = clientSecrets.ToArray();
-
-                    await _clientDb.UpdateClientAsync(this.CurrentClient);
+                    await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "ClientSecrets" });
                 }
+            }
+            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+            , successMessage: "Secrets updated successfully");
+        }
 
-                return RedirectToPage(new { id = Input.ClientId });
-            }, onException: (ex) => RedirectToPage(new { id = Input.ClientId }));
+        async public Task<IActionResult> OnGetRemoveAsync(string id, int secretIndex, string secretHash)
+        {
+            return await PostFormHandlerAsync(async () =>
+            {
+                await LoadCurrentClientAsync(id);
+
+                if (this.CurrentClient.ClientSecrets != null && secretIndex >= 0 && this.CurrentClient.ClientSecrets.Count() > secretIndex)
+                {
+                    var deleteSecret = this.CurrentClient.ClientSecrets.ToArray()[secretIndex];
+                    if (deleteSecret.Value.ToSha256().StartsWith(secretHash))
+                    {
+                        this.CurrentClient.ClientSecrets = this.CurrentClient.ClientSecrets
+                                                                    .Where(s => s != deleteSecret)
+                                                                    .ToArray();
+
+                        await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "ClientSecrets" });
+                    }
+                }
+            }
+            , onFinally: () => RedirectToPage(new { id = id })
+            , successMessage: "Successfully removed secret");
         }
 
         [BindProperty]

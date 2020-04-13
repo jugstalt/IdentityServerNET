@@ -17,22 +17,27 @@ namespace IdentityServer.Areas.Admin.Pages
         [TempData]
         public string StatusMessage { get; set; }
 
-        async protected Task<IActionResult> PostFormHandlerAsync(Func<Task<IActionResult>> func,  Func<Exception, IActionResult> onException = null)
+        async protected Task<IActionResult> PostFormHandlerAsync(Func<Task> func, Func<IActionResult> onFinally, string successMessage, Func<Exception, IActionResult> onException = null)
         {
             try
             {
-                return await func();
+                StatusMessage = successMessage;
+
+                await func();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 StatusMessage = $"Error: { ex.Message }";
 
-                if(onException!=null)
+                if (onException != null)
                 {
                     return onException(ex);
                 }
-                return RedirectToPage();
+                //return RedirectToPage();
             }
+
+            return onFinally();
+
         }
     }
 }

@@ -7,6 +7,7 @@
 
 <h4>@ViewData["Title"]</h4>
 <div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
 
         <ul class="nav nav-pills nav-stacked">
@@ -17,7 +18,7 @@
                 var hasGrant = Model.CurrentClient.AllowedGrantTypes != null && Model.CurrentClient.AllowedGrantTypes.Contains(grantValue);
 
                 <li style="border-bottom:1px solid #eee">
-                    <a asp-page="./SetGrant"
+                    <a asp-page-handler="Set"
                        asp-route-id="@Model.CurrentClient.ClientId"
                        asp-route-grant="@grantValue"
                        asp-route-remove="@hasGrant">
