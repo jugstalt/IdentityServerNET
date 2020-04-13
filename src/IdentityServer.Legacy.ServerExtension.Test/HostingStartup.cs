@@ -9,6 +9,7 @@ using static IdentityModel.OidcConstants;
 using IdentityModel;
 using IdentityServer.Legacy.Services.PasswordHasher;
 using IdentityServer.Legacy.Services.Serialize;
+using IdentityServer.Legacy.MongoDb.Services.DbContext;
 
 [assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -56,6 +57,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
                 #region Add a ClientDbContext (required)
 
+                /*
                 services.AddClientDbContext<FileBlobClientDb>(options =>
                 {
                     options.ConnectionString = @"c:\temp\identityserver_legacy\storage\clients";
@@ -100,6 +102,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                             PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
                         }
                     };
+                });
+                */
+
+                services.AddClientDbContext<MongoBlobClientDb>(options =>
+                {
+                    options.ConnectionString = "mongodb://localhost:27017";
                 });
 
                 #endregion
