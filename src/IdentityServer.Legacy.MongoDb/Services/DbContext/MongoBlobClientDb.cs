@@ -52,7 +52,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
         async public Task<Client> FindClientByIdAsync(string clientId)
         {
-            string id = clientId.NameToHexId(_cryptoService);
+            string id = clientId.ClientIdToHexId(_cryptoService);
 
             var collection = GetCollection();
 
@@ -80,8 +80,12 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 return;
             }
 
-            string id = client.ClientId.NameToHexId(_cryptoService);
-            // ToDo: Check if id exists;
+            if (await FindClientByIdAsync(client.ClientId) != null)
+            {
+                throw new Exception("client alread exists");
+            }
+
+            string id = client.ClientId.ClientIdToHexId(_cryptoService);
 
             var collection = GetCollection();
 
@@ -109,7 +113,10 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             {
                 foreach (var clientDocument in cursor.Current)
                 {
-                    result.Add(_blobSerializer.DeserializeObject<Client>(_cryptoService.DecryptText(clientDocument.BlobData)));
+                    if (clientDocument.Id.IsValidClientHexId())
+                    {
+                        result.Add(_blobSerializer.DeserializeObject<Client>(_cryptoService.DecryptText(clientDocument.BlobData)));
+                    }
                 }
             }
 
@@ -120,7 +127,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
         {
             var collection = GetCollection();
 
-            string id = client.ClientId.NameToHexId(_cryptoService);
+            string id = client.ClientId.ClientIdToHexId(_cryptoService);
 
             await collection
                 .DeleteOneAsync<ClientBlobDocument>(d => d.Id == id);
@@ -130,7 +137,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
         {
             var collection = GetCollection();
 
-            string id = client.ClientId.NameToHexId(_cryptoService);
+            string id = client.ClientId.ClientIdToHexId(_cryptoService);
 
             UpdateDefinition<ClientBlobDocument> update =  Builders<ClientBlobDocument>
                 .Update

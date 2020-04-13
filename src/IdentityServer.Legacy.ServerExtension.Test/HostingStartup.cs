@@ -38,6 +38,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
                 #region Add a ResourceDbContext (required) 
 
+                /*
                 services.AddResourceDbContext<FileBlobResourceDb>(options =>
                 {
                     options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
@@ -51,6 +52,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                     {
 
                     };
+                });
+                */
+
+                services.AddResourceDbContext<MongoBlobResourceDb>(options =>
+                {
+                    options.ConnectionString = "mongodb://localhost:27017";
                 });
 
                 #endregion
