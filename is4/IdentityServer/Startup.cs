@@ -60,8 +60,6 @@ namespace IdentityServer
                 options.LogoutPath = "/Account/Logout";
             });
 
-            
-
             services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddRazorPages()
                 .AddRazorPagesOptions(options =>

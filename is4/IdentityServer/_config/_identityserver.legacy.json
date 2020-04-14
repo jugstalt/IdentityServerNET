@@ -1,0 +1,6 @@
+{
+  "LegacyAssemblyName": "IdentityServer.Legacy.ServerExtension.Test",
+  "ConnectionStrings": {
+    "MongoDb": "mongodb://mongoadmin:mongoadmin@localhost:27017"
+  }
+}
