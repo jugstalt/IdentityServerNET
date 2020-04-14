@@ -338,3 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+_config/identityserver.legacy.json
+/is4/IdentityServer/_config/identityserver.legacy.json
