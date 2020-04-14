@@ -22,4 +22,8 @@
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="_config\" />
+  </ItemGroup>
 </Project>
