@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using IdentityServer.Legacy.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,5 +17,6 @@ namespace IdentityServer.Legacy.Services.DbContext
         Task<ApplicationUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken); 
         Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken);
         Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation);
+        Task UpdatePropertyAsync(ApplicationUser user, DbPropertyInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation);
     }
 }

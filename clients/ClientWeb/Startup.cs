@@ -38,11 +38,11 @@ namespace ClientWeb
                     //options.Scope.Add("api1");
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
-                    options.Scope.Add("email");
-                    options.Scope.Add("role");
-                    options.Scope.Add("phone");
-                    options.Scope.Add("address");
-                    options.Scope.Add("offline_access");
+                    //options.Scope.Add("email");
+                    //options.Scope.Add("role");
+                    //options.Scope.Add("phone");
+                    //options.Scope.Add("address");
+                    //options.Scope.Add("offline_access");
                 });
 
             services.AddMvc();

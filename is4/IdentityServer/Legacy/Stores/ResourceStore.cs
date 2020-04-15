@@ -28,36 +28,42 @@ namespace IdentityServer.Legacy
             return await _resourcedbContext.FindApiResourcesByScopeAsync(scopeNames);
         }
 
-        public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
             List<IdentityResource> identityResources = new List<IdentityResource>();
 
             foreach (var scopeName in scopeNames)
             {
-                switch (scopeName.ToLower())
+                //switch (scopeName.ToLower())
+                //{
+                //    case "openid":
+                //        identityResources.Add(new IdentityResources.OpenId());
+                //        break;
+                //    case "profile":
+                //        identityResources.Add(new IdentityResources.Profile());
+                //        break;
+                //    case "email":
+                //        identityResources.Add(new IdentityResources.Email());
+                //        break;
+                //    case "address":
+                //        identityResources.Add(new IdentityResources.Address());
+                //        break;
+                //    case "phone":
+                //        identityResources.Add(new IdentityResources.Phone());
+                //        break;
+                //    case "role":
+                //        identityResources.Add(new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role }));
+                //        break;
+                //}
+
+                var identityResource = await _resourcedbContext.FindIdentityResource(scopeName);
+                if(identityResource!=null)
                 {
-                    case "openid":
-                        identityResources.Add(new IdentityResources.OpenId());
-                        break;
-                    case "profile":
-                        identityResources.Add(new IdentityResources.Profile());
-                        break;
-                    case "email":
-                        identityResources.Add(new IdentityResources.Email());
-                        break;
-                    case "address":
-                        identityResources.Add(new IdentityResources.Address());
-                        break;
-                    case "phone":
-                        identityResources.Add(new IdentityResources.Phone());
-                        break;
-                    case "role":
-                        identityResources.Add(new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role }));
-                        break;
+                    identityResources.Add(identityResource);
                 }
             }
 
-            return Task.FromResult<IEnumerable<IdentityResource>>(identityResources.ToArray());
+            return identityResources;
         }
 
         async public Task<Resources> GetAllResourcesAsync()

@@ -33,6 +33,25 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\users";
                 options.CryptoService = new DefaultCryptoService("My super pa33wo4d 1234567890");
+
+                options.ManageAccountProperties = new DbPropertyInfos()
+                {
+                    CanDelete = true,
+                    PropertyInfos = new[]
+                    {
+                        KnownUserDbPropertyInfos.UserName(),
+                        KnownUserDbPropertyInfos.GivenName(),
+                        KnownUserDbPropertyInfos.FamilyName(),
+                        KnownUserDbPropertyInfos.Organisation(),
+                        KnownUserDbPropertyInfos.PhoneNumber(),
+                        KnownUserDbPropertyInfos.BirthDate(),
+
+                        KnownUserDbPropertyInfos.Email(),
+
+                        KnownUserDbPropertyInfos.PasswordHash(DbPropertyInfoAction.ReadOnly),
+                        KnownUserDbPropertyInfos.TwoFactorEnabled()
+                    }
+                };
             });
 
             #endregion
@@ -113,18 +132,18 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             });
             */
 
-            /*
+            
             services.AddClientDbContext<MongoBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
             });
-            */
-
+            
+/*
             services.AddClientDbContext<TableStorageBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
-
+*/
             #endregion
 
             #region Add ExportClientDbContext (optional)

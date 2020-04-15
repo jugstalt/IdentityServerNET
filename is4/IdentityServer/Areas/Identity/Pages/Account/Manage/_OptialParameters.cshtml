@@ -1,0 +1,20 @@
+﻿@model ManageAccountPageModel
+
+@if (Model.OptionalPropertyInfos != null)
+{
+    foreach (var optionalProperty in Model.OptionalPropertyInfos
+                                        .PropertyInfos
+                                        .Where(p => String.IsNullOrEmpty(Model.Category) || Model.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase)))
+    {
+    <div class="form-group">
+        <label>@optionalProperty.DisplayName</label>
+        <input name="Input.Options.@optionalProperty.Name"
+               @(optionalProperty.Action.HasFlag(DbPropertyInfoAction.ReadOnly) ? "readonly" : "")
+               value="@Model.GetPropertyValue(optionalProperty)"
+               type="@Model.GetPropertyType(optionalProperty)"
+               class="form-control" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="Input.Options.@optionalProperty.Name" data-valmsg-replace="true"></span>
+    </div>
+    }
+}
+

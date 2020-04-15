@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using IdentityServer.Legacy.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -107,6 +108,24 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult<T>(propertyValue);
         }
 
+        public Task UpdatePropertyAsync(ApplicationUser user, DbPropertyInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+        {
+            if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
+            {
+                List<Claim> claims = new List<Claim>(user.Claims
+                        .Where(c => c.Type != dbPropertyInfo.ClaimName));
+
+                if (!String.IsNullOrWhiteSpace(propertyValue?.ToString()))
+                {
+                    claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()));
+                }
+
+                user.Claims = claims;
+            }
+
+            return Task.CompletedTask;
+        }
+
         #endregion
 
         #region IUserClaimsDbContext
@@ -127,6 +146,8 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             return Task.CompletedTask;
         }
+
+        
 
         #endregion
     }

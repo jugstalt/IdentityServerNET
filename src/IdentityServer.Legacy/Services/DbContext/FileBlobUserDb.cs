@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.Serialize;
+using System.Security.Claims;
+using System.Linq;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
@@ -145,19 +147,55 @@ namespace IdentityServer.Legacy.Services.DbContext
         async public Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation)
         {
             var propertyInfo = user.GetType().GetProperty(applicationUserProperty);
-            if(propertyInfo!=null)
+            if (propertyInfo != null)
             {
                 propertyInfo.SetValue(user, propertyValue);
-            }
 
-            if(user.UserName.ToUpper()!=user.Email.ToUpper())
-            {
-                throw new Exception("username and email must be idential");
-            }
 
-            await UpdateAsync(user, cancellation);
+                if (user.UserName.ToUpper() != user.Email.ToUpper())
+                {
+                    throw new Exception("username and email must be idential");
+                }
+
+                
+
+                await UpdateAsync(user, cancellation);
+            }
 
             return propertyValue;
+        }
+
+        async public Task UpdatePropertyAsync(ApplicationUser user, DbPropertyInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+        {
+            var propertyInfo = user.GetType().GetProperty(dbPropertyInfo.Name);
+            if (propertyInfo != null)
+            {
+                propertyInfo.SetValue(user, Convert.ChangeType(propertyValue, dbPropertyInfo.PropertyType));
+
+                if (user.UserName.ToUpper() != user.Email.ToUpper())
+                {
+                    throw new Exception("username and email must be idential");
+                }
+
+                await UpdateAsync(user, cancellation);
+            } 
+            else
+            {
+                if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
+                {
+                    List<Claim> claims = new List<Claim>(user.Claims
+                        .Where(c => c.Type != dbPropertyInfo.ClaimName));
+
+                    if (!String.IsNullOrWhiteSpace(propertyValue?.ToString()))
+                    {
+                        claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()));
+                    }
+
+                    user.Claims = claims;
+                }
+
+                await UpdateAsync(user, cancellation);
+            }
         }
 
         #endregion

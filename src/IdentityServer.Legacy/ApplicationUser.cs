@@ -1,11 +1,8 @@
-﻿using IdentityModel;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy
 {
@@ -39,7 +36,9 @@ namespace IdentityServer.Legacy
             get
             {
                 if (this._claims == null)
+                {
                     return new Claim[0];
+                }
 
                 return this._claims;
             }
@@ -50,12 +49,44 @@ namespace IdentityServer.Legacy
             }
         }
 
+        [JsonProperty("Claims")]
+        public SerializableClaim[] SerializableClaims
+        {
+            get
+            {
+                return this.Claims.Select(c => new SerializableClaim()
+                {
+                    Type = c.Type,
+                    Value = c.Value,
+                    ValueType = c.ValueType
+                }).ToArray();
+            }
+            set
+            {
+                if (value != null)
+                {
+                    _claims = value.Select(c => new Claim(c.Type, c.Value, c.Value)).ToArray();
+                }
+            }
+        }
+
         #endregion
 
         #region TFA
 
         public string AuthenticatorKey { get; set; }
         public IEnumerable<string> TfaRecoveryCodes { get; set; }
+
+        #endregion
+
+        #region Classes
+
+        public class SerializableClaim
+        {
+            public string Type { get; set; }
+            public string Value { get; set; }
+            public string ValueType { get; set; }
+        }
 
         #endregion
     }

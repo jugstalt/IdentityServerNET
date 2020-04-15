@@ -4,91 +4,82 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
+using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
-    public partial class IndexModel : PageModel
+    public partial class IndexModel : ManageAccountPageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public IndexModel(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IUserDbContext userDbContext,
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
+            : base("Profile", userDbContext, userDbContextConfiguration)
         {
-            _userManager = userManager;
+            _userDbContext = userDbContext;
             _signInManager = signInManager;
         }
 
         public string Username { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
-
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
-
-        private async Task LoadAsync(ApplicationUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
-
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            await base.LoadUserAsync();
+            if (this.ApplicationUser == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Unable to load user.");
             }
 
-            await LoadAsync(user);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            await base.LoadUserAsync();
+
+            if (this.ApplicationUser == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Unable to load user.");
             }
 
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
+                await base.LoadUserAsync();
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            foreach(var formKey in this.Request.Form.Keys)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                if (formKey.IndexOf("Input.Options.") == 0)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
+                    var propertyName = formKey.Substring("Input.Options.".Length);
+
+                    var optionalProperty = base.OptionalPropertyInfos?
+                                               .PropertyInfos?
+                                               .Where(p => p.Name == propertyName)
+                                               .FirstOrDefault();
+
+                    if (optionalProperty == null || optionalProperty.Action.HasFlag(DbPropertyInfoAction.ReadOnly))
+                    {
+                        continue;
+                    }
+
+                    await _userDbContext.UpdatePropertyAsync(
+                        this.ApplicationUser, 
+                        optionalProperty,
+                        this.Request.Form[formKey].ToString(),
+                        new System.Threading.CancellationToken());
                 }
             }
 
-            await _signInManager.RefreshSignInAsync(user);
+            await _signInManager.RefreshSignInAsync(this.ApplicationUser);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }
