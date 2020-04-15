@@ -19,6 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IdentityServer.Legacy.MongoDb\IdentityServer.Legacy.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
   </ItemGroup>

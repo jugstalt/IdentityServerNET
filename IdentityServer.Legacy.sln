@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Legacy.Serve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Legacy.MongoDb", "src\IdentityServer.Legacy.MongoDb\IdentityServer.Legacy.MongoDb.csproj", "{02AEB557-11B0-430C-98A7-3FB934D35B68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Legacy.Azure", "src\IdentityServer.Legacy.Azure\IdentityServer.Legacy.Azure.csproj", "{1A265B1B-C54C-4E63-898B-69CFA7A22091}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,18 @@ Global
 		{02AEB557-11B0-430C-98A7-3FB934D35B68}.Release|x64.Build.0 = Release|Any CPU
 		{02AEB557-11B0-430C-98A7-3FB934D35B68}.Release|x86.ActiveCfg = Release|Any CPU
 		{02AEB557-11B0-430C-98A7-3FB934D35B68}.Release|x86.Build.0 = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Debug|x86.Build.0 = Debug|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|x64.Build.0 = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|x86.ActiveCfg = Release|Any CPU
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +158,7 @@ Global
 		{846E4ABE-5CBA-43B3-9593-C9692DEB9647} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{5C70A876-741C-41AF-9262-0BFE529A3A79} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{02AEB557-11B0-430C-98A7-3FB934D35B68} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6F7C9AB4-22C4-485D-BF3E-67CF94045749}
