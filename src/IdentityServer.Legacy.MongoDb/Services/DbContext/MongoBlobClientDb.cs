@@ -31,21 +31,6 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             _connectionString = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
             _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
-
-            //DirectoryInfo di = new DirectoryInfo(_connectionString);
-            //if (!di.Exists)
-            //{
-            //    di.Create();
-
-            //    // Initialize Api Clients
-            //    if (options.Value.IntialClients != null)
-            //    {
-            //        foreach (var client in options.Value.IntialClients)
-            //        {
-            //            AddClientAsync(client).Wait();
-            //        }
-            //    }
-            //}
         }
 
         #region  IClientDbContext

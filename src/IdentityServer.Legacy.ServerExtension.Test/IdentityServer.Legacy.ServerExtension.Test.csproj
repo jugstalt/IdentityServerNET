@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IdentityServer.Legacy.Azure\IdentityServer.Legacy.Azure.csproj" />
     <ProjectReference Include="..\IdentityServer.Legacy.MongoDb\IdentityServer.Legacy.MongoDb.csproj" />
     <ProjectReference Include="..\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
   </ItemGroup>

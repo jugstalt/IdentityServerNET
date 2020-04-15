@@ -11,6 +11,7 @@ using IdentityServer.Legacy.Services.PasswordHasher;
 using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer.Legacy.MongoDb.Services.DbContext;
 using IdentityServer.Legacy.Reflection;
+using IdentityServer.Legacy.Azure.Services.DbContext;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -112,9 +113,16 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             });
             */
 
+            /*
             services.AddClientDbContext<MongoBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
+            });
+            */
+
+            services.AddClientDbContext<TableStorageBlobClientDb>(options =>
+            {
+                options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
 
             #endregion
