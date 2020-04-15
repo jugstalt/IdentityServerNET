@@ -4,6 +4,7 @@
 using IdentityServer.Legacy;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -42,8 +43,16 @@ namespace IdentityServer
             {
                 //options.AddPolicy("admin-policy",
                 //        policy => policy.RequireUserName("identityserver-administrator"));
-                options.AddPolicy("admin-policy",
-                    policy => policy.RequireUserName("test@xyz.com"));
+                if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
+                {
+                    options.AddPolicy("admin-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                }
+                else
+                {
+                    options.AddPolicy("admin-policy",
+                        policy => policy.RequireRole("identityserver-legacy-administrator"));
+                }
             });
 
             services.AddMvc()
@@ -56,6 +65,10 @@ namespace IdentityServer
 
             services.ConfigureApplicationCookie(options =>
             {
+                if (!String.IsNullOrWhiteSpace(Configuration["Cookie:Name"]))
+                {
+                    options.Cookie = new Microsoft.AspNetCore.Http.CookieBuilder() { Name = Configuration["Cookie:Name"] };
+                }
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
             });
