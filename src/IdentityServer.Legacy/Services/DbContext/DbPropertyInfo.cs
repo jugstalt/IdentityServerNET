@@ -4,12 +4,10 @@ using System.Text;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    [Flags]
     public enum DbPropertyInfoAction
     {
         Editable = 1,
-        ReadOnly = 2,
-        CanChange = 4
+        ReadOnly = 2
     }
 
     public class DbPropertyInfo
@@ -47,5 +45,24 @@ namespace IdentityServer.Legacy.Services.DbContext
         public DbPropertyInfoAction Action { get; set; }
 
         public string ClaimName { get; set; }
+
+        public string RegexPattern { get; set; }
+        
+        public bool IsRequired { get; set; }
+
+        public bool IsValid(string value)
+        {
+            if (IsRequired && String.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            if(!value.CheckRegex(RegexPattern))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,10 +33,11 @@ namespace ClientWeb
                     options.ClientSecret = "secret";
                     options.ResponseType = "code";
 
-                    //options.GetClaimsFromUserInfoEndpoint = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.SaveTokens = true;
 
+                    options.Scope.Clear();
                     //options.Scope.Add("api1");
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
@@ -43,6 +46,20 @@ namespace ClientWeb
                     //options.Scope.Add("phone");
                     //options.Scope.Add("address");
                     //options.Scope.Add("offline_access");
+
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    {
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+                    };
+
+                    options.ClaimActions.MapAllExcept("iss", "nbf", "exp", "aud", "nonce", "iat", "c_hash");
+
+                    //options.ClaimActions.MapUniqueJsonKey("sub", "sub");
+                    //options.ClaimActions.MapUniqueJsonKey("name", "name");
+                    //options.ClaimActions.MapUniqueJsonKey("given_name", "given_name");
+                    //options.ClaimActions.MapUniqueJsonKey("family_name", "family_name");
+                    //options.ClaimActions.MapUniqueJsonKey("email", "email");
                 });
 
             services.AddMvc();

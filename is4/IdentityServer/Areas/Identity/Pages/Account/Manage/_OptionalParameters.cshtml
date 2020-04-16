@@ -1,4 +1,4 @@
-﻿@model ManageAccountPageModel
+﻿@model ManageAccountProfilePageModel
 
 @if (Model.OptionalPropertyInfos != null)
 {
@@ -9,9 +9,19 @@
     <div class="form-group">
         <label>@optionalProperty.DisplayName</label>
         <input name="Input.Options.@optionalProperty.Name"
-               @(optionalProperty.Action.HasFlag(DbPropertyInfoAction.ReadOnly) ? "readonly" : "")
+               @(optionalProperty.Action == DbPropertyInfoAction.ReadOnly ? "readonly" : "")
                value="@Model.GetPropertyValue(optionalProperty)"
                type="@Model.GetPropertyType(optionalProperty)"
+               @if(optionalProperty.PropertyType==typeof(double) ||
+                    optionalProperty.PropertyType==typeof(float) ||
+                    optionalProperty.PropertyType==typeof(decimal))
+               {
+                   <text>
+                   step="0.01" 
+                   </text>
+               }
+
+
                class="form-control" />
         <span class="text-danger field-validation-valid" data-valmsg-for="Input.Options.@optionalProperty.Name" data-valmsg-replace="true"></span>
     </div>

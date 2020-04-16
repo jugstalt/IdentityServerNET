@@ -13,7 +13,7 @@ namespace IdentityServer.Legacy.DependencyInjection
         public ICryptoService CryptoService { get; set; }
         public IBlobSerializer BlobSerializer { get; set; }
 
-        public DbPropertyInfos ManageAccountProperties { get; set; }
+        public ManageAccountDbPropertyInfos ManageAccountProperties { get; set; }
         public DbPropertyInfos AdminAccountProperties { get; set; }
     }
 }

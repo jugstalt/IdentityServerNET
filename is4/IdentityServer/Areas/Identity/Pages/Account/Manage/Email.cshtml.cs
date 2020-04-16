@@ -6,15 +6,17 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
+using IdentityServer.Legacy.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
-    public partial class EmailModel : PageModel
+    public partial class EmailModel : ManageAccountPageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -23,7 +25,9 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public EmailModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
+            :base(userDbContextConfiguration)
         {
             _userManager = userManager;
             _signInManager = signInManager;

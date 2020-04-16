@@ -1,15 +1,49 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
+@model ManageAccountDbPropertyInfos
+
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+
+    string[] categories = null;
+    if (Model != null)
+    {
+        categories = Model.PropertyInfos
+                            .Select(p => p.Category)
+                            .Distinct()
+                            .ToArray();
+    }
 }
+
+@if (categories != null)
+{
     <ul class="nav nav-pills nav-stacked">
-        <li class="@ManageNavPages.IndexNavClass(ViewContext)"><a asp-page="./Index">Profile</a></li>
+        @foreach (var category in categories)
+        {
+            <li class="@(ViewData["Category"] != null && category.Equals(ViewData["Category"].ToString(), StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                <a asp-page="./Index"
+                   asp-route-category="@category">@category</a>
+            </li>
+        }
+        @if (Model.ShowChangeEmailPage)
+        {
         <li class="@ManageNavPages.EmailNavClass(ViewContext)"><a id="email" asp-page="./Email">Email</a></li>
+        }
+        @if (Model.ShowChangePasswordPage)
+        {
         <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a id="change-password" asp-page="./ChangePassword">Password</a></li>
+        }
         @if (hasExternalLogins)
         {
             <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a id="external-login" asp-page="./ExternalLogins">External logins</a></li>
         }
+        @if (Model.ShowTfaPage)
+        {
         <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-        <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)"><a asp-page="./PersonalData">Personal data</a></li>
+        }
+
+        <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)">
+            <a asp-page="./PersonalData">Personal data</a>
+        </li>
+
     </ul>
+}

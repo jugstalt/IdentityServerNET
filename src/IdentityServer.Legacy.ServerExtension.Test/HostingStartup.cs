@@ -34,22 +34,24 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\users";
                 options.CryptoService = new DefaultCryptoService("My super pa33wo4d 1234567890");
 
-                options.ManageAccountProperties = new DbPropertyInfos()
+                options.ManageAccountProperties = new ManageAccountDbPropertyInfos()
                 {
-                    CanDelete = true,
+                    AllowDelete = false,
+                    ShowChangeEmailPage = true,
+                    ShowChangePasswordPage = true,
+                    ShowTfaPage = true,
                     PropertyInfos = new[]
                     {
-                        KnownUserDbPropertyInfos.UserName(),
+                        KnownUserDbPropertyInfos.ReadOnlyUserName(),
+                        KnownUserDbPropertyInfos.ReadOnlyEmail(),
                         KnownUserDbPropertyInfos.GivenName(),
                         KnownUserDbPropertyInfos.FamilyName(),
                         KnownUserDbPropertyInfos.Organisation(),
                         KnownUserDbPropertyInfos.PhoneNumber(),
                         KnownUserDbPropertyInfos.BirthDate(),
-
-                        KnownUserDbPropertyInfos.Email(),
-
-                        KnownUserDbPropertyInfos.PasswordHash(DbPropertyInfoAction.ReadOnly),
-                        KnownUserDbPropertyInfos.TwoFactorEnabled()
+                        new DbPropertyInfo("Ranking", typeof(int)) { Category="Advanced", ClaimName="ranking" },
+                        new DbPropertyInfo("Cost", typeof(double)) { Category="Advanced", ClaimName="cost" },
+                        new DbPropertyInfo("SendInfos", typeof(bool)) { Category="Privacy", ClaimName="send_infos"}
                     }
                 };
             });

@@ -2,14 +2,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
+using IdentityServer.Legacy.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
-    public class DeletePersonalDataModel : PageModel
+    public class DeletePersonalDataModel : ManageAccountPageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -18,11 +20,18 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public DeletePersonalDataModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+            ILogger<DeletePersonalDataModel> logger,
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
+            : base(userDbContextConfiguration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+
+            if(base.OptionalPropertyInfos?.AllowDelete != true)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [BindProperty]

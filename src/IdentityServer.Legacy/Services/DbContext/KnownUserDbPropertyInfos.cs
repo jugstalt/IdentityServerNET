@@ -5,16 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Services.DbContext
 {
     static public class KnownUserDbPropertyInfos
     {
-        static public DbPropertyInfo UserName(DbPropertyInfoAction action = DbPropertyInfoAction.ReadOnly)
+        static public DbPropertyInfo ReadOnlyUserName(DbPropertyInfoAction action = DbPropertyInfoAction.ReadOnly)
         {
             return new DbPropertyInfo("UserName", "Username", typeof(string), "Profile")
             {
                 Action = action,
-                ClaimName = JwtClaimTypes.PreferredUserName
+                ClaimName = JwtClaimTypes.PreferredUserName,
+                IsRequired=true
+            };
+        }
+
+        static public DbPropertyInfo EditableUserName(DbPropertyInfoAction action = DbPropertyInfoAction.ReadOnly)
+        {
+            return new DbPropertyInfo("UserName", "Username", typeof(string), "Profile")
+            {
+                Action = action,
+                ClaimName = JwtClaimTypes.PreferredUserName,
+                RegexPattern = ValidationExtensions.GeneralUsernameRegex,
+                IsRequired = true
             };
         }
 
@@ -49,7 +61,8 @@ namespace IdentityServer.Legacy.DependencyInjection
             return new DbPropertyInfo("BirthDay", "Birthday", typeof(DateTime), "Profile")
             {
                 Action = action,
-                ClaimName = JwtClaimTypes.BirthDate
+                ClaimName = JwtClaimTypes.BirthDate,
+
             };
         }
 
@@ -62,29 +75,39 @@ namespace IdentityServer.Legacy.DependencyInjection
             };
         }
 
-        static public DbPropertyInfo Email(DbPropertyInfoAction action = DbPropertyInfoAction.ReadOnly | DbPropertyInfoAction.CanChange)
+        static public DbPropertyInfo EditableEmail(DbPropertyInfoAction action = DbPropertyInfoAction.Editable)
         {
-            return new DbPropertyInfo("Email", "Email", typeof(string), "Email")
+            return new DbPropertyInfo("Email", "Email", typeof(string), "Profile")
+            {
+                Action = action,
+                ClaimName = JwtClaimTypes.Email,
+                RegexPattern = ValidationExtensions.EmailAddressRegex
+            };
+        }
+
+        static public DbPropertyInfo ReadOnlyEmail(DbPropertyInfoAction action = DbPropertyInfoAction.ReadOnly)
+        {
+            return new DbPropertyInfo("Email", "Email", typeof(string), "Profile")
             {
                 Action = action,
                 ClaimName = JwtClaimTypes.Email
             };
         }
 
-        static public DbPropertyInfo PasswordHash(DbPropertyInfoAction action = DbPropertyInfoAction.CanChange)
-        {
-            return new DbPropertyInfo("PasswordHash", "Password", typeof(string), "Password")
-            {
-                Action = action
-            };
-        }
+        //static public DbPropertyInfo PasswordHash(DbPropertyInfoAction action = DbPropertyInfoAction.CanChange)
+        //{
+        //    return new DbPropertyInfo("PasswordHash", "Password", typeof(string), "Password")
+        //    {
+        //        Action = action
+        //    };
+        //}
 
-        static public DbPropertyInfo TwoFactorEnabled(DbPropertyInfoAction action = DbPropertyInfoAction.Editable)
-        {
-            return new DbPropertyInfo("TwoFactorEnabled", "TwoFactorEnabled", typeof(bool), "Two-factor authentication")
-            {
-                Action = action
-            };
-        }
+        //static public DbPropertyInfo TwoFactorEnabled(DbPropertyInfoAction action = DbPropertyInfoAction.Editable)
+        //{
+        //    return new DbPropertyInfo("TwoFactorEnabled", "TwoFactorEnabled", typeof(bool), "Two-factor authentication")
+        //    {
+        //        Action = action
+        //    };
+        //}
     }
 }

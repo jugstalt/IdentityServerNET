@@ -12,16 +12,14 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
-    public class ManageAccountPageModel : PageModel
+    public class ManageAccountProfilePageModel : PageModel, IManageAccountPageModel
     {
         protected IUserDbContext _userDbContext;
 
-        protected ManageAccountPageModel(
-            string category,
+        protected ManageAccountProfilePageModel(
             IUserDbContext userManager,
             IOptions<UserDbContextConfiguration> userDbContextConfiguration)
         {
-            Category = category;
             _userDbContext = userManager;
             OptionalPropertyInfos =
                 userDbContextConfiguration?.Value?.ManageAccountProperties;
@@ -34,7 +32,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public string Category { get; set; }
 
-        public DbPropertyInfos OptionalPropertyInfos { get; set; }
+        public ManageAccountDbPropertyInfos OptionalPropertyInfos { get; set; }
 
         async protected Task LoadUserAsync()
         {
@@ -72,6 +70,12 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         {
             if (dbPropertyInfo.PropertyType == typeof(DateTime))
                 return "date";
+            if (dbPropertyInfo.PropertyType == typeof(int))
+                return "number";
+            if (dbPropertyInfo.PropertyType == typeof(double) ||
+                dbPropertyInfo.PropertyType == typeof(float) ||
+                dbPropertyInfo.PropertyType == typeof(decimal))
+                return "number";
             if (dbPropertyInfo.PropertyType == typeof(bool))
                 return "checkbox";
 

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
-    public partial class IndexModel : ManageAccountPageModel
+    public partial class IndexModel : ManageAccountProfilePageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
 
@@ -21,7 +21,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             SignInManager<ApplicationUser> signInManager,
             IUserDbContext userDbContext,
             IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base("Profile", userDbContext, userDbContextConfiguration)
+            : base(userDbContext, userDbContextConfiguration)
         {
             _userDbContext = userDbContext;
             _signInManager = signInManager;
@@ -29,8 +29,10 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public string Username { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string category)
         {
+            this.Category = String.IsNullOrWhiteSpace(category) ? "Profile" : category; 
+
             await base.LoadUserAsync();
             if (this.ApplicationUser == null)
             {
@@ -43,6 +45,9 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnPostAsync()
         {
             await base.LoadUserAsync();
+            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ? 
+                "Profile" :
+                Request.Form["_category"].ToString();
 
             if (this.ApplicationUser == null)
             {
@@ -63,10 +68,10 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
                     var optionalProperty = base.OptionalPropertyInfos?
                                                .PropertyInfos?
-                                               .Where(p => p.Name == propertyName)
+                                               .Where(p => p.Name == propertyName && this.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase))
                                                .FirstOrDefault();
 
-                    if (optionalProperty == null || optionalProperty.Action.HasFlag(DbPropertyInfoAction.ReadOnly))
+                    if (optionalProperty == null || optionalProperty.Action == DbPropertyInfoAction.ReadOnly)
                     {
                         continue;
                     }
@@ -80,8 +85,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(this.ApplicationUser);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            StatusMessage = $"Your { Category.ToLower() } settings has been updated";
+            return RedirectToPage(new { category = this.Category });
         }
     }
 }
