@@ -4,10 +4,10 @@ using System.Text;
 
 namespace IdentityServer.Legacy.Token.ErrorHandling
 {
-    public class WrongIssuerException : TokenVerificationException
+    public class TokenNotBeforeException : TokenValidationException 
     {
-        public WrongIssuerException()
-            : base("wrong issuer")
+        public TokenNotBeforeException()
+            : base("Not use before")
         {
 
         }

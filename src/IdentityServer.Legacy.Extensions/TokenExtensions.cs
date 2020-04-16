@@ -59,7 +59,7 @@ namespace IdentityServer.Legacy.Token
             string[] tokenParts = token.Split('.');
             if (tokenParts.Length != 3)
             {
-                throw new TokenVerificationException("Invalid jwt access token format");
+                throw new TokenValidationException("Invalid jwt access token format");
             }
 
             string headerEncoded = tokenParts[0];
@@ -99,7 +99,7 @@ namespace IdentityServer.Legacy.Token
                         .FirstOrDefault();
                     if (secKey == null)
                     {
-                        throw new TokenVerificationException($"Can't find RS256 Key: { header.KeyId }");
+                        throw new TokenValidationException($"Can't find RS256 Key: { header.KeyId }");
                     }
 
                     RSAParameters rsaParameters = new RSAParameters();
@@ -122,7 +122,7 @@ namespace IdentityServer.Legacy.Token
 
                     break;
                 default:
-                    throw new TokenVerificationException($"Unsupported token algorithm { header.Algorithm }");
+                    throw new TokenValidationException($"Unsupported token algorithm { header.Algorithm }");
 
             }
 
