@@ -53,6 +53,17 @@ namespace IdentityServer
                     options.AddPolicy("admin-policy",
                         policy => policy.RequireRole("identityserver-legacy-administrator"));
                 }
+
+                if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
+                {
+                    options.AddPolicy("admin-users-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                }
+                else
+                {
+                    options.AddPolicy("admin-users-policy",
+                        policy => policy.RequireRole("identityserver-legacy-user-administrator"));
+                }
             });
 
             services.AddMvc()

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.Services.DbContext
+namespace IdentityServer.Legacy.UserInteraction
 {
-    public class ManageAccountDbPropertyInfos : DbPropertyInfos
+    public class ManageAccountEditor : EditorInfoCollection
     {
         public bool AllowDelete { get; set; }
         public bool ShowChangeEmailPage { get; set; }

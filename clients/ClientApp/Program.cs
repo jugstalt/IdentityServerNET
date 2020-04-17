@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Token;
+using IdentityServer.Legacy.Extensions;
 
 namespace ClientApp
 {
@@ -28,7 +28,7 @@ namespace ClientApp
 
                 Console.WriteLine(tokenResponse.Json);
 
-                if (!await tokenResponse.AccessToken.VerifyAccessToken(issuer))
+                if (await tokenResponse.AccessToken.ToValidatedJwtSecurityToken(issuer) == null)
                 {
                     Console.WriteLine("Token not valid");
                     return;

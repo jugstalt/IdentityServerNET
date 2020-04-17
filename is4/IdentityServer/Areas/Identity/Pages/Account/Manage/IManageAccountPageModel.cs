@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.UserInteraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
     public interface IManageAccountPageModel
     {
-        ManageAccountDbPropertyInfos OptionalPropertyInfos { get; set; }
+        ManageAccountEditor EditorInfos { get; set; }
     }
 }

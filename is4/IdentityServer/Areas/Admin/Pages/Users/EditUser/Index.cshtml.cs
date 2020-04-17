@@ -1,41 +1,32 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.UserInteraction;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
-namespace IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {
-    public partial class IndexModel : ManageAccountProfilePageModel
+    public class IndexModel : EditUserPageModel
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-
         public IndexModel(
-            SignInManager<ApplicationUser> signInManager,
             IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
             : base(userDbContext, userDbContextConfiguration)
         {
-            _userDbContext = userDbContext;
-            _signInManager = signInManager;
+
         }
 
-        public string Username { get; set; }
-
-        public async Task<IActionResult> OnGetAsync(string category)
+        async public Task<IActionResult> OnGetAsync(string id, string category)
         {
-            this.Category = String.IsNullOrWhiteSpace(category) ? "Profile" : category; 
+            this.Category = String.IsNullOrWhiteSpace(category) ? "Profile" : category;
 
-            await base.LoadUserAsync();
-            if (this.ApplicationUser == null)
+            await base.LoadCurrentApplicationUserAsync(id);
+            if (this.CurrentApplicationUser == null)
             {
                 return NotFound($"Unable to load user.");
             }
@@ -45,15 +36,16 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await base.LoadUserAsync();
-            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ? 
-                "Profile" :
-                Request.Form["_category"].ToString();
-
-            if (this.ApplicationUser == null)
+            await base.LoadCurrentApplicationUserAsync(Request.Form["__current_admin_account_user_id"].ToString());
+           
+            if (this.CurrentApplicationUser == null)
             {
                 return NotFound($"Unable to load user.");
             }
+
+            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ?
+                "Profile" :
+                Request.Form["_category"].ToString();
 
             if (!this.EditorInfos.Validate(Request.Form, out string message))
             {
@@ -81,15 +73,14 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
                 }
 
                 await _userDbContext.UpdatePropertyAsync(
-                    this.ApplicationUser,
+                    this.CurrentApplicationUser,
                     editorInfo,
                     this.Request.Form[formKey].ToString(),
                     new System.Threading.CancellationToken());
             }
 
-            await _signInManager.RefreshSignInAsync(this.ApplicationUser);
-            StatusMessage = $"Your { Category.ToLower() } settings has been updated";
-            return RedirectToPage(new { category = this.Category });
+            StatusMessage = $"The current users { Category.ToLower() } settings has been updated";
+            return RedirectToPage(new { id=this.CurrentApplicationUser.Id, category = this.Category });
         }
     }
 }

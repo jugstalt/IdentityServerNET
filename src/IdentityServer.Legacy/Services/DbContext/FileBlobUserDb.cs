@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.Serialize;
 using System.Security.Claims;
 using System.Linq;
+using IdentityServer.Legacy.UserInteraction;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public class FileBlobUserDb : IUserDbContext
+    public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext
     {
         private string _rootPath = null;
         private ICryptoService _cryptoService = null;
@@ -165,7 +166,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return propertyValue;
         }
 
-        async public Task UpdatePropertyAsync(ApplicationUser user, DbPropertyInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+        async public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
         {
             var propertyInfo = user.GetType().GetProperty(dbPropertyInfo.Name);
             if (propertyInfo != null)
@@ -200,14 +201,39 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #endregion
 
+        #region IAdminUserDbContext
+
+        async public Task<IEnumerable<ApplicationUser>> GetUsersAsync(int limit, int skip, CancellationToken cancellationToken)
+        {
+            List<ApplicationUser> users = new List<ApplicationUser>();
+            foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.user").Skip(skip))
+            {
+                if (users.Count >= limit)
+                {
+                    break;
+                }
+
+                using (var reader = File.OpenText(fi.FullName))
+                {
+                    var fileText = await reader.ReadToEndAsync();
+
+                    fileText = _cryptoService.DecryptText(fileText);
+
+                    users.Add(_blobSerializer.DeserializeObject<ApplicationUser>(fileText));
+                }
+            }
+
+            return users;
+        }
+
+        #endregion
+
         #region Helper
 
         private string UsernameToId(ApplicationUser user)
         {
             return user.UserName.NameToHexId(_cryptoService);
         }
-
-        
 
         #endregion
     }

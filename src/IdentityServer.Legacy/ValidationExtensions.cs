@@ -24,6 +24,7 @@ namespace IdentityServer.Legacy
                 @"([\+\-_\.][0-9a-zA-Z]+)*" + // No continues or ending +-_. chars in email
                 @")+" +
                 @"@(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]*\.)+[a-zA-Z0-9]{2,17})$";
+        public const string PhoneNumberRegex = @"^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$";
         public const string PromotionCodeRegex = @"^[a-z0-9]*$";
         public const string NamespaceRegex = @"^[a-z0-9\-]*$";
         public const string NumberRegex = @"^[0-9]*$";

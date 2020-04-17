@@ -2,11 +2,11 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-@model IManageAccountPageModel
+@model IEditUserPageModel
 
-<h2>Manage your account</h2>
+<h2>Admin Users</h2>
 <div class="admin-resources">
-    <h4>Change your account settings</h4>
+    <h4>Edit Application User: @Model?.CurrentApplicationUser?.UserName</h4>
     <hr />
 
     <div class="row">
@@ -16,7 +16,7 @@
 
             </div>
 
-            <partial name="_ManageNav" model="Model?.EditorInfos" />
+            <partial name="_EditUserNav" model="Model" />
         </div>
         <div class="col-md-9">
             @RenderBody()

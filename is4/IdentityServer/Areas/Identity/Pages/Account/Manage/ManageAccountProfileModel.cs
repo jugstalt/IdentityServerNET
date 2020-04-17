@@ -1,6 +1,7 @@
 ﻿using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,10 +20,10 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         protected ManageAccountPageModel(
             IOptions<UserDbContextConfiguration> userDbContextConfiguration)
         {
-            OptionalPropertyInfos =
-                userDbContextConfiguration?.Value?.ManageAccountProperties;
+            EditorInfos =
+                userDbContextConfiguration?.Value?.ManageAccountEditor;
         }
 
-        public ManageAccountDbPropertyInfos OptionalPropertyInfos { get; set; }
+        public ManageAccountEditor EditorInfos { get; set; }
     }
 }

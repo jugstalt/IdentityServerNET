@@ -1,0 +1,21 @@
+﻿@model EditUserPageModel
+
+@if (Model.EditorInfos != null)
+{
+    foreach (var editorInfo in Model.EditorInfos
+                                        .EditorInfos
+                                        .Where(p => String.IsNullOrEmpty(Model.Category) || Model.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase)))
+    {
+    <div class="form-group">
+        <label>@editorInfo.DisplayName</label>
+        <input name="@editorInfo.Name"
+               value="@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)"
+               @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
+               class="form-control" />
+        <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true">
+
+        </span>
+    </div>
+    }
+}
+

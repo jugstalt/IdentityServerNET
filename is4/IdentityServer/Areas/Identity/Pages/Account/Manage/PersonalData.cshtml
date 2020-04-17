@@ -16,7 +16,7 @@
         <form asp-page="DownloadPersonalData" method="post" class="form-group">
             <button class="btn btn-default" type="submit">Download</button>
         </form>
-        @if (Model.OptionalPropertyInfos?.AllowDelete == true)
+        @if (Model.EditorInfos?.AllowDelete == true)
         {
         <p>
             <a asp-page="DeletePersonalData" class="btn btn-default">Delete</a>

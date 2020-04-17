@@ -1,0 +1,23 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Users.IndexModel
+@{
+}
+
+@if (Model.ApplicationUsers != null)
+{
+    <ul class="nav nav-pills nav-stacked">
+        @foreach (var user in Model.ApplicationUsers)
+        {
+            <li class="app-users">
+                <a asp-page="EditUser/Index"
+                   asp-route-id="@user.Id">
+                    <strong>@user.UserName</strong>
+                    <div>
+                        @user.Claims.Where(c => c.Type == "given_name").FirstOrDefault()?.Value
+                        @user.Claims.Where(c => c.Type == "family_name").FirstOrDefault()?.Value
+                    </div>
+                </a>
+            </li>
+        }
+    </ul>
+}

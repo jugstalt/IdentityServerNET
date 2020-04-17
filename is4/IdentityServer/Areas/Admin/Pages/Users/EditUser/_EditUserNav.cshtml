@@ -1,0 +1,46 @@
+﻿@model EditUserPageModel
+
+@{
+    string[] categories = null;
+    if (Model != null)
+    {
+        categories = Model.EditorInfos.EditorInfos
+                            .Select(p => p.Category)
+                            .Distinct()
+                            .ToArray();
+    }
+}
+
+    <ul class="nav nav-pills nav-stacked">
+        <li class="">
+            <a asp-page="../Index">..</a>
+        </li>
+        @if (categories != null)
+        {
+
+            @foreach (var category in categories)
+            {
+                <li class="@(ViewData["Category"] != null && category.Equals(ViewData["Category"].ToString(), StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                    <a asp-page="./Index"
+                       asp-route-id="@Model.CurrentApplicationUser.Id"
+                       asp-route-category="@category">@category</a>
+                </li>
+            }
+        }
+
+        @if (Model.EditorInfos.AllowSetPassword)
+        {
+            <li class="@EditUserNavPages.SetPasswordClass(ViewContext)">
+                <a asp-page="./SetPassword"
+                   asp-route-id="@Model.CurrentApplicationUser.Id">Set Password</a>
+            </li>
+        }
+        @if (Model.EditorInfos.AllowDelete)
+        {
+            <li class="@EditUserNavPages.DeleteUserNavClass(ViewContext)">
+                    <a asp-page="./DeleteUser"
+                       asp-route-id="@Model.CurrentApplicationUser.Id">Delete User</a>
+            </li>
+        }
+
+    </ul>

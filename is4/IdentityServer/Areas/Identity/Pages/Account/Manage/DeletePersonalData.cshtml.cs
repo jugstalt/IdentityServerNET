@@ -28,7 +28,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
             _logger = logger;
 
-            if(base.OptionalPropertyInfos?.AllowDelete != true)
+            if(base.EditorInfos?.AllowDelete != true)
             {
                 throw new NotImplementedException();
             }

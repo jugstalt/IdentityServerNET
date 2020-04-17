@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Concurrent;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext
+    public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDbContext
     {
         private static ConcurrentDictionary<string, ApplicationUser> _users = new ConcurrentDictionary<string, ApplicationUser>();
 
@@ -108,7 +109,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult<T>(propertyValue);
         }
 
-        public Task UpdatePropertyAsync(ApplicationUser user, DbPropertyInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+        public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
         {
             if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
             {
@@ -147,7 +148,14 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        
+        #endregion
+
+        #region IAdminUserDbContext
+
+        public Task<IEnumerable<ApplicationUser>> GetUsersAsync(int limit, int skip, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IEnumerable<ApplicationUser>>(_users.Values.Skip(skip).Take(limit));
+        }
 
         #endregion
     }
