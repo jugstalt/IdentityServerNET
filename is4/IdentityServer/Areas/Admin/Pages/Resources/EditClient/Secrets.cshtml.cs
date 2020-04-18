@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using IdentityServer.Legacy.Extensions;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 {
@@ -21,9 +24,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
         {
             await LoadCurrentClientAsync(id);
 
+            //IdentityServerConstants.SecretTypes.
+
             Input = new NewSecretModel()
             {
-                ClientId = id
+                ClientId = id,
+                SecretType=IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret
             };
 
             return Page();
@@ -31,16 +37,30 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(Input.ClientId);
+
+                var inputSecret = Input.Secret.Trim();
+
+                switch(Input.SecretType)
+                {
+                    case IdentityServerConstants.SecretTypes.SharedSecret:
+                        inputSecret = inputSecret.Sha256();
+                        break;
+                    case IdentityServerConstants.SecretTypes.X509CertificateBase64:
+                        inputSecret = inputSecret.ParseCertBase64String();
+                        break;
+                    default:
+                        throw new Exception("Unknown secret type");
+                }
 
                 if (!String.IsNullOrWhiteSpace(Input.Secret))
                 {
                     var secret = new Secret()
                     {
                         Type = Input.SecretType,
-                        Value = Input.Secret.Trim().ToSha256(),
+                        Value = inputSecret,
                         Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
                         Expiration = Input.Expiration
                     };
@@ -62,7 +82,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnGetRemoveAsync(string id, int secretIndex, string secretHash)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(id);
 
@@ -91,9 +111,11 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
             public string ClientId { get; set; }
            
             public string Secret { get; set; }
-            public string SecretType => "SharedSecret";
+            public string SecretType { get; set; }
             public string SecretDescription { get; set; }
             public DateTime? Expiration { get; set; }
         }
+
+
     }
 }

@@ -24,7 +24,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnGetSetAsync(string id, string grant, bool remove)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(id);
 

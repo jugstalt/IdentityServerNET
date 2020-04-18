@@ -39,7 +39,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
 
             string clientId = Input.ClientId.Trim().ToLower();
 
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 if (_clientDb != null)
                 {

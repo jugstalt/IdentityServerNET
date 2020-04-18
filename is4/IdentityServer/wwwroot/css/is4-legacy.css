@@ -1,4 +1,17 @@
-﻿.admin-resources {
+﻿@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #333;
+        color: #eee;
+    }
+    .form-control {
+        background-color: #000;
+    }
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] {
+            background-color: #333;
+        }
+}
+
+.admin-resources {
 
 }
 

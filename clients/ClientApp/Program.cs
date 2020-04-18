@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Extensions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ClientApp
 {
@@ -11,8 +12,10 @@ namespace ClientApp
     {
         async static Task Main(string[] args)
         {
+            var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
+
             string issuer = "https://localhost:44300";
-            var tokenResponse = /*await GetToken()*/ await GetUserToken();
+            var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);
 
             //if(tokenResponse == null)
             //{
@@ -68,6 +71,43 @@ namespace ClientApp
                 ClientSecret = "secret1",
                 
                 Scope = "api1"
+            });
+
+            if (tokenResponse.IsError)
+            {
+                Console.WriteLine(tokenResponse.Error);
+                return null;
+            }
+
+            return tokenResponse;
+        }
+
+        async static Task<TokenResponse> GetToken(X509Certificate2 cert)
+        {
+            // discover endpoints from metadata
+            var client = new HttpClient();
+            var disco = await client.GetDiscoveryDocumentAsync("https://localhost:44300");
+            if (disco.IsError)
+            {
+                Console.WriteLine(disco.Error);
+                return null;
+            }
+
+            var clientAssertion = new ClientAssertion()
+            {
+                Type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                Value = cert.ToAssertionToken("client", "https://localhost:44300").ToTokenString()
+            };
+
+            // request token
+            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = "client",
+                ClientAssertion=  clientAssertion,
+
+                Scope = "api1",
             });
 
             if (tokenResponse.IsError)

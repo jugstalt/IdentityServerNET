@@ -24,7 +24,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnGetSetAsync(string id, string option, bool value)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentApiResourceAsync(id);
 

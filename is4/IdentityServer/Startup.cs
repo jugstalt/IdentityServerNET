@@ -3,6 +3,7 @@
 
 using IdentityServer.Legacy;
 using IdentityServer4.Configuration;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -107,8 +108,13 @@ namespace IdentityServer
                     CookieSlidingExpiration = true
                 };
             })
+            // Add Jwt Client Assertation (get token from certificate)
+            .AddSecretParser<JwtBearerClientAssertionSecretParser>()
+            .AddSecretValidator<PrivateKeyJwtSecretValidator>()
+            // Add Identity
             .AddAspNetIdentity<ApplicationUser>()
             //.AddProfileService<LegacyProfileService>()
+            // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
 

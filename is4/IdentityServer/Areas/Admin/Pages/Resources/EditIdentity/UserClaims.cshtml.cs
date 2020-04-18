@@ -30,7 +30,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         async public Task<IActionResult> OnGetRemoveAsync(string id, string userClaim)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentIdentityResourceAsync(id);
 
@@ -52,7 +52,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
                 return Page();
             }
 
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentIdentityResourceAsync(Input.IdentityName);
 

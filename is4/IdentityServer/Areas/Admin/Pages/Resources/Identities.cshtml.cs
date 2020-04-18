@@ -38,7 +38,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             }
             string identityName = Input.IdentityResourceName.Trim().ToLower();
             
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 if (_resourceDb != null)
                 {

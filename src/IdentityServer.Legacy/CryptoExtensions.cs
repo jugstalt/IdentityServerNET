@@ -6,7 +6,7 @@ using System.Text;
 
 namespace IdentityServer.Legacy
 {
-    static public class Extensions
+    static public class CryptoExtensions
     {
         static public string NameToHexId(this string name, ICryptoService cryptoService=null)
         {

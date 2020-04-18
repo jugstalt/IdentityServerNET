@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -73,37 +74,33 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await base.LoadCurrentApplicationUserAsync(Input.CurrentUserId);
-
-            #region Verify new Password
-
-            try
+            return await base.SecureHandlerAsync(async () =>
             {
+                await base.LoadCurrentApplicationUserAsync(Input.CurrentUserId);
+
+                #region Verify new Password
+
                 Input.NewPassword = Input.NewPassword.Trim();
 
                 if (String.IsNullOrWhiteSpace(Input.NewPassword))
                 {
-                    throw new Exception("New password is empty.");
+                    throw new StatusMessageException("New password is empty.");
                 }
 
-                if(!Input.NewPassword.Equals(Input.ConfirmPassword))
+                if (!Input.NewPassword.Equals(Input.ConfirmPassword))
                 {
-                    throw new Exception("The two passwords don't match.");
+                    throw new StatusMessageException("The two passwords don't match.");
                 }
+
+
+                #endregion
+
+                string newPasswordhash = _passwordHasher.HashPassword(this.CurrentApplicationUser, Input.NewPassword);
+
+                await _userDbContext.UpdatePropertyAsync<string>(this.CurrentApplicationUser, "PasswordHash", newPasswordhash, CancellationToken.None);
             }
-            catch (Exception ex)
-            {
-                StatusMessage = "Error: " + ex.Message;
-                return RedirectToPage(new { id = Input.CurrentUserId });
-            }
-
-            #endregion
-
-            string newPasswordhash = _passwordHasher.HashPassword(this.CurrentApplicationUser, Input.NewPassword);
-
-            await _userDbContext.UpdatePropertyAsync<string>(this.CurrentApplicationUser, "PasswordHash", newPasswordhash, CancellationToken.None);
-
-            return RedirectToPage(new { id = Input.CurrentUserId });
+            , onFinally: () => RedirectToPage(new { id = Input.CurrentUserId })
+            , successMessage: "Password changed");
         }
     }
 }

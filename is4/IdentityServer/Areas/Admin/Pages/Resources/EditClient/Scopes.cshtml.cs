@@ -70,7 +70,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnGetRemoveAsync(string id, string scopeName)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(id);
 
@@ -87,7 +87,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnGetAddAsync(string id, string scopeName)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(id);
 
@@ -114,7 +114,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         async public Task<IActionResult> OnPostAsync()
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(Input.ClientId);
 

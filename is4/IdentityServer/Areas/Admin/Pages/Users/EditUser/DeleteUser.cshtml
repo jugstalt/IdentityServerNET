@@ -1,0 +1,26 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Users.EditUser.DeleteUserModel
+@{
+    ViewData["Title"] = "Delete User Account";
+    ViewData["ActivePage"] = EditUserNavPages.DeleteUser;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="change-password-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input asp-for="Input.CurrentUserId" />
+            <div class="form-group">
+                <label asp-for="Input.ConfirmUsername"></label>
+                <input asp-for="Input.ConfirmUsername" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-danger">Delete User Account!</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

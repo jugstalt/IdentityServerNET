@@ -32,7 +32,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
         async public Task<IActionResult> OnPostAsync()
         {
             List<string> propertyNames = new List<string>();
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(Input.ClientId);
 

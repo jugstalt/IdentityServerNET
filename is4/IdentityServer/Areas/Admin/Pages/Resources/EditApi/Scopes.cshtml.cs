@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnGetRemoveAsync(string id, string scopeName)
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentApiResourceAsync(id);
 
@@ -56,7 +57,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
         async public Task<IActionResult> OnPostAsync()
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentApiResourceAsync(Input.ApiName);
 
@@ -70,13 +71,13 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 if (String.IsNullOrWhiteSpace(Input.Scope?.Name) ||
                    Input.Scope.Name.Trim().Length<3)
                 {
-                    throw new Exception("Invalid scope name: min. 3 letters, mumbers, . - _");
+                    throw new StatusMessageException("Invalid scope name: min. 3 letters, mumbers, . - _");
                 }
 
                 var regEx = new Regex(@"^[a-z0-9_\-\.]+$");
                 if(!regEx.IsMatch(Input.Scope.Name))
                 {
-                    throw new Exception("Invalid scope name: Only lowercase letters, numbers,-,_,.");
+                    throw new StatusMessageException("Invalid scope name: Only lowercase letters, numbers,-,_,.");
                 }
 
                 if (checkNameConvention)
@@ -84,7 +85,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     if (Input.Scope.Name != this.CurrentApiResource.Name &&
                        !Input.Scope.Name.StartsWith(this.CurrentApiResource.Name + "."))
                     {
-                        throw new Exception($"Bad name convention: Scope names for this API resource shold start with '{ CurrentApiResource.Name }.'. If you want to overrule this convonention, type @@ befor your scope name...");
+                        throw new StatusMessageException($"Bad name convention: Scope names for this API resource shold start with '{ CurrentApiResource.Name }.'. If you want to overrule this convonention, type @@ befor your scope name...");
                     }
                 }
 

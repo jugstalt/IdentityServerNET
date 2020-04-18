@@ -1,5 +1,7 @@
 ﻿using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {
-    public class EditUserPageModel : PageModel, IEditUserPageModel
+    public class EditUserPageModel : SecurePageModel, IEditUserPageModel
     {
         public EditUserPageModel(
             IUserDbContext userDbContext,
@@ -34,9 +36,6 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
         }
 
         public string Category { get; set; }
-
-        [TempData]
-        public String StatusMessage { get; set; }
 
         public ApplicationUser CurrentApplicationUser { get; set; }
     }

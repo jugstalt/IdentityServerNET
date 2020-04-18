@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
         async public Task<IActionResult> OnPostAsync()
         {
             List<string> propertyNames = new List<string>();
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentApiResourceAsync(Input.ApiName);
 
@@ -73,7 +74,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 }
                 else
                 {
-                    throw new Exception("No changes found...");
+                    throw new StatusMessageException("No changes found...");
                 }
             }
             , onFinally: () => RedirectToPage(new { id = Input.ApiName })

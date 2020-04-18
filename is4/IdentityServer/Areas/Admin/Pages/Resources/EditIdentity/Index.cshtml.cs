@@ -31,7 +31,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         public async Task<IActionResult> OnPostAsync()
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentIdentityResourceAsync(Input.Name);
 

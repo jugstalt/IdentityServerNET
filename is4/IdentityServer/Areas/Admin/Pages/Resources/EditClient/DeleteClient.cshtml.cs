@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,7 +30,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         public async Task<IActionResult> OnPostAsync()
         {
-            return await PostFormHandlerAsync(async () =>
+            return await SecureHandlerAsync(async () =>
             {
                 await LoadCurrentClientAsync(Input.ClientId);
 
@@ -39,7 +40,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
                 } 
                 else
                 {
-                    throw new Exception("Please type the correct client id");
+                    throw new StatusMessageException("Please type the correct client id");
                 }
             }
             , onFinally: () => RedirectToPage("../Clients")
