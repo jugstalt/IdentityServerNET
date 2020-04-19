@@ -15,10 +15,11 @@
             {
                 @foreach (var client in Model.Clients)
                 {
-                    <li style="border-bottom:1px solid #eee">
+                    <li class="ui-list-item">
                         <a style="padding-left:4px"
                            asp-page="./EditClient/Index"
                            asp-route-id="@client.ClientId">
+                            <div class="ui-icon left glyphicon glyphicon-globe"></div>
                             <div><strong>@client.ClientId</strong></div>
                             <div>@client.ClientName</div>
                             @if (!String.IsNullOrWhiteSpace(client.Description))

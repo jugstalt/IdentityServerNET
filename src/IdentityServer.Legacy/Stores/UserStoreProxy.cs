@@ -22,7 +22,8 @@ namespace IdentityServer.Legacy.Stores
                                   IUserClaimStore<ApplicationUser>,
                                   IUserClaimsPrincipalFactory<ApplicationUser>, 
                                   IUserLoginStore<ApplicationUser>,
-                                  IUserSecurityStampStore<ApplicationUser>
+                                  IUserSecurityStampStore<ApplicationUser>,
+                                  IUserRoleStore<ApplicationUser>
                                   
     {
         private IUserDbContext _dbContext;
@@ -351,6 +352,52 @@ namespace IdentityServer.Legacy.Stores
         public Task<string> GetSecurityStampAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.SecurityStamp);
+        }
+
+        #endregion
+
+        #region IUserRoleStore
+
+        public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            if(_dbContext is IUserRoleDbContext)
+            {
+                return ((IUserRoleDbContext)_dbContext).AddToRoleAsync(user, roleName, cancellationToken);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            if (_dbContext is IUserRoleDbContext)
+            {
+                return ((IUserRoleDbContext)_dbContext).RemoveFromRoleAsync(user, roleName, cancellationToken);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IList<string>>(user.Roles?.ToArray() ?? new string[0]);
+        }
+
+        public Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var isInRole = user.Roles != null && user.Roles.Contains(roleName);
+
+            return Task.FromResult(isInRole);
+        }
+
+        public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            if (_dbContext is IUserRoleDbContext)
+            {
+                return ((IUserRoleDbContext)_dbContext).GetUsersInRoleAsync(roleName, cancellationToken);
+            }
+
+            return Task.FromResult<IList<ApplicationUser>>(new ApplicationUser[0]);
         }
 
         #endregion

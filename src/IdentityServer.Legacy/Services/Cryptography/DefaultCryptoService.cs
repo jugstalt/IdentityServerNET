@@ -45,7 +45,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return Convert.ToBase64String(AES_Encrypt(bytes, _defaultPasswordBytes, keySize: 128, useRandomSalt: true));
         }
 
-        public string EncryptTextUnsalted(string text, Encoding encoding = null)
+        public string EncryptTextConvergent(string text, Encoding encoding = null)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return encoding.GetString(decryptedBytes);
         }
 
-        public string DecryptTextUnsalted(string base64Text, Encoding encoding = null)
+        public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
         {
             try
             {

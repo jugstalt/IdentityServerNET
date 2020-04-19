@@ -22,12 +22,9 @@ namespace IdentityServer.Legacy
             builder.ConfigureServices((context, services) =>
             {
                 services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
-                //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
+                services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
 
-                // ToDo:
-                // ServerExtension.Test wird nur aufgerufen, wenn sie auch im Projekt IdentityServer als Dependency geführt wird!
-                // Hier sollte es einen Mechanischmus geben, dass man das Startuphosting auch für die "eingbunden dll laden kann"
-                // Der Name der Assembly sollte in der Config stehen -> GetTypes -> IHostingStartup -> Invoke
+                //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
 
                 string legacyAssemblyName = context.Configuration["LegacyAssemblyName"];
                 if(!String.IsNullOrWhiteSpace(legacyAssemblyName))

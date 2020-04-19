@@ -15,10 +15,11 @@
             {
                 @foreach (var identityResource in Model.IdentityResources)
                 {
-                    <li style="border-bottom:1px solid #eee">
+                    <li class="ui-list-item">
                         <a style="padding-left:4px"
                            asp-page="./EditIdentity/Index"
                            asp-route-id="@identityResource.Name">
+                            <div class="ui-icon left glyphicon glyphicon-tag"></div>
                             <div><strong>@identityResource.Name</strong></div>
                             <div>@identityResource.DisplayName</div>
                         </a>

@@ -15,10 +15,11 @@
             {
                 @foreach (var apiResource in Model.ApiResources)
                 {
-                    <li style="border-bottom:1px solid #eee">
+                    <li class="ui-list-item">
                         <a style="padding-left:4px"
                            asp-page="./EditApi/Index"
                            asp-route-id="@apiResource.Name">
+                            <div class="ui-icon left glyphicon glyphicon-transfer"></div>
                             <div><strong>@apiResource.Name</strong></div>
                             <div>@apiResource.DisplayName</div>
                         </a>

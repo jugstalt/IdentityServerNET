@@ -8,9 +8,10 @@
     <ul class="nav nav-pills nav-stacked">
         @foreach (var user in Model.ApplicationUsers)
         {
-            <li class="app-users">
+            <li class="ui-list-item">
                 <a asp-page="EditUser/Index"
                    asp-route-id="@user.Id">
+                    <div class="ui-icon left glyphicon glyphicon-user"></div>
                     <strong>@user.UserName</strong>
                     <div>
                         @user.Claims.Where(c => c.Type == "given_name").FirstOrDefault()?.Value

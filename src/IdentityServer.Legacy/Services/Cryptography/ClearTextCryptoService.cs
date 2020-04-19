@@ -13,7 +13,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return text;
         }
 
-        public string EncryptTextUnsalted(string text, Encoding encoding = null)
+        public string EncryptTextConvergent(string text, Encoding encoding = null)
         {
             return text;
         }
@@ -23,7 +23,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return base64Text;
         }
 
-        public string DecryptTextUnsalted(string base64Text, Encoding encoding=null)
+        public string DecryptTextConvergent(string base64Text, Encoding encoding=null)
         {
             return base64Text;
         }

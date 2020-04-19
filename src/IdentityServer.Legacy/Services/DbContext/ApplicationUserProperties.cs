@@ -19,4 +19,10 @@ namespace IdentityServer.Legacy.Services.DbContext
         public const string TfaRecoveryCodes = "TfaRecoveryCodes";
         public const string SecurityStamp = "SecurityStamp";
     }
+
+    public static class ApplicationRoleProperties
+    {
+        public const string NormalizedName = "NormalizedName";
+        public const string Name = "Name";
+    }
 }

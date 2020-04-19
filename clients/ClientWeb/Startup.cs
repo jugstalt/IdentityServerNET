@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -18,6 +19,9 @@ namespace ClientWeb
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                        .AddDefaultTokenProviders();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "Cookies";
@@ -41,6 +45,7 @@ namespace ClientWeb
                     //options.Scope.Add("api1");
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
+                    options.Scope.Add("role");
                     //options.Scope.Add("email");
                     //options.Scope.Add("role");
                     //options.Scope.Add("phone");

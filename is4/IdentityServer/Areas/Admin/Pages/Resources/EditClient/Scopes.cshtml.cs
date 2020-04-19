@@ -18,6 +18,9 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
         private IResourceDbContextModify _resourceDb = null;
 
+        public string[] IdentityResourceScopes = null;
+        public string[] ApiResouceScopes = null;
+
         async public Task<IActionResult> OnGetAsync(string id)
         {
             await LoadCurrentClientAsync(id);
@@ -27,7 +30,10 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
             {
                 var identityResources = await _resourceDb.GetAllIdentityResources();
                 var apiResources = await _resourceDb.GetAllApiResources();
-                
+
+                IdentityResourceScopes = identityResources?.Select(s => s.Name).ToArray() ?? new string[0];
+                ApiResouceScopes = apiResources?.SelectMany(m => m.Scopes.Select(s => s.Name)).ToArray() ?? new string[0];
+
                 if(identityResources!=null)
                 {
                     resourceScopes.AddRange(identityResources
@@ -111,6 +117,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
             , onFinally: () => RedirectToPage(new { id = id })
             , successMessage: $"Scope '{ scopeName }' addes successfully");
         }
+
 
         async public Task<IActionResult> OnPostAsync()
         {

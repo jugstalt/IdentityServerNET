@@ -8,10 +8,10 @@ namespace IdentityServer.Legacy.Services.Cryptography
     {
         string EncryptText(string text, Encoding encoding = null);
         
-        string EncryptTextUnsalted(string text, Encoding encoding = null);
+        string EncryptTextConvergent(string text, Encoding encoding = null);
 
         string DecryptText(string base64Text, Encoding encoding = null);
         
-        string DecryptTextUnsalted(string base64Text, Encoding encoding = null);
+        string DecryptTextConvergent(string base64Text, Encoding encoding = null);
     }
 }

@@ -1,0 +1,28 @@
+﻿@page
+@model IdentityServer.Areas.Admin.IndexModel
+@{
+    Layout = "_Layout.cshtml";
+}
+
+<ul class="ui-tiles">
+    <li class="ui-tile">
+        <a asp-page="./Users/Index">
+            <div class="ui-tile-icon glyphicon glyphicon-user">
+
+            </div>
+            <div class="ui-tile-text ">
+                Users...
+            </div>
+        </a>
+    </li>
+    <li class="ui-tile">
+        <a asp-page="./Resources/Index">
+            <div class="ui-tile-icon glyphicon glyphicon-tasks">
+
+            </div>
+            <div class="ui-tile-text">
+                Identities, APIs, Clients...
+            </div>
+        </a>
+    </li>
+</ul>

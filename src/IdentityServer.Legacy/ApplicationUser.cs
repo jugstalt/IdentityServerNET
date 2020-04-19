@@ -22,6 +22,11 @@ namespace IdentityServer.Legacy
             //        new Claim(JwtClaimTypes.Role, "rol1,role2"),
             //        new Claim(JwtClaimTypes.Address, @"{ 'street_address': 'One Hacker Way', 'locality': 'Heidelberg', 'postal_code': 69118, 'country': 'Germany' }", ClaimValueTypes.String)
             //    };
+
+            this.Roles = new string[]
+            {
+                "role_1","role_2"
+            };
         }
 
         public bool IsLocked { get; set; }
@@ -71,6 +76,8 @@ namespace IdentityServer.Legacy
         }
 
         #endregion
+
+        public ICollection<string> Roles { get; set; }
 
         #region TFA
 

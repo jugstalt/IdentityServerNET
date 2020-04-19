@@ -1,14 +1,5 @@
-﻿@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #333;
-        color: #eee;
-    }
-    .form-control {
-        background-color: #000;
-    }
-        .form-control[disabled], .form-control[readonly], fieldset[disabled] {
-            background-color: #333;
-        }
+﻿label {
+    font-weight:normal;
 }
 
 .admin-resources {
@@ -36,3 +27,74 @@
         .admin-users li.app-users > a {
             min-height:60px
         }
+
+.ui-list-item {
+
+}
+.ui-list-item:nth-child(2n) {
+    background-color:#fafafa;
+}
+
+.ui-list-item a:first-child {
+    min-height: 50px;
+}
+
+.ui-icon {
+    font-size: 26px;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    opacity: .5;
+    box-sizing: border-box;
+    padding: 9px;
+}
+
+    .ui-icon.left {
+        float: left;
+        margin-right:10px;
+    }
+
+
+ul.ui-tiles {
+    list-style:none;
+}
+
+    ul.ui-tiles li.ui-tile {
+        display: inline-table;
+        width: 160px;
+        height: 160px;
+        border:1px solid #eee;
+    }
+        ul.ui-tiles li.ui-tile .ui-tile-icon {
+            width: 160px;
+            height: 100px;
+            text-align:center;
+            box-sizing:border-box;
+            padding:30px;
+            font-size:70px;
+            opacity:.75;
+        }
+
+        ul.ui-tiles li.ui-tile .ui-tile-text {
+            width: 160px;
+            height: 60px;
+            text-align: center;
+            box-sizing: border-box;
+            padding: 8px;
+            font-size: 14px
+        }
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #333;
+        color: #eee;
+    }
+
+    .form-control {
+        background-color: #000;
+    }
+
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] {
+            background-color: #333;
+        }
+}

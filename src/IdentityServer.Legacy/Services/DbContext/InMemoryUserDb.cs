@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDbContext
+    public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDbContext, IUserRoleDbContext
     {
         private static ConcurrentDictionary<string, ApplicationUser> _users = new ConcurrentDictionary<string, ApplicationUser>();
 
@@ -155,6 +155,52 @@ namespace IdentityServer.Legacy.Services.DbContext
         public Task<IEnumerable<ApplicationUser>> GetUsersAsync(int limit, int skip, CancellationToken cancellationToken)
         {
             return Task.FromResult<IEnumerable<ApplicationUser>>(_users.Values.Skip(skip).Take(limit));
+        }
+
+        #endregion
+
+        #region IUserRoleContext
+
+        public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var roles = new List<string>();
+            if(user.Roles!=null)
+            {
+                roles.AddRange(user.Roles);
+            }
+
+            if(!roles.Contains(roleName))
+            {
+                roles.Add(roleName);
+            }
+
+            user.Roles = roles;
+
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            if (user.Roles != null)
+            {
+                var roles = new List<string>(user.Roles);
+                if(roles.Contains(roleName))
+                {
+                    roles.Remove(roleName);
+                    user.Roles = roles;
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IList<ApplicationUser>>(
+                    _users.Values
+                          .Where(u => u.Roles != null && u.Roles.Contains(roleName))
+                          .ToList()
+                );
         }
 
         #endregion

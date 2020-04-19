@@ -59,6 +59,10 @@ namespace IdentityServer.Legacy
                 var identityResource = await _resourcedbContext.FindIdentityResource(scopeName);
                 if(identityResource!=null)
                 {
+                    if(identityResource.Name=="role")
+                    {
+                        identityResource = new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role });
+                    }
                     identityResources.Add(identityResource);
                 }
             }

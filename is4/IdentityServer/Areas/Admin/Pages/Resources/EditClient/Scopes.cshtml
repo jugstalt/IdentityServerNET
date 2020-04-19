@@ -14,9 +14,19 @@
             {
                 <ul class="nav nav-pills nav-stacked">
 
-                    @foreach (var scope in Model.CurrentClient.AllowedScopes)
+                    @foreach (var scope in Model.CurrentClient.AllowedScopes.OrderBy(s=>s))
                     {
-                        <li style="border-bottom:1px solid #eee">
+                        var icon = "";
+                        if(Model.IdentityResourceScopes.Contains(scope))
+                        {
+                            icon = "tag";
+                        }
+                        else if(Model.ApiResouceScopes.Contains(scope))
+                        {
+                            icon = "transfer";
+                        }
+                        <li class="ui-list-item">
+                            <div class="ui-icon left glyphicon glyphicon-@icon"></div>
                             <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope)</div>
                             <a style="display:inline-block;float:right"
                                asp-page-handler="Remove"
@@ -46,20 +56,26 @@
                 <ul class="nav nav-pills nav-stacked">
                     @foreach (var resourceScope in Model.PossibleResourceScopes)
                     {
-                        <li style="border-bottom:1px solid #eee">
-                            <a 
-                               asp-page-handler="Add"
+                        var icon = "tag";
+                        if (resourceScope.ResourceType == "API")
+                        {
+                            icon = "transfer";
+                        }
+
+                        <li class="ui-list-item">
+                            <a asp-page-handler="Add"
                                asp-route-id="@Model.CurrentClient.ClientId"
                                asp-route-scopeName="@resourceScope.Name">
-                                <div style="padding:10px 15px 10px 5px">
+                                <div class="ui-icon left glyphicon glyphicon-@(icon)"></div>
+                                <div style_="padding:10px 15px 10px 5px">
                                     <strong>@(resourceScope.ResourceType):</strong>
                                     @resourceScope.Name
                                 </div>
                                 @if (!String.IsNullOrEmpty(resourceScope.DisplayName))
                                 {
-                                <div style="color:#aaa;font-size:.85em">
-                                    @resourceScope.DisplayName
-                                </div>
+                                    <div style="color:#aaa;font-size:.85em">
+                                        @resourceScope.DisplayName
+                                    </div>
                                 }
                             </a>
                         </li>

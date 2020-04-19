@@ -10,11 +10,14 @@ namespace IdentityServer.Legacy
     {
         static public string NameToHexId(this string name, ICryptoService cryptoService=null)
         {
+            if (String.IsNullOrWhiteSpace(name))
+                return String.Empty;
+
             if(cryptoService == null)
             {
                 cryptoService = new Base64CryptoService();
             }
-            var encryptedUserName = cryptoService.EncryptTextUnsalted(name.Trim().ToUpper());
+            var encryptedUserName = cryptoService.EncryptTextConvergent(name.Trim().ToUpper());
             return ByteArrayToString(Encoding.UTF8.GetBytes(encryptedUserName.ToSha256()));
         }
 
