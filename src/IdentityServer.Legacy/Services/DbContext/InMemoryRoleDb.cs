@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public class InMemoryRoleDb : IRoleDbContext
+    public class InMemoryRoleDb : IRoleDbContext, IAdminRoleDbContext
     {
         private static ConcurrentDictionary<string, ApplicationRole> _roles = new ConcurrentDictionary<string, ApplicationRole>();
+
+        #region 
 
         async public Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)
         {
@@ -93,5 +95,16 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             return Task.FromResult<T>(propertyValue);
         }
+
+        #endregion
+
+        #region IAdminRoleDbContext
+
+        public Task<IEnumerable<ApplicationRole>> GetRolesAsync(int limit, int skip, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<IEnumerable<ApplicationRole>>(_roles.Values.Skip(skip).Take(limit));
+        }
+
+        #endregion
     }
 }

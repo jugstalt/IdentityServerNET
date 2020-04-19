@@ -47,12 +47,12 @@ namespace IdentityServer
             {
                 //options.AddPolicy("admin-policy",
                 //        policy => policy.RequireUserName("identityserver-administrator"));
-                //if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
-                //{
-                //    options.AddPolicy("admin-policy",
-                //        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
-                //}
-                //else
+                if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
+                {
+                    options.AddPolicy("admin-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                }
+                else
                 {
                     options.AddPolicy("admin-policy",
                         policy => policy.RequireRole("identityserver-legacy-administrator"));

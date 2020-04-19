@@ -153,5 +153,34 @@ namespace IdentityServer.Legacy.DependencyInjection
         }
 
         #endregion
+
+        #region RoleDbContext
+
+        static public IRoleDbContextBuilder AddRoleDbContext<T>(this IServiceCollection services)
+            where T : class, IRoleDbContext
+        {
+            services.AddTransient<IRoleDbContext, T>();
+
+            return new RoleDbContextBuilder(services);
+        }
+
+        static public IServiceCollection AddRoleDbContext<T>(this IServiceCollection services, Action<RoleDbContextConfiguration> setupAction)
+            where T : class, IRoleDbContext
+        {
+            services.Configure(setupAction);
+            services.AddTransient<IRoleDbContext, T>();
+
+            return services;
+        }
+
+        public static IRoleDbContextBuilder AddRoleDbContextOptions(this IRoleDbContextBuilder builder,
+            Action<RoleDbContextConfiguration> setupAction)
+        {
+            builder.Services.Configure(setupAction);
+
+            return builder;
+        }
+
+        #endregion
     }
 }

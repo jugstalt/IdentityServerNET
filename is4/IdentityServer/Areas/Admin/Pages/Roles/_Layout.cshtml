@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Admin IdentityServer</h2>
+<div class="admin-users">
+    <h4>Edit Users</h4>
+    <hr />
+    <div class="row">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        <div class="col-md-3 sidebar">
+            <partial name="_RolesNav" model="Model" />
+        </div>
+        <div class="col-md-9">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("scripts", required: false)
+}

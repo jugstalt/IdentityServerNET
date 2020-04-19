@@ -73,6 +73,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #endregion
 
+            #region Add RoleDbContext (optional) 
+
+            services.AddRoleDbContext<InMemoryRoleDb>();
+
+            #endregion
+
             #region Add a ResourceDbContext (required) 
 
             /*

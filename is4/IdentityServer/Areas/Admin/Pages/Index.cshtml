@@ -4,25 +4,44 @@
     Layout = "_Layout.cshtml";
 }
 
-<ul class="ui-tiles">
-    <li class="ui-tile">
-        <a asp-page="./Users/Index">
-            <div class="ui-tile-icon glyphicon glyphicon-user">
+    <ul class="ui-tiles">
+        @if (Model.HasUserDb)
+        {
+        <li class="ui-tile">
+            <a asp-page="./Users/Index">
+                <div class="ui-tile-icon glyphicon glyphicon-user">
 
-            </div>
-            <div class="ui-tile-text ">
-                Users...
-            </div>
-        </a>
-    </li>
-    <li class="ui-tile">
-        <a asp-page="./Resources/Index">
-            <div class="ui-tile-icon glyphicon glyphicon-tasks">
+                </div>
+                <div class="ui-tile-text ">
+                    Users...
+                </div>
+            </a>
+        </li>
+        }
+        @if (Model.HasRoleDb)
+        {
+        <li class="ui-tile">
+            <a asp-page="./Roles/Index">
+                <div class="ui-tile-icon glyphicon glyphicon-ok">
 
-            </div>
-            <div class="ui-tile-text">
-                Identities, APIs, Clients...
-            </div>
-        </a>
-    </li>
-</ul>
+                </div>
+                <div class="ui-tile-text ">
+                    Roles...
+                </div>
+            </a>
+        </li>
+        }
+        @if (Model.HasResourceOrClientDb)
+        {
+        <li class="ui-tile">
+            <a asp-page="./Resources/Index">
+                <div class="ui-tile-icon glyphicon glyphicon-tasks">
+
+                </div>
+                <div class="ui-tile-text">
+                    Identities, APIs, Clients...
+                </div>
+            </a>
+        </li>
+        }
+    </ul>

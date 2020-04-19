@@ -1,0 +1,83 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace IdentityServer.Areas.Admin.Pages.Roles
+{
+    public class IndexModel : SecurePageModel
+    {
+        private IRoleDbContext _roleDb = null;
+
+        public IndexModel(IRoleDbContext roleDbContext)
+        {
+            _roleDb = roleDbContext;
+        }
+
+        public IEnumerable<ApplicationRole> ApplicationRoles { get; set; }
+
+        [BindProperty]
+        public InputModel FindInput { get; set; }
+
+        [BindProperty]
+        public InputModel CreateInput { get; set; }
+
+        public class InputModel
+        {
+            public string Rolename { get; set; }
+        }
+
+        async public Task<IActionResult> OnGetAsync(int skip = 0)
+        {
+            if(_roleDb is IAdminRoleDbContext)
+            {
+                this.ApplicationRoles = await ((IAdminRoleDbContext)_roleDb).GetRolesAsync(100, skip, CancellationToken.None);
+            }
+
+            return Page();
+        }
+
+        async public Task<IActionResult> OnPostAsync()
+        {
+            string roleId = String.Empty;
+
+            return await SecureHandlerAsync(async () =>
+            {
+                var role = new ApplicationRole() { Id = CreateInput.Rolename, Name = CreateInput.Rolename };
+                await _roleDb.CreateAsync(role, CancellationToken.None);
+
+                roleId = role.Id;
+
+            },
+            onFinally: () => RedirectToPage("EditRole/Index", new { id = roleId }),
+            successMessage: "",
+            onException: (ex) => RedirectToPage());
+        }
+
+        async public Task<IActionResult> OnPostFindAsync()
+        {
+            string roleId = String.Empty;
+
+            return await SecureHandlerAsync(async () =>
+            {
+                var role = await _roleDb.FindByNameAsync(FindInput.Rolename?.ToString(), CancellationToken.None);
+                if (role == null)
+                {
+                    throw new StatusMessageException($"Unknown role { FindInput.Rolename }");
+                }
+
+                roleId = role.Id;
+            },
+            onFinally: () => RedirectToPage("EditRole/Index", new { id = roleId }),
+            successMessage: "",
+            onException: (ex) => RedirectToPage());
+        }
+    }
+}

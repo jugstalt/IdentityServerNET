@@ -1,0 +1,39 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Roles.IndexModel
+@{
+}
+
+@if (Model.ApplicationRoles != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="nav nav-pills nav-stacked">
+                @foreach (var role in Model.ApplicationRoles)
+                {
+                    <li class="ui-list-item">
+                        <a asp-page="EditRole/Index"
+                           asp-route-id="@role.Id">
+                            <div class="ui-icon left glyphicon glyphicon-ok"></div>
+                            <strong>@role.Name</strong>
+                            <div>
+                                @role.Description
+                            </div>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Create new role</h4>
+            <form id="create-role-form" method="post" >
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="CreateInput.Rolename"></label>
+                    <input asp-for="CreateInput.Rolename" class="form-control" placeholder="new role name..." />
+                </div>
+                <button type="submit" class="btn btn-default">Create new role</button>
+            </form>
+        </div>
+    </div>
+    
+}

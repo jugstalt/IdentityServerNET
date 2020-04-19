@@ -10,6 +10,6 @@ namespace IdentityServer.Legacy.Services.DbContext
     {
         Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken);
         Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken);
-        Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken);
     }
 }
