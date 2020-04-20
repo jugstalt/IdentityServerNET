@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using IdentityServer.Legacy;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -14,20 +16,42 @@ namespace IdentityServer.Areas.Admin.Pages.Users
 {
     public class IndexModel : SecurePageModel
     {
+        private IPasswordHasher<ApplicationUser> _passwordHasher = null;
         private IUserDbContext _userDb = null;
-        public IndexModel(IUserDbContext userDbContext)
+
+        public IndexModel(
+            IPasswordHasher<ApplicationUser> passwordHasher, 
+            IUserDbContext userDbContext)
         {
+            _passwordHasher = passwordHasher;
             _userDb = userDbContext as IUserDbContext;
         }
 
         public IEnumerable<ApplicationUser> ApplicationUsers { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public FindInputModel FindInput { get; set; }
 
-        public class InputModel
+        public class FindInputModel
         {
             public string Username { get; set; }
+        }
+
+        [BindProperty]
+        public CreateInputModel CreateInput { get; set; }
+
+        public class CreateInputModel
+        {
+            [Required]
+            [RegularExpression(@"^[a-z0-9\-_@\.]*$", ErrorMessage = "Only lowercase letters, numbers, [- _ @ .] is allowed")]
+            [MinLength(5)]
+            public string Username { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Password")]
+            public string Password { get; set; }
         }
 
         async public Task<IActionResult> OnGetAsync(int skip = 0)
@@ -42,14 +66,52 @@ namespace IdentityServer.Areas.Admin.Pages.Users
 
         async public Task<IActionResult> OnPostAsync()
         {
+            string userId = String.Empty;
+
+            return await SecureHandlerAsync(async () =>
+            {
+                if (!ModelState.IsValid)
+                {
+                    throw new StatusMessageException($"Type a valid username.");
+                }
+
+                var user = new ApplicationUser()
+                {
+                    Id=Guid.NewGuid().ToString(),
+                    UserName = CreateInput.Username
+                };
+
+                if ((await _userDb.FindByNameAsync(user.UserName, CancellationToken.None)) != null)
+                {
+                    throw new StatusMessageException("User already exisits");
+                }
+
+                user.PasswordHash = _passwordHasher.HashPassword(user, CreateInput.Password);
+
+                var result = await _userDb.CreateAsync(user, CancellationToken.None);
+                if(result.Succeeded==false)
+                {
+                    throw new StatusMessageException("Unkonwn error. Can't create user");
+                }
+
+                user = await _userDb.FindByNameAsync(user.UserName, CancellationToken.None);
+                userId = user.Id;
+            },
+            onFinally: () => RedirectToPage("EditUser/Index", new { id = userId }),
+            successMessage: "",
+            onException: (ex) => RedirectToPage());
+        }
+
+        async public Task<IActionResult> OnPostFindAsync()
+        {
             string userId=String.Empty;
 
             return await SecureHandlerAsync(async () =>
             {
-                var user = await _userDb.FindByNameAsync(Input.Username?.ToString(), CancellationToken.None);
+                var user = await _userDb.FindByNameAsync(FindInput.Username?.ToString(), CancellationToken.None);
                 if(user==null)
                 {
-                    throw new StatusMessageException($"Unknown user { Input.Username }");
+                    throw new StatusMessageException($"Unknown user { FindInput.Username }");
                 }
 
                 userId = user.Id;

@@ -37,13 +37,14 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 
         public async Task<IActionResult> OnPostAsync()
         {
-            return await base.SecureHandlerAsync(async () =>
-           {
-               base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ?
+            string userId = Request.Form["__current_admin_account_user_id"].ToString();
+            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ?
                   "Profile" :
                   Request.Form["_category"].ToString();
 
-               await base.LoadCurrentApplicationUserAsync(Request.Form["__current_admin_account_user_id"].ToString());
+            return await base.SecureHandlerAsync(async () =>
+            {
+               await base.LoadCurrentApplicationUserAsync(userId);
 
                if (this.CurrentApplicationUser == null)
                {
@@ -76,7 +77,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                        new System.Threading.CancellationToken());
                }
            }
-           , onFinally: () => RedirectToPage(new { id = this.CurrentApplicationUser.Id, category = this.Category })
+           , onFinally: () => RedirectToPage(new { id = userId, category = this.Category })
            , successMessage: $"The current users { Category.ToLower() } settings has been updated");
         }
     }

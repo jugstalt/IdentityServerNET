@@ -1,6 +1,6 @@
 ﻿@model EditUserPageModel
 
-@if (Model.EditorInfos != null)
+@if (Model.EditorInfos?.EditorInfos != null)
 {
     foreach (var editorInfo in Model.EditorInfos
                                         .EditorInfos
@@ -8,13 +8,21 @@
     {
     <div class="form-group">
         <label>@editorInfo.DisplayName</label>
-        <input name="@editorInfo.Name"
-               value="@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)"
-               @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
-               class="form-control" />
-        <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true">
 
-        </span>
+        @if(editorInfo.PropertyType.IsArray)
+        {
+    <textarea name="@editorInfo.Name"
+              @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
+              class="form-control">@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)</textarea>
+               <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true"></span>
+        } else { 
+            <input name="@editorInfo.Name"
+                   value="@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)"
+                   @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
+                   class="form-control" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true"></span>
+        }
+        
     </div>
     }
 }

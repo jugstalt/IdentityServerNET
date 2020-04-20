@@ -38,7 +38,7 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
         public class CreateInputModel
         {
             [Required]
-            [RegularExpression(@"^[a-z0-9\-]*$", ErrorMessage = "Only lowercase letters, numbers, -, _ is allowed")]
+            [RegularExpression(@"^[a-z0-9\-_]*$", ErrorMessage = "Only lowercase letters, numbers, -, _ is allowed")]
             [MinLength(3)]
             public string Rolename { get; set; }
             public string Description { get; set; }

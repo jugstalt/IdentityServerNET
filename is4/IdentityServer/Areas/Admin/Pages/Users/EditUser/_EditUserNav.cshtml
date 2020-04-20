@@ -2,7 +2,7 @@
 
 @{
     string[] categories = null;
-    if (Model != null)
+    if (Model?.EditorInfos?.EditorInfos != null)
     {
         categories = Model.EditorInfos.EditorInfos
                             .Select(p => p.Category)
@@ -28,14 +28,14 @@
             }
         }
 
-        @if (Model.EditorInfos.AllowSetPassword)
+        @if (Model?.EditorInfos?.AllowSetPassword == true)
         {
             <li class="@EditUserNavPages.SetPasswordClass(ViewContext)">
                 <a asp-page="./SetPassword"
                    asp-route-id="@Model.CurrentApplicationUser.Id">Set Password</a>
             </li>
         }
-        @if (Model.EditorInfos.AllowDelete)
+        @if (Model?.EditorInfos?.AllowDelete == true)
         {
             <li class="@EditUserNavPages.DeleteUserNavClass(ViewContext)">
                     <a asp-page="./DeleteUser"

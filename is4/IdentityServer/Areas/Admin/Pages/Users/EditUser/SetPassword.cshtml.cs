@@ -63,10 +63,15 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                 return NotFound($"Unable to load user.");
             }
 
+            string passwordHash = this.CurrentApplicationUser.PasswordHash.Substring(0, Math.Min(20, this.CurrentApplicationUser.PasswordHash.Length));
+            if (passwordHash.Length < this.CurrentApplicationUser.PasswordHash.Length)
+            {
+                passwordHash += "...";
+            }
             this.Input = new InputModel()
             {
                 CurrentUserId = this.CurrentApplicationUser.Id,
-                CurrentPassword = this.CurrentApplicationUser.PasswordHash.Substring(0, Math.Min(20, this.CurrentApplicationUser.PasswordHash.Length)) + "..."
+                CurrentPassword = passwordHash
             };
 
             return Page();

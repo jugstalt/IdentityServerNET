@@ -5,7 +5,7 @@
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 
     string[] categories = null;
-    if (Model != null)
+    if (Model?.EditorInfos != null)
     {
         categories = Model.EditorInfos
                             .Select(p => p.Category)
@@ -27,11 +27,11 @@
             }
         }
 
-            @if (Model.ShowChangeEmailPage)
+            @if (Model?.ShowChangeEmailPage == true)
             {
                 <li class="@ManageNavPages.EmailNavClass(ViewContext)"><a id="email" asp-page="./Email">Email</a></li>
             }
-            @if (Model.ShowChangePasswordPage)
+            @if (Model?.ShowChangePasswordPage == true)
             {
                 <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a id="change-password" asp-page="./ChangePassword">Password</a></li>
             }
@@ -39,7 +39,7 @@
             {
                 <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a id="external-login" asp-page="./ExternalLogins">External logins</a></li>
             }
-            @if (Model.ShowTfaPage)
+            @if (Model?.ShowTfaPage == true)
             {
                 <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
             }

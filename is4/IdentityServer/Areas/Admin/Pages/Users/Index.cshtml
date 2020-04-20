@@ -3,22 +3,45 @@
 @{
 }
 
-@if (Model.ApplicationUsers != null)
-{
-    <ul class="nav nav-pills nav-stacked">
-        @foreach (var user in Model.ApplicationUsers)
+    <div class="row">
+        @if (Model.ApplicationUsers != null)
         {
-            <li class="ui-list-item">
-                <a asp-page="EditUser/Index"
-                   asp-route-id="@user.Id">
-                    <div class="ui-icon left glyphicon glyphicon-user"></div>
-                    <strong>@user.UserName</strong>
-                    <div>
-                        @user.Claims.Where(c => c.Type == "given_name").FirstOrDefault()?.Value
-                        @user.Claims.Where(c => c.Type == "family_name").FirstOrDefault()?.Value
-                    </div>
-                </a>
-            </li>
+
+            <div class="col-md-6">
+                <ul class="nav nav-pills nav-stacked">
+                    @foreach (var user in Model.ApplicationUsers)
+                    {
+                        <li class="ui-list-item">
+                            <a asp-page="EditUser/Index"
+                               asp-route-id="@user.Id">
+                                <div class="ui-icon left glyphicon glyphicon-user"></div>
+                                <strong>@user.UserName</strong>
+                                <div>
+                                    @user.Claims.Where(c => c.Type == "given_name").FirstOrDefault()?.Value
+                                    @user.Claims.Where(c => c.Type == "family_name").FirstOrDefault()?.Value
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
         }
-    </ul>
-}
+        <div class="col-md-6">
+            <h4>Create new user</h4>
+            <form id="create-role-form" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="CreateInput.Username"></label>
+                    <input asp-for="CreateInput.Username" class="form-control" placeholder="new namename..." />
+                    <span asp-validation-for="CreateInput.Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CreateInput.Password"></label>
+                    <input asp-for="CreateInput.Password" class="form-control" placeholder="Strong password..." />
+                    <span asp-validation-for="CreateInput.Password" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-default">Create</button>
+            </form>
+        </div>
+    </div>
