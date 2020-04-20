@@ -57,6 +57,7 @@
 
 ul.ui-tiles {
     list-style:none;
+    padding:0px;
 }
 
     ul.ui-tiles li.ui-tile {
