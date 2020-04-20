@@ -65,6 +65,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task<ApplicationRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
+            normalizedRoleName = normalizedRoleName.ToUpper();
             var role = _roles.Values
                 .ToArray()
                 .Where(u => u.Name.ToUpper() == normalizedRoleName)

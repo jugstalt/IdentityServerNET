@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,14 +25,23 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
         public IEnumerable<ApplicationRole> ApplicationRoles { get; set; }
 
         [BindProperty]
-        public InputModel FindInput { get; set; }
+        public FindInputModel FindInput { get; set; }
 
-        [BindProperty]
-        public InputModel CreateInput { get; set; }
-
-        public class InputModel
+        public class FindInputModel
         {
             public string Rolename { get; set; }
+        }
+
+        [BindProperty]
+        public CreateInputModel CreateInput { get; set; }
+
+        public class CreateInputModel
+        {
+            [Required]
+            [RegularExpression(@"^[a-z0-9\-]*$", ErrorMessage = "Only lowercase letters, numbers, -, _ is allowed")]
+            [MinLength(3)]
+            public string Rolename { get; set; }
+            public string Description { get; set; }
         }
 
         async public Task<IActionResult> OnGetAsync(int skip = 0)
@@ -50,7 +60,12 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
 
             return await SecureHandlerAsync(async () =>
             {
-                var role = new ApplicationRole() { Id = CreateInput.Rolename, Name = CreateInput.Rolename };
+                if(!ModelState.IsValid)
+                {
+                    throw new StatusMessageException($"Type a valid role name.");
+                }
+
+                var role = new ApplicationRole() { Id = CreateInput.Rolename, Name = CreateInput.Rolename, Description=CreateInput.Description };
                 await _roleDb.CreateAsync(role, CancellationToken.None);
 
                 roleId = role.Id;
@@ -67,6 +82,10 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
 
             return await SecureHandlerAsync(async () =>
             {
+                if(String.IsNullOrWhiteSpace(FindInput.Rolename))
+                {
+                    throw new StatusMessageException("Please type a rolename");
+                }
                 var role = await _roleDb.FindByNameAsync(FindInput.Rolename?.ToString(), CancellationToken.None);
                 if (role == null)
                 {
