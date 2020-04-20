@@ -6,7 +6,7 @@ using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources
+namespace IdentityServer.Areas.Admin.Pages.Clients
 {
     public class ExportClientDbModel : AdminPageModel
     {

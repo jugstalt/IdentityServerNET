@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
-    public class DeleteClientModel : EditClientPageModel
+    public class IndexModel : EditClientPageModel
     {
-        public DeleteClientModel(IClientDbContext clientDbContext)
+        public IndexModel(IClientDbContext clientDbContext)
              : base(clientDbContext)
         {
         }
@@ -22,7 +22,9 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
 
             Input = new InputModel()
             {
-                ClientId = CurrentClient.ClientId
+                ClientId = CurrentClient.ClientId,
+                ClientName = CurrentClient.ClientName,
+                ClientDescription = CurrentClient.Description
             };
 
             return Page();
@@ -34,18 +36,13 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
             {
                 await LoadCurrentClientAsync(Input.ClientId);
 
-                if (Input.ConfirmClientId == CurrentClient.ClientId)
-                {
-                    await _clientDb.RemoveClientAsync(this.CurrentClient);
-                } 
-                else
-                {
-                    throw new StatusMessageException("Please type the correct client id");
-                }
+                CurrentClient.ClientName = Input.ClientName;
+                CurrentClient.Description = Input.ClientDescription;
+
+                await _clientDb.UpdateClientAsync(CurrentClient, new[] { "ClientName", "Description" });
             }
-            , onFinally: () => RedirectToPage("../Clients")
-            , "Successfully deleted client"
-            , onException: (ex) => RedirectToPage(new { id = Input.ClientId }));
+            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+            , successMessage: "The client has been updated successfully");   
         }
 
         [BindProperty]
@@ -54,7 +51,8 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
         public class InputModel
         {
             public string ClientId { get; set; }
-            public string ConfirmClientId { get; set; }
-        }
+            public string ClientName { get; set; }
+            public string ClientDescription { get; set; }
+        } 
     }
 }

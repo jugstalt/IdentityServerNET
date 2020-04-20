@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
     public interface IEditClientPageModel
     {

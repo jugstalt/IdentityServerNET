@@ -14,13 +14,15 @@ namespace IdentityServer.Areas.Admin
         {
             this.HasUserDb = userDbContext != null;
             this.HasRoleDb = roleDbContext != null;
-            this.HasResourceOrClientDb = resourceDbContxt != null || clientDbContext != null;
+            this.HasResourceDb = resourceDbContxt != null;
+            this.HasClientDb = clientDbContext != null;
         }
 
 
         public bool HasUserDb { get; private set; }
         public bool HasRoleDb { get; private set; }
-        public bool HasResourceOrClientDb { get; private set; }
+        public bool HasResourceDb { get; private set; }
+        public bool HasClientDb { get; private set; }
 
         public void OnGet()
         {

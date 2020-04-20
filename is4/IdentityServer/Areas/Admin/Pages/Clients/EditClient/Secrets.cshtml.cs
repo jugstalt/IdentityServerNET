@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using IdentityServer.Legacy.Extensions;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
     public class SecretsModel : EditClientPageModel
     {

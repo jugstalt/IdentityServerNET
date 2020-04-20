@@ -7,7 +7,7 @@ using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
     public class OptionsModel : EditClientPageModel
     {

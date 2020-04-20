@@ -1,0 +1,62 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Clients.IndexModel
+@{
+    ViewData["Title"] = "Info";
+    ViewData["ActivePage"] = "Index";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>@ViewData["Title"]</h4>
+        <p>
+            From this page you can admin IdentityServer Clients.
+            Create a new Client or select an existing.
+        </p>
+        
+        <h4>Clients</h4>
+        <p>
+            Clients represent applications that can request tokens from your identityserver.
+
+            The details vary, but typically this are the common settings for a client:
+
+            <ul>
+                <li>a unique client ID</li>
+                <li>a secret if needed</li>
+                <li>the allowed interactions with the token service (called a grant type)</li>
+                <li>a network location where identity and/or access token gets sent to (called a redirect URI)</li>
+                <li>a list of scopes (aka resources) the client is allowed to access</li>
+            </ul>
+
+        </p>
+    </div>
+
+    @if (Model.HasExports)
+    {
+        <div class="col-md-6">
+            <h4>Export/Backup Databases</h4>
+            <ul class="nav nav-pills nav-stacked">
+
+                @if (Model.HasExportClientDbContext)
+                {
+                    <li>
+                        <a asp-page="ExportClientDb">
+                            <div><strong>Export Client Database</strong></div>
+                            <div style="color:#aaa;font-size:.85em">
+                                to @Model.ExportClientDbContextType
+                            </div>
+                            <div>
+                                Click to flush target database clients and export...
+                            </div>
+                            @if (!String.IsNullOrEmpty(Model.ExportClientsMessage))
+                            {
+                                <div class="alert alert-info alert-dismissible">
+                                    @Model.ExportClientsMessage
+                                </div>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+     }
+</div>

@@ -4,21 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources
+namespace IdentityServer.Areas.Admin.Pages.Clients
 {
-    public static class ResourcesNavPages
+    public static class ClientsNavPages
     {
         public static string Index => "Index";
 
-        public static string Apis => "Apis";
-
-        public static string Identities => "Identities";
+        public static string Clients => "Clients";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
-        public static string ApisNavClass(ViewContext viewContext) => PageNavClass(viewContext, Apis);
-
-        public static string IdentitiesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Identities);
+        public static string ClientsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Clients);
 
 
         private static string PageNavClass(ViewContext viewContext, string page)
