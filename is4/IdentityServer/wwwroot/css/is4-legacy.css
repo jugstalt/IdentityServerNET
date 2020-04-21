@@ -65,6 +65,8 @@ ul.ui-tiles {
         width: 160px;
         height: 160px;
         border:1px solid #eee;
+        background-color: #f8f8f8;
+        border-radius:25px;
     }
         ul.ui-tiles li.ui-tile .ui-tile-icon {
             width: 160px;
@@ -84,6 +86,21 @@ ul.ui-tiles {
             padding: 8px;
             font-size: 14px
         }
+
+
+@media (max-width: 991px) {
+    .sidebar .nav-stacked li {
+        display:inline-block;
+        border-bottom: 1px solid #337ab7;
+        float:left;
+        vertical-align:top;
+    }
+
+        .sidebar .nav-stacked li a {
+            padding: 10px 5px;
+            border-radius:4px 4px 0px 0px;
+        }
+}
 
 @media (prefers-color-scheme: dark) {
     body {

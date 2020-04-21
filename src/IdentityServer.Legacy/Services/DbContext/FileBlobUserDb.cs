@@ -1,30 +1,27 @@
-﻿using IdentityModel;
+﻿using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Services.Serialize;
+using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.Serialize;
-using System.Security.Claims;
-using System.Linq;
-using IdentityServer.Legacy.UserInteraction;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext
+    public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbContext
     {
         private string _rootPath = null;
         private ICryptoService _cryptoService = null;
         private IBlobSerializer _blobSerializer;
 
-        public FileBlobUserDb(IOptions<UserDbContextConfiguration> options)
+        public FileBlobUserDb(IOptions<UserDbContextConfiguration> options=null)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
                 throw new ArgumentException("FileBlobUserDb: no connection string defined");
@@ -114,9 +111,9 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
         }
 
-        async public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await FindByIdAsync(normalizedUserName.NameToHexId(_cryptoService), cancellationToken);
+            return FindByIdAsync(normalizedUserName.NameToHexId(_cryptoService), cancellationToken);
         }
 
         async public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -208,7 +205,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             List<ApplicationUser> users = new List<ApplicationUser>();
             foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.user").Skip(skip))
             {
-                if (users.Count >= limit)
+                if (limit>0 && users.Count >= limit)
                 {
                     break;
                 }
@@ -223,7 +220,57 @@ namespace IdentityServer.Legacy.Services.DbContext
                 }
             }
 
-            return users;
+            return users.OrderBy(u => u.UserName);
+        }
+
+        #endregion
+
+        #region IUserRoleDbContext
+
+        async public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var updateUser = await FindByIdAsync(user.Id, cancellationToken); // reload user
+
+            if (updateUser.Roles == null)
+            {
+                updateUser.Roles = new string[] { roleName };
+
+                await UpdateAsync(updateUser, cancellationToken);
+            }
+            else
+            {
+                List<string> roles = new List<string>(updateUser.Roles);
+                if (!roles.Contains(roleName))
+                {
+                    roles.Add(roleName);
+                    updateUser.Roles = roles.ToArray();
+                    await UpdateAsync(updateUser, cancellationToken);
+                }
+            }
+
+            user.Roles = updateUser.Roles;
+        }
+
+        async public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var updateUser = await FindByIdAsync(user.Id, cancellationToken); // reload user
+
+            if (updateUser.Roles != null && updateUser.Roles.Contains(roleName))
+            {
+                updateUser.Roles = updateUser.Roles.Where(r => r != roleName).ToArray();
+                await UpdateAsync(updateUser, cancellationToken);
+            }
+
+            user.Roles = updateUser.Roles;
+        }
+
+        async public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            var users = await GetUsersAsync(0, 0, cancellationToken);
+
+            return users
+                    .Where(u => u.Roles != null && u.Roles.Contains(roleName))
+                    .ToList();
         }
 
         #endregion

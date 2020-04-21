@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
-    public interface IUserRoleDbContext
+    public interface IUserRoleDbContext : IUserDbContext
     {
         Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken);
         Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken);

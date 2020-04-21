@@ -17,8 +17,9 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
     {
         public DeleteUserModel(
             IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
-            : base(userDbContext, userDbContextConfiguration)
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration,
+            IRoleDbContext roleDbContext = null)
+            : base(userDbContext, userDbContextConfiguration, roleDbContext)
         {
         }
 

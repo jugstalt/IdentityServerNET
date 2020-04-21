@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using IdentityServer.Legacy;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,19 +21,21 @@ namespace IdentityServer
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment, ILogger<HomeController> logger)
+        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager)
         {
             _interaction = interaction;
             _environment = environment;
             _logger = logger;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
+        async public Task<IActionResult> Index()
         {
-            return View();
+            var applicationUser = await _userManager.GetUserAsync(User);
+            return View(applicationUser);
         }
-
         public IActionResult About()
         {
             return View();

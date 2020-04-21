@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Legacy.Azure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Legacy.Extensions", "src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj", "{E2C14877-B80A-4C51-9273-E3A66FEFD823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Legacy.Tools.CreateCert", "src\IdentityServer.Legacy.Tools.CreateCert\IdentityServer.Legacy.Tools.CreateCert.csproj", "{92A9AEF7-B91F-488B-8EDC-B14F257D0692}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Legacy.Tools.CreateCert", "src\IdentityServer.Legacy.Tools.CreateCert\IdentityServer.Legacy.Tools.CreateCert.csproj", "{92A9AEF7-B91F-488B-8EDC-B14F257D0692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

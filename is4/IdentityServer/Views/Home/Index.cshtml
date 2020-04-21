@@ -1,6 +1,7 @@
+@model IdentityServer.Legacy.ApplicationUser;
+@using IdentityServer.Legacy;
 @{
     var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
-    var user = this.User.Identity;
 }
 
 <h2>Identity Server Legacy</h2>
@@ -8,15 +9,15 @@
 <hr/>
     <div class="row">
         <div class="col-md-3">
-            @if (user.IsAuthenticated)
+            @if (Model!=null)
             {
-                <h4>Hello, @user.Name</h4>
+                <h4>Hello, @Model.ApplicationUserName()</h4>
             }
         </div>
         <div class="col-md-9">
             
             <ul class="ui-tiles">
-                @if (user == null || user.IsAuthenticated == false)
+                @if (Model == null)
                 {
                     <li class="ui-tile">
                         <a href="~/account/login">
@@ -43,6 +44,17 @@
                     </li>
 
                     <li class="ui-tile">
+                        <a href="~/grants">
+                            <div class="ui-tile-icon glyphicon glyphicon-tags">
+
+                            </div>
+                            <div class="ui-tile-text ">
+                                Grants
+                            </div>
+                        </a>
+                    </li>
+
+                    <li class="ui-tile">
                         <a href="~/identity/account/manage">
                             <div class="ui-tile-icon glyphicon glyphicon-user">
 
@@ -53,17 +65,19 @@
                         </a>
                     </li>
 
-                    <li class="ui-tile">
-                        <a href="~/admin">
-                            <div class="ui-tile-icon glyphicon glyphicon-cog">
+                    if (Model.HasAdministratorRole())
+                    {
+                        <li class="ui-tile">
+                            <a href="~/admin">
+                                <div class="ui-tile-icon glyphicon glyphicon-cog">
 
-                            </div>
-                            <div class="ui-tile-text ">
-                                Admin
-                            </div>
-                        </a>
-                    </li>
-
+                                </div>
+                                <div class="ui-tile-text ">
+                                    Admin
+                                </div>
+                            </a>
+                        </li>
+                    }
                 }
 
 

@@ -5,7 +5,7 @@
 }
 
     <ul class="ui-tiles">
-        @if (Model.HasUserDb)
+        @if (Model.HasUserDb && Model.ApplicationUser.IsUserAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Users/Index">
@@ -18,11 +18,11 @@
                 </a>
             </li>
         }
-        @if (Model.HasRoleDb)
+        @if (Model.HasRoleDb && Model.ApplicationUser.IsRoleAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Roles/Index">
-                    <div class="ui-tile-icon glyphicon glyphicon-ok">
+                    <div class="ui-tile-icon glyphicon glyphicon-knight">
 
                     </div>
                     <div class="ui-tile-text ">
@@ -31,7 +31,7 @@
                 </a>
             </li>
         }
-        @if (Model.HasResourceDb)
+        @if (Model.HasResourceDb && Model.ApplicationUser.IsResourceAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Resources/Index">
@@ -39,12 +39,12 @@
 
                     </div>
                     <div class="ui-tile-text">
-                        Identities & APIs
+                        Resources (Identities & APIs)
                     </div>
                 </a>
             </li>
         }
-        @if (Model.HasClientDb)
+        @if (Model.HasClientDb && Model.ApplicationUser.IsClientAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Clients/Index">

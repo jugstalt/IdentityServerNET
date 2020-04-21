@@ -10,9 +10,13 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
     {
         public static string Index => "Index";
 
+        public static string RoleUsers => "RoleUsers";
+
         public static string DeleteRole => "DeleteRole";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+
+        public static string RoleUsersNavClass(ViewContext viewContext) => PageNavClass(viewContext, RoleUsers);
 
         public static string DeleteRoleNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteRole);
 

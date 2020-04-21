@@ -75,7 +75,11 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region Add RoleDbContext (optional) 
 
-            services.AddRoleDbContext<InMemoryRoleDb>();
+            //services.AddRoleDbContext<InMemoryRoleDb>();
+            services.AddRoleDbContext<FileBlobRoleDb>(options =>
+            {
+                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\roles";
+            });
 
             #endregion
 

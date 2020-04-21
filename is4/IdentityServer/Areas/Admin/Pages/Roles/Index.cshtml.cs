@@ -76,6 +76,40 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
             onException: (ex) => RedirectToPage());
         }
 
+        async public Task<IActionResult> OnGetAddKnownRoleAsync(string name)
+        {
+            string roleId = String.Empty;
+
+            return await SecureHandlerAsync(async () =>
+            {
+                var knownRole = typeof(KnownRoles)
+                                    .GetMethods()
+                                    .Where(m => m.ReturnType == typeof(ApplicationRole))
+                                    .Select(m => (ApplicationRole)m.Invoke(Activator.CreateInstance<KnownRoles>(), null))
+                                    .Where(r => r.Name == name)
+                                    .FirstOrDefault();
+
+                if(knownRole==null)
+                {
+                    throw new StatusMessageException($"Unknown role { name }");
+                }
+
+                var existsingRole = await _roleDb.FindByNameAsync(knownRole.Name, CancellationToken.None);
+                if (existsingRole != null)
+                {
+                    roleId = existsingRole.Id;
+                }
+                else
+                {
+                    await _roleDb.CreateAsync(knownRole, CancellationToken.None);
+                    roleId = knownRole.Id;
+                }
+            },
+            onFinally: () => RedirectToPage("EditRole/Index", new { id = roleId }),
+            successMessage: "",
+            onException: (ex) => RedirectToPage());
+        }
+
         async public Task<IActionResult> OnPostFindAsync()
         {
             string roleId = String.Empty;
