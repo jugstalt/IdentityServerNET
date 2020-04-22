@@ -13,7 +13,7 @@
                     <li class="ui-list-item">
                         <a asp-page="EditRole/Index"
                            asp-route-id="@role.Id">
-                            <div class="ui-icon left glyphicon glyphicon-ok"></div>
+                            <div class="ui-icon left glyphicon glyphicon-knight"></div>
                             <strong>@role.Name</strong>
                             <div>
                                 @role.Description
@@ -39,6 +39,25 @@
                 </div>
                 <button type="submit" class="btn btn-default">Create new role</button>
             </form>
+            <hr />
+            <h4>Add IdentityServer role</h4>
+            <ul class="nav nav-pills nav-stacked">
+                @foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                {
+                    var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
+
+                    <li class="ui-list-item">
+                        <a asp-page-handler="AddKnownRole"
+                           asp-route-name="@knownRole.Name">
+                            <div class="ui-icon left glyphicon glyphicon-knight"></div>
+                            <strong>@knownRole.Name</strong>
+                            <div>
+                                @knownRole.Description
+                            </div>
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
     </div>
 

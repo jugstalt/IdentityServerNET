@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -15,12 +17,16 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 {
     public class DeleteRoleModel : EditRolePageModel
     {
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
         public DeleteRoleModel(
+            SignInManager<ApplicationUser> signInManager,
             IRoleDbContext roleDbContext,
             IUserDbContext userDbContext,
             IOptions<RoleDbContextConfiguration> roleDbContextConfiguration = null)
             : base(roleDbContext, roleDbContextConfiguration)
         {
+            _signInManager = signInManager;
             _userDbContext = userDbContext;
         }
 
@@ -78,6 +84,7 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
                     foreach(var user in await userRoleDb.GetUsersInRoleAsync(CurrentApplicationRole.Name, CancellationToken.None))
                     {
                         await userRoleDb.RemoveFromRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
+                        await _signInManager.RefreshSignInAsync(user);
                     }
                 }
 

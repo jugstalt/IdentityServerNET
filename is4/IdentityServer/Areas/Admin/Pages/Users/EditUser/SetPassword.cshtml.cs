@@ -21,8 +21,9 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
         public SetPasswordModel(
             IPasswordHasher<ApplicationUser> passwordHasher,
             IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
-            : base(userDbContext, userDbContextConfiguration)
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration,
+            IRoleDbContext roleDbContext = null)
+            : base(userDbContext, userDbContextConfiguration, roleDbContext)
         {
             _passwordHasher = passwordHasher;
         }

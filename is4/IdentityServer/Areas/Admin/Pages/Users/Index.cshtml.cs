@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
@@ -84,6 +85,12 @@ namespace IdentityServer.Areas.Admin.Pages.Users
                 if ((await _userDb.FindByNameAsync(user.UserName, CancellationToken.None)) != null)
                 {
                     throw new StatusMessageException("User already exisits");
+                }
+
+                if(Regex.Match(user.UserName, ValidationExtensions.EmailAddressRegex).Success == true)
+                {
+                    user.Email = user.UserName;
+                    user.EmailConfirmed = true;
                 }
 
                 user.PasswordHash = _passwordHasher.HashPassword(user, CreateInput.Password);

@@ -7,8 +7,9 @@
     <h4>Edit Users</h4>
     <hr />
     <div class="row">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
         <div class="col-md-3 sidebar">
-            <partial name="_UsersNav"  model="Model" />
+            <partial name="_UsersNav" model="Model" />
         </div>
         <div class="col-md-9">
             @RenderBody()

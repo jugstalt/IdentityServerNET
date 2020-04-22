@@ -40,33 +40,39 @@ namespace IdentityServer
                     )
                 .AddRoles<ApplicationRole>()
                 .AddDefaultTokenProviders();
-            //services.AddIdentity<ApplicationUser, ApplicationRole>()
-            //    .AddDefaultTokenProviders();
 
             services.AddAuthorization(options =>
             {
-                //options.AddPolicy("admin-policy",
-                //        policy => policy.RequireUserName("identityserver-administrator"));
                 if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
                 {
-                    options.AddPolicy("admin-policy",
-                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
-                }
-                else
-                {
-                    options.AddPolicy("admin-policy",
-                        policy => policy.RequireRole("identityserver-legacy-administrator"));
-                }
+                    ApplicationUserExtensions.SetAdministratorUserName(Environment, Configuration);
 
-                if (Environment.IsDevelopment() && !String.IsNullOrWhiteSpace(Configuration["IdentityServer:AdminUsername"]))
-                {
-                    options.AddPolicy("admin-users-policy",
+                    options.AddPolicy("admin-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-user-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-role-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-resource-policy",
+                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-client-policy",
                         policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                 }
                 else
                 {
-                    options.AddPolicy("admin-users-policy",
-                        policy => policy.RequireRole("identityserver-legacy-user-administrator"));
+                    options.AddPolicy("admin-policy",
+                        policy => policy.RequireRole(KnownRoles.UserAdministrator, 
+                                                     KnownRoles.RoleAdministrator, 
+                                                     KnownRoles.ResourceAdministrator, 
+                                                     KnownRoles.ClientAdministrator));
+                    options.AddPolicy("admin-user-policy",
+                        policy => policy.RequireRole(KnownRoles.UserAdministrator));
+                    options.AddPolicy("admin-role-policy",
+                        policy => policy.RequireRole(KnownRoles.RoleAdministrator));
+                    options.AddPolicy("admin-resource-policy",
+                        policy => policy.RequireRole(KnownRoles.ResourceAdministrator));
+                    options.AddPolicy("admin-client-policy",
+                        policy => policy.RequireRole(KnownRoles.ClientAdministrator));
                 }
             });
 
@@ -74,6 +80,11 @@ namespace IdentityServer
                 .AddRazorPagesOptions(options =>
                 {
                     options.Conventions.AuthorizeAreaFolder("Admin", "/", "admin-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/users", "admin-user-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/roles", "admin-role-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/resources", "admin-resource-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/clients", "admin-client-policy");
+
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
                 });

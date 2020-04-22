@@ -10,13 +10,15 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
     {
         public static string Index => "Index";
 
+        public static string UserRoles => "UserRoles";
+
         public static string SetPassword => "SetPassword";
 
         public static string DeleteUser => "DeleteUser";
 
-        public static string TwoFactorAuthentication => "TwoFactorAuthentication";
+        public static string UserRolesNavClass(ViewContext viewContext) => PageNavClass(viewContext, UserRoles);
 
-        public static string SetPasswordClass(ViewContext viewContext) => PageNavClass(viewContext, SetPassword);
+        public static string SetPasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, SetPassword);
 
         public static string DeleteUserNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteUser);
 

@@ -19,9 +19,11 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
     {
         public EditUserPageModel(
             IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
+            IOptions<UserDbContextConfiguration> userDbContextConfiguration,
+            IRoleDbContext roleDbContext)
         {
             _userDbContext = userDbContext;
+            _roleDbContext = roleDbContext;
             EditorInfos =
                     userDbContextConfiguration?.Value?.AdminAccountEditor;
         }
@@ -29,6 +31,9 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
         public AdminAccountEditor EditorInfos { get; set; }
 
         protected IUserDbContext _userDbContext = null;
+        protected IRoleDbContext _roleDbContext = null;
+
+        public bool HasRoleDbContext => _roleDbContext != null && _userDbContext is IUserRoleDbContext;
 
         async protected Task LoadCurrentApplicationUserAsync(string id)
         {
