@@ -3,6 +3,7 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -11,14 +12,21 @@
                 <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
             </li>
             <li>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link">Logout</button>
+                <a asp-action="Logout" asp-controller="Account" title="Logout">Logout</a>
             </li>
         </ul>
 }
 else
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li><a asp-area="Identity" asp-page="/Account/Register">Register</a></li>
-        <li><a asp-area="Identity" asp-page="/Account/Login">Login</a></li>
-    </ul>
+<ul class="nav navbar-nav navbar-right">
+    @if (Configuration["Capabilities:UserAccounts:AllowRegister"]?.ToLower() != "false")
+    {
+    <li>
+        <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+    </li>
+    }
+    <li>
+        <a href="/Account/Login" title="Login">Login</a>
+    </li>
+</ul>
 }
