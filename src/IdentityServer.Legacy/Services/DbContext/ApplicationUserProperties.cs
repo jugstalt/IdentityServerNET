@@ -18,6 +18,9 @@ namespace IdentityServer.Legacy.Services.DbContext
         public const string TwoFactorEnabled = "TwoFactorEnabled";
         public const string TfaRecoveryCodes = "TfaRecoveryCodes";
         public const string SecurityStamp = "SecurityStamp";
+        public const string LockoutEnd = "LockoutEnd";
+        public const string AccessFailedCount = "AccessFailedCount";
+        public const string LockoutEnabled = "LockoutEnabled";
     }
 
     public static class ApplicationRoleProperties

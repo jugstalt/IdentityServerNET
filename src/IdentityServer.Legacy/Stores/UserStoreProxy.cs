@@ -23,7 +23,8 @@ namespace IdentityServer.Legacy.Stores
                                   IUserClaimsPrincipalFactory<ApplicationUser>, 
                                   IUserLoginStore<ApplicationUser>,
                                   IUserSecurityStampStore<ApplicationUser>,
-                                  IUserRoleStore<ApplicationUser>
+                                  IUserRoleStore<ApplicationUser>,
+                                  IUserLockoutStore<ApplicationUser>
                                   
     {
         private IUserDbContext _dbContext;
@@ -248,7 +249,7 @@ namespace IdentityServer.Legacy.Stores
 
         #endregion
 
-        #region IUserTwoFactorRecoveryCodeStore (ToDo)
+        #region IUserTwoFactorRecoveryCodeStore
 
         async public Task ReplaceCodesAsync(ApplicationUser user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
         {
@@ -259,9 +260,17 @@ namespace IdentityServer.Legacy.Stores
                     (user, ApplicationUserProperties.TfaRecoveryCodes, recoveryCodes, cancellationToken);
         }
 
-        public Task<bool> RedeemCodeAsync(ApplicationUser user, string code, CancellationToken cancellationToken)
+        async public Task<bool> RedeemCodeAsync(ApplicationUser user, string code, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.TfaRecoveryCodes != null && user.TfaRecoveryCodes.Contains(code));
+            if (user.TfaRecoveryCodes == null || !user.TfaRecoveryCodes.Contains(code))
+                return false;
+
+            user.TfaRecoveryCodes = await _dbContext.UpdatePropertyAsync<IEnumerable<string>>
+                    (user, ApplicationUserProperties.TfaRecoveryCodes,
+                    user.TfaRecoveryCodes.Where(c=>c!=code).ToArray(), 
+                    cancellationToken);
+
+            return true;
         }
 
         public Task<int> CountCodesAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -398,6 +407,51 @@ namespace IdentityServer.Legacy.Stores
             }
 
             return Task.FromResult<IList<ApplicationUser>>(new ApplicationUser[0]);
+        }
+
+        #endregion
+
+        #region IUserLockoutStore
+
+        public Task<DateTimeOffset?> GetLockoutEndDateAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.LockoutEnd);
+        }
+
+        async public Task SetLockoutEndDateAsync(ApplicationUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
+        {
+            user.LockoutEnd =
+                await _dbContext.UpdatePropertyAsync<DateTimeOffset?>(user, ApplicationUserProperties.LockoutEnd, lockoutEnd, cancellationToken);
+        }
+
+        async public Task<int> IncrementAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            user.AccessFailedCount =
+                await _dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, user.AccessFailedCount + 1, cancellationToken);
+
+            return user.AccessFailedCount;
+        }
+
+        async public Task ResetAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            user.AccessFailedCount =
+                await _dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, 0, cancellationToken);
+        }
+
+        public Task<int> GetAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        public Task<bool> GetLockoutEnabledAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.LockoutEnabled);
+        }
+
+        async public Task SetLockoutEnabledAsync(ApplicationUser user, bool enabled, CancellationToken cancellationToken)
+        {
+            user.LockoutEnabled =
+                await _dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.LockoutEnabled, enabled, cancellationToken);
         }
 
         #endregion
