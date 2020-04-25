@@ -201,5 +201,10 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #endregion
         }
+
+        public string CssOverrides()
+        {
+            return Properties.Resources.is4_overrides;
+        }
     }
 }

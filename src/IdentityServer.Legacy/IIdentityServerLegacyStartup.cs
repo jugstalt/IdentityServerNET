@@ -10,5 +10,7 @@ namespace IdentityServer.Legacy
     public interface IIdentityServerLegacyStartup
     {
         void ConfigureServices(WebHostBuilderContext context, IServiceCollection services);
+
+        string CssOverrides();
     }
 }

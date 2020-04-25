@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using IdentityServer.Legacy;
+using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer4.Configuration;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +12,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace IdentityServer
@@ -136,12 +139,31 @@ namespace IdentityServer
             builder.AddDeveloperSigningCredential();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IOptions<StylingConfiguration> stylingConfig = null)
         {
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            #region Overrides (Styling)
+            try
+            {
+                var overrideCss = stylingConfig?.Value?.OverrideCssContent ?? String.Empty;
+
+                FileInfo fi = new FileInfo($"{ Environment.WebRootPath }/css/is4-overrides.css");
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+                File.WriteAllText(fi.FullName, overrideCss);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: Styling overrrides not updated");
+            }
+
+            #endregion
 
             // uncomment if you want to add MVC
             app.UseHttpsRedirection();

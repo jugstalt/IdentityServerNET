@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Reflection;
 using IdentityServer.Legacy.Stores;
 using Microsoft.AspNetCore.Hosting;
@@ -39,6 +41,12 @@ namespace IdentityServer.Legacy
                             {
                                 var hostingStartup = Activator.CreateInstance(type) as IIdentityServerLegacyStartup;
                                 hostingStartup.ConfigureServices(context, services);
+
+                                string overrideCss = hostingStartup.CssOverrides() ?? String.Empty;
+                                services.Configure<StylingConfiguration>(options =>
+                                {
+                                    options.OverrideCssContent = overrideCss;
+                                });
                             }
                         }
                     }

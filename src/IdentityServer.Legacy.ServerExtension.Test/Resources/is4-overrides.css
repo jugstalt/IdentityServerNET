@@ -1,0 +1,51 @@
+﻿.navbar-inverse {
+    border-color: #0094ff;
+    background-color: #0094ff;
+}
+
+    .navbar-inverse .navbar-brand {
+        color: #fff;
+    }
+
+    .navbar-inverse .navbar-nav > li > a {
+        color: #fff;
+    }
+
+
+.body-layout-empty {
+    background-color: #53aef5;
+}
+
+    .body-layout-empty .panel {
+        box-shadow: 4px 4px 9px rgba(0,0,0,.4);
+    }
+
+    .body-layout-empty .panel-heading {
+        border: none;
+    }
+
+    .body-layout-empty .panel-body {
+        background-color: #fff;
+        border: none;
+    }
+
+    .body-layout-empty input.form-control {
+        border: 1px solid #ccc !important;
+        border-radius: 6px !important;
+        height: 56px;
+    }
+
+    .body-layout-empty .form-group label {
+        color: #0094ff;
+        background-color: #fff;
+        position: relative;
+        top: 15px;
+        left: 6px;
+        border-radius: 6px;
+        padding: 0px 5px;
+    }
+
+    .body-layout-empty .form-group.login-remember label
+    {
+        position: unset;
+    }
