@@ -3,14 +3,17 @@
 
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Services;
 using IdentityServer4.Configuration;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
@@ -137,19 +140,22 @@ namespace IdentityServer
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
+
+            services.AddTransient<IEmailSender, EmailSenderProxy>();
         }
 
-        public void Configure(IApplicationBuilder app, IOptions<StylingConfiguration> stylingConfig = null)
+        public void Configure(IApplicationBuilder app, IOptions<UserInterfaceConfiguration> userInterfaceConfig = null)
         {
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            #region Overrides (Styling)
+            #region UserInterface (Styling)
+
             try
             {
-                var overrideCss = stylingConfig?.Value?.OverrideCssContent ?? String.Empty;
+                var overrideCss = userInterfaceConfig?.Value?.OverrideCssContent ?? String.Empty;
 
                 FileInfo fi = new FileInfo($"{ Environment.WebRootPath }/css/is4-overrides.css");
                 if (fi.Exists)
@@ -157,6 +163,23 @@ namespace IdentityServer
                     fi.Delete();
                 }
                 File.WriteAllText(fi.FullName, overrideCss);
+
+                if(userInterfaceConfig?.Value?.MediaContent!=null)
+                {
+                    foreach(var media in userInterfaceConfig.Value.MediaContent)
+                    {
+                        fi = new FileInfo($"{ Environment.WebRootPath }/css/media/{ media.Key }");
+                        if(!fi.Directory.Exists)
+                        {
+                            fi.Directory.Create();
+                        }
+                        if (fi.Exists)
+                        {
+                            fi.Delete();
+                        }
+                        File.WriteAllBytes(fi.FullName, media.Value);
+                    }
+                }
             }
             catch (Exception ex)
             {

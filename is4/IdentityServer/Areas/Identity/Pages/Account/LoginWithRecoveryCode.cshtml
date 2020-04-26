@@ -1,7 +1,10 @@
 ﻿@page
+@using IdentityServer.Legacy.DependencyInjection;
+@using Microsoft.Extensions.Options;
+@inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
 @model LoginWithRecoveryCodeModel
 @{
-    Layout = "~/Views/Shared/_Layout_Empty.cshtml";
+    Layout = "~/Views/Shared/_Layout_Login.cshtml";
     ViewData["Title"] = "Recovery code verification";
 }
 
@@ -9,7 +12,17 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">@ViewData["Title"]</h3>
+                <table>
+                    <tr>
+                        <td>
+                            <div class="panel-logo"></div>
+                        </td>
+                        <td>
+                            <h3 class="panel-title">@userInterfaceConfig.Value.ApplicationTitle</h3>
+                            <div>@ViewData["Title"]</div>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="panel-body">
                 <p>
@@ -29,7 +42,7 @@
         </div>
     </div>
 </div>
- 
- @section Scripts {
+
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

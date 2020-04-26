@@ -12,30 +12,30 @@
     }
 
 
-.body-layout-empty {
+.body-layout-login {
     background-color: #53aef5;
 }
 
-    .body-layout-empty .panel {
+    .body-layout-login .panel {
         box-shadow: 4px 4px 9px rgba(0,0,0,.4);
     }
 
-    .body-layout-empty .panel-heading {
+    .body-layout-login .panel-heading {
         border: none;
     }
 
-    .body-layout-empty .panel-body {
+    .body-layout-login .panel-body {
         background-color: #fff;
         border: none;
     }
 
-    .body-layout-empty input.form-control {
+    .body-layout-login input.form-control {
         border: 1px solid #ccc !important;
         border-radius: 6px !important;
         height: 56px;
     }
 
-    .body-layout-empty .form-group label {
+    .body-layout-login .form-group label {
         color: #0094ff;
         background-color: #fff;
         position: relative;
@@ -45,7 +45,14 @@
         padding: 0px 5px;
     }
 
-    .body-layout-empty .form-group.login-remember label
-    {
+    .body-layout-login .form-group.login-remember label {
         position: unset;
+    }
+
+    .body-layout-login .panel-logo {
+        background-image: url('media/openid-logo.png');
+    }
+
+    .body-layout-login .panel-title {
+        font-size: 20px;
     }

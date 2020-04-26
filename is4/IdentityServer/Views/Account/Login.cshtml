@@ -1,6 +1,10 @@
+@using IdentityServer.Legacy.DependencyInjection;
+@using Microsoft.Extensions.Options;
+@inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
+  
 @model LoginViewModel
 @{
-    Layout = "~/Views/Shared/_Layout_Empty.cshtml";
+    Layout = "~/Views/Shared/_Layout_Login.cshtml";
 }
 <div class="login-page">
     <partial name="_ValidationSummary" />
@@ -12,7 +16,17 @@
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Local Login</h3>
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="panel-logo"></div>
+                                </td>
+                                <td>
+                                    <h3 class="panel-title">@userInterfaceConfig.Value.ApplicationTitle</h3>
+                                    <div>Login</div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="panel-body">
 
@@ -43,6 +57,9 @@
                                 </div>
                             </fieldset>
                         </form>
+                        <p>
+                            <a href="~/Identity/Account/ForgotPassword">Forgot Password?</a>
+                        </p>
                     </div>
                 </div>
             </div>

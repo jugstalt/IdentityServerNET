@@ -41,12 +41,6 @@ namespace IdentityServer.Legacy
                             {
                                 var hostingStartup = Activator.CreateInstance(type) as IIdentityServerLegacyStartup;
                                 hostingStartup.ConfigureServices(context, services);
-
-                                string overrideCss = hostingStartup.CssOverrides() ?? String.Empty;
-                                services.Configure<StylingConfiguration>(options =>
-                                {
-                                    options.OverrideCssContent = overrideCss;
-                                });
                             }
                         }
                     }

@@ -61,11 +61,48 @@ namespace IdentityServer.Legacy.ServerExtension.Test.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to .navbar-inverse {
+        ///    border-color: #0094ff;
+        ///    background-color: #0094ff;
+        ///}
+        ///
+        ///    .navbar-inverse .navbar-brand {
+        ///        color: #fff;
+        ///    }
+        ///
+        ///    .navbar-inverse .navbar-nav &gt; li &gt; a {
+        ///        color: #fff;
+        ///    }
+        ///
+        ///
+        ///.body-layout-login {
+        ///    background-color: #53aef5;
+        ///}
+        ///
+        ///    .body-layout-login .panel {
+        ///        box-shadow: 4px 4px 9px rgba(0,0,0,.4);
+        ///    }
+        ///
+        ///    .body-layout-login .panel-heading {
+        ///        border: none;
+        ///    }
+        ///
+        ///    .body-layout-login .panel-body {
+        ///        background-col [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string is4_overrides {
             get {
                 return ResourceManager.GetString("is4_overrides", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] openid_logo {
+            get {
+                object obj = ResourceManager.GetObject("openid_logo", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

@@ -13,6 +13,8 @@ using IdentityServer.Legacy.MongoDb.Services.DbContext;
 using IdentityServer.Legacy.Reflection;
 using IdentityServer.Legacy.Azure.Services.DbContext;
 using IdentityServer.Legacy.UserInteraction;
+using IdentityServer.Legacy.Services.EmailSender;
+using System.Collections.Generic;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -200,11 +202,26 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             });
 
             #endregion
-        }
 
-        public string CssOverrides()
-        {
-            return Properties.Resources.is4_overrides;
+            #region UI (required)
+
+            services.Configure<UserInterfaceConfiguration>(options =>
+            {
+                options.ApplicationTitle = "IdentityServer.Legacy.Test";  // required
+                options.OverrideCssContent = Properties.Resources.is4_overrides;
+                options.MediaContent = new Dictionary<string, byte[]>()
+                {
+                    { "openid-logo.png", Properties.Resources.openid_logo }
+                };
+            });
+
+            #endregion
+
+            #region EmailSender (required)
+
+            services.AddTransient<ICustomEmailSender, MailJetEmailSender>();
+
+            #endregion
         }
     }
 }
