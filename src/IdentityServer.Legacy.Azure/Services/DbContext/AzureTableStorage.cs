@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
 {
-    public class AzureTableStorage
+    public class AzureTableStorage<T> where T : TableEntity, new()
     {
         static private object thisLocker = new object();
         private string _connectionString;
@@ -32,7 +32,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             return true;
         }
 
-        async public Task<bool> InsertEntityAsync(string tableName, ITableEntity entity)
+        async public Task<bool> InsertEntityAsync(string tableName, T entity)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             }
         }
 
-        async private Task<bool> InsertEntity(string tableName, ITableEntity entity, bool mergeIfExists = false)
+        async private Task<bool> InsertEntity(string tableName, T entity, bool mergeIfExists = false)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
 
@@ -68,7 +68,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             return true;
         }
 
-        async public Task<bool> TryInsertEntityAsync(string tableName, ITableEntity entity)
+        async public Task<bool> TryInsertEntityAsync(string tableName, T entity)
         {
             try
             {
@@ -80,17 +80,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             }
         }
 
-        async public Task<IEnumerable<TableEntity>> AllEntitiesAsync(string tableName)
-        {
-            return await AllTableEntities(tableName, String.Empty);
-        }
-
-        async public Task<IEnumerable<TableEntity>> AllEntitiesAsync(string tableName, string partitionKey)
-        {
-            return await AllTableEntities(tableName, partitionKey);
-        }
-
-        async private Task<IEnumerable<TableEntity>> AllTableEntities(string tableName, string partitionKey)
+        async public Task<bool> MergeEntity(string tableName, T entity)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
 
@@ -100,11 +90,42 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             // Create the CloudTable object that represents the "people" table.
             CloudTable table = tableClient.GetTableReference(tableName);
 
-            TableQuery<TableEntity> query = String.IsNullOrWhiteSpace(partitionKey) ?
-                     new TableQuery<TableEntity>() :
-                     new TableQuery<TableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            // Create the TableOperation object that inserts the customer entity.
+            entity.ETag = "*";  // Always merge
+            TableOperation mergeOperation = TableOperation.Merge(entity);
 
-            List<TableEntity> entities = new List<TableEntity>();
+            // Execute the insert operation.
+            await table.ExecuteAsync(mergeOperation);
+
+            return true;
+        }
+
+        async public Task<IEnumerable<T>> AllEntitiesAsync(string tableName)
+        {
+            return await AllTableEntities(tableName, String.Empty);
+        }
+
+        async public Task<IEnumerable<T>> AllEntitiesAsync(string tableName, string partitionKey)
+        {
+            return await AllTableEntities(tableName, partitionKey);
+        }
+
+        async private Task<IEnumerable<T>> AllTableEntities(string tableName, string partitionKey)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference(tableName);
+
+            TableQuery<T> query = String.IsNullOrWhiteSpace(partitionKey) ?
+                     new TableQuery<T>() :
+                     new TableQuery<T>()
+                        .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+            List<T> entities = new List<T>();
             foreach (var entity in await ExecuteQueryAsync(table, query))
             {
                 entities.Add(entity);
@@ -113,10 +134,10 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             return entities.ToArray();
         }
 
-        async private Task<List<TableEntity>> ExecuteQueryAsync(CloudTable table, TableQuery<TableEntity> query)
+        async private Task<List<T>> ExecuteQueryAsync(CloudTable table, TableQuery<T> query)
         {
-            List<TableEntity> results = new List<TableEntity>();
-            TableQuerySegment<TableEntity> currentSegment = null;
+            List<T> results = new List<T>();
+            TableQuerySegment<T> currentSegment = null;
 
             if (query.TakeCount > 0)
             {
@@ -142,16 +163,16 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             return results;
         }
 
-        async public Task<TableEntity> EntityAsync(string tableName, string partitionKey, string rowKey)
+        async public Task<T> EntityAsync(string tableName, string partitionKey, string rowKey)
         {
-            TableEntity tableEntity = await Entity(tableName, partitionKey, rowKey);
+            T tableEntity = await Entity(tableName, partitionKey, rowKey);
             if (tableEntity != null)
                 return tableEntity;
 
             return null;
         }
 
-        async public Task<bool> DeleteEntityAsync(string tableName, ITableEntity tableEntity)
+        async public Task<bool> DeleteEntityAsync(string tableName, T tableEntity)
         {
             return await DeleteEntityAsync(tableName, tableEntity.PartitionKey, tableEntity.RowKey);
         }
@@ -190,7 +211,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             return tableClient;
         }
 
-        async private Task<TableEntity> Entity(string tableName, string partitionKey, string rowKey, CloudTableClient tableClient = null)
+        async private Task<T> Entity(string tableName, string partitionKey, string rowKey, CloudTableClient tableClient = null)
         {
             if (tableClient == null)
                 tableClient = CreateTableClient();
@@ -198,13 +219,13 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             // Create the CloudTable object that represents the "people" table.
             CloudTable table = tableClient.GetTableReference(tableName);
 
-            TableOperation retrieveOperation = TableOperation.Retrieve<TableEntity>(partitionKey, rowKey);
+            TableOperation retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
 
             TableResult retrievedResult = await table.ExecuteAsync(retrieveOperation);
 
-            if (retrievedResult.Result is TableEntity)
+            if (retrievedResult.Result is T)
             {
-                return (TableEntity)retrievedResult.Result;
+                return (T)retrievedResult.Result;
             }
             return null;
         }

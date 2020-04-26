@@ -4,17 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer4.Models;
-using static IdentityModel.OidcConstants;
-using IdentityModel;
 using IdentityServer.Legacy.Services.PasswordHasher;
 using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer.Legacy.MongoDb.Services.DbContext;
 using IdentityServer.Legacy.Reflection;
-using IdentityServer.Legacy.Azure.Services.DbContext;
 using IdentityServer.Legacy.UserInteraction;
 using IdentityServer.Legacy.Services.EmailSender;
 using System.Collections.Generic;
+using IdentityServer.Legacy.Azure.Services.DbContext;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -104,9 +101,16 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             });
             */
 
+            /*
             services.AddResourceDbContext<MongoBlobResourceDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
+            });
+            */
+
+            services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
+            {
+                options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
 
             #endregion
@@ -161,18 +165,18 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             });
             */
 
-            
+            /*
             services.AddClientDbContext<MongoBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
             });
-            
-/*
+            */
+
             services.AddClientDbContext<TableStorageBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
-*/
+
             #endregion
 
             #region Add ExportClientDbContext (optional)
