@@ -57,4 +57,17 @@
                 </a>
             </li>
         }
+        @if (Model.HasClientDb && Model.ApplicationUser.IsSecretVaultAdministrator())
+        {
+            <li class="ui-tile">
+                <a asp-page="./SecretsVault/Index">
+                    <div class="ui-tile-icon glyphicon glyphicon-eye-close">
+
+                    </div>
+                    <div class="ui-tile-text">
+                        Secrets Vault...
+                    </div>
+                </a>
+            </li>
+        }
     </ul>

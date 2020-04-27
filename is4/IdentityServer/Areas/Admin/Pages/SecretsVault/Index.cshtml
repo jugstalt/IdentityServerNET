@@ -1,0 +1,43 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.SecretsVault.IndexModel
+@{
+}
+
+@if (Model.SecretContainers != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="nav nav-pills nav-stacked">
+                @foreach (var secretContainer in Model.SecretContainers)
+                {
+                    <li class="ui-list-item">
+                        <a asp-page="EditRole/Index"
+                           asp-route-id="@secretContainer.Name">
+                            <div class="ui-icon left glyphicon glyphicon-knight"></div>
+                            <strong>@secretContainer.Name</strong>
+                            <div>
+                                @secretContainer.Description
+                            </div>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Create new container</h4>
+            <form id="find-user-form" method="post" asp-page-handler="Find">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="ContainerInput.ContainerName"></label>
+                    <input asp-for="ContainerInput.ContainerName" class="form-control" placeholder="New container..." />
+                </div>
+                <button type="submit" class="btn btn-default">Create</button>
+            </form>
+        </div>
+    </div>
+
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

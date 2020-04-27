@@ -3,7 +3,9 @@
 
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
+using IdentityServer.Legacy.Services.Validation;
 using IdentityServer4.Configuration;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace IdentityServer
@@ -139,8 +142,16 @@ namespace IdentityServer
             .AddClientStore<ClientStore>();
 
             // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+            //builder.AddDeveloperSigningCredential();
 
+            services.AddTransient<ICertificateFactory, CertificateFactory>();
+            services.AddSingleton<IValidationCertificateStorage, ValidationCertificateStorage>();
+
+            foreach(var cert in new ValidationCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
+            {
+                builder.AddValidationKey(cert);
+            }
+            
             services.AddTransient<IEmailSender, EmailSenderProxy>();
         }
 

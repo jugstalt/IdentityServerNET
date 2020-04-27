@@ -87,6 +87,17 @@ namespace IdentityServer.Legacy
             return user.Roles.Contains(KnownRoles.ClientAdministrator);
         }
 
+        static public bool IsSecretVaultAdministrator(this ApplicationUser user)
+        {
+            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+                return true;
+
+            if (user?.Roles == null)
+                return false;
+
+            return user.Roles.Contains(KnownRoles.SecretVaultAdministrator);
+        }
+
         static public bool HasAdministratorRole(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
@@ -95,7 +106,11 @@ namespace IdentityServer.Legacy
             if (user?.Roles == null)
                 return false;
 
-            return user.IsUserAdministrator() || user.IsRoleAdministrator() || user.IsResourceAdministrator() || user.IsClientAdministrator();
+            return user.IsUserAdministrator() || 
+                   user.IsRoleAdministrator() || 
+                   user.IsResourceAdministrator() || 
+                   user.IsClientAdministrator() ||
+                   user.IsSecretVaultAdministrator();
         }
     }
 }
