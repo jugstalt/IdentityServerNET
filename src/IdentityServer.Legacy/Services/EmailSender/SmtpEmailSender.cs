@@ -13,7 +13,7 @@ namespace IdentityServer.Legacy.Services.EmailSender
         //"Smtp": {
         //	"Username": "xxxxxxxx",   // optional
         //  "Password": "***********",  // optional
-        //  "SmtpServer", "smtp.server.com",
+        //  "SmtpServer": "smtp.server.com",
         //  "SmtpPort": 234,
         //	"FromEmail": "identity@server.com",
         //	"FromName": "Identity Server"
