@@ -12,6 +12,10 @@ namespace ClientApp
     {
         async static Task Main(string[] args)
         {
+
+            await CallSecretsVault("webgis", "secret", "webgis/sec1");
+            return;
+
             var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
             string issuer = "https://localhost:44300";
@@ -198,6 +202,53 @@ namespace ClientApp
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(JArray.Parse(content));
             }
+        }
+
+        async static Task CallSecretsVault(string clientName, string secret, string path)
+        {
+            var client = new HttpClient();
+            var disco = await client.GetDiscoveryDocumentAsync("https://localhost:44300");
+            if (disco.IsError)
+            {
+                Console.WriteLine(disco.Error);
+                return;
+            }
+
+            // request token
+            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = clientName,
+                ClientSecret = secret,
+
+                Scope = "secrets-vault secrets-vault.webgis"
+            });
+
+            if (tokenResponse.IsError)
+            {
+                Console.WriteLine(tokenResponse.Error);
+                return;
+            }
+
+            Console.WriteLine("Access-Token: " + tokenResponse.AccessToken);
+
+            client.SetBearerToken(tokenResponse.AccessToken);
+
+            var response = await client.GetAsync("https://localhost:44300/api/secretsvault?path=" + path);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine(response.StatusCode);
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Secret:");
+
+                Console.WriteLine(content);
+            }
+
+            Console.ReadLine();
         }
     }
 }

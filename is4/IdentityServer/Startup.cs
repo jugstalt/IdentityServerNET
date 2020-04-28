@@ -85,6 +85,15 @@ namespace IdentityServer
                 }
             });
 
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "https://localhost:44300";
+                    options.RequireHttpsMetadata = false;
+
+                    options.Audience = "secrets-vault";
+                });
+
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {
@@ -142,15 +151,15 @@ namespace IdentityServer
             .AddClientStore<ClientStore>();
 
             // not recommended for production - you need to store your key material somewhere secure
-            //builder.AddDeveloperSigningCredential();
+            builder.AddDeveloperSigningCredential();
 
-            services.AddTransient<ICertificateFactory, CertificateFactory>();
-            services.AddSingleton<IValidationCertificateStorage, ValidationCertificateStorage>();
+            //services.AddTransient<ICertificateFactory, CertificateFactory>();
+            //services.AddSingleton<IValidationCertificateStorage, ValidationCertificateStorage>();
 
-            foreach(var cert in new ValidationCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
-            {
-                builder.AddValidationKey(cert);
-            }
+            //foreach(var cert in new ValidationCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
+            //{
+            //    builder.AddValidationKey(cert);
+            //}
             
             services.AddTransient<IEmailSender, EmailSenderProxy>();
         }

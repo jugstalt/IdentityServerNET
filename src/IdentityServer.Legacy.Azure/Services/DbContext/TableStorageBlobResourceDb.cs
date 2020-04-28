@@ -130,8 +130,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
 
         async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            return (await GetAllApiResources())
+            var apis =  (await GetAllApiResources())
                         .Where(a => scopeNames.Contains(a.Name));
+            return apis;
         }
 
         async public Task<IEnumerable<ApiResource>> GetAllApiResources()

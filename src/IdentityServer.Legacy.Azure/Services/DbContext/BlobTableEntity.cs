@@ -54,6 +54,11 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
 
             //var blobBase64 = properties["Blob"]?.StringValue;
 
+            if(entity?.Blob==null)
+            {
+                return default(T);
+            }
+
             var bloblBase64 = entity.Blob;
 
             return blobSerializer.DeserializeObject<T>(cryptoService.DecryptText(bloblBase64));
