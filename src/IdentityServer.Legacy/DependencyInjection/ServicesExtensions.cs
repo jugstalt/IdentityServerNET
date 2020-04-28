@@ -182,5 +182,34 @@ namespace IdentityServer.Legacy.DependencyInjection
         }
 
         #endregion
+
+        #region SecretsVaultDb
+
+        static public ISecretsVaultDbContextBuilder AddSecretsVaultDbContext<T>(this IServiceCollection services)
+            where T : class, ISecretsVaultDbContext
+        {
+            services.AddTransient<ISecretsVaultDbContext, T>();
+
+            return new SecretsVaultDbContextBuilder(services);
+        }
+
+        static public IServiceCollection AddSecretsVaultDbContext<T>(this IServiceCollection services, Action<SecretsVaultDbContextConfiguration> setupAction)
+            where T : class, ISecretsVaultDbContext
+        {
+            services.Configure(setupAction);
+            services.AddTransient<ISecretsVaultDbContext, T>();
+
+            return services;
+        }
+
+        public static ISecretsVaultDbContextBuilder AddSecretsVaultDbContextOptions(this ISecretsVaultDbContextBuilder builder,
+            Action<SecretsVaultDbContextConfiguration> setupAction)
+        {
+            builder.Services.Configure(setupAction);
+
+            return builder;
+        }
+
+        #endregion
     }
 }

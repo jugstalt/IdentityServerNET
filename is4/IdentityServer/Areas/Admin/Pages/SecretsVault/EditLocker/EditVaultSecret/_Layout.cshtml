@@ -2,21 +2,30 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+@model IEditVaultSecretPageModel
+
 <h2>Admin Secrets Vault</h2>
-<div class="admin-users">
-    <h4>Edit/Create Lockers</h4>
+<div class="admin-resources">
+    <h4>Edit Secret: @($"{ Model.LockerName }/{ @Model?.CurrentSecret?.Name }")</h4>
     <hr />
+
     <div class="row">
-        <partial name="_StatusMessage" model="Model.StatusMessage" />
         <div class="col-md-3 sidebar">
-            <partial name="_SecretsVaultNav" model="Model" />
+            <div style="padding:10px">
+
+
+            </div>
+
+            <partial name="_EditVaultSecretNav" model="Model" />
         </div>
         <div class="col-md-9">
             @RenderBody()
         </div>
     </div>
+
 </div>
 
 @section Scripts {
     @RenderSection("scripts", required: false)
 }
+

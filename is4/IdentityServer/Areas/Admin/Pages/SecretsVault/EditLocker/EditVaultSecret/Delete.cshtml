@@ -1,0 +1,27 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret.DeleteModel
+@{
+    ViewData["Title"] = "Delete Secret";
+    ViewData["ActivePage"] = EditLockerNavPages.Delete;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="delete-user-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input asp-for="Input.LockerName" />
+            <input asp-for="Input.CurrentSecretName" />
+            <div class="form-group">
+                <label asp-for="Input.ConfirmSecretName"></label>
+                <input asp-for="Input.ConfirmSecretName" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-danger">Delete Locker!</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

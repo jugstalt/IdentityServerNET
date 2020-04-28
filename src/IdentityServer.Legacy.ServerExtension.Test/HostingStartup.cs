@@ -207,6 +207,16 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #endregion
 
+            #region App SecretsVaultDbContext (optional) 
+
+            services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(options =>
+            {
+                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\secretsvault";
+                options.CryptoService = new Base64CryptoService();
+            });
+
+            #endregion
+
             #region UI (required)
 
             services.Configure<UserInterfaceConfiguration>(options =>
