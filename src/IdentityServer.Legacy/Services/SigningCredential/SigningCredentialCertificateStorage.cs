@@ -9,15 +9,17 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Legacy.Services.Validation
+namespace IdentityServer.Legacy.Services.SigningCredential
 {
-    public class ValidationCertificateStorage : IValidationCertificateStorage
+    public class SigningCredentialCertificateStorage : ISigningCredentialCertificateStorage
     {
         private readonly string _validationKeyStoragePath;
         private readonly string _certPassword;
         private readonly ICertificateFactory _certificateFactory;
 
-        public ValidationCertificateStorage(IConfiguration configuration, ICertificateFactory certificateFactory)
+        public SigningCredentialCertificateStorage(
+                IConfiguration configuration, 
+                ICertificateFactory certificateFactory)
         {
             _validationKeyStoragePath = configuration["ValidationKeys:Storage"];
             _certPassword = configuration["ValidationKeys:CertPassword"];
@@ -77,7 +79,7 @@ namespace IdentityServer.Legacy.Services.Validation
             string filename = subject;
             foreach(var s in subject.Split(',').Select(s=>s.Trim()))
             {
-                if(s.StartsWith("cn="))
+                if(s.ToLower().StartsWith("cn="))
                 {
                     filename = subject.Substring(3).Trim();
                     break;

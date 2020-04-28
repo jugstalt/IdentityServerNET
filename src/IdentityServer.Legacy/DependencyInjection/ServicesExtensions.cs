@@ -1,4 +1,5 @@
-﻿using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -185,19 +186,23 @@ namespace IdentityServer.Legacy.DependencyInjection
 
         #region SecretsVaultDb
 
-        static public ISecretsVaultDbContextBuilder AddSecretsVaultDbContext<T>(this IServiceCollection services)
+        static public ISecretsVaultDbContextBuilder AddSecretsVaultDbContext<T, TSecretEncryptor>(this IServiceCollection services)
             where T : class, ISecretsVaultDbContext
+            where TSecretEncryptor : class, IVaultSecretCryptoService
         {
             services.AddTransient<ISecretsVaultDbContext, T>();
+            services.AddTransient<IVaultSecretCryptoService, TSecretEncryptor>();
 
             return new SecretsVaultDbContextBuilder(services);
         }
 
-        static public IServiceCollection AddSecretsVaultDbContext<T>(this IServiceCollection services, Action<SecretsVaultDbContextConfiguration> setupAction)
+        static public IServiceCollection AddSecretsVaultDbContext<T, TSecretEncryptor>(this IServiceCollection services, Action<SecretsVaultDbContextConfiguration> setupAction)
             where T : class, ISecretsVaultDbContext
+            where TSecretEncryptor : class, IVaultSecretCryptoService
         {
             services.Configure(setupAction);
             services.AddTransient<ISecretsVaultDbContext, T>();
+            services.AddTransient<IVaultSecretCryptoService, TSecretEncryptor>();
 
             return services;
         }

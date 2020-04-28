@@ -5,7 +5,9 @@ using IdentityServer.Legacy;
 using IdentityServer.Legacy.DependencyInjection;
 using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
-using IdentityServer.Legacy.Services.Validation;
+using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.SigningCredential;
 using IdentityServer4.Configuration;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -151,16 +153,18 @@ namespace IdentityServer
             .AddClientStore<ClientStore>();
 
             // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+            //builder.AddDeveloperSigningCredential();
 
-            //services.AddTransient<ICertificateFactory, CertificateFactory>();
-            //services.AddSingleton<IValidationCertificateStorage, ValidationCertificateStorage>();
+            services.AddTransient<ICertificateFactory, CertificateFactory>();
+            services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
 
-            //foreach(var cert in new ValidationCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
-            //{
-            //    builder.AddValidationKey(cert);
-            //}
-            
+            foreach (var cert in new SigningCredentialCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
+            {
+                builder.AddSigningCredential(cert);
+                //builder.AddValidationKey(cert);
+                //break;
+            }
+
             services.AddTransient<IEmailSender, EmailSenderProxy>();
         }
 

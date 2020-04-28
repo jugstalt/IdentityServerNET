@@ -15,11 +15,12 @@ namespace IdentityServer.Legacy.Services.DbContext
 {
     public class FileBlobSecretsVaultDb : ISecretsVaultDbContext
     {
-        protected string _rootPath = null;
-        private ICryptoService _cryptoService = null;
-        private IBlobSerializer _blobSerializer = null;
+        private readonly string _rootPath = null;
+        private readonly ICryptoService _cryptoService = null;
+        private readonly IBlobSerializer _blobSerializer = null;
 
-        public FileBlobSecretsVaultDb(IOptions<SecretsVaultDbContextConfiguration> options)
+        public FileBlobSecretsVaultDb(
+            IOptions<SecretsVaultDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
                 throw new ArgumentException("FileBlobSecretsVaultDb: no connection string defined");

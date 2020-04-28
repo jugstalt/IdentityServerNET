@@ -13,15 +13,18 @@ using IdentityServer.Legacy.Extensions;
 using IdentityServer.Legacy.Models;
 using System.Threading;
 using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Services.Cryptography;
 
 namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret
 {
     public class VersionsModel : EditVaultSecretPageModel
     {
-        public VersionsModel(ISecretsVaultDbContext secretsVaultDb)
+        private readonly IVaultSecretCryptoService _vaultSecrtesCryptoService;
+
+        public VersionsModel(ISecretsVaultDbContext secretsVaultDb, IVaultSecretCryptoService vaultSecrtesCryptoService)
             : base(secretsVaultDb)
         {
-
+            _vaultSecrtesCryptoService = vaultSecrtesCryptoService;
         }
 
         async public Task<IActionResult> OnGetAsync(string id, string locker)
@@ -52,7 +55,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecr
                     var secretVersion = new VaultSecretVersion()
                     {
                         VersionTimeStamp = DateTime.UtcNow.Ticks,
-                        Secret = Input.Secret  // ToDo: Encrypt!!!!
+                        Secret = _vaultSecrtesCryptoService.EncryptText(Input.Secret, Encoding.Unicode)
                     };
 
                     await _secretsVaultDb.CreateVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, secretVersion, CancellationToken.None);

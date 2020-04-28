@@ -209,7 +209,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region App SecretsVaultDbContext (optional) 
 
-            services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(options =>
+            services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb, SigningCredentialCertStoreCryptoService>(options =>
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\secretsvault";
                 options.CryptoService = new Base64CryptoService();

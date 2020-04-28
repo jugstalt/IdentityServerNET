@@ -1,5 +1,5 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.Validation;
+using IdentityServer.Legacy.Services.SigningCredential;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;

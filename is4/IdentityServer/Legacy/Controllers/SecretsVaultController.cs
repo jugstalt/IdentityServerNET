@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using IdentityServer.Legacy.Extensions;
+using IdentityServer.Legacy.Services.Cryptography;
+using System.Text;
 
 namespace IdentityServer.Legacy.Controllers
 {
@@ -19,10 +21,14 @@ namespace IdentityServer.Legacy.Controllers
     public class SecretsVaultController : ControllerBase
     {
         private readonly ISecretsVaultDbContext _secretsVaultDb;
+        private readonly IVaultSecretCryptoService _vaultSecrtesCryptoService;
 
-        public SecretsVaultController(ISecretsVaultDbContext secretsVaultDb)
+        public SecretsVaultController(
+            ISecretsVaultDbContext secretsVaultDb,
+            IVaultSecretCryptoService vaultSecrtesCryptoService)
         {
             _secretsVaultDb = secretsVaultDb;
+            _vaultSecrtesCryptoService = vaultSecrtesCryptoService;
         }
 
         [HttpGet]
@@ -63,6 +69,9 @@ namespace IdentityServer.Legacy.Controllers
                     throw new StatusMessageException($"Secret { path } not found");
                 }
 
+                secretVersion.Secret =
+                    _vaultSecrtesCryptoService.DecryptText(secretVersion.Secret, Encoding.Unicode);
+
                 return new JsonResult(
                     new
                     {
@@ -86,7 +95,6 @@ namespace IdentityServer.Legacy.Controllers
                     new
                     {
                         success = false,
-                        xxx=ex.Message,
                         errorMessage = "Internal error."
                     });
             }

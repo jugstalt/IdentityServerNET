@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Legacy.Services.Validation
+namespace IdentityServer.Legacy.Services.SigningCredential
 {
     public interface ICertificateFactory
     {

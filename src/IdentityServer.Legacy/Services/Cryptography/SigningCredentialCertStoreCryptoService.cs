@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.Services.Validation;
+﻿using IdentityServer.Legacy.Services.SigningCredential;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using System.Text;
 
 namespace IdentityServer.Legacy.Services.Cryptography
 {
-    public class ValidationCertStoreCryptoService : ICryptoService
+    public class SigningCredentialCertStoreCryptoService : ICryptoService
     {
-        private ValidationCertificateStorage _validationKeyStorage;
-        public ValidationCertStoreCryptoService(ValidationCertificateStorage validationKeyStorage)
+        private ISigningCredentialCertificateStorage _validationKeyStorage;
+        public SigningCredentialCertStoreCryptoService(ISigningCredentialCertificateStorage validationKeyStorage)
         {
             _validationKeyStorage = validationKeyStorage;
         }

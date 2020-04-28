@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace IdentityServer.Legacy.Services.Validation
+namespace IdentityServer.Legacy.Services.SigningCredential
 {
-    public interface IValidationCertificateStorage
+    public interface ISigningCredentialCertificateStorage
     {
         IEnumerable<X509Certificate2> GetCertificates();
 
