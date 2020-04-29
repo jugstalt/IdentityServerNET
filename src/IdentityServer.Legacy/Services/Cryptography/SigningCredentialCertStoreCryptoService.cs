@@ -6,6 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.Cryptography
 {
@@ -24,7 +25,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             string jsonString = Encoding.UTF8.GetString(Convert.FromBase64String(base64Text));
             var encryptedObject = JsonConvert.DeserializeObject<EncryptedObject>(jsonString);
 
-            return DecryptToString(encryptedObject);
+            return DecryptToStringAsync(encryptedObject).Result;
         }
 
         public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
@@ -46,7 +47,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
         public string EncryptText(string text, Encoding encoding = null)
         {
             encoding = encoding ?? Encoding.Unicode;
-            var encryptedObject = Encrypt(encoding.GetBytes(text));
+            var encryptedObject = EncryptAsync(encoding.GetBytes(text)).Result;
 
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(encryptedObject)));
         }
@@ -69,14 +70,14 @@ namespace IdentityServer.Legacy.Services.Cryptography
 
         #region Encryption
 
-        private EncryptedObject Encrypt(string clearText)
+        async private Task<EncryptedObject> EncryptAsync(string clearText)
         {
-            return Encrypt(Encoding.Unicode.GetBytes(clearText));
+            return await EncryptAsync(Encoding.Unicode.GetBytes(clearText));
         }
 
-        private EncryptedObject Encrypt(byte[] data)
+        async private Task<EncryptedObject> EncryptAsync(byte[] data)
         {
-            var randomCert = _validationKeyStorage.GetRandomCertificate(60);
+            var randomCert = await _validationKeyStorage.GetRandomCertificateAsync(60);
 
             var password = PasswordFromCert(randomCert);
             var bytes = AES_Encrypt(data, password.AESPassword, salt: password.AESSalt, g1: password.AESG1);
@@ -88,14 +89,14 @@ namespace IdentityServer.Legacy.Services.Cryptography
             };
         }
 
-        private string DecryptToString(EncryptedObject encryptedObject)
+        async private Task<string> DecryptToStringAsync(EncryptedObject encryptedObject)
         {
-            return Encoding.Unicode.GetString(DecryptToBytes(encryptedObject));
+            return Encoding.Unicode.GetString(await DecryptToBytesAsync(encryptedObject));
         }
 
-        private byte[] DecryptToBytes(EncryptedObject encryptedObject)
+        async private Task<byte[]> DecryptToBytesAsync(EncryptedObject encryptedObject)
         {
-            X509Certificate2 cert = _validationKeyStorage.GetCertificate(encryptedObject.CertSubject);
+            X509Certificate2 cert = await _validationKeyStorage.GetCertificateAsync(encryptedObject.CertSubject);
             if(cert==null)
             {
                 throw new Exception("Can't decrypt object. Unknown encryption certificate");

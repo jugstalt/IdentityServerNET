@@ -56,7 +56,7 @@ namespace IdentityServer
         private static string[] StartupAssemblies = new[]
         {
             "IdentityServer.Legacy"
-            , "IdentityServer.Legacy.ServerExtension.Test"
+            //, "IdentityServer.Legacy.ServerExtension.Test"
         };
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

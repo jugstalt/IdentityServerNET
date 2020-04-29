@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.SigningCredential
 {
     public interface ISigningCredentialCertificateStorage
     {
-        IEnumerable<X509Certificate2> GetCertificates();
+        Task RenewCertificatesAsync(int ifOlderThanDays = 60);
 
-        X509Certificate2 GetRandomCertificate(int maxAgeInDays);
+        Task<IEnumerable<X509Certificate2>> GetCertificatesAsync();
 
-        X509Certificate2 GetCertificate(string subject);
+        Task<X509Certificate2> GetRandomCertificateAsync(int maxAgeInDays);
+
+        Task<X509Certificate2> GetCertificateAsync(string subject);
     }
 }

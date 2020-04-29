@@ -14,39 +14,25 @@ namespace IdentityServer.Legacy.Services.SigningCredential
     public class SigningCredentialCertificateStorage : ISigningCredentialCertificateStorage
     {
         private readonly string _validationKeyStoragePath;
-        private readonly string _certPassword;
         private readonly ICertificateFactory _certificateFactory;
+        private readonly ICertificateSerializer _certificateSerializer;
 
         public SigningCredentialCertificateStorage(
                 IConfiguration configuration, 
-                ICertificateFactory certificateFactory)
+                ICertificateFactory certificateFactory,
+                ICertificateSerializer certificateSerializer = null)
         {
-            _validationKeyStoragePath = configuration["ValidationKeys:Storage"];
-            _certPassword = configuration["ValidationKeys:CertPassword"];
+            _validationKeyStoragePath = configuration["SigningCredential:Storage"];
             _certificateFactory = certificateFactory;
-
-            UpdateValidationKeyStorage();
+            _certificateSerializer = certificateSerializer ?? new SimpleCertificateSerializer(configuration);
         }
 
-        private void UpdateValidationKeyStorage()
+        async public Task RenewCertificatesAsync(int ifOlderThanDays = 60)
         {
-            DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
-            if(!di.Exists)
-            {
-                di.Create();
-            }
-
-            var newestCert = di.GetFiles("*.pfx")
-                               .OrderByDescending(f => f.CreationTime)
-                               .FirstOrDefault();
-
-            if (newestCert == null || (DateTime.Now - newestCert.CreationTime).TotalDays > 1)
-            {
-                CreateNewValidationCert(3);
-            }
+            await UpdateValidationKeyStorageAsync(ifOlderThanDays);
         }
 
-        public IEnumerable<X509Certificate2> GetCertificates()
+        async public Task<IEnumerable<X509Certificate2>> GetCertificatesAsync()
         {
             DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
             List<X509Certificate2> certs = new List<X509Certificate2>();
@@ -54,14 +40,14 @@ namespace IdentityServer.Legacy.Services.SigningCredential
             foreach(var certFile in di.GetFiles("*.pfx")
                                       .Where(f => f.CreationTime > DateTime.Now.AddDays(-60)))
             {
-                X509Certificate2 cert = new X509Certificate2(certFile.FullName, _certPassword);
+                X509Certificate2 cert = await _certificateSerializer.LoadFromFileAsync(certFile.FullName);
                 certs.Add(cert);
             }
 
             return certs;
         }
 
-        public X509Certificate2 GetRandomCertificate(int maxAgeInDays)
+        async public Task<X509Certificate2> GetRandomCertificateAsync(int maxAgeInDays)
         {
             DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
             var certFiles = di.GetFiles("*.pfx")
@@ -71,10 +57,10 @@ namespace IdentityServer.Legacy.Services.SigningCredential
             var random = new Random();
             var certFile = certFiles[random.Next(certFiles.Length)];
 
-            return new X509Certificate2(certFile.FullName, _certPassword);
+            return await _certificateSerializer.LoadFromFileAsync(certFile.FullName);
         }
 
-        public X509Certificate2 GetCertificate(string subject)
+        async public Task<X509Certificate2> GetCertificateAsync(string subject)
         {
             string filename = subject;
             foreach(var s in subject.Split(',').Select(s=>s.Trim()))
@@ -92,12 +78,30 @@ namespace IdentityServer.Legacy.Services.SigningCredential
                 return null;
             }
 
-            return new X509Certificate2(certFile.FullName, _certPassword);
+            return await _certificateSerializer.LoadFromFileAsync(certFile.FullName);
         }
 
         #region Helper
 
-        private void CreateNewValidationCert(int count = 1)
+        async private Task UpdateValidationKeyStorageAsync(int ifOlderThanDays)
+        {
+            DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+
+            var newestCert = di.GetFiles("*.pfx")
+                               .OrderByDescending(f => f.CreationTime)
+                               .FirstOrDefault();
+
+            if (newestCert == null || (DateTime.Now - newestCert.CreationTime).TotalDays > ifOlderThanDays)
+            {
+                await CreateNewValidationCertAsync();
+            }
+        }
+
+        async private Task CreateNewValidationCertAsync(int count = 1)
         {
             for (int i = 0; i < count; i++)
             {
@@ -105,7 +109,8 @@ namespace IdentityServer.Legacy.Services.SigningCredential
                 int expireDays = 36500;
 
                 var cert = _certificateFactory.CreateNewX509Certificate(name, expireDays);
-                File.WriteAllBytes($@"{ _validationKeyStoragePath }/{ name }.pfx", cert.Export(X509ContentType.Pfx, _certPassword));
+
+                await _certificateSerializer.WriteToFileAsync($@"{ _validationKeyStoragePath }/{ name }.pfx", cert, X509ContentType.Pfx);
             }
         }
 

@@ -156,9 +156,11 @@ namespace IdentityServer
             //builder.AddDeveloperSigningCredential();
 
             services.AddTransient<ICertificateFactory, CertificateFactory>();
-            services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
+            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
 
-            foreach (var cert in new SigningCredentialCertificateStorage(this.Configuration, new CertificateFactory()).GetCertificates())
+            var sp = services.BuildServiceProvider();
+            var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
+            foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
             {
                 builder.AddSigningCredential(cert);
                 //builder.AddValidationKey(cert);
