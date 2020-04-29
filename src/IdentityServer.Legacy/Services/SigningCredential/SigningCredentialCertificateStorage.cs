@@ -25,6 +25,12 @@ namespace IdentityServer.Legacy.Services.SigningCredential
             _validationKeyStoragePath = configuration["SigningCredential:Storage"];
             _certificateFactory = certificateFactory;
             _certificateSerializer = certificateSerializer ?? new SimpleCertificateSerializer(configuration);
+
+            var di = new DirectoryInfo(_validationKeyStoragePath);
+            if(!di.Exists)
+            {
+                di.Create();
+            }
         }
 
         async public Task RenewCertificatesAsync(int ifOlderThanDays = 60)
