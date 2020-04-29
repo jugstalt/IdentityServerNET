@@ -28,18 +28,28 @@ namespace IdentityServer.Legacy.Services.SigningCredential
                 await fs.ReadAsync(buffer, 0, buffer.Length);
             }
 
-            return new X509Certificate2(buffer, _certPassword);
+            return LoadFromBytes(buffer);
+        }
+
+        public X509Certificate2 LoadFromBytes(byte[] bytes)
+        {
+            return new X509Certificate2(bytes, _certPassword);
         }
 
         async public Task WriteToFileAsync(string fileName, X509Certificate2 cert, X509ContentType type)
         {
-            byte[] buffer = cert.Export(X509ContentType.Pfx, _certPassword);
+            byte[] buffer = WriteToBytes(cert, type);
 
             using (var fs = new FileStream(fileName, FileMode.OpenOrCreate,
                             FileAccess.Write, FileShare.None, buffer.Length, true))
             {
                 await fs.WriteAsync(buffer, 0, buffer.Length);
             }
+        }
+
+        public byte[] WriteToBytes(X509Certificate2 cert, X509ContentType type)
+        {
+            return cert.Export(X509ContentType.Pfx, _certPassword);
         }
 
         #endregion
