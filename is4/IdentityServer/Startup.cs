@@ -157,20 +157,31 @@ namespace IdentityServer
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
 
-            // not recommended for production - you need to store your key material somewhere secure
-            //builder.AddDeveloperSigningCredential();
-
             services.AddTransient<ICertificateFactory, CertificateFactory>();
-            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
+
+            if (String.IsNullOrEmpty(Configuration["SigningCredential:Storage"]))
+            {
+                // not recommended for production - you need to store your key material somewhere secure
+                builder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
+            }
+
+            #region Refresh Certificate Store and add SigningCredentials
 
             var sp = services.BuildServiceProvider();
             var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
+            signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
             foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
             {
                 builder.AddSigningCredential(cert);
                 //builder.AddValidationKey(cert);
                 //break;
             }
+
+            #endregion
 
             services.AddTransient<IEmailSender, EmailSenderProxy>();
         }
