@@ -89,6 +89,9 @@ namespace IdentityServer
                     options.AddPolicy("admin-secretsvault-policy",
                        policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
                 }
+
+                // DoTo: find a policy that never matches!!
+                options.AddPolicy("forbidden", policy => policy.RequireRole("_#_locked_for_everybody_#_"));
             });
 
             services.AddAuthentication("Bearer")
@@ -104,11 +107,11 @@ namespace IdentityServer
                 .AddRazorPagesOptions(options =>
                 {
                     options.Conventions.AuthorizeAreaFolder("Admin", "/", "admin-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/users", "admin-user-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/roles", "admin-role-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/resources", "admin-resource-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/clients", "admin-client-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", "admin-secretsvault-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/users", Configuration["identityserver:allow_admin_users"] == "false" ? "forbidden" : "admin-user-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/roles", Configuration["identityserver:allow_admin_roles"] == "false" ? "forbidden" : "admin-role-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration["identityserver:allow_admin_resources"] == "false" ? "forbidden" : "admin-resource-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration["identityserver:allow_admin_clients"] == "false" ? "forbidden" : "admin-client-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration["identityserver:allow_admin_secretsvault"] == "false" ? "forbidden" : "admin-secretsvault-policy");
 
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
@@ -167,21 +170,22 @@ namespace IdentityServer
             else
             {
                 services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
+
+
+                #region Refresh Certificate Store and add SigningCredentials
+
+                var sp = services.BuildServiceProvider();
+                var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
+                signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
+                foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
+                {
+                    builder.AddSigningCredential(cert);
+                    //builder.AddValidationKey(cert);
+                    //break;
+                }
+
+                #endregion
             }
-
-            #region Refresh Certificate Store and add SigningCredentials
-
-            var sp = services.BuildServiceProvider();
-            var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
-            signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
-            foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
-            {
-                builder.AddSigningCredential(cert);
-                //builder.AddValidationKey(cert);
-                //break;
-            }
-
-            #endregion
 
             services.AddTransient<IEmailSender, EmailSenderProxy>();
         }
