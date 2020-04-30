@@ -11,7 +11,7 @@ namespace IdentityServer.Legacy
         public const string RoleAdministrator = "identityserver-legacy-role-administrator";
         public const string ResourceAdministrator = "identityserver-legacy-resource-administrator";
         public const string ClientAdministrator = "identityserver-legacy-client-administrator";
-        public const string SecretVaultAdministrator = "identityserver-legacy-secretvault-administrator";
+        public const string SecretsVaultAdministrator = "identityserver-legacy-secretsvault-administrator";
         
         public ApplicationRole UserAdministratorRole()
         {
@@ -53,12 +53,12 @@ namespace IdentityServer.Legacy
             };
         }
 
-        public ApplicationRole SecretVaultAdministratorRole()
+        public ApplicationRole SecretsVaultAdministratorRole()
         {
             return new ApplicationRole()
             {
-                Id = KnownRoles.SecretVaultAdministrator,
-                Name = KnownRoles.SecretVaultAdministrator,
+                Id = KnownRoles.SecretsVaultAdministrator,
+                Name = KnownRoles.SecretsVaultAdministrator,
                 Description = "Role to administrate secret vault"
             };
         }

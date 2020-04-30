@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Extensions;
 using System.Security.Cryptography.X509Certificates;
+using IdentityServer.Legacy.Clients;
 
 namespace ClientApp
 {
@@ -12,11 +13,20 @@ namespace ClientApp
     {
         async static Task Main(string[] args)
         {
+            var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
-            await CallSecretsVault("webgis", "secret", "webgis/sec1");
+            //await CallSecretsVault("webgis", "secret", "webgis/sec1");
+
+            //var secretsVaultClient = new SecretsVaultClient("webgis", "secret");
+            var secretsVaultClient = new SecretsVaultClient("webgis", cert);
+            await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
+            var secret = await secretsVaultClient.GetSecret("sec1");
+
+            Console.Write("Secret: " + secret.GetValue());
+
             return;
 
-            var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
+            //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
             string issuer = "https://localhost:44300";
             var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);

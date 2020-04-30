@@ -68,6 +68,8 @@ namespace IdentityServer
                         policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                     options.AddPolicy("admin-client-policy",
                         policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-secretsvault-policy",
+                       policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                 }
                 else
                 {
@@ -84,6 +86,8 @@ namespace IdentityServer
                         policy => policy.RequireRole(KnownRoles.ResourceAdministrator));
                     options.AddPolicy("admin-client-policy",
                         policy => policy.RequireRole(KnownRoles.ClientAdministrator));
+                    options.AddPolicy("admin-secretsvault-policy",
+                       policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
                 }
             });
 
@@ -104,6 +108,7 @@ namespace IdentityServer
                     options.Conventions.AuthorizeAreaFolder("Admin", "/roles", "admin-role-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/resources", "admin-resource-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/clients", "admin-client-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", "admin-secretsvault-policy");
 
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");

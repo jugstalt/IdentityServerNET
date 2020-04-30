@@ -16,7 +16,7 @@ using System.Text;
 namespace IdentityServer.Legacy.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
     [ApiController]
     public class SecretsVaultController : ControllerBase
     {
@@ -38,13 +38,16 @@ namespace IdentityServer.Legacy.Controllers
             {
                 string[] pathParts = path.Split('/');
 
+                if (!this.User.GetScopes().Contains($"secrets-vault.{ pathParts[0] }") &&
+                    !this.User.IsInRole(KnownRoles.SecretsVaultAdministrator))
+                {
+                    throw new StatusMessageException($"Unauthorized user or client \"{ this.User.GetUsernameOrClientId() }\"");
+                    //return Unauthorized();
+                }
+
                 if (pathParts.Length < 2 || pathParts.Length > 3)
                 {
                     throw new StatusMessageException($"Invalid path: { path }");
-                }
-
-                if(!this.User.GetScopes().Contains($"secrets-vault.{ pathParts[0] }")) {
-                    return Unauthorized();
                 }
 
                 VaultSecretVersion secretVersion = null;

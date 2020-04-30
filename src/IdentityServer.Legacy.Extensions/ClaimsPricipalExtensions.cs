@@ -58,5 +58,26 @@ namespace IdentityServer.Legacy.Extensions
                         .Select(c => c.Value)
                         .ToArray();
         }
+
+        static public string GetClientId(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal?
+                        .Claims?
+                        .Where(c => c.Type == "client_id")
+                        .FirstOrDefault()?
+                        .Value;
+        }
+
+        static public string GetUsernameOrClientId(this ClaimsPrincipal claimsPrincipal)
+        {
+            var username = claimsPrincipal.GetUsername();
+
+            if (!String.IsNullOrEmpty(username))
+            {
+                return username;
+            }
+
+            return claimsPrincipal.GetClientId();
+        }
     }
 }

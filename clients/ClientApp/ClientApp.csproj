@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IdentityServer.Legacy.Clients\IdentityServer.Legacy.Clients.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
   </ItemGroup>
 

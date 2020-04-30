@@ -95,7 +95,7 @@ namespace IdentityServer.Legacy
             if (user?.Roles == null)
                 return false;
 
-            return user.Roles.Contains(KnownRoles.SecretVaultAdministrator);
+            return user.Roles.Contains(KnownRoles.SecretsVaultAdministrator);
         }
 
         static public bool HasAdministratorRole(this ApplicationUser user)
