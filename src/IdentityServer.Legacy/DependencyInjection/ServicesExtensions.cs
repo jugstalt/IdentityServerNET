@@ -1,5 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -213,6 +214,28 @@ namespace IdentityServer.Legacy.DependencyInjection
             builder.Services.Configure(setupAction);
 
             return builder;
+        }
+
+        #endregion
+
+        #region Bot Detection
+
+        public static IServiceCollection AddLoginBotDetection<TBotDecetionType>(this IServiceCollection services)
+           where TBotDecetionType : class, ILoginBotDetection
+        {
+            services.AddTransient<ILoginBotDetection, TBotDecetionType>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddLoginBotDetection<TBotDecetionType, TCaptchaRendererType>(this IServiceCollection services)
+           where TBotDecetionType : class, ILoginBotDetection
+           where TCaptchaRendererType : class, ICaptchCodeRenderer
+        {
+            services.AddTransient<ILoginBotDetection, TBotDecetionType>();
+            services.AddTransient<ICaptchCodeRenderer, TCaptchaRendererType>();
+
+            return services;
         }
 
         #endregion

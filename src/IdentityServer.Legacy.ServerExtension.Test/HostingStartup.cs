@@ -12,6 +12,7 @@ using IdentityServer.Legacy.UserInteraction;
 using IdentityServer.Legacy.Services.EmailSender;
 using System.Collections.Generic;
 using IdentityServer.Legacy.Azure.Services.DbContext;
+using IdentityServer.Legacy.Services.Security;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -234,6 +235,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             #region EmailSender (required)
 
             services.AddTransient<ICustomEmailSender, MailJetEmailSender>();
+
+            #endregion
+
+            #region Login BotDetection (optional)
+
+            services.AddLoginBotDetection<LoginBotDetection, CatchaCodeRenderer>();
 
             #endregion
         }

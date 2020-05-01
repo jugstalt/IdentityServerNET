@@ -65,43 +65,58 @@ ul.ui-tiles {
 
     ul.ui-tiles li.ui-tile {
         display: inline-table;
-        width: 160px;
-        height: 160px;
-        border:1px solid #eee;
+        width: 320px;
+        height: 60px;
+        border: 1px solid #eee;
         background-color: #f8f8f8;
-        border-radius:25px;
+        border-radius: 5px;
+        margin: 0px 5px 5px 0px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.20)
     }
         ul.ui-tiles li.ui-tile .ui-tile-icon {
-            width: 160px;
-            height: 100px;
-            text-align:center;
-            box-sizing:border-box;
-            padding:30px;
-            font-size:70px;
-            opacity:.75;
-        }
-
-        ul.ui-tiles li.ui-tile .ui-tile-text {
-            width: 160px;
+            width: 60px;
             height: 60px;
             text-align: center;
             box-sizing: border-box;
+            padding: 10px;
+            font-size: 40px;
+            opacity: .75;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        ul.ui-tiles li.ui-tile .ui-tile-text {
+            width: 250px;
+            height: 60px;
+            text-align: left;
+            box-sizing: border-box;
             padding: 8px;
-            font-size: 14px
+            font-size: 14px;
+            display: inline-block;
+            vertical-align: top;
         }
 
 
 @media (max-width: 991px) {
+    .sidebar .nav-stacked {
+        border-bottom:1px solid #eee;
+    }
     .sidebar .nav-stacked li {
-        display:inline-block;
-        border-bottom: 1px solid #337ab7;
-        float:left;
-        vertical-align:top;
+        display: inline-block;
+        /*border-bottom: 1px solid #ddd;
+        float: left;*/
+        background-color: #fafafa;
+        vertical-align: baseline;
     }
 
         .sidebar .nav-stacked li a {
             padding: 10px 5px;
-            border-radius:4px 4px 0px 0px;
+            border-radius: 4px 4px 0px 0px;
+            min-width: 75px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            border-right: 1px solid #eee;
+            border-left: 1px solid #eee;
         }
 }
 

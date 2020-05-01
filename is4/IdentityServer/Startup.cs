@@ -90,8 +90,8 @@ namespace IdentityServer
                        policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
                 }
 
-                // DoTo: find a policy that never matches!!
-                options.AddPolicy("forbidden", policy => policy.RequireRole("_#_locked_for_everybody_#_"));
+            // DoTo: find a policy that never matches!!
+            options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
             });
 
             services.AddAuthentication("Bearer")
@@ -106,12 +106,13 @@ namespace IdentityServer
             services.AddMvc()
                 .AddRazorPagesOptions(options =>
                 {
+                    // _forbidden => unknown policy will cause an exception => denies access for everyone!!
                     options.Conventions.AuthorizeAreaFolder("Admin", "/", "admin-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/users", Configuration["identityserver:allow_admin_users"] == "false" ? "forbidden" : "admin-user-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/roles", Configuration["identityserver:allow_admin_roles"] == "false" ? "forbidden" : "admin-role-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration["identityserver:allow_admin_resources"] == "false" ? "forbidden" : "admin-resource-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration["identityserver:allow_admin_clients"] == "false" ? "forbidden" : "admin-client-policy");
-                    options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration["identityserver:allow_admin_secretsvault"] == "false" ? "forbidden" : "admin-secretsvault-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/users", Configuration.DenyAdminUsers() ? "_forbidden" : "admin-user-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/roles", Configuration.DenyAdminRoles() ? "_forbidden" : "admin-role-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration.DenyAdminResources() ? "_forbidden" : "admin-resource-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration.DenyAdminClients() ? "_forbidden" : "admin-client-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
 
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
@@ -245,11 +246,13 @@ namespace IdentityServer
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // uncomment, if you want to add MVC
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapDefaultControllerRoute();
-            //});
+            // to allow images with base64... eg. captcha images (image-src data:)
+            app.Use(async (ctx, next) =>
+            {
+                ctx.Response.Headers.Add("Content-Security-Policy",
+                                         "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+                await next();
+            });
 
             app.UseEndpoints(endpoints =>
             {

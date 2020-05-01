@@ -1,11 +1,14 @@
 ﻿@page
+@using IdentityServer.Legacy
+@using Microsoft.Extensions.Configuration  
+@inject IConfiguration configuration
 @model IdentityServer.Areas.Admin.IndexModel
 @{
     Layout = "_Layout.cshtml";
 }
 
     <ul class="ui-tiles">
-        @if (Model.HasUserDb && Model.ApplicationUser.IsUserAdministrator())
+        @if (!configuration.DenyAdminUsers() && Model.HasUserDb && Model.ApplicationUser.IsUserAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Users/Index">
@@ -18,7 +21,7 @@
                 </a>
             </li>
         }
-        @if (Model.HasRoleDb && Model.ApplicationUser.IsRoleAdministrator())
+        @if (!configuration.DenyAdminRoles() && Model.HasRoleDb && Model.ApplicationUser.IsRoleAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Roles/Index">
@@ -31,7 +34,7 @@
                 </a>
             </li>
         }
-        @if (Model.HasResourceDb && Model.ApplicationUser.IsResourceAdministrator())
+        @if (!configuration.DenyAdminResources() && Model.HasResourceDb && Model.ApplicationUser.IsResourceAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Resources/Index">
@@ -44,7 +47,7 @@
                 </a>
             </li>
         }
-        @if (Model.HasClientDb && Model.ApplicationUser.IsClientAdministrator())
+        @if (!configuration.DenyAdminClients() && Model.HasClientDb && Model.ApplicationUser.IsClientAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./Clients/Index">
@@ -57,7 +60,7 @@
                 </a>
             </li>
         }
-        @if (Model.HasClientDb && Model.ApplicationUser.IsSecretVaultAdministrator())
+        @if (!configuration.DenyAdminSecretsVault() && Model.HasClientDb && Model.ApplicationUser.IsSecretVaultAdministrator())
         {
             <li class="ui-tile">
                 <a asp-page="./SecretsVault/Index">

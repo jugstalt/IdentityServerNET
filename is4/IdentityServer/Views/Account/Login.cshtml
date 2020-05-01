@@ -1,7 +1,7 @@
 @using IdentityServer.Legacy.DependencyInjection;
 @using Microsoft.Extensions.Options;
 @inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
-  
+
 @model LoginViewModel
 @{
     Layout = "~/Views/Shared/_Layout_Login.cshtml";
@@ -10,7 +10,6 @@
     <partial name="_ValidationSummary" />
 
     <div class="row">
-
         @if (Model.EnableLocalLogin)
         {
             <div class="col-sm-6">
@@ -42,6 +41,14 @@
                                     <label asp-for="Password"></label>
                                     <input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">
                                 </div>
+                                @if (Model.CaptchaImage != null)
+                                {
+                                    <img src="data:image/png;base64,@Html.Raw(Convert.ToBase64String(Model.CaptchaImage))" />
+                                    <div class="form-group">
+                                        <label asp-for="CaptchaCode"></label>
+                                        <input asp-for="CaptchaCode" class="form-control" />
+                                    </div>
+                                }
                                 @if (Model.AllowRememberLogin)
                                 {
                                     <div class="form-group login-remember">

@@ -4,6 +4,7 @@
 
 using IdentityModel;
 using IdentityServer.Legacy;
+using IdentityServer.Legacy.Services.Security;
 using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
@@ -38,14 +39,18 @@ namespace IdentityServer
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
+        private readonly ILoginBotDetection _loginBotDetection;
+        private readonly ICaptchCodeRenderer _captchaCodeRenderer;
 
         public AccountController(
-             UserManager<ApplicationUser>/*LegacyUserManager*/ userManager,
+            UserManager<ApplicationUser>/*LegacyUserManager*/ userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
-            IEventService events)
+            IEventService events,
+            ILoginBotDetection loginBotDetetion = null,
+            ICaptchCodeRenderer captchaCodeRenderer = null)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -54,6 +59,9 @@ namespace IdentityServer
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+
+            _loginBotDetection = loginBotDetetion;
+            _captchaCodeRenderer = captchaCodeRenderer;
         }
 
         /// <summary>
@@ -113,7 +121,23 @@ namespace IdentityServer
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                bool suspicous = false;
+                if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
+                {
+                    await _loginBotDetection.BlockSuspicousUser(model.Username, 5000);
+
+                    if (_captchaCodeRenderer != null)
+                    {
+                        if(!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
+                        {
+                            suspicous = true;
+                        }
+                    }
+                }
+
+                var result = suspicous == true ?
+                    Microsoft.AspNetCore.Identity.SignInResult.Failed :
+                    await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
 
                 if (result.Succeeded)
                 {
@@ -139,6 +163,11 @@ namespace IdentityServer
                     //};
 
                     //await HttpContext.SignInAsync(isuser, props);
+
+                    if(_loginBotDetection != null)
+                    {
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                    }
 
                     if (context != null)
                     {
@@ -170,6 +199,11 @@ namespace IdentityServer
                 } 
                 else if(result.RequiresTwoFactor)
                 {
+                    if (_loginBotDetection != null)
+                    {
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                    }
+
                     string twoFactorUrl = "~/Identity/Account/LoginWith2fa?ReturnUrl={0}";
                     if (context != null || Url.IsLocalUrl(model.ReturnUrl))
                     {
@@ -178,6 +212,19 @@ namespace IdentityServer
                     else
                     {
                         return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode("~/")));
+                    }
+                }
+
+                if (_loginBotDetection != null)
+                {
+                    string captcaCode = await _loginBotDetection.AddSuspicousUserAndGenerateCaptchaCodeAsync(model.Username);
+                    if (await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
+                    {
+                        if (!String.IsNullOrEmpty(captcaCode) && _captchaCodeRenderer != null)
+                        {
+                            byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
+                            model.CaptchaImage = captchaImageBytes;
+                        }
                     }
                 }
 
@@ -317,6 +364,8 @@ namespace IdentityServer
             var vm = await BuildLoginViewModelAsync(model.ReturnUrl);
             vm.Username = model.Username;
             vm.RememberLogin = model.RememberLogin;
+            vm.CaptchaCode = model.CaptchaCode;
+            vm.CaptchaImage = model.CaptchaImage;
             return vm;
         }
 
