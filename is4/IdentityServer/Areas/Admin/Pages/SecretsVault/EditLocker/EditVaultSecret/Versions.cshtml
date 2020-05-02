@@ -14,16 +14,18 @@
             {
                 <ul class="nav nav-pills nav-stacked">
 
-                   @foreach(var secretVersion in Model.VaultSecretVersions.OrderByDescending(s=>s.VersionTimeStamp))
-                   { 
+                   @foreach (var secretVersion in Model.VaultSecretVersions.OrderByDescending(s => s.VersionTimeStamp))
+                   {
                     <li class="ui-list-item" style="min-height:50px;position:relative">
                         <div class="ui-icon left glyphicon glyphicon-modal-window"></div>
                         <div style="display:inline-block;padding:10px 15px 10px 5px">
                             @($"{ new DateTime(secretVersion.VersionTimeStamp, DateTimeKind.Utc).ToLocalTime().ToShortDateString() } { new DateTime(secretVersion.VersionTimeStamp, DateTimeKind.Utc).ToLocalTime().ToLongTimeString() }")
                         </div>
-                        <br/>
-                        <div style="display:inline-block;padding:2px 15px 2px 5px;color:#ccc">@(secretVersion.Secret.Substring(0,Math.Min(secretVersion.Secret.Length/2, 22)))***</div>
-
+                        <br />
+                        @*
+        <div style="display:inline-block;padding:2px 15px 2px 5px;color:#ccc">@(secretVersion.Secret.Substring(0, Math.Min(secretVersion.Secret.Length / 2, 22)))***</div>
+                        *@
+                        <a href="~/api/secretsvault?v=1.0&path=@($"{Model.LockerName}/{Model.CurrentSecret.Name}/{secretVersion.VersionTimeStamp}")" target="_blank">@($"{Model.LockerName}/{Model.CurrentSecret.Name}/{secretVersion.VersionTimeStamp}")</a>
                         <a style="position:absolute; right:0px;top:0px"
                            asp-page-handler="Remove"
                            asp-route-id="@Model.CurrentSecret.Name"
