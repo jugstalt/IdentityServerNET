@@ -63,6 +63,12 @@ ul.ui-tiles {
     padding:0px;
 }
 
+    ul.ui-tiles a:hover,
+    a:focus {
+        color: #23527c;
+        text-decoration: none;
+    }
+
     ul.ui-tiles li.ui-tile {
         display: inline-table;
         width: 320px;

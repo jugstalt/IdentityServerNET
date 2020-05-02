@@ -224,6 +224,9 @@ namespace IdentityServer
                         {
                             byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
                             model.CaptchaImage = captchaImageBytes;
+
+                            this.Response.Headers.Add("Content-Security-Policy",
+                                             "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
                         }
                     }
                 }

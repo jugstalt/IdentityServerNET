@@ -13,6 +13,7 @@ using IdentityServer.Legacy.Services.EmailSender;
 using System.Collections.Generic;
 using IdentityServer.Legacy.Azure.Services.DbContext;
 using IdentityServer.Legacy.Services.Security;
+using IdentityServer.Legacy.CaptchaRenderers;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test

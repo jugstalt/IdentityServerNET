@@ -1,11 +1,12 @@
-﻿using System;
+﻿using IdentityServer.Legacy.Services.Security;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 
-namespace IdentityServer.Legacy.Services.Security
+namespace IdentityServer.Legacy.CaptchaRenderers
 {
     public class CatchaCodeRenderer : ICaptchCodeRenderer
     {
@@ -19,13 +20,13 @@ namespace IdentityServer.Legacy.Services.Security
 
                 Random rand = new Random();
 
-                graph.Clear(GetRandomLightColor());
+                var bgColor = GetRandomLightColor();
+                graph.Clear(bgColor);
 
                 DrawCaptchaCode();
 
-                DrawDisorderLine();
-
                 AdjustRippleEffect();
+                DrawDisorderLine(bgColor);
 
                 MemoryStream ms = new MemoryStream();
 
@@ -78,12 +79,12 @@ namespace IdentityServer.Legacy.Services.Security
                     }
                 }
 
-                void DrawDisorderLine()
+                void DrawDisorderLine(Color color)
                 {
-                    Pen linePen = new Pen(new SolidBrush(Color.Black), 3);
+                    Pen linePen = new Pen(new SolidBrush(Color.Black), 4);
                     for (int i = 0; i < rand.Next(3, 5); i++)
                     {
-                        linePen.Color = GetRandomDeepColor();
+                        linePen.Color = color; //GetRandomDeepColor();
 
                         Point startPoint = new Point(rand.Next(0, width), rand.Next(0, height));
                         Point endPoint = new Point(rand.Next(0, width), rand.Next(0, height));

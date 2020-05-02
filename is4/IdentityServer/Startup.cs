@@ -247,12 +247,12 @@ namespace IdentityServer
             app.UseAuthorization();
 
             // to allow images with base64... eg. captcha images (image-src data:)
-            app.Use(async (ctx, next) =>
-            {
-                ctx.Response.Headers.Add("Content-Security-Policy",
-                                         "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
-                await next();
-            });
+            //app.Use(async (ctx, next) =>
+            //{
+            //    ctx.Response.Headers.Add("Content-Security-Policy",
+            //                             "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+            //    await next();
+            //});
 
             app.UseEndpoints(endpoints =>
             {
