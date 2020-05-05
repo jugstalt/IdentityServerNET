@@ -8,6 +8,7 @@ using IdentityServer.Legacy.Services;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.SigningCredential;
+using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -148,7 +149,7 @@ namespace IdentityServer
                 options.Authentication = new AuthenticationOptions()
                 {
                     CookieLifetime = TimeSpan.FromHours(10), // ID server cookie timeout set to 10 hours
-                    CookieSlidingExpiration = true
+                    CookieSlidingExpiration = true,
                 };
             })
             // Add Jwt Client Assertation (get token from certificate)
@@ -160,6 +161,21 @@ namespace IdentityServer
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
+
+            if (Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0)
+            {
+                services.ConfigureApplicationCookie(options =>
+                {
+                    if(!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
+                         options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
+                    if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Domain"]))
+                        options.Cookie.Domain = Configuration["IdentityServer:Cookie:Domain"];
+                    if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Path"]))
+                        options.Cookie.Path = Configuration["IdentityServer:Cookie:Path"];
+                    if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:ExpireDays"]))
+                        options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(Configuration["IdentityServer:Cookie:ExpireDays"]));
+                });
+            }
 
             services.AddTransient<ICertificateFactory, CertificateFactory>();
 
