@@ -1,5 +1,6 @@
 @model IdentityServer.Legacy.ApplicationUser;
 @using IdentityServer.Legacy;
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration;
 @{
     var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
 }
@@ -13,9 +14,10 @@
             {
                 <h4>Hello, @Model.ApplicationUserName()</h4>
             }
+            
         </div>
         <div class="col-md-9">
-            
+
             <ul class="ui-tiles">
                 @if (Model == null)
                 {
@@ -32,16 +34,7 @@
                 }
                 else
                 {
-                    <li class="ui-tile">
-                        <a href="~/account/logout">
-                            <div class="ui-tile-icon glyphicon glyphicon-log-out">
 
-                            </div>
-                            <div class="ui-tile-text ">
-                                Logout
-                            </div>
-                        </a>
-                    </li>
 
                     <li class="ui-tile">
                         <a href="~/grants">
@@ -54,13 +47,27 @@
                         </a>
                     </li>
 
+                    @if (!configuration.DenyManageAccount())
+                    {
+                        <li class="ui-tile">
+                            <a href="~/identity/account/manage">
+                                <div class="ui-tile-icon glyphicon glyphicon-user">
+
+                                </div>
+                                <div class="ui-tile-text ">
+                                    Manage my account
+                                </div>
+                            </a>
+                        </li>
+                    }
+
                     <li class="ui-tile">
-                        <a href="~/identity/account/manage">
-                            <div class="ui-tile-icon glyphicon glyphicon-user">
+                        <a href="~/account/logout">
+                            <div class="ui-tile-icon glyphicon glyphicon-log-out">
 
                             </div>
                             <div class="ui-tile-text ">
-                                Manage my account
+                                Logout
                             </div>
                         </a>
                     </li>
@@ -80,20 +87,10 @@
                     }
                 }
 
-
-
-
-                <li class="ui-tile">
-                    <a asp-action="About">
-                        <div class="ui-tile-icon glyphicon glyphicon-info-sign">
-
-                        </div>
-                        <div class="ui-tile-text">
-                            About
-                        </div>
-                    </a>
-                </li>
-
             </ul>
+            <p>
+                <a asp-action="About">IdentiyServer: About...</a>
+            </p>
+            
         </div>
     </div>

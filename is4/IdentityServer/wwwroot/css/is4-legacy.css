@@ -149,3 +149,8 @@ ul.ui-tiles {
     background-position: left center;
     background-repeat: no-repeat;
 }
+
+.body-layout-login .panel-body button {
+    width: 100%;
+    border-radius: 17px;
+}

@@ -69,7 +69,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            if (_configuration["Capabilities:UserAccounts:AllowRegister"]?.ToLower() == "false")
+            if (_configuration.DenyRegisterAccount())
             {
                 return RedirectToPage("/");
             }

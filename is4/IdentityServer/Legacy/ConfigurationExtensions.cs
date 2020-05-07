@@ -32,5 +32,30 @@ namespace IdentityServer.Legacy
         {
             return configuration["identityserver:DenyAdminSecretsVault"]?.ToLower() == "true";
         }
+
+        static public bool DenyManageAccount(this IConfiguration configuration)
+        {
+            return configuration["identityserver:DenyManageAccount"]?.ToLower() == "true";
+        }
+
+        static public bool DenyRegisterAccount(this IConfiguration configuration)
+        {
+            return configuration["identityserver:DenyRegisterAccount"]?.ToLower() == "true";
+        }
+
+        static public bool DenyForgotPasswordChallange(this IConfiguration configuration)
+        {
+            return configuration["identityserver:Login:DenyForgotPasswordChallange"]?.ToLower() == "true";
+        }
+
+        static public bool DenyRememberLogin(this IConfiguration configuration)
+        {
+            return configuration["identityserver:Login:DenyRememberLogin"]?.ToLower() == "true";
+        }
+
+        static public bool RememberLoginDefaultValue(this IConfiguration configuration)
+        {
+            return configuration["identityserver:Login:RememberLoginDefaultValue"]?.ToLower() == "true";
+        }
     }
 }

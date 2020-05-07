@@ -1,6 +1,8 @@
+@using IdentityServer.Legacy; 
 @using IdentityServer.Legacy.DependencyInjection;
 @using Microsoft.Extensions.Options;
 @inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration; 
 
 @model LoginViewModel
 @{
@@ -35,11 +37,11 @@
                             <fieldset>
                                 <div class="form-group">
                                     <label asp-for="Username"></label>
-                                    <input class="form-control" placeholder="Username" asp-for="Username" autofocus>
+                                    <input class="form-control" placeholder="Enter username..." asp-for="Username" autofocus>
                                 </div>
                                 <div class="form-group">
                                     <label asp-for="Password"></label>
-                                    <input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">
+                                    <input type="password" class="form-control" placeholder="Enter password..." asp-for="Password" autocomplete="off">
                                 </div>
                                 @if (Model.CaptchaImage != null)
                                 {
@@ -60,13 +62,22 @@
                                 }
                                 <div class="form-group">
                                     <button class="btn btn-primary" name="button" value="login">Login</button>
-                                    <button class="btn btn-default" name="button" value="cancel">Cancel</button>
+                                    @*<button class="btn btn-default" name="button" value="cancel">Cancel</button>*@
                                 </div>
                             </fieldset>
                         </form>
-                        <p>
-                            <a href="~/Identity/Account/ForgotPassword">Forgot Password?</a>
-                        </p>
+                        @if (!configuration.DenyForgotPasswordChallange())
+                        {
+                            <p>
+                                <a href="~/Identity/Account/ForgotPassword">Forgot Password?</a>
+                            </p>
+                        }
+                        @if (!configuration.DenyRegisterAccount())
+                        {
+                            <p>
+                                <a href="~/Identity/Account/Register">Register a new account...</a>
+                            </p>
+                        }
                     </div>
                 </div>
             </div>

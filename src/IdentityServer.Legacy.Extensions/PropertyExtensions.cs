@@ -8,6 +8,11 @@ namespace IdentityServer.Legacy.Extensions
 {
     static public class PropertyExtensions
     {
+        static public string ToClaimString(this string str)
+        {
+            return str ?? String.Empty;
+        }
+
         static public string ToClaimArrayString(this object[] array)
         {
             if (array == null)

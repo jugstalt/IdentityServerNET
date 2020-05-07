@@ -7,15 +7,39 @@
                                         .Where(p => String.IsNullOrEmpty(Model.Category) || Model.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase)))
     {
     <div class="form-group">
-        <label>@editorInfo.DisplayName</label>
-
-        @if(editorInfo.PropertyType.IsArray)
+        @if (!String.IsNullOrEmpty(editorInfo.DisplayName))
         {
-    <textarea name="@editorInfo.Name"
-              @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
-              class="form-control">@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)</textarea>
-               <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true"></span>
-        } else { 
+        <label>@editorInfo.DisplayName</label>
+        }
+
+        @if (editorInfo.PropertyType.IsArray || editorInfo.EditorType.HasFlag(EditorType.TextArea))
+        {
+
+            <textarea name="@editorInfo.Name"
+                  @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
+                  class="form-control">@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)</textarea>
+                   <span class="text-danger field-validation-valid" data-valmsg-for="@editorInfo.Name" data-valmsg-replace="true"></span>
+
+        } else if(editorInfo.EditorType.HasFlag(EditorType.ComboBox)) {
+
+            var optionsValue = @RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)?.ToString();
+
+            <select name="@editorInfo.Name" 
+                    @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))
+                    class="form-control">
+
+                @if(editorInfo.ComboBoxOptions!=null)
+                {
+                    foreach(var key in editorInfo.ComboBoxOptions.Keys)
+                    {
+                        <option value="@key">@editorInfo.ComboBoxOptions[key]</option>
+                    }
+                }
+
+            </select>
+
+        } else {
+
             <input name="@editorInfo.Name"
                    value="@RazorHelpers.GetPropertyValue(Model.CurrentApplicationUser, editorInfo)"
                    @Html.Raw(RazorHelpers.GetPropertyAttributes(editorInfo))

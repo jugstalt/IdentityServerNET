@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace IdentityServer
         private readonly IEventService _events;
         private readonly ILoginBotDetection _loginBotDetection;
         private readonly ICaptchCodeRenderer _captchaCodeRenderer;
+        private readonly IConfiguration _configuration;
 
         public AccountController(
             UserManager<ApplicationUser>/*LegacyUserManager*/ userManager,
@@ -49,6 +51,7 @@ namespace IdentityServer
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
+            IConfiguration configuration,
             ILoginBotDetection loginBotDetetion = null,
             ICaptchCodeRenderer captchaCodeRenderer = null)
         {
@@ -59,6 +62,8 @@ namespace IdentityServer
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+
+            _configuration = configuration;
 
             _loginBotDetection = loginBotDetetion;
             _captchaCodeRenderer = captchaCodeRenderer;
@@ -78,6 +83,9 @@ namespace IdentityServer
                 // we only have one option for logging in and it's an external provider
                 return RedirectToAction("Challenge", "External", new { provider = vm.ExternalLoginScheme, returnUrl });
             }
+
+            vm.AllowRememberLogin = !_configuration.DenyRememberLogin();
+            vm.RememberLogin = _configuration.RememberLoginDefaultValue();
 
             return View(vm);
         }

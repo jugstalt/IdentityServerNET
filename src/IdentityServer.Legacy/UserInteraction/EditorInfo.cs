@@ -17,7 +17,9 @@ namespace IdentityServer.Legacy.UserInteraction
         Url = 128,
         Password = 256,
         Date = 512,
-        Time = 1024
+        Time = 1024,
+        TextArea = 2048,
+        ComboBox = 4096
     }
 
     public class EditorInfo
@@ -87,5 +89,7 @@ namespace IdentityServer.Legacy.UserInteraction
 
             return true;
         }
+
+        public IDictionary<string, string> ComboBoxOptions { get; set; }
     }
 }

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -114,6 +115,11 @@ namespace IdentityServer
                     options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration.DenyAdminResources() ? "_forbidden" : "admin-resource-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration.DenyAdminClients() ? "_forbidden" : "admin-client-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
+
+                    if (Configuration.DenyManageAccount() == true)
+                    {
+                        options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage", "_forbidden");
+                    }
 
                     options.Conventions.AuthorizePage("/Account/Login");
                     options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
