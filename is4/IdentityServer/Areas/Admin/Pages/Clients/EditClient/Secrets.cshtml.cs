@@ -115,7 +115,5 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
             public string SecretDescription { get; set; }
             public DateTime? Expiration { get; set; }
         }
-
-
     }
 }

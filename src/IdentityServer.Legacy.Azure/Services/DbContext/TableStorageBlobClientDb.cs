@@ -29,6 +29,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                 throw new ArgumentException("TableStorageBlobClientDb: no connection string defined");
 
             _connectionString = options.Value.ConnectionString;
+            _tablename = !String.IsNullOrWhiteSpace(options.Value.TableName) ?
+                                    options.Value.TableName :
+                                    _tablename;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
             _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
 
