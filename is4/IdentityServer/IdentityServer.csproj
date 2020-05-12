@@ -21,7 +21,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
-    <ProjectReference Include="C:\Development\Appond\Appond.Web\src\IdentityServer.Legacy.Appond\IdentityServer.Legacy.Appond.csproj" />
   </ItemGroup>
 </Project>
