@@ -46,6 +46,7 @@
                 <span asp-validation-for="Input.ClientName" class="text-danger"></span>
             </div>
             <hr/>
+            <label>Template</label>
             <div class="form-group">
                 <select asp-for="Input.ClientType" class="form-control"
                         asp-items="Html.GetEnumSelectList<ClientsModel.ClientTemplateType>()">
@@ -59,7 +60,7 @@
                 <input asp-for="Input.ApiScopes" class="form-control" placeholder="Optional: [scope1] [scope2]..." />
                 <span asp-validation-for="Input.ApiScopes" class="text-danger"></span>
             </div>
-            <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
+            <button id="new-client-button" type="submit" class="btn btn-default">Create new client...</button>
         </form>
     </div>
 
