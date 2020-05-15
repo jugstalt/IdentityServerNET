@@ -29,22 +29,23 @@
         </ul>
     </div>
     <div class="col-md-6">
-
-        <form id="-form" method="post">
+        <div class="row collapsable-tool">
             <h4>New Api Resource</h4>
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <input asp-for="Input.ApiResourceName" class="form-control" placeholder="A unique API name..." />
-                <span asp-validation-for="Input.ApiResourceName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="Input.ApiResourceDisplayName" class="form-control" placeholder="Optional: an API display name..." />
-                <span asp-validation-for="Input.ApiResourceDisplayName" class="text-danger"></span>
-            </div>
-            <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
-        </form>
-    </div>
+            <form id="-form" method="post">
 
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <input asp-for="Input.ApiResourceName" class="form-control" placeholder="A unique API name..." />
+                    <span asp-validation-for="Input.ApiResourceName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.ApiResourceDisplayName" class="form-control" placeholder="Optional: an API display name..." />
+                    <span asp-validation-for="Input.ApiResourceDisplayName" class="text-danger"></span>
+                </div>
+                <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
