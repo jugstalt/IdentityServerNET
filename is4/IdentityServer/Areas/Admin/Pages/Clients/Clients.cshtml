@@ -33,22 +33,38 @@
         </ul>
     </div>
     <div class="col-md-6">
-
-        <form id="-form" method="post">
+        <div class="row collapsable-tool">
             <h4>New Client</h4>
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <input asp-for="Input.ClientId" class="form-control" placeholder="A unique client id..." />
-                <span asp-validation-for="Input.ClientId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="Input.ClientName" class="form-control" placeholder="Optional: Client name..." />
-                <span asp-validation-for="Input.ClientName" class="text-danger"></span>
-            </div>
-            <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
-        </form>
-    </div>
+            <form id="-form" method="post">
 
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <input asp-for="Input.ClientId" class="form-control" placeholder="A unique client id..." />
+                    <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.ClientName" class="form-control" placeholder="Optional: Client name..." />
+                    <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+                </div>
+                <hr />
+                <label>Template</label>
+                <div class="form-group">
+                    <select asp-for="Input.ClientType" class="form-control"
+                            asp-items="Html.GetEnumSelectList<ClientsModel.ClientTemplateType>()">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.ClientUrl" class="form-control" placeholder="Optional: Client Url..." />
+                    <span asp-validation-for="Input.ClientUrl" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.ApiScopes" class="form-control" placeholder="Optional: [scope1] [scope2]..." />
+                    <span asp-validation-for="Input.ApiScopes" class="text-danger"></span>
+                </div>
+                <button id="new-client-button" type="submit" class="btn btn-default">Create new client...</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

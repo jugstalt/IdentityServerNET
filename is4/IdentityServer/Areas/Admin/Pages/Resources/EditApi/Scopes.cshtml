@@ -41,48 +41,49 @@
 
     </div>
     <div class="col-md-6">
-
-        <form id="-form" method="post">
+        <div class="row collapsable-tool">
             <h4>@(Model.Input.Scope!=null ? $"Update" : "New") Scope</h4>
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <input type="hidden" asp-for="Input.ApiName" />
-            @if (Model.Input.Scope != null)
-            {
-                <input type="hidden" asp-for="Input.Scope.Name" />
-                <div class="form-group">
-                    <input value="@Model.Input.Scope.Name" class="form-control" disabled />
-                </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <input asp-for="Input.Scope.Name" class="form-control" placeholder="New scope name..." />
-                    <span asp-validation-for="Input.Scope.Name" class="text-danger"></span>
-                </div>
-            }
-            <div class="form-group">
-                <input asp-for="Input.Scope.DisplayName" class="form-control" placeholder="Optional: scope display name.." />
-                <span asp-validation-for="Input.Scope.DisplayName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <textarea asp-for="Input.Scope.Description" class="form-control" placeholder="Optional: scope description..." rows="3">
-            </textarea>
-                <span asp-validation-for="Input.Scope.Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="Input.Scope.Required" class="form-control_" />
-                <label asp-for="Input.Scope.Required"></label>
-                <span asp-validation-for="Input.Scope.Required" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="Input.Scope.Emphasize" class="form-control_" />
-                <label asp-for="Input.Scope.Emphasize"></label>
-                <span asp-validation-for="Input.Scope.Emphasize" class="text-danger"></span>
-            </div>
-            <button id="add-scope-button" type="submit" class="btn btn-default">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
-        </form>
-    </div>
+            <form id="-form" method="post">
 
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <input type="hidden" asp-for="Input.ApiName" />
+                @if (Model.Input.Scope != null)
+                {
+                    <input type="hidden" asp-for="Input.Scope.Name" />
+                    <div class="form-group">
+                        <input value="@Model.Input.Scope.Name" class="form-control" disabled />
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <input asp-for="Input.Scope.Name" class="form-control" placeholder="New scope name..." />
+                        <span asp-validation-for="Input.Scope.Name" class="text-danger"></span>
+                    </div>
+                }
+                <div class="form-group">
+                    <input asp-for="Input.Scope.DisplayName" class="form-control" placeholder="Optional: scope display name.." />
+                    <span asp-validation-for="Input.Scope.DisplayName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <textarea asp-for="Input.Scope.Description" class="form-control" placeholder="Optional: scope description..." rows="3">
+            </textarea>
+                    <span asp-validation-for="Input.Scope.Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.Scope.Required" class="form-control_" />
+                    <label asp-for="Input.Scope.Required"></label>
+                    <span asp-validation-for="Input.Scope.Required" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Input.Scope.Emphasize" class="form-control_" />
+                    <label asp-for="Input.Scope.Emphasize"></label>
+                    <span asp-validation-for="Input.Scope.Emphasize" class="text-danger"></span>
+                </div>
+                <button id="add-scope-button" type="submit" class="btn btn-default">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

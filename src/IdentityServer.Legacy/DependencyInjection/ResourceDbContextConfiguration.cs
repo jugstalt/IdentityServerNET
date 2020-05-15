@@ -13,6 +13,7 @@ namespace IdentityServer.Legacy.DependencyInjection
         public IEnumerable<IdentityResource> InitialIdentityResources { get; set; }
 
         public string ConnectionString { get; set; }
+        public string TableName { get; set; }
         public ICryptoService CryptoService { get; set; }
         public IBlobSerializer BlobSerializer { get; set; } 
     }

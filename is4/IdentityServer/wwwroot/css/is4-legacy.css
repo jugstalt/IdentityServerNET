@@ -154,3 +154,33 @@ ul.ui-tiles {
     width: 100%;
     border-radius: 17px;
 }
+
+.collapsable-tool {
+    max-height:40px;
+    overflow:hidden;
+}
+    .collapsable-tool h4 {
+        cursor: pointer;
+    }
+        .collapsable-tool h4:hover {
+            text-decoration: underline;
+        }
+    /*.collapsable-tool h4:before {
+        content: "˅  "
+    }
+
+    .collapsable-tool.expanded h4:before {
+        content: "˄  "
+    }*/
+
+        .collapsable-tool h4:before {
+            content: "+  "
+        }
+
+    .collapsable-tool.expanded h4:before {
+        content: "×  "
+    }
+
+.collapsable-tool.expanded {
+    max-height:unset;
+}
