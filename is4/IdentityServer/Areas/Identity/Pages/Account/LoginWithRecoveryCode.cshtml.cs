@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using IdentityServer4.Services;
+using IdentityServer4.Events;
 
 namespace IdentityServer.Areas.Identity.Pages.Account
 {
@@ -17,11 +19,16 @@ namespace IdentityServer.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
+        private readonly IEventService _events;
 
-        public LoginWithRecoveryCodeModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginWithRecoveryCodeModel> logger)
+        public LoginWithRecoveryCodeModel(
+            SignInManager<ApplicationUser> signInManager, 
+            ILogger<LoginWithRecoveryCodeModel> logger,
+            IEventService events)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _events = events;
         }
 
         [BindProperty]
@@ -72,17 +79,24 @@ namespace IdentityServer.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
+                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+
                 return LocalRedirect(returnUrl ?? Url.Content("~/"));
             }
+
             if (result.IsLockedOut)
             {
                 _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "account locked out"));
+
                 return RedirectToPage("./Lockout");
             }
             else
             {
                 _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
+                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "Invalid recovery code entered "));
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
+
                 return Page();
             }
         }

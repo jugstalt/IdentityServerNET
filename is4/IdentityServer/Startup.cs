@@ -10,6 +10,7 @@ using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.SigningCredential;
 using IdentityServer4;
 using IdentityServer4.Configuration;
+using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -167,6 +168,8 @@ namespace IdentityServer
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
+
+            services.AddSingleton<IEventSink, EventSinkProxy>();
 
             if (Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0)
             {

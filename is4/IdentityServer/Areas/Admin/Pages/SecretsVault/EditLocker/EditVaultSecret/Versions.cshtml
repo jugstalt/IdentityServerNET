@@ -40,22 +40,24 @@
 
         </div>
         <div class="col-md-6">
-            
-            <form id="-form" method="post">
+            <div class="row collapsable-tool">
                 <h4>New secret version</h4>
-                <div asp-validation-summary="All" class="text-danger"></div>
-                <input type="hidden" asp-for="Input.LockerName" />
-                <input type="hidden" asp-for="Input.SecretName" />
+                <form id="-form" method="post">
 
-                <div class="form-group">
-                    <textarea asp-for="Input.Secret" class="form-control" type="password" placeholder="Something you want to hide..." rows="5">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <input type="hidden" asp-for="Input.LockerName" />
+                    <input type="hidden" asp-for="Input.SecretName" />
+
+                    <div class="form-group">
+                        <textarea asp-for="Input.Secret" class="form-control" type="password" placeholder="Something you want to hide..." rows="5">
 
                     </textarea>
-                    <span asp-validation-for="Input.Secret" class="text-danger"></span>
-                </div>
+                        <span asp-validation-for="Input.Secret" class="text-danger"></span>
+                    </div>
 
-                <button id="add-secret-button" type="submit" class="btn btn-default">Add</button>
-            </form>
+                    <button id="add-secret-button" type="submit" class="btn btn-default">Add</button>
+                </form>
+            </div>
+            <partial name="_createRandomSecretPartial" />
         </div>
-        
     </div>

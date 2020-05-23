@@ -1,5 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.EventSinks;
 using IdentityServer.Legacy.Services.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -236,6 +237,26 @@ namespace IdentityServer.Legacy.DependencyInjection
             services.AddTransient<ICaptchCodeRenderer, TCaptchaRendererType>();
 
             return services;
+        }
+
+        #endregion
+
+        #region IdentityEventSink
+
+        public static IServiceCollection AddIdentityEventSink<TSinkType>(this IServiceCollection services)
+            where TSinkType : class, IIdentityEventSink
+        {
+            services.AddSingleton<IIdentityEventSink, TSinkType>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddIdentityEventSink<TSinkType, TSinkOpitonsType>(this IServiceCollection services, Action<TSinkOpitonsType> optionsSetup)
+            where TSinkType : class, IIdentityEventSink
+            where TSinkOpitonsType : class
+        {
+            services.Configure<TSinkOpitonsType>(optionsSetup);
+            return services.AddIdentityEventSink<TSinkType>();
         }
 
         #endregion
