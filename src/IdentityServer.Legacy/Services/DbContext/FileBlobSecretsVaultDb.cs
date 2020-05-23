@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.DependencyInjection;
+﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.Cryptography;

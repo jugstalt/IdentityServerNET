@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
-using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Services.Security;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,10 +9,19 @@ using System.Text;
 
 namespace IdentityServer.Legacy.CaptchaRenderers
 {
-    public class CatchaCodeRenderer : ICaptchCodeRenderer
+    public class CaptchaCodeRenderer : ICaptchCodeRenderer
     {
-        public byte[] RenderCodeToImage(string captchaCode, int width = 200, int height = 60)
+        private CaptchaCodeRendererOptions _options;
+        public CaptchaCodeRenderer(IOptionsMonitor<CaptchaCodeRendererOptions> options)
         {
+            _options = options.CurrentValue ?? new CaptchaCodeRendererOptions();
+        }
+
+        public byte[] RenderCodeToImage(string captchaCode)
+        {
+            int width = _options.Width;
+            int height = _options.Height;
+
             using (Bitmap baseMap = new Bitmap(width, height))
             using (Graphics graph = Graphics.FromImage(baseMap))
             {
@@ -20,7 +30,17 @@ namespace IdentityServer.Legacy.CaptchaRenderers
 
                 Random rand = new Random();
 
-                var bgColor = GetRandomLightColor();
+                var bgColor = Color.White;
+
+                switch(_options.BackgroundType)
+                {
+                    case ColorType.Monochrome:
+                        bgColor = Color.White;
+                        break;
+                    case ColorType.Random:
+                        bgColor = GetRandomLightColor();
+                        break;
+                }
                 graph.Clear(bgColor);
 
                 DrawCaptchaCode();
@@ -66,7 +86,10 @@ namespace IdentityServer.Legacy.CaptchaRenderers
                     Font font = new Font(FontFamily.GenericSerif, fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
                     for (int i = 0; i < captchaCode.Length; i++)
                     {
-                        fontBrush.Color = GetRandomDeepColor();
+                        fontBrush.Color =
+                            _options.TextColorType == ColorType.Random ?
+                                    GetRandomDeepColor() :
+                                    Color.Black;
 
                         int shiftPx = fontSize / 6;
 
@@ -81,7 +104,7 @@ namespace IdentityServer.Legacy.CaptchaRenderers
 
                 void DrawDisorderLine(Color color)
                 {
-                    Pen linePen = new Pen(new SolidBrush(Color.Black), 4);
+                    Pen linePen = new Pen(new SolidBrush(Color.Black), _options.DisorderLinePenWidth);
                     for (int i = 0; i < rand.Next(3, 5); i++)
                     {
                         linePen.Color = color; //GetRandomDeepColor();

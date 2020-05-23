@@ -1,11 +1,9 @@
-﻿using IdentityServer.Legacy.DependencyInjection;
+﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;

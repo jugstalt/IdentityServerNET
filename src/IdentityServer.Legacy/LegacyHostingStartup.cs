@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Reflection;
 using IdentityServer.Legacy.Stores;
 using Microsoft.AspNetCore.Hosting;

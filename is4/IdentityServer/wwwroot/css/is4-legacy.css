@@ -126,7 +126,13 @@ ul.ui-tiles {
         }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (max-width: 800px) {
+    body.body-layout-login {
+        margin-top:15px;
+    }
+}
+
+@media (prefers-color-scheme: __dark) {
     body {
         background-color: #333;
         color: #eee;

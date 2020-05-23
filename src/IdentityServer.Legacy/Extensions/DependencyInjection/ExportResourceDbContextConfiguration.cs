@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
-    public class ExportClientDbContextConfiguration : ClientDbContextConfiguration
+    public class ExportResourceDbContextConfiguration : ResourceDbContextConfiguration
     {
     }
 }

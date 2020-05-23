@@ -1,7 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.Serialize;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
 using System.Text;

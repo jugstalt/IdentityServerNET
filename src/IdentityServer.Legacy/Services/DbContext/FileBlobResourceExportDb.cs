@@ -1,5 +1,5 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
