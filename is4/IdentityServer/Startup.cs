@@ -7,7 +7,9 @@ using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.SecretsVault;
 using IdentityServer.Legacy.Services.SigningCredential;
+using IdentityServer.Legacy.Services.Validators;
 using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
@@ -143,6 +145,7 @@ namespace IdentityServer
                     //options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                 });
 
+            services.AddTransient<SecretsVaultManager>();
 
             //services.AddTransient<IProfileService, LegacyProfileService>();
             var builder = services.AddIdentityServer(options =>
@@ -162,12 +165,14 @@ namespace IdentityServer
             // Add Jwt Client Assertation (get token from certificate)
             .AddSecretParser<JwtBearerClientAssertionSecretParser>()
             .AddSecretValidator<PrivateKeyJwtSecretValidator>()
+            .AddSecretValidator<SecretsVaultSecretValidator>()
             // Add Identity
             .AddAspNetIdentity<ApplicationUser>()
             //.AddProfileService<LegacyProfileService>()
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
+            
 
             services.AddSingleton<IEventSink, EventSinkProxy>();
 

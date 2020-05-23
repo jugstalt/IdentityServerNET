@@ -10,14 +10,22 @@ using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using IdentityServer.Legacy.Extensions;
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Services.SecretsVault;
+using IdentityServer.Legacy.Exceptions;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
     public class SecretsModel : EditClientPageModel
     {
-        public SecretsModel(IClientDbContext clientDbContext)
+        private readonly SecretsVaultManager _secretsVaultManager;
+
+        public SecretsModel(
+            IClientDbContext clientDbContext,
+            SecretsVaultManager secretsVaultManager)
              : base(clientDbContext)
         {
+            _secretsVaultManager = secretsVaultManager;
         }
 
         async public Task<IActionResult> OnGetAsync(string id)
@@ -29,7 +37,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
             Input = new NewSecretModel()
             {
                 ClientId = id,
-                SecretType=IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret
+                SecretType = IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret
             };
 
             return Page();
@@ -50,6 +58,21 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                         break;
                     case IdentityServerConstants.SecretTypes.X509CertificateBase64:
                         inputSecret = inputSecret.ParseCertBase64String();
+                        break;
+                    case IdentityServerLegacyConstants.SecretTypes.SecretsVaultSecret:
+                        try
+                        {
+                            var secretsVersion = await _secretsVaultManager.GetSecretVersion(inputSecret);
+                            if (secretsVersion == null)
+                            {
+                                throw new StatusMessageException($"Secret with path { inputSecret } not exits in secrets vault");
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            throw new StatusMessageException(ex.Message);
+                        }
+                        
                         break;
                     default:
                         throw new Exception("Unknown secret type");

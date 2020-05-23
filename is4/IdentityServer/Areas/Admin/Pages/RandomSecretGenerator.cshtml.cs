@@ -66,6 +66,7 @@ namespace IdentityServer.Areas.Admin.Pages
             public int SecretCharacters { get; set; }
 
             [DisplayName("Secret")]
+            [ReadOnly(true)]
             public string Secret { get; set; }
         }
     }
