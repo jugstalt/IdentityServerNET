@@ -6,6 +6,6 @@ namespace IdentityServer.Legacy.Services.Security
 {
     public interface ICaptchCodeRenderer
     {
-        byte[] RenderCodeToImage(string captchaCode, int width = 200, int height = 60);
+        byte[] RenderCodeToImage(string captchaCode);
     }
 }

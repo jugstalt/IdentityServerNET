@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
@@ -15,6 +16,21 @@ namespace IdentityServer.Legacy.Extensions
         static public DateTime FromClaimDateValue(this string dateString)
         {
             return DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
+        static public bool TryAddClaim(this List<Claim> claims, string type, string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                try
+                {
+                    claims.Add(new Claim(type, value));
+                    return true;
+                }
+                catch { }
+            }
+
+            return false;
         }
     }
 }

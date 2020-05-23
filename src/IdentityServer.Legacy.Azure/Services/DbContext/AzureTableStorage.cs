@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
 {
-    public class AzureTableStorage<T> where T : TableEntity, new()
+    public class AzureTableStorage<T> where T : ITableEntity, new()
     {
         static private object thisLocker = new object();
         private string _connectionString;
@@ -169,7 +168,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             if (tableEntity != null)
                 return tableEntity;
 
-            return null;
+            return default(T);
         }
 
         async public Task<bool> DeleteEntityAsync(string tableName, T tableEntity)
@@ -227,7 +226,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             {
                 return (T)retrievedResult.Result;
             }
-            return null;
+            return default(T);
         }
 
         #endregion

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
     public static class ServicesExtensions
     {
@@ -220,22 +220,38 @@ namespace IdentityServer.Legacy.DependencyInjection
 
         #region Bot Detection
 
-        public static IServiceCollection AddLoginBotDetection<TBotDecetionType>(this IServiceCollection services)
-           where TBotDecetionType : class, ILoginBotDetection
+        public static IServiceCollection AddLoginBotDetection<TBotDetectionType>(this IServiceCollection services)
+           where TBotDetectionType : class, ILoginBotDetection
         {
-            services.AddTransient<ILoginBotDetection, TBotDecetionType>();
+            services.AddTransient<ILoginBotDetection, TBotDetectionType>();
 
             return services;
         }
 
-        public static IServiceCollection AddLoginBotDetection<TBotDecetionType, TCaptchaRendererType>(this IServiceCollection services)
-           where TBotDecetionType : class, ILoginBotDetection
+        public static IServiceCollection AddLoginBotDetection<TBotDetectionType, TBotDetectionOptionsType>(this IServiceCollection services, Action<TBotDetectionOptionsType> botOptionsSetup)
+            where TBotDetectionType : class, ILoginBotDetection
+            where TBotDetectionOptionsType : class
+        {
+            services.Configure<TBotDetectionOptionsType>(botOptionsSetup);
+
+            return services.AddLoginBotDetection<TBotDetectionType>();
+        }
+
+        public static IServiceCollection AddCaptchaRenderer<TCaptchaRendererType>(this IServiceCollection services)
            where TCaptchaRendererType : class, ICaptchCodeRenderer
         {
-            services.AddTransient<ILoginBotDetection, TBotDecetionType>();
             services.AddTransient<ICaptchCodeRenderer, TCaptchaRendererType>();
 
             return services;
+        }
+
+        public static IServiceCollection AddCaptchaRenderer<TCaptchaRendererType, TCaptchaRendererOptionsType>(this IServiceCollection services, Action<TCaptchaRendererOptionsType> captchaOptionsSetup)
+            where TCaptchaRendererType : class, ICaptchCodeRenderer
+            where TCaptchaRendererOptionsType : class
+        {
+            services.Configure<TCaptchaRendererOptionsType>(captchaOptionsSetup);
+
+            return services.AddCaptchaRenderer<TCaptchaRendererType>();
         }
 
         #endregion

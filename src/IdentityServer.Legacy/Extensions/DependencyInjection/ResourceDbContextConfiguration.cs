@@ -5,15 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
-    public class ClientDbContextConfiguration
+    public class ResourceDbContextConfiguration
     {
-        public IEnumerable<Client> IntialClients { get; set; }
+        public IEnumerable<ApiResource> InitialApiResources { get; set; }
+        public IEnumerable<IdentityResource> InitialIdentityResources { get; set; }
 
         public string ConnectionString { get; set; }
         public string TableName { get; set; }
         public ICryptoService CryptoService { get; set; }
-        public IBlobSerializer BlobSerializer { get; set; }
+        public IBlobSerializer BlobSerializer { get; set; } 
     }
 }

@@ -132,7 +132,7 @@ namespace IdentityServer
                 bool suspicous = false;
                 if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                 {
-                    await _loginBotDetection.BlockSuspicousUser(model.Username, 5000);
+                    await _loginBotDetection.BlockSuspicousUser(model.Username);
 
                     if (_captchaCodeRenderer != null)
                     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
     public interface ISecretsVaultDbContextBuilder : IBuilder
     {

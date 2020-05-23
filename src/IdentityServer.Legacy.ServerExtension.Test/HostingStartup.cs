@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using IdentityServer.Legacy.DependencyInjection;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.PasswordHasher;
@@ -241,7 +241,8 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region Login BotDetection (optional)
 
-            services.AddLoginBotDetection<LoginBotDetection, CatchaCodeRenderer>();
+            services.AddLoginBotDetection<LoginBotDetection>();
+            services.AddCaptchaRenderer<CaptchaCodeRenderer>();
 
             #endregion
         }

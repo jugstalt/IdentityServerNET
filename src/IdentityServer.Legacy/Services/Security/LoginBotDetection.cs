@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -10,11 +11,13 @@ namespace IdentityServer.Legacy.Services.Security
 {
     public class LoginBotDetection : ILoginBotDetection
     {
-        private IDistributedCache _cache;
+        private readonly IDistributedCache _cache;
+        private readonly LoginBotDetectionOptions _options;
         
-        public LoginBotDetection(IDistributedCache cache)
+        public LoginBotDetection(IDistributedCache cache, IOptionsMonitor<LoginBotDetectionOptions> options)
         {
             _cache = cache;
+            _options = options.CurrentValue ?? new LoginBotDetectionOptions();
         }
 
         #region ILoginBotDetection
@@ -28,14 +31,14 @@ namespace IdentityServer.Legacy.Services.Security
 
             if (suspiciousUser != null)
             {
-                var lastSet = suspiciousUser.TimeStamp;
-                if ((DateTime.UtcNow - lastSet).TotalHours >= 1.0)
+                var lastSet = suspiciousUser.TimeStamp.ToUniversalTime();
+                if ((DateTime.UtcNow - lastSet).TotalMinutes >= _options.RembemberSuspiciousUserTotalMinutes)
                 {
                     await RemoveSuspiciousUserAsync(username);
                     return false;
                 }
 
-                return suspiciousUser.CountFailes >= 3;
+                return suspiciousUser.CountFailes >= _options.MaxFailCount;
             }
 
             return false;
@@ -44,6 +47,8 @@ namespace IdentityServer.Legacy.Services.Security
         async public Task AddSuspiciousUserAsync(string username)
         {
             var suspiciousUser = SuspiciousUser.FromStringOrDefault(await _cache.GetStringAsync(username), username);
+
+            suspiciousUser.TimeStamp = DateTime.Now;
             suspiciousUser.CountFailes++;
 
             await _cache.SetStringAsync(username, suspiciousUser.ToString());
@@ -59,27 +64,27 @@ namespace IdentityServer.Legacy.Services.Security
             }
         }
 
-        private const string Letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
         async public Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username)
         {
             var suspiciousUser = SuspiciousUser.FromStringOrDefault(await _cache.GetStringAsync(username), username);
             suspiciousUser.CountFailes++;
 
             Random rand = new Random();
-            int maxRand = Letters.Length - 1;
+            int maxRand = _options.CaptchaCodeLetters.Length - 1;
 
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < _options.CaptchaCodeLength; i++)
             {
                 int index = rand.Next(maxRand);
-                sb.Append(Letters[index]);
+                sb.Append(_options.CaptchaCodeLetters[index]);
             }
 
             string code = sb.ToString();
 
             suspiciousUser.CaptchaCode = code;
+            suspiciousUser.TimeStamp = DateTime.Now;
+
             await _cache.SetStringAsync(username, suspiciousUser.ToString());
 
             return code;
@@ -94,13 +99,13 @@ namespace IdentityServer.Legacy.Services.Security
 
         private static ConcurrentDictionary<string, DateTime> _suspiciousUserBlocks = new ConcurrentDictionary<string, DateTime>();
 
-        async public Task BlockSuspicousUser(string username, int milliseconds = 10000)
+        async public Task BlockSuspicousUser(string username)
         {
-            if (_suspiciousUserBlocks.ContainsKey(username) && (DateTime.UtcNow - _suspiciousUserBlocks[username]).TotalMilliseconds < milliseconds)
+            if (_suspiciousUserBlocks.ContainsKey(username) && (DateTime.UtcNow - _suspiciousUserBlocks[username]).TotalSeconds < (double)_options.BlockSuspiciousUserSeconds)
                 throw new Exception("Suspicous bot request detected");
 
             _suspiciousUserBlocks.TryAdd(username, DateTime.UtcNow);
-            await Task.Delay(milliseconds);
+            await Task.Delay(_options.BlockSuspiciousUserSeconds * 1000);
             _suspiciousUserBlocks.TryRemove(username, out DateTime timeStamp);
         }
 

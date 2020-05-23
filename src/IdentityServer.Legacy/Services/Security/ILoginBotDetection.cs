@@ -14,6 +14,6 @@ namespace IdentityServer.Legacy.Services.Security
         Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username);
         Task<bool> VerifyCaptchaCodeAsync(string username, string code);
 
-        Task BlockSuspicousUser(string username, int milliseconds = 10000);
+        Task BlockSuspicousUser(string username);
     }
 }

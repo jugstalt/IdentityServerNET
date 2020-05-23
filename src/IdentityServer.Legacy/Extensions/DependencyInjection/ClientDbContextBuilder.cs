@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.DependencyInjection
+namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
     class ClientDbContextBuilder : Builder, IClientDbContextBuilder
     {
