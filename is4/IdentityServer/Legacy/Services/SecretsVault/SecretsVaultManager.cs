@@ -17,8 +17,8 @@ namespace IdentityServer.Legacy.Services.SecretsVault
         private readonly IVaultSecretCryptoService _vaultSecrtesCryptoService;
 
         public SecretsVaultManager(
-            ISecretsVaultDbContext secretsVaultDb,
-            IVaultSecretCryptoService vaultSecrtesCryptoService)
+            ISecretsVaultDbContext secretsVaultDb = null,
+            IVaultSecretCryptoService vaultSecrtesCryptoService = null)
         {
             _secretsVaultDb = secretsVaultDb;
             _vaultSecrtesCryptoService = vaultSecrtesCryptoService;
@@ -26,6 +26,11 @@ namespace IdentityServer.Legacy.Services.SecretsVault
 
         async public Task<VaultSecretVersion> GetSecretVersion(string path)
         {
+            if(_secretsVaultDb==null || _vaultSecrtesCryptoService==null)
+            {
+                throw new ArgumentException("Scretsvault not initialized. No SecretsVaultDbContext or VautlSecretCryptService definied");
+            }
+
             string[] pathParts = path.Split('/');
 
             if (pathParts.Length < 2 || pathParts.Length > 3)

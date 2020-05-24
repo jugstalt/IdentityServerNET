@@ -54,5 +54,10 @@ namespace IdentityServer.Legacy.Clients
                 return JsonConvert.DeserializeObject<SecretsVaultResponse>(secretJson);    
             }
         }
+
+        public object OpenLocker(string secretsVaultServer, object p)
+        {
+            throw new NotImplementedException();
+        }
     }
  };

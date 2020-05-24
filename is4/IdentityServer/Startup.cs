@@ -17,6 +17,7 @@ using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
@@ -43,11 +44,6 @@ namespace IdentityServer
         public IConfiguration Configuration { get; }
 
         public IWebHostEnvironment Environment { get; }
-
-        public Startup(IWebHostEnvironment environment)
-        {
-            Environment = environment;
-        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -161,6 +157,10 @@ namespace IdentityServer
                     CookieLifetime = TimeSpan.FromHours(10), // ID server cookie timeout set to 10 hours
                     CookieSlidingExpiration = true,
                 };
+                if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
+                {
+                    options.PublicOrigin = Configuration["IdentityServer:PublicOrigin"];
+                }
             })
             // Add Jwt Client Assertation (get token from certificate)
             .AddSecretParser<JwtBearerClientAssertionSecretParser>()
@@ -265,8 +265,18 @@ namespace IdentityServer
 
             #endregion
 
+            app.Use(async (context, next) =>
+            {
+                var xproto = context.Request.Headers["X-Forwarded-Proto"].ToString();
+                if (xproto != null && xproto.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Request.Scheme = "https";
+                }
+                await next();
+            });
+
             // uncomment if you want to add MVC
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
 
