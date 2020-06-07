@@ -275,8 +275,20 @@ namespace IdentityServer
                 await next();
             });
 
-            // uncomment if you want to add MVC
-            //app.UseHttpsRedirection();
+            #region Optional Middleware
+
+            if (Configuration["IdentityServer:AddXForwardedProtoMiddleware"] == "true")
+            {
+                app.AddXForwardedProtoMiddleware();
+            }
+
+            if (Configuration["IdentityServer:UseHttpsRedirection"] != "false")
+            {
+                app.UseHttpsRedirection();
+            }
+
+            #endregion
+
             app.UseStaticFiles();
             app.UseRouting();
 
