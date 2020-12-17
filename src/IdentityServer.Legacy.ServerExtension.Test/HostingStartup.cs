@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using IdentityServer.Legacy.Azure.Services.DbContext;
 using IdentityServer.Legacy.Services.Security;
 using IdentityServer.Legacy.CaptchaRenderers;
+using IdentityServer4.Models;
+using IdentityModel;
+using static IdentityModel.OidcConstants;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Legacy.ServerExtension.Test
@@ -86,7 +89,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region Add a ResourceDbContext (required) 
 
-            /*
+            
             services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
@@ -101,7 +104,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
                 };
             });
-            */
+            
 
             /*
             services.AddResourceDbContext<MongoBlobResourceDb>(options =>
@@ -109,17 +112,16 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
             });
             */
-
+            /*
             services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
-
+            */
             #endregion
 
             #region Add a ClientDbContext (required)
 
-            /*
             services.AddClientDbContext<FileBlobClientDb>(options =>
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\clients";
@@ -165,7 +167,6 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                     }
                 };
             });
-            */
 
             /*
             services.AddClientDbContext<MongoBlobClientDb>(options =>
@@ -173,12 +174,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                 options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
             });
             */
-
+            /*
             services.AddClientDbContext<TableStorageBlobClientDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
             });
-
+            */
             #endregion
 
             #region Add ExportClientDbContext (optional)
