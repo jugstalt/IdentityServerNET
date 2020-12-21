@@ -1,13 +1,10 @@
-﻿using IdentityServer4.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
     public interface IClientDbContext
     {
-        Task<Client> FindClientByIdAsync(string clientId);
+        Task<ClientModel> FindClientByIdAsync(string clientId);
     }
 }

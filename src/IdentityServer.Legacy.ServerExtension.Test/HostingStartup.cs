@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IdentityModel;
+using IdentityServer.Legacy.CaptchaRenderers;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Reflection;
+using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.EmailSender;
+using IdentityServer.Legacy.Services.PasswordHasher;
+using IdentityServer.Legacy.Services.Security;
+using IdentityServer.Legacy.Services.Serialize;
+using IdentityServer.Legacy.UserInteraction;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.PasswordHasher;
-using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer.Legacy.MongoDb.Services.DbContext;
-using IdentityServer.Legacy.Reflection;
-using IdentityServer.Legacy.UserInteraction;
-using IdentityServer.Legacy.Services.EmailSender;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
-using IdentityServer.Legacy.Azure.Services.DbContext;
-using IdentityServer.Legacy.Services.Security;
-using IdentityServer.Legacy.CaptchaRenderers;
-using IdentityServer4.Models;
-using IdentityModel;
 using static IdentityModel.OidcConstants;
 
 //[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
@@ -94,12 +93,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
                 options.CryptoService = new Base64CryptoService();
-                options.InitialApiResources = new ApiResource[]
+                options.InitialApiResources = new ApiResourceModel[]
                 {
-                    new ApiResource("api1","My Api1"),
-                    new ApiResource("api2","My Api2")
+                    new ApiResourceModel("api1","My Api1"),
+                    new ApiResourceModel("api2","My Api2")
                 };
-                options.InitialIdentityResources = new IdentityResource[]
+                options.InitialIdentityResources = new IdentityResourceModel[]
                 {
 
                 };
@@ -126,18 +125,18 @@ namespace IdentityServer.Legacy.ServerExtension.Test
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\clients";
                 options.CryptoService = new Base64CryptoService();
-                options.IntialClients = new Client[]
+                options.IntialClients = new ClientModel[]
                 {
-                    new Client()
+                    new ClientModel()
                     {
                         ClientId = "client",
-                        ClientSecrets = new Secret[]
+                        ClientSecrets = new SecretModel[]
                         {
-                            new Secret()
+                            new SecretModel()
                             {
                                 Value = "secret1".ToSha256()
                             },
-                            new Secret()
+                            new SecretModel()
                             {
                                 Value = "secret2".ToSha256()
                             }
@@ -145,12 +144,12 @@ namespace IdentityServer.Legacy.ServerExtension.Test
                         AllowedGrantTypes = { GrantTypes.ClientCredentials, GrantTypes.Password },
                         AllowedScopes = { "api1", "api2", "profile", "openid" }
                     },
-                    new Client()
+                    new ClientModel()
                     {
                         ClientId = "mvc",
-                        ClientSecrets = new Secret[]
+                        ClientSecrets = new SecretModel[]
                         {
-                            new Secret() { Value ="secret".ToSha256() }
+                            new SecretModel() { Value ="secret".ToSha256() }
                         },
                         AllowedGrantTypes = { GrantTypes.AuthorizationCode },
                         AllowedScopes = { "openid", "profile", "api1", "email", "role", "address", "phone" },

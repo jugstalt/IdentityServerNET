@@ -1,25 +1,25 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
     public class InMemoryResourceDb : IResourceDbContextModify
     {
-        private static ConcurrentDictionary<string, ApiResource> _apiResources = null;
-        private static ConcurrentDictionary<string, IdentityResource> _identityResources = null;
+        private static ConcurrentDictionary<string, ApiResourceModel> _apiResources = null;
+        private static ConcurrentDictionary<string, IdentityResourceModel> _identityResources = null;
 
         public InMemoryResourceDb(IOptions<ResourceDbContextConfiguration> options = null)
         {
             if (_apiResources == null)
             {
-                _apiResources = new ConcurrentDictionary<string, ApiResource>();
+                _apiResources = new ConcurrentDictionary<string, ApiResourceModel>();
 
                 // Init from configuration
                 if (options?.Value?.InitialApiResources != null)
@@ -33,7 +33,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
             if(_identityResources==null)
             {
-                _identityResources = new ConcurrentDictionary<string, IdentityResource>();
+                _identityResources = new ConcurrentDictionary<string, IdentityResourceModel>();
 
                 // Init from configuration
                 if (options?.Value?.InitialIdentityResources != null)
@@ -48,23 +48,23 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #region IResourceDbContext
 
-        public Task<ApiResource> FindApiResourceAsync(string name)
+        public Task<ApiResourceModel> FindApiResourceAsync(string name)
         {
             if (_apiResources.ContainsKey(name))
             {
                 return Task.FromResult(_apiResources[name]);
             }
 
-            return Task.FromResult<ApiResource>(null);
+            return Task.FromResult<ApiResourceModel>(null);
         }
 
-        public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        public Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            return Task.FromResult<IEnumerable<ApiResource>>(
+            return Task.FromResult<IEnumerable<ApiResourceModel>>(
                 _apiResources.Values.Where(r => scopeNames.Contains(r.Name)));
         }
 
-        public Task AddApiResourceAsync(ApiResource apiResource)
+        public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
             if(_apiResources.ContainsKey(apiResource.Name))
             {
@@ -76,7 +76,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task UpdateApiResourceAsync(ApiResource resource, IEnumerable<string> propertyNames = null)
+        public Task UpdateApiResourceAsync(ApiResourceModel resource, IEnumerable<string> propertyNames = null)
         {
             if (!_apiResources.ContainsKey(resource.Name))
             {
@@ -88,7 +88,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task RemoveApiResourceAsync(ApiResource apiResource)
+        public Task RemoveApiResourceAsync(ApiResourceModel apiResource)
         {
             if (!_apiResources.ContainsKey(apiResource.Name))
             {
@@ -103,27 +103,27 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<ApiResource>> GetAllApiResources()
+        public Task<IEnumerable<ApiResourceModel>> GetAllApiResources()
         {
-            return Task.FromResult<IEnumerable<ApiResource>>(_apiResources.Values);
+            return Task.FromResult<IEnumerable<ApiResourceModel>>(_apiResources.Values);
         }
 
-        public Task<IdentityResource> FindIdentityResource(string name)
+        public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
             if(_identityResources.ContainsKey(name))
             {
                 return Task.FromResult(_identityResources[name]);
             }
 
-            return Task.FromResult<IdentityResource>(null);
+            return Task.FromResult<IdentityResourceModel>(null);
         }
 
-        public Task<IEnumerable<IdentityResource>> GetAllIdentityResources()
+        public Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources()
         {
-            return Task.FromResult<IEnumerable<IdentityResource>>(_identityResources.Values);
+            return Task.FromResult<IEnumerable<IdentityResourceModel>>(_identityResources.Values);
         }
 
-        public Task AddIdentityResourceAsync(IdentityResource identityResource)
+        public Task AddIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             if (_identityResources.ContainsKey(identityResource.Name))
             {
@@ -135,7 +135,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames)
+        public Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames)
         {
             if (!_identityResources.ContainsKey(identityResource.Name))
             {
@@ -147,7 +147,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        public Task RemoveIdentityResourceAsync(IdentityResource identityResource)
+        public Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             if (!_identityResources.ContainsKey(identityResource.Name))
             {

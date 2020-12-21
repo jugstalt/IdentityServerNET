@@ -20,12 +20,13 @@ namespace IdentityServer.Legacy
 
         async public Task<ApiResource> FindApiResourceAsync(string name)
         {
-            return await _resourcedbContext.FindApiResourceAsync(name);
+            return (await _resourcedbContext.FindApiResourceAsync(name)).IndentityServer4Instance as ApiResource;
         }
 
         async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            return await _resourcedbContext.FindApiResourcesByScopeAsync(scopeNames);
+            return (await _resourcedbContext.FindApiResourcesByScopeAsync(scopeNames))
+                        .Select(r=>(ApiResource)r.IndentityServer4Instance);
         }
 
         async public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
@@ -56,10 +57,10 @@ namespace IdentityServer.Legacy
                 //        break;
                 //}
 
-                var identityResource = await _resourcedbContext.FindIdentityResource(scopeName);
-                if(identityResource!=null)
+                var identityResource = (await _resourcedbContext.FindIdentityResource(scopeName))?.IndentityServer4Instance as IdentityResource;
+                if (identityResource != null)
                 {
-                    if(identityResource.Name=="role")
+                    if (identityResource.Name == "role")
                     {
                         identityResource = new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role });
                     }
@@ -90,7 +91,9 @@ namespace IdentityServer.Legacy
 
             if(_resourcedbContext is IResourceDbContextModify)
             {
-                resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources()).ToArray();
+                resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources())
+                                            .Select(r=>(ApiResource)r.IndentityServer4Instance)
+                                            .ToArray();
             }
 
             return resources;

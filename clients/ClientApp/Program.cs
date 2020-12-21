@@ -17,16 +17,16 @@ namespace ClientApp
 
             //await CallSecretsVault("webgis", "secret", "webgis/sec1");
 
-            var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
+            //var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
             //var secretsVaultClient = new SecretsVaultClient("webgis", cert);
-            await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
-            var secret = await secretsVaultClient.GetSecret("sec1");
+            //await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
+            //var secret = await secretsVaultClient.GetSecret("sec1");
 
-            Console.Write("Secret: " + secret.GetValue());
+            //Console.Write("Secret: " + secret.GetValue());
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
-            return;
+            //return;
 
             //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
@@ -55,7 +55,7 @@ namespace ClientApp
 
                 Console.WriteLine("Token successfully verified!");
 
-                await GetUserInfo(tokenResponse);
+                //await GetUserInfo(tokenResponse);
                 //await VerifyToken(tokenResponse);
                 await CallApi(tokenResponse.AccessToken);
             }

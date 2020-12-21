@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                                         .Where(v => !String.IsNullOrEmpty(v))
                                         .ToArray();
 
-                var propertyInfo = typeof(ApiResource).GetProperty(Input.PropertyName);
+                var propertyInfo = typeof(ApiResourceModel).GetProperty(Input.PropertyName);
                 if (propertyInfo != null)
                 {
                     propertyInfo.SetValue(this.CurrentApiResource, values);

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.MongoDb.MongoDocuments;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
@@ -35,7 +36,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
         #region  IClientDbContext
 
-        async public Task<Client> FindClientByIdAsync(string clientId)
+        async public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
             string id = clientId.ClientIdToHexId(_cryptoService);
 
@@ -47,7 +48,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             if (document != null)
             {
-                return _blobSerializer.DeserializeObject<Client>(
+                return _blobSerializer.DeserializeObject<ClientModel>(
                     _cryptoService.DecryptText(document.BlobData));
             }
 
@@ -58,7 +59,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
         #region IClientDbContextModify
 
-        async public Task AddClientAsync(Client client)
+        async public Task AddClientAsync(ClientModel client)
         {
             if (client == null)
             {
@@ -83,7 +84,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             await collection.InsertOneAsync(document);
         }
 
-        async public Task<IEnumerable<Client>> GetAllClients()
+        async public Task<IEnumerable<ClientModel>> GetAllClients()
         {
             var collection = GetCollection();
 
@@ -91,7 +92,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                     .AsQueryable<ClientBlobDocument>()
                     .Where(_ => true);
 
-            var result = new List<Client>();
+            var result = new List<ClientModel>();
 
             var cursor = await query.ToCursorAsync();
             while (await cursor.MoveNextAsync())
@@ -100,7 +101,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 {
                     if (clientDocument.Id.IsValidClientHexId())
                     {
-                        result.Add(_blobSerializer.DeserializeObject<Client>(_cryptoService.DecryptText(clientDocument.BlobData)));
+                        result.Add(_blobSerializer.DeserializeObject<ClientModel>(_cryptoService.DecryptText(clientDocument.BlobData)));
                     }
                 }
             }
@@ -108,7 +109,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             return result;
         }
 
-        async public Task RemoveClientAsync(Client client)
+        async public Task RemoveClientAsync(ClientModel client)
         {
             var collection = GetCollection();
 
@@ -118,7 +119,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 .DeleteOneAsync<ClientBlobDocument>(d => d.Id == id);
         }
 
-        async public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
+        async public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
             var collection = GetCollection();
 

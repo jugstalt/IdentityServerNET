@@ -1,19 +1,18 @@
-﻿using IdentityServer4.Models;
-using System;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
     public interface IResourceDbContextModify : IResourceDbContext
     {
-        Task AddApiResourceAsync(ApiResource apiResource);
-        Task UpdateApiResourceAsync(ApiResource apiResource, IEnumerable<string> propertyNames = null);
-        Task RemoveApiResourceAsync(ApiResource apiResource);
+        Task AddApiResourceAsync(ApiResourceModel apiResource);
+        Task UpdateApiResourceAsync(ApiResourceModel apiResource, IEnumerable<string> propertyNames = null);
+        Task RemoveApiResourceAsync(ApiResourceModel apiResource);
 
-        Task AddIdentityResourceAsync(IdentityResource identityResource);
-        Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames = null);
-        Task RemoveIdentityResourceAsync(IdentityResource identityResource);
+        Task AddIdentityResourceAsync(IdentityResourceModel identityResource);
+        Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames = null);
+        Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource);
     }
 }

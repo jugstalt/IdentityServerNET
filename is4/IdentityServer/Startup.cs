@@ -258,7 +258,7 @@ namespace IdentityServer
                     }
                 }
             }
-            catch (Exception ex)
+            catch /*(Exception ex)*/
             {
                 Console.WriteLine("Exception: Styling overrrides not updated");
             }

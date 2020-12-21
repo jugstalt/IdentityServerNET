@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
@@ -25,7 +23,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
                 if (nestedType != null)
                 {
                     var identityResource = (IdentityResource)Activator.CreateInstance(nestedType);
-                    await _resourceDb.AddIdentityResourceAsync(identityResource);
+                    await _resourceDb.AddIdentityResourceAsync(new IdentityResourceModel(identityResource));
                 }
             }
 

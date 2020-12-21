@@ -1,17 +1,15 @@
-﻿using IdentityServer4.Models;
-using System;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
     public interface IClientDbContextModify : IClientDbContext
     {
-        Task AddClientAsync(Client client);
-        Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null);
-        Task RemoveClientAsync(Client client);
+        Task AddClientAsync(ClientModel client);
+        Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null);
+        Task RemoveClientAsync(ClientModel client);
 
-        Task<IEnumerable<Client>> GetAllClients();
+        Task<IEnumerable<ClientModel>> GetAllClients();
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -45,7 +46,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
             {
                 if (_clientDb != null)
                 {
-                    var client = new Client()
+                    var client = new ClientModel()
                     {
                         ClientId = clientId,
                         ClientName = Input.ClientName?.Trim()
@@ -128,7 +129,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
             , onException: (ex) => RedirectToPage());
         }
 
-        public IEnumerable<Client> Clients { get; set; }
+        public IEnumerable<ClientModel> Clients { get; set; }
 
         [BindProperty]
         public NewClient Input { get; set; }

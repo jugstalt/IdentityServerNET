@@ -13,7 +13,7 @@
         <input type="hidden" asp-for="Input.ClientId" />
         <div class="col-md-6">
             @{ var count = 0; }
-            @foreach (var field in typeof(IdentityServer4.Models.Client).GetProperties())
+            @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.ClientModel).GetProperties())
             {
                 if (!Model.Input.IgnoreProperties.Contains(field.Name) && field.CanWrite && field.CanRead &&
                     (field.PropertyType == typeof(string) || field.PropertyType == typeof(int)))
