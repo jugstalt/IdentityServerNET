@@ -37,11 +37,11 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
         public ICollection<string> UserClaims { get; set; }
 
         [JsonIgnore]
-        public Scope IdentitityServer4Insance
+        public ApiScope IdentitityServer4Insance
         {
             get
             {
-                return new Scope()
+                return new ApiScope()
                 {
                     Name = Name,
                     DisplayName = DisplayName,

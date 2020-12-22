@@ -15,7 +15,7 @@ namespace ClientApp
         {
             var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
-            //await CallSecretsVault("webgis", "secret", "webgis/sec1");
+            await CallSecretsVault("webgis", "secret", "webgis/sec1");
 
             //var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
             //var secretsVaultClient = new SecretsVaultClient("webgis", cert);
@@ -26,7 +26,7 @@ namespace ClientApp
 
             //Console.ReadLine();
 
-            //return;
+            return;
 
             //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 

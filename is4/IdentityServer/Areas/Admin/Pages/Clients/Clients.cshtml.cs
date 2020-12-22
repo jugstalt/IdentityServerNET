@@ -49,7 +49,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
                     var client = new ClientModel()
                     {
                         ClientId = clientId,
-                        ClientName = Input.ClientName?.Trim()
+                        ClientName = Input.ClientName?.Trim(),
                     };
 
                     #region Apply Client Templates
@@ -116,6 +116,8 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
                                     Input.ClientUrl+"/signout-callback-oidc"
                                 };
                             }
+
+
                             break;
                     }
 

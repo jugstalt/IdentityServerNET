@@ -5,31 +5,24 @@ using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
-using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.SecretsVault;
 using IdentityServer.Legacy.Services.SigningCredential;
 using IdentityServer.Legacy.Services.Validators;
-using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace IdentityServer
 {
@@ -157,14 +150,16 @@ namespace IdentityServer
                     CookieLifetime = TimeSpan.FromHours(10), // ID server cookie timeout set to 10 hours
                     CookieSlidingExpiration = true,
                 };
-                if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
-                {
-                    options.PublicOrigin = Configuration["IdentityServer:PublicOrigin"];
-                }
+
+                // use ForwaredHeaders: https://github.com/IdentityServer/IdentityServer4/issues/4631
+                //if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
+                //{
+                //    options.PublicOrigin = Configuration["IdentityServer:PublicOrigin"];
+                //}
             })
             // Add Jwt Client Assertation (get token from certificate)
             .AddSecretParser<JwtBearerClientAssertionSecretParser>()
-            .AddSecretValidator<PrivateKeyJwtSecretValidator>()
+            .AddSecretValidator<PrivateKeyJwtSecretValidator>()   // Requires IReplayCache
             .AddSecretValidator<SecretsVaultSecretValidator>()
             // Add Identity
             .AddAspNetIdentity<ApplicationUser>()
@@ -172,7 +167,17 @@ namespace IdentityServer
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
-            
+
+            builder.Services.AddTransient<IReplayCache, DefaultReplayCache>();
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
 
             services.AddSingleton<IEventSink, EventSinkProxy>();
 
@@ -181,13 +186,24 @@ namespace IdentityServer
                 services.ConfigureApplicationCookie(options =>
                 {
                     if(!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
-                         options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
+                    {
+                        options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Domain"]))
+                    {
                         options.Cookie.Domain = Configuration["IdentityServer:Cookie:Domain"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Path"]))
+                    {
                         options.Cookie.Path = Configuration["IdentityServer:Cookie:Path"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:ExpireDays"]))
+                    {
                         options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(Configuration["IdentityServer:Cookie:ExpireDays"]));
+                    }
                 });
             }
 
@@ -226,6 +242,7 @@ namespace IdentityServer
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
             }
 
             #region UserInterface (Styling)
@@ -288,6 +305,8 @@ namespace IdentityServer
             }
 
             #endregion
+
+            app.UseForwardedHeaders();
 
             app.UseStaticFiles();
             app.UseRouting();

@@ -40,7 +40,7 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
                 apiResource.Properties = this.Properties;
 
                 apiResource.ApiSecrets = this.ApiSecrets?.Select(s=>s.IdentityServer4Instance).ToList();
-                apiResource.Scopes = this.Scopes?.Select(s=>s.IdentitityServer4Insance).ToList();
+                apiResource.Scopes = this.Scopes?.Select(s=>s.IdentitityServer4Insance.Name).ToList();
 
                 return apiResource;
             }

@@ -22,6 +22,20 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
             this.AllowedGrantTypes = new List<string>();
             this.RedirectUris = new List<string>();
             this.PostLogoutRedirectUris = new List<string>();
+
+            this.Enabled = true;
+            this.EnableLocalLogin = true;
+            this.ProtocolType = "oidc";
+
+            this.IdentityTokenLifetime = 300;
+            this.AccessTokenLifetime = 3600;
+            this.AuthorizationCodeLifetime = 300;
+            this.ClientClaimsPrefix = "client_";
+            this.AbsoluteRefreshTokenLifetime = 2592000;
+            this.SlidingRefreshTokenLifetime = 1296000;
+            this.DeviceCodeLifetime = 300;
+
+            this.FrontChannelLogoutSessionRequired = this.BackChannelLogoutSessionRequired = true;
         }
 
         [JsonProperty("AllowOfflineAccess")]
@@ -183,7 +197,9 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
                     AccessTokenType = this.AccessTokenType,
                     EnableLocalLogin = this.EnableLocalLogin,
                     IdentityProviderRestrictions = this.IdentityProviderRestrictions,
-                    Claims = this.Claims,
+                    Claims = this.Claims?
+                                    .Select(c=>new ClientClaim(c.Type, c.Value, c.ValueType))
+                                    .ToList(),
                     AlwaysSendClientClaims = this.AlwaysSendClientClaims,
                     ClientClaimsPrefix = this.ClientClaimsPrefix,
                     PairWiseSubjectSalt = this.PairWiseSubjectSalt,
