@@ -1,4 +1,6 @@
 ﻿@using IdentityServer4.Extensions
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @{
     string name = null;
     if (!true.Equals(ViewData["signed-out"]))
@@ -12,16 +14,14 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IdentityServer4</title>
-    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
+    <title>@Configuration["ApplicationTitle"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is4-legacy.css" rel="stylesheet" />
     <link href="~/css/is4-overrides.css" rel="stylesheet" />
 </head>
 <body class="body-layout-login var-@((1 + new Random().Next(12)).ToString())">
-    
+
     <div class="container body-content">
         @RenderBody()
     </div>

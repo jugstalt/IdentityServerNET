@@ -23,6 +23,5 @@
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
-    <ProjectReference Include="E:\gstaltjr\_devops\gstalt\WebPortal\WebPortal.IdentityServer.Legacy\WebPortal.IdentityServer.Legacy.csproj" />
   </ItemGroup>
 </Project>
