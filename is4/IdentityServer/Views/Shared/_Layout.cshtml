@@ -2,8 +2,10 @@
 @using IdentityServer.Legacy.Extensions.DependencyInjection;
 @using Microsoft.Extensions.Options;
 @using Microsoft.Extensions.Configuration
+@using IdentityServer.Legacy.Services.UI;
+
 @inject IConfiguration Configuration
-@inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
+@inject IUserInterfaceService userInterface;
 @{
     string name = null;
     if (!true.Equals(ViewData["signed-out"]))
@@ -37,7 +39,7 @@
                 <a href="~/">
                     <span class="navbar-brand">
                         <img class="icon-banner">
-                        @userInterfaceConfig.Value.ApplicationTitle
+                        @userInterface.ApplicationTitle
                     </span>
                 </a>
 

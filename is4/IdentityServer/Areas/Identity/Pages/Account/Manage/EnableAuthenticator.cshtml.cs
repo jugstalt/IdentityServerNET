@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using IdentityServer.Legacy.Services.UI;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
@@ -21,7 +22,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<EnableAuthenticatorModel> _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly UserInterfaceConfiguration _userInterfaceConfig;
+        private readonly IUserInterfaceService _userInterface;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -30,13 +31,13 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             ILogger<EnableAuthenticatorModel> logger,
             UrlEncoder urlEncoder,
             IOptions<UserDbContextConfiguration> userDbContextConfiguration = null,
-            IOptions<UserInterfaceConfiguration> userInterfaceConfig = null)
+            IUserInterfaceService userInterface = null)
             : base(userDbContextConfiguration)
         {
             _userManager = userManager;
             _logger = logger;
             _urlEncoder = urlEncoder;
-            _userInterfaceConfig = userInterfaceConfig?.Value;
+            _userInterface = userInterface;
         }
 
         public string SharedKey { get; set; }
@@ -156,7 +157,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         {
             return string.Format(
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode(_userInterfaceConfig?.ApplicationTitle ?? "IdentityServer"),
+                _urlEncoder.Encode(_userInterface?.ApplicationTitle ?? "IdentityServer"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

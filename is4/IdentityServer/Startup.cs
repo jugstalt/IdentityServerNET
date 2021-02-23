@@ -6,8 +6,11 @@ using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
 using IdentityServer.Legacy.Services.SecretsVault;
+using IdentityServer.Legacy.Services.Signing;
 using IdentityServer.Legacy.Services.SigningCredential;
+using IdentityServer.Legacy.Services.UI;
 using IdentityServer.Legacy.Services.Validators;
+using IdentityServer.Services;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -95,6 +98,13 @@ namespace IdentityServer
                     options.RequireHttpsMetadata = false;
 
                     options.Audience = "secrets-vault";
+                })
+                .AddJwtBearer("Bearer-Signing", options =>
+                {
+                    options.Authority = "https://localhost:44300";
+                    options.RequireHttpsMetadata = false;
+
+                    options.Audience = "signing-api";
                 });
 
             services.AddMvc()
@@ -169,6 +179,7 @@ namespace IdentityServer
             .AddClientStore<ClientStore>();
 
             builder.Services.AddTransient<IReplayCache, DefaultReplayCache>();
+            builder.Services.AddTransient<IAuthorizationContextService, AuthorizationContextService>();
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -235,9 +246,11 @@ namespace IdentityServer
             }
 
             services.AddTransient<IEmailSender, EmailSenderProxy>();
+
+            services.AddScoped<CustomTokenService>();
         }
 
-        public void Configure(IApplicationBuilder app, IOptions<UserInterfaceConfiguration> userInterfaceConfig = null)
+        public void Configure(IApplicationBuilder app, IUserInterfaceService userInterface = null)
         {
             if (Environment.IsDevelopment())
             {
@@ -249,7 +262,7 @@ namespace IdentityServer
 
             try
             {
-                var overrideCss = userInterfaceConfig?.Value?.OverrideCssContent ?? String.Empty;
+                var overrideCss = userInterface?.OverrideCssContent ?? String.Empty;
 
                 FileInfo fi = new FileInfo($"{ Environment.WebRootPath }/css/is4-overrides.css");
                 if (fi.Exists)
@@ -258,9 +271,9 @@ namespace IdentityServer
                 }
                 File.WriteAllText(fi.FullName, overrideCss);
 
-                if(userInterfaceConfig?.Value?.MediaContent!=null)
+                if(userInterface?.MediaContent!=null)
                 {
-                    foreach(var media in userInterfaceConfig.Value.MediaContent)
+                    foreach(var media in userInterface.MediaContent)
                     {
                         fi = new FileInfo($"{ Environment.WebRootPath }/css/media/{ media.Key }");
                         if(!fi.Directory.Exists)

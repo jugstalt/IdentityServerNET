@@ -30,6 +30,8 @@ namespace ClientApp
 
             //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
+            await SigningApiTest("https://localhost:44300");
+
             string issuer = "https://localhost:44300";
             var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);
 
@@ -261,6 +263,27 @@ namespace ClientApp
             }
 
             Console.ReadLine();
+        }
+
+        async static Task SigningApiTest(string issuerAddress)
+        {
+            string clientId = "client", clientSecret = "secret1";
+
+            var singingApiClient = new SigningApiClient(clientId, clientSecret);
+            var signingResponse = await singingApiClient.SignData(issuerAddress, "data-i-want-to-sign");
+
+            if(signingResponse.Succeded==false)
+            {
+                Console.WriteLine($"Signing response error: { signingResponse.ErrorMessage }");
+                return;
+            }
+
+            Console.WriteLine($"Signing-Token: { signingResponse.SecurityToken }");
+
+            Console.WriteLine("Try validate signing-token:");
+            var data = await SigningApiClient.GetValidatedDataFromToken(signingResponse.SecurityToken, issuerAddress);
+
+            Console.WriteLine($"Signed-data: { data }");
         }
     }
 }

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>33ba4f5b-c252-47fe-926b-959a2c9af1b0</UserSecretsId>
+    <AssemblyVersion>2.21.101.0</AssemblyVersion>
   </PropertyGroup>
   
   <ItemGroup>
@@ -23,5 +24,7 @@
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
+    <ProjectReference Include="E:\gstaltjr\_devops\gstalt\WebPortal\WebPortal.IdentityServer.Legacy\WebPortal.IdentityServer.Legacy.csproj" />
+    <ProjectReference Include="E:\gstaltjr\_git\root\NetStandard\E.Standard.Krako.IdentityServer.Legacy.Extensions\E.Standard.Krako.IdentityServer.Legacy.Extensions.csproj" />
   </ItemGroup>
 </Project>

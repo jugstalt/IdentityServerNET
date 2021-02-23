@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IdentityServer.Legacy.Extensions.DependencyInjection
+namespace IdentityServer.Legacy.Services.UI
 {
-    public class UserInterfaceConfiguration
+    public class UserInterfaceServiceOptions
     {
         public string ApplicationTitle { get; set; }
 
