@@ -10,6 +10,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -58,6 +60,21 @@ namespace IdentityServer.Legacy.Services.Signing
                 {
                     new Claim("token-data", data)
                 })
+            };
+
+            return token;
+        }
+
+        public IdentityServer4.Models.Token CreateCustomToken(NameValueCollection claims, int lifeTime = 3600)
+        {
+            var token = new IdentityServer4.Models.Token()
+            {
+                AccessTokenType = AccessTokenType.Jwt,
+                Lifetime = lifeTime,
+                Issuer = AppUrl(),
+                Claims = claims.AllKeys?
+                               .Select(k => new Claim(k, claims[k]))
+                               .ToArray()
             };
 
             return token;

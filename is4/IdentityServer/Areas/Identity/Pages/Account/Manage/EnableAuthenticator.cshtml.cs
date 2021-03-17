@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using IdentityServer.Legacy.Services.UI;
+using IdentityServer.Legacy.Services.DbContext;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
@@ -30,9 +31,9 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             UserManager<ApplicationUser> userManager,
             ILogger<EnableAuthenticatorModel> logger,
             UrlEncoder urlEncoder,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null,
+            IUserStoreFactory userStoreFactory,
             IUserInterfaceService userInterface = null)
-            : base(userDbContextConfiguration)
+            : base(userStoreFactory)
         {
             _userManager = userManager;
             _logger = logger;

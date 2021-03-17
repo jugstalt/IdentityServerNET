@@ -1,10 +1,10 @@
 ﻿@model ManageAccountProfilePageModel
 
-@if (Model.EditorInfos != null)
+@if ((await Model.EditorInfos()) != null)
 {
-    foreach (var editorInfo in Model.EditorInfos
+    foreach (var editorInfo in ((await Model.EditorInfos())
                                         .EditorInfos
-                                        .Where(p => String.IsNullOrEmpty(Model.Category) || Model.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase)))
+                                        .Where(p => String.IsNullOrEmpty(Model.Category) || Model.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase))))
     {
     <div class="form-group">
         @if (!String.IsNullOrEmpty(editorInfo.DisplayName))

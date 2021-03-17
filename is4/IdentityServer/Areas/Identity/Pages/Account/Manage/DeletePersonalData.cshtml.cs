@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,14 +22,14 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<DeletePersonalDataModel> logger,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base(userDbContextConfiguration)
+            IUserStoreFactory userStoreFactory)
+            : base(userStoreFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
 
-            if(base.EditorInfos?.AllowDelete != true)
+            if(EditorInfos().Result?.AllowDelete != true)
             {
                 throw new NotImplementedException();
             }

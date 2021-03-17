@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,8 +21,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public SetPasswordModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base(userDbContextConfiguration)
+            IUserStoreFactory userStoreFactory)
+            : base(userStoreFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;

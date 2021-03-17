@@ -94,14 +94,14 @@ namespace IdentityServer
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "https://localhost:44300";
+                    options.Authority = Configuration["IdentityServer:PublicOrigin"];
                     options.RequireHttpsMetadata = false;
 
                     options.Audience = "secrets-vault";
                 })
                 .AddJwtBearer("Bearer-Signing", options =>
                 {
-                    options.Authority = "https://localhost:44300";
+                    options.Authority = Configuration["IdentityServer:PublicOrigin"];
                     options.RequireHttpsMetadata = false;
 
                     options.Audience = "signing-api";

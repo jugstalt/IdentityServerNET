@@ -9,6 +9,6 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
     public interface IManageAccountPageModel
     {
-        ManageAccountEditor EditorInfos { get; set; }
+        Task<ManageAccountEditor> EditorInfos();
     }
 }

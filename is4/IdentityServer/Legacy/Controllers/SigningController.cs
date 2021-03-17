@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using IdentityServer.Legacy.Extensions;
 using IdentityServer.Legacy.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Specialized;
 
 namespace IdentityServer.Legacy.Controllers
 {
@@ -24,15 +25,26 @@ namespace IdentityServer.Legacy.Controllers
         }
 
         [HttpPost]
-        async public Task<IActionResult> Post([FromForm] string data)
+        async public Task<IActionResult> Post(int lifeTime = 3600)
         {
             try
             {
-                if(String.IsNullOrEmpty(data))
+                if (!Request.HasFormContentType)
                 {
-                    throw new StatusMessageException("data is NULL");
+                    throw new StatusMessageException("No form data to sign");
                 }
-                var token = _customToken.CreateCustomToken(data);
+
+                NameValueCollection claims = new NameValueCollection();
+
+                foreach(string formKey in Request.Form.Keys)
+                {
+                    if (!formKey.Equals("lifetime", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        claims[formKey] = Request.Form[formKey];
+                    }
+                }
+
+                var token = _customToken.CreateCustomToken(claims, lifeTime);
                 var tokenString = await _customToken.CreateSecurityTokenAsync(token);
 
                 //var jwtToken = await tokenString.ToValidatedJwtSecurityToken(token.Issuer);

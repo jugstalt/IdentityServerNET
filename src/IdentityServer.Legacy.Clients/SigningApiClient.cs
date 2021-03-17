@@ -3,6 +3,8 @@ using IdentityServer.Legacy.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -24,7 +26,15 @@ namespace IdentityServer.Legacy.Clients
 
         }
 
-        async public Task<SigningApiResponse> SignData(string identityServerAddress, string data)
+        public Task<SigningApiResponse> SignData(string identityServerAddress, string tokenData, int lifeTime = 3600)
+        {
+            var nvc = new NameValueCollection();
+            nvc["token-data"] = tokenData;
+
+            return SignData(identityServerAddress, nvc, lifeTime);
+        }
+
+        async public Task<SigningApiResponse> SignData(string identityServerAddress, NameValueCollection claims, int lifeTime = 3600)
         {
             try
             {
@@ -33,12 +43,12 @@ namespace IdentityServer.Legacy.Clients
                 var httpClient = GetHttpClient();
                 httpClient.SetBearerToken(this.AccessToken);
 
-                using (var httpContext = new FormUrlEncodedContent(new[]
-                                            {
-                                                new KeyValuePair<string, string>("data", data)
-                                            }))
+
+                using (var httpContext = new FormUrlEncodedContent(claims.AllKeys?
+                                                                         .Select(k => new KeyValuePair<string, string>(k, claims[k]))
+                                                                         .ToArray()))
                 {
-                    var httpResponse = await httpClient.PostAsync($"{ identityServerAddress }/api/signing", httpContext);
+                    var httpResponse = await httpClient.PostAsync($"{ identityServerAddress }/api/signing?lifetime={ lifeTime }", httpContext);
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         var jsonResponse = await httpResponse.Content.ReadAsStringAsync();

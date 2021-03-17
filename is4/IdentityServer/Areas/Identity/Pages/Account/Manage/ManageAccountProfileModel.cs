@@ -15,15 +15,13 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
     public class ManageAccountPageModel : PageModel, IManageAccountPageModel
     {
-        protected IUserDbContext _userDbContext;
+        protected IUserStoreFactory _userStoreFactory;
 
-        protected ManageAccountPageModel(
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
+        protected ManageAccountPageModel(IUserStoreFactory userStoreFactory)
         {
-            EditorInfos =
-                userDbContextConfiguration?.Value?.ManageAccountEditor;
+            _userStoreFactory = userStoreFactory;
         }
 
-        public ManageAccountEditor EditorInfos { get; set; }
+        async public Task<ManageAccountEditor> EditorInfos() => (await _userStoreFactory.CreateUserDbContextInstance())?.ContextConfiguration?.ManageAccountEditor;
     }
 }

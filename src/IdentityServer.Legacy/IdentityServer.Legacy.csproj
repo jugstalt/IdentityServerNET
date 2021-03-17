@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="IdentityModel" Version="4.5.0" />
     <PackageReference Include="IdentityServer4.Storage" Version="4.1.1" />
+    <PackageReference Include="Mailjet.Api" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.1" />

@@ -20,11 +20,9 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public IndexModel(
             SignInManager<ApplicationUser> signInManager,
-            IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base(userDbContext, userDbContextConfiguration)
+            IUserStoreFactory userStoreFactory)
+            : base(userStoreFactory)
         {
-            _userDbContext = userDbContext;
             _signInManager = signInManager;
         }
 
@@ -55,7 +53,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user.");
             }
 
-            if (!this.EditorInfos.Validate(Request.Form, out string message))
+            if (!(await EditorInfos()).Validate(Request.Form, out string message))
             {
                 StatusMessage = $"Error: { message }";
                 return Page();
@@ -70,7 +68,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             {
                 var propertyName = formKey;
 
-                var editorInfo = base.EditorInfos?
+                var editorInfo = (await EditorInfos())?
                                      .EditorInfos?
                                      .Where(p => p.Name == propertyName && this.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase))
                                      .FirstOrDefault();
@@ -80,7 +78,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
                     continue;
                 }
 
-                await _userDbContext.UpdatePropertyAsync(
+                var userDbContext = await CurrentUserDbContext();
+                await userDbContext.UpdatePropertyAsync(
                     this.ApplicationUser,
                     editorInfo,
                     this.Request.Form[formKey].ToString(),

@@ -19,5 +19,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken);
         Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation);
         Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation);
+
+        UserDbContextConfiguration ContextConfiguration { get; }
     }
 }
