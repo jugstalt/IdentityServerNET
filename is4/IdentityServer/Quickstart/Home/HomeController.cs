@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace IdentityServer
@@ -22,18 +24,41 @@ namespace IdentityServer
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _config;
 
-        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager)
+        public HomeController(IIdentityServerInteractionService interaction, 
+                              IWebHostEnvironment environment, 
+                              ILogger<HomeController> logger, 
+                              UserManager<ApplicationUser> userManager,
+                              IConfiguration config)
         {
             _interaction = interaction;
             _environment = environment;
             _logger = logger;
             _userManager = userManager;
+            _config = config;
         }
 
         async public Task<IActionResult> Index()
         {
             var applicationUser = await _userManager.GetUserAsync(User);
+
+            string redirectAuth = _config["IdentityServer:RedirectAuthUsersToClientUrl"];
+            string redirectAnonymous = _config["IdentityServer:RedirectAnonymousUsersToClientUrl"];
+
+            if (!String.IsNullOrEmpty(redirectAuth) &&
+                applicationUser != null &&
+                !applicationUser.HasAdministratorRole())
+            {
+                return Redirect(redirectAuth);
+            }
+            
+            if (!String.IsNullOrEmpty(redirectAnonymous) &&
+                String.IsNullOrEmpty(applicationUser?.UserName))
+            {
+                return Redirect(redirectAnonymous);
+            }
+
             return View(applicationUser);
         }
         public IActionResult About()

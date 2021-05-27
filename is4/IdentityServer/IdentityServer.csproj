@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>33ba4f5b-c252-47fe-926b-959a2c9af1b0</UserSecretsId>
-    <AssemblyVersion>2.21.1102.0</AssemblyVersion>
+    <AssemblyVersion>2.21.2101.0</AssemblyVersion>
   </PropertyGroup>
   
   <ItemGroup>
@@ -23,5 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
+    
   </ItemGroup>
 </Project>

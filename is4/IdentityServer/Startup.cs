@@ -1,7 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-using IdentityServer.Legacy;
+﻿using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
@@ -85,6 +82,8 @@ namespace IdentityServer
                         policy => policy.RequireRole(KnownRoles.ClientAdministrator));
                     options.AddPolicy("admin-secretsvault-policy",
                        policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
+                    options.AddPolicy("admin-signing-ui-policy",
+                       policy => policy.RequireRole(KnownRoles.SigningAdministrator));
                 }
 
             // DoTo: find a policy that never matches!!
@@ -117,6 +116,7 @@ namespace IdentityServer
                     options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration.DenyAdminResources() ? "_forbidden" : "admin-resource-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration.DenyAdminClients() ? "_forbidden" : "admin-client-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/signing", Configuration.DenySigningUI() ? "_forbidden" : "admin-signing-ui-policy");
 
                     if (Configuration.DenyManageAccount() == true)
                     {

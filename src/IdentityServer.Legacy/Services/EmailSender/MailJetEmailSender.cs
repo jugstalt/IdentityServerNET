@@ -32,7 +32,7 @@ namespace IdentityServer.Legacy.Services.EmailSender
         {
             try
             {
-                Console.WriteLine($"Try send mail to...");
+                Console.WriteLine($"Try send mail to: { to }");
                 
                 MailjetClient client = new MailjetClient(
                     _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
@@ -54,11 +54,14 @@ namespace IdentityServer.Legacy.Services.EmailSender
 
                 MailMessage msg = new MailMessage();
 
-                foreach (var responseMessage in response.Messages)
+                if (response.Messages != null)
                 {
-                    if (responseMessage?.Errors != null)
+                    foreach (var responseMessage in response.Messages)
                     {
-                        Console.WriteLine($"Status: { responseMessage.Status }, Errors: { String.Join(", ", responseMessage.Errors?.Select(e => $"{ e.ErrorCode }:{ e.ErrorMessage }")) }");
+                        if (responseMessage?.Errors != null)
+                        {
+                            Console.WriteLine($"Status: { responseMessage.Status }, Errors: { String.Join(", ", responseMessage.Errors?.Select(e => $"{ e.ErrorCode }:{ e.ErrorMessage }")) }");
+                        }
                     }
                 }
      

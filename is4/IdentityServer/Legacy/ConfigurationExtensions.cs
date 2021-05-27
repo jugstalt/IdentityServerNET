@@ -33,6 +33,11 @@ namespace IdentityServer.Legacy
             return configuration["identityserver:DenyAdminSecretsVault"]?.ToLower() == "true";
         }
 
+        static public bool DenySigningUI(this IConfiguration configuration)
+        {
+            return configuration["identityserver:DenySigningUI"]?.ToLower() == "true";
+        }
+
         static public bool DenyManageAccount(this IConfiguration configuration)
         {
             return configuration["identityserver:DenyManageAccount"]?.ToLower() == "true";
