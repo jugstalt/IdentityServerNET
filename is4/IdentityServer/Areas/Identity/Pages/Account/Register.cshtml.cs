@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using IdentityServer.Legacy.UserInteraction;
+using IdentityServer.Legacy.Services.DbContext;
+using System.Security.Claims;
+using IdentityModel;
 
 namespace IdentityServer.Areas.Identity.Pages.Account
 {
@@ -26,19 +30,23 @@ namespace IdentityServer.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RegisterAccountEditor _editor;
+        private readonly IUserStoreFactory _userStoreFactory;
 
         public RegisterModel(
             IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserStoreFactory userStoreFactory)
         {
             _configuration = configuration;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userStoreFactory = userStoreFactory;
         }
 
         [BindProperty]
@@ -52,19 +60,35 @@ namespace IdentityServer.Areas.Identity.Pages.Account
         {
             [Required]
             [EmailAddress]
-            [Display(Name = "Email")]
+            [Display(Name = "Email *")]
             public string Email { get; set; }
+
+            [Required]
+            [Display(Name = "Given Name *")]
+            public string GivenName { get; set; }
+
+            [Required]
+            [Display(Name = "Family Name *")]
+            public string FamilyName { get; set; }
+
+            //[Required]
+            [Display(Name = "Company")]
+            public string Company { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Password *")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
+            [Display(Name = "Confirm password *")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Promotion Code *")]
+            public string PromotionCode { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
@@ -82,16 +106,50 @@ namespace IdentityServer.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            if (_configuration["Capabilities:UserAccounts:AllowRegister"]?.ToLower() == "false")
+            if (_configuration.DenyRegisterAccount())
             {
                 return RedirectToPage("/");
             }
+
 
             returnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var userDbContext = await _userStoreFactory.CreateUserDbContextInstance();
+                var editor = userDbContext?.ContextConfiguration?.RegisterAccountEditor ?? new RegisterAccountEditor();
+
+                if(!String.IsNullOrEmpty(editor.PromotionCode) &&
+                    editor.PromotionCode!=Input.PromotionCode)
+                {
+                    ModelState.AddModelError("PromotionCode", "Sorry, you are not allowed to register. Invalid/Wrong Promotion Code");
+                    return Page();
+                }
+
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    Claims = new List<Claim>()
+                };
+                if (editor.ShowGivenName)
+                {
+                    user.Claims.Add(new Claim(JwtClaimTypes.GivenName, Input.GivenName));
+                }
+                if (editor.ShowFamilyName)
+                {
+                    user.Claims.Add(new Claim(JwtClaimTypes.FamilyName, Input.FamilyName));
+                }
+                if (editor.ShowCompany)
+                {
+                    user.Claims.Add(new Claim("company", Input.Company));
+                }
+
+                if(userDbContext is IUserDbContextPreActions)
+                {
+                    user = await ((IUserDbContextPreActions)userDbContext).PreCreateAsync(user, new System.Threading.CancellationToken());
+                }
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -123,6 +181,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+
 
             // If we got this far, something failed, redisplay form
             return Page();

@@ -61,7 +61,7 @@ namespace IdentityServer.Legacy.Controllers
                         errorMessage = sme.Message
                     });
             }
-            catch (Exception ex)
+            catch /*(Exception ex)*/
             {
                 return new JsonResult(
                     new

@@ -17,18 +17,20 @@ namespace ClientApp
 
             //await CallSecretsVault("webgis", "secret", "webgis/sec1");
 
-            var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
+            //var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
             //var secretsVaultClient = new SecretsVaultClient("webgis", cert);
-            await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
-            var secret = await secretsVaultClient.GetSecret("sec1");
+            //await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
+            //var secret = await secretsVaultClient.GetSecret("sec1");
 
-            Console.Write("Secret: " + secret.GetValue());
+            //Console.Write("Secret: " + secret.GetValue());
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
-            return;
+            //return;
 
             //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
+
+            await SigningApiTest("https://localhost:44300");
 
             string issuer = "https://localhost:44300";
             var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);
@@ -55,7 +57,7 @@ namespace ClientApp
 
                 Console.WriteLine("Token successfully verified!");
 
-                await GetUserInfo(tokenResponse);
+                //await GetUserInfo(tokenResponse);
                 //await VerifyToken(tokenResponse);
                 await CallApi(tokenResponse.AccessToken);
             }
@@ -261,6 +263,27 @@ namespace ClientApp
             }
 
             Console.ReadLine();
+        }
+
+        async static Task SigningApiTest(string issuerAddress)
+        {
+            string clientId = "client", clientSecret = "secret1";
+
+            var singingApiClient = new SigningApiClient(clientId, clientSecret);
+            var signingResponse = await singingApiClient.SignData(issuerAddress, "data-i-want-to-sign");
+
+            if(signingResponse.Succeded==false)
+            {
+                Console.WriteLine($"Signing response error: { signingResponse.ErrorMessage }");
+                return;
+            }
+
+            Console.WriteLine($"Signing-Token: { signingResponse.SecurityToken }");
+
+            Console.WriteLine("Try validate signing-token:");
+            var data = await SigningApiClient.GetValidatedDataFromToken(signingResponse.SecurityToken, issuerAddress);
+
+            Console.WriteLine($"Signed-data: { data }");
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -43,12 +44,23 @@ namespace IdentityServer.Legacy.Extensions
             {
                 SecurityToken validatedToken;
                 IPrincipal principal = tokenHandler.ValidateToken(jwtEncodedString, validationParameters, out validatedToken);
-            } 
-            catch(Exception)
+            }
+            catch (Exception)
             {
                 throw new TokenValidationException("Invalid token");
             }
             return jwtEncodedString.ToJwtSecurityToken();
+        }
+
+        async static public Task<string> GetValidatedClaimValue(this string jwtEncodedString, string issuerUrl, string claimType, string audience = null)
+        {
+            var jwtToken = await jwtEncodedString.ToValidatedJwtSecurityToken(issuerUrl);
+
+            return jwtToken?
+                        .Claims?
+                        .Where(c => claimType.Equals(c.Type))
+                        .FirstOrDefault()?
+                        .Value;
         }
 
         static public JwtSecurityToken ToAssertionToken(this X509Certificate2 cert, string clientId, string issuer)
@@ -82,6 +94,23 @@ namespace IdentityServer.Legacy.Extensions
             var tokenString = tokenHandler.WriteToken(token);
 
             return tokenString;
+        }
+
+        static public byte[] BytesFromBase64(this string base64)
+        {
+            try
+            {
+                return Convert.FromBase64String(base64);
+            }
+            catch { }
+
+            try
+            {
+                return Convert.FromBase64String($"{ base64 }==");
+            }
+            catch { }
+
+            return Convert.FromBase64String($"{ base64 }=");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.MongoDb.MongoDocuments;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
@@ -9,7 +10,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.MongoDb.Services.DbContext
@@ -27,7 +27,9 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
         public MongoBlobResourceDb(IOptions<ResourceDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("FileBlobResourceDb: no connection string defined");
+            }
 
             _connectionString = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
@@ -58,7 +60,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
         #region IResourceDbContext
 
-        async public Task<ApiResource> FindApiResourceAsync(string name)
+        async public Task<ApiResourceModel> FindApiResourceAsync(string name)
         {
             string id = name.ApiNameToHexId(_cryptoService);
 
@@ -70,16 +72,16 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             if (document != null)
             {
-                return _blobSerializer.DeserializeObject<ApiResource>(
+                return _blobSerializer.DeserializeObject<ApiResourceModel>(
                     _cryptoService.DecryptText(document.BlobData));
             }
 
             return null;
         }
 
-        async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            List<ApiResource> apiResources = new List<ApiResource>();
+            List<ApiResourceModel> apiResources = new List<ApiResourceModel>();
 
             foreach (var scopeName in scopeNames)
             {
@@ -93,7 +95,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             return apiResources;
         }
 
-        async public Task<IdentityResource> FindIdentityResource(string name)
+        async public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
             string id = name.IdentityNameToHexId(_cryptoService);
 
@@ -105,7 +107,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             if (document != null)
             {
-                return _blobSerializer.DeserializeObject<IdentityResource>(
+                return _blobSerializer.DeserializeObject<IdentityResourceModel>(
                     _cryptoService.DecryptText(document.BlobData));
             }
 
@@ -113,7 +115,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             return null;
         }
 
-        async public Task<IEnumerable<ApiResource>> GetAllApiResources()
+        async public Task<IEnumerable<ApiResourceModel>> GetAllApiResources()
         {
             var collection = GetApiResourceCollection();
 
@@ -121,7 +123,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                     .AsQueryable<ApiResourceDocument>()
                     .Where(_ => true);
 
-            var result = new List<ApiResource>();
+            var result = new List<ApiResourceModel>();
 
             var cursor = await query.ToCursorAsync();
             while (await cursor.MoveNextAsync())
@@ -130,7 +132,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 {
                     if (apiResourceDocument.Id.IsValidApiResourceHexId())
                     {
-                        result.Add(_blobSerializer.DeserializeObject<ApiResource>(_cryptoService.DecryptText(apiResourceDocument.BlobData)));
+                        result.Add(_blobSerializer.DeserializeObject<ApiResourceModel>(_cryptoService.DecryptText(apiResourceDocument.BlobData)));
                     }
                 }
             }
@@ -138,7 +140,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             return result;
         }
 
-        async public Task<IEnumerable<IdentityResource>> GetAllIdentityResources()
+        async public Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources()
         {
             var collection = GetIdentityResourceCollection();
 
@@ -146,7 +148,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                     .AsQueryable<IdentityResourceDocument>()
                     .Where(_ => true);
 
-            var result = new List<IdentityResource>();
+            var result = new List<IdentityResourceModel>();
 
             var cursor = await query.ToCursorAsync();
             while (await cursor.MoveNextAsync())
@@ -155,7 +157,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 {
                     if (identityResourceDocument.Id.IsValidIdentityResourceHexId())
                     {
-                        result.Add(_blobSerializer.DeserializeObject<IdentityResource>(_cryptoService.DecryptText(identityResourceDocument.BlobData)));
+                        result.Add(_blobSerializer.DeserializeObject<IdentityResourceModel>(_cryptoService.DecryptText(identityResourceDocument.BlobData)));
                     }
                 }
             }
@@ -167,7 +169,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
         #region  IResourceDbContextModify
 
-        async public Task AddApiResourceAsync(ApiResource apiResource)
+        async public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
             if (apiResource == null)
             {
@@ -192,7 +194,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             await collection.InsertOneAsync(document);
         }
 
-        async public Task AddIdentityResourceAsync(IdentityResource identityResource)
+        async public Task AddIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             if (identityResource == null)
             {
@@ -217,7 +219,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             await collection.InsertOneAsync(document);
         }
 
-        async public Task RemoveApiResourceAsync(ApiResource apiResource)
+        async public Task RemoveApiResourceAsync(ApiResourceModel apiResource)
         {
             var collection = GetApiResourceCollection();
 
@@ -227,7 +229,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 .DeleteOneAsync<ApiResourceDocument>(d => d.Id == id);
         }
 
-        async public Task RemoveIdentityResourceAsync(IdentityResource identityResource)
+        async public Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             var collection = GetIdentityResourceCollection();
 
@@ -237,7 +239,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 .DeleteOneAsync<IdentityResourceDocument>(d => d.Id == id);
         }
 
-        async public Task UpdateApiResourceAsync(ApiResource apiResource, IEnumerable<string> propertyNames = null)
+        async public Task UpdateApiResourceAsync(ApiResourceModel apiResource, IEnumerable<string> propertyNames = null)
         {
             var collection = GetApiResourceCollection();
 
@@ -251,7 +253,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 .UpdateOneAsync<ApiResourceDocument>(d => d.Id == id, update);
         }
 
-        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames = null)
+        async public Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames = null)
         {
             var collection = GetIdentityResourceCollection();
 

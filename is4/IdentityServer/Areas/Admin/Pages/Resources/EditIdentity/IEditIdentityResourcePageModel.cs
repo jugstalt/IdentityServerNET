@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 {
     public interface IEditIdentityResourcePageModel
     {
-        public IdentityResource CurrentIdentityResource { get; set; }
+        public IdentityResourceModel CurrentIdentityResource { get; set; }
     }
 }

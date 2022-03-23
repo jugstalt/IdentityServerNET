@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.Serialize;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
@@ -47,7 +48,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #region IClientDbContext
 
-        async public Task<Client> FindClientByIdAsync(string clientId)
+        async public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ clientId.NameToHexId(_cryptoService) }.client");
 
@@ -61,7 +62,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                 var fileText = await reader.ReadToEndAsync();
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return _blobSerializer.DeserializeObject<Client>(fileText);
+                return _blobSerializer.DeserializeObject<ClientModel>(fileText);
             }
         }
 
@@ -69,7 +70,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #region IClientDbContextModify
 
-        async public Task AddClientAsync(Client client)
+        async public Task AddClientAsync(ClientModel client)
         {
             string id = client.ClientId.NameToHexId(_cryptoService);
             FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.client");
@@ -89,7 +90,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
         }
 
-        public Task RemoveClientAsync(Client client)
+        public Task RemoveClientAsync(ClientModel client)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ client.ClientId.NameToHexId(_cryptoService) }.client");
 
@@ -105,7 +106,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        async public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
+        async public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ client.ClientId.NameToHexId(_cryptoService) }.client");
 
@@ -121,9 +122,9 @@ namespace IdentityServer.Legacy.Services.DbContext
             await AddClientAsync(client);
         }
 
-        async public Task<IEnumerable<Client>> GetAllClients()
+        async public Task<IEnumerable<ClientModel>> GetAllClients()
         {
-            List<Client> clients = new List<Client>();
+            List<ClientModel> clients = new List<ClientModel>();
 
             foreach(var fi in new DirectoryInfo(_rootPath).GetFiles("*.client"))
             {
@@ -132,7 +133,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                     var fileText = await reader.ReadToEndAsync();
                     fileText = _cryptoService.DecryptText(fileText);
 
-                    clients.Add(_blobSerializer.DeserializeObject<Client>(fileText));
+                    clients.Add(_blobSerializer.DeserializeObject<ClientModel>(fileText));
                 }
             }
 

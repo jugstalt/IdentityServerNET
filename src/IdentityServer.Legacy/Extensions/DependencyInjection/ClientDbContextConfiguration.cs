@@ -1,4 +1,5 @@
-﻿using IdentityServer.Legacy.Services.Cryptography;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer4.Models;
 using System;
@@ -9,7 +10,7 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
     public class ClientDbContextConfiguration
     {
-        public IEnumerable<Client> IntialClients { get; set; }
+        public IEnumerable<ClientModel> IntialClients { get; set; }
 
         public string ConnectionString { get; set; }
         public string TableName { get; set; }

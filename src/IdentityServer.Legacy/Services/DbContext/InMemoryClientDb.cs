@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,13 +13,13 @@ namespace IdentityServer.Legacy.Services.DbContext
 {
     public class InMemoryClientDb : IClientDbContext, IClientDbContextModify
     {
-        private static ConcurrentDictionary<string, Client> _clients = null;
+        private static ConcurrentDictionary<string, ClientModel> _clients = null;
 
         public InMemoryClientDb(IOptions<ClientDbContextConfiguration> options = null)
         {
             if(_clients==null)
             {
-                _clients = new ConcurrentDictionary<string, Client>();
+                _clients = new ConcurrentDictionary<string, ClientModel>();
 
                 // Init from configuration
                 if(options?.Value?.IntialClients != null)
@@ -33,21 +34,21 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #region IClientDbContext
 
-        public Task<Client> FindClientByIdAsync(string clientId)
+        public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
             if (_clients.ContainsKey(clientId))
             {
                 return Task.FromResult(_clients[clientId]);
             }
 
-            return Task.FromResult<Client>(null);
+            return Task.FromResult < ClientModel>(null);
         }
 
         #endregion
 
         #region IClientDbContextModify
 
-        public Task AddClientAsync(Client client)
+        public Task AddClientAsync(ClientModel client)
         {
             if(_clients.ContainsKey(client.ClientId))
             {
@@ -59,7 +60,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult(0);
         }
 
-        public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
+        public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
             if (!_clients.ContainsKey(client.ClientId))
             {
@@ -71,7 +72,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult(0);
         }
 
-        public Task RemoveClientAsync(Client client)
+        public Task RemoveClientAsync(ClientModel client)
         {
             if (!_clients.ContainsKey(client.ClientId))
             {
@@ -86,9 +87,9 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.FromResult(0);
         }
 
-        public Task<IEnumerable<Client>> GetAllClients()
+        public Task<IEnumerable<ClientModel>> GetAllClients()
         {
-            return Task.FromResult<IEnumerable<Client>>(_clients.Values.ToArray());
+            return Task.FromResult<IEnumerable<ClientModel>>(_clients.Values.ToArray());
         }
 
         #endregion

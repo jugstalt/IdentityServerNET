@@ -1,11 +1,11 @@
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -38,7 +38,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 
                 var inputClient = Input.Client;
 
-                foreach (var propertyInfo in typeof(Client).GetProperties())
+                foreach (var propertyInfo in typeof(ClientModel).GetProperties())
                 {
 
                     if (!Input.IgnoreProperties.Contains(propertyInfo.Name) &&
@@ -86,7 +86,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
         public class InputModel
         {
             public string ClientId { get; set; }
-            public Client Client { get; set; }
+            public ClientModel Client { get; set; }
             public string[] IgnoreProperties => new string[] { "ClientId", "ClientName", "Description" };
         }
     }

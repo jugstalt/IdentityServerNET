@@ -20,15 +20,17 @@ namespace IdentityServer.Legacy.Services.DbContext
         private string _rootPath = null;
         private ICryptoService _cryptoService = null;
         private IBlobSerializer _blobSerializer;
+        private UserDbContextConfiguration _config;
 
-        public FileBlobUserDb(IOptions<UserDbContextConfiguration> options=null)
+        public FileBlobUserDb(IOptionsMonitor<UserDbContextConfiguration> options=null)
         {
-            if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            if (String.IsNullOrEmpty(options?.CurrentValue?.ConnectionString))
                 throw new ArgumentException("FileBlobUserDb: no connection string defined");
 
-            _rootPath = options.Value.ConnectionString;
-            _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-            _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+            _config = options.CurrentValue;
+            _rootPath = _config.ConnectionString;
+            _cryptoService = _config.CryptoService ?? new Base64CryptoService();
+            _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
 
             DirectoryInfo di = new DirectoryInfo(_rootPath);
             if(!di.Exists)
@@ -38,6 +40,8 @@ namespace IdentityServer.Legacy.Services.DbContext
         }
 
         #region IUserDbContext
+
+        public UserDbContextConfiguration ContextConfiguration => _config;
 
         async public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {

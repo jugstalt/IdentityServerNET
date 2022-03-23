@@ -16,5 +16,6 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
 
         public ManageAccountEditor ManageAccountEditor { get; set; }
         public AdminAccountEditor AdminAccountEditor { get; set; }
+        public RegisterAccountEditor RegisterAccountEditor { get; set; }
     }
 }

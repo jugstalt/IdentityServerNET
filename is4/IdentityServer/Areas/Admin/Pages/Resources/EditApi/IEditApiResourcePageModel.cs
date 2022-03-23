@@ -1,4 +1,6 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,6 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
     public interface IEditApiResourcePageModel
     {
-        public ApiResource CurrentApiResource { get; set; }
+        public ApiResourceModel CurrentApiResource { get; set; }
     }
 }

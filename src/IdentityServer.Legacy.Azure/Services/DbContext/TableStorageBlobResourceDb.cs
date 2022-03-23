@@ -1,4 +1,6 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
@@ -41,7 +43,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
 
         #region IResourceDbContextModify
 
-        async public Task AddApiResourceAsync(ApiResource apiResource)
+        async public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
             if (_tableStorage == null || apiResource == null)
                 return;
@@ -55,7 +57,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task UpdateApiResourceAsync(ApiResource apiResource, IEnumerable<string> propertyNames = null)
+        async public Task UpdateApiResourceAsync(ApiResourceModel apiResource, IEnumerable<string> propertyNames = null)
         {
             if (_tableStorage == null || apiResource == null)
                 return;
@@ -68,7 +70,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task RemoveApiResourceAsync(ApiResource apiResource)
+        async public Task RemoveApiResourceAsync(ApiResourceModel apiResource)
         {
             if (_tableStorage == null || apiResource == null)
                 return;
@@ -81,7 +83,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task AddIdentityResourceAsync(IdentityResource identityResource)
+        async public Task AddIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             if (_tableStorage == null || identityResource == null)
                 return;
@@ -95,7 +97,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames = null)
+        async public Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames = null)
         {
             if (_tableStorage == null || identityResource == null)
                 return;
@@ -108,7 +110,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task RemoveIdentityResourceAsync(IdentityResource identityResource)
+        async public Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             if (_tableStorage == null || identityResource == null)
                 return;
@@ -121,50 +123,50 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task<ApiResource> FindApiResourceAsync(string name)
+        async public Task<ApiResourceModel> FindApiResourceAsync(string name)
         {
             if (_tablename == null || String.IsNullOrWhiteSpace(name))
                 return null;
 
             var tableEntity = await _tableStorage.EntityAsync(_tablename, ApiResourcePartitionKey, name);
 
-            return tableEntity.Deserialize<ApiResource>(_cryptoService, _blobSerializer);
+            return tableEntity.Deserialize<ApiResourceModel>(_cryptoService, _blobSerializer);
         }
 
-        async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
             var apis =  (await GetAllApiResources())
                         .Where(a => scopeNames.Contains(a.Name));
             return apis;
         }
 
-        async public Task<IEnumerable<ApiResource>> GetAllApiResources()
+        async public Task<IEnumerable<ApiResourceModel>> GetAllApiResources()
         {
             if (_tableStorage == null)
-                return new ApiResource[0];
+                return new ApiResourceModel[0];
 
             return (await _tableStorage.AllEntitiesAsync(_tablename, ApiResourcePartitionKey))
-                       .Select(e => e.Deserialize<ApiResource>(_cryptoService, _blobSerializer))
+                       .Select(e => e.Deserialize<ApiResourceModel>(_cryptoService, _blobSerializer))
                        .ToArray();
         }
 
-        async public Task<IdentityResource> FindIdentityResource(string name)
+        async public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
             if (_tablename == null || String.IsNullOrWhiteSpace(name))
                 return null;
 
             var tableEntity = await _tableStorage.EntityAsync(_tablename, IdentityResourcePartitionKey, name);
 
-            return tableEntity.Deserialize<IdentityResource>(_cryptoService, _blobSerializer);
+            return tableEntity.Deserialize<IdentityResourceModel>(_cryptoService, _blobSerializer);
         }
 
-        async public Task<IEnumerable<IdentityResource>> GetAllIdentityResources()
+        async public Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources()
         {
             if (_tableStorage == null)
-                return new IdentityResource[0];
+                return new IdentityResourceModel[0];
 
             return (await _tableStorage.AllEntitiesAsync(_tablename, IdentityResourcePartitionKey))
-                       .Select(e => e.Deserialize<IdentityResource>(_cryptoService, _blobSerializer))
+                       .Select(e => e.Deserialize<IdentityResourceModel>(_cryptoService, _blobSerializer))
                        .ToArray();
         }
 

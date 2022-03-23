@@ -1,4 +1,5 @@
-﻿using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using System;
@@ -18,17 +19,47 @@ namespace IdentityServer.Legacy
 
         private IResourceDbContext _resourcedbContext = null;
 
-        async public Task<ApiResource> FindApiResourceAsync(string name)
+        //
+        // Summary:
+        //     Gets API resources by scope name.
+        //Task<IEnumerable<ApiResource>> FindApiResourcesByScopeNameAsync(IEnumerable<string> scopeNames);
+        //
+        // Summary:
+        //     Gets API scopes by scope name.
+        //Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames);
+
+
+
+        async public Task<ApiResource> FindApiResourceByNameAsync(string name)
         {
-            return await _resourcedbContext.FindApiResourceAsync(name);
+            return (await _resourcedbContext.FindApiResourceAsync(name)).IndentityServer4Instance as ApiResource;
         }
 
-        async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<ApiResource>> FindApiResourcesByNameAsync(IEnumerable<string> apiResourceNames)
         {
-            return await _resourcedbContext.FindApiResourcesByScopeAsync(scopeNames);
+            return (await _resourcedbContext.GetAllApiResources())
+                                            .Where(r=> apiResourceNames.Contains(r.Name))
+                                            .Select(r=> (ApiResource)r.IndentityServer4Instance);
         }
 
-        async public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
+        {
+            List<ScopeModel> scopes = new List<ScopeModel>();
+
+            scopes.AddRange((await _resourcedbContext.GetAllApiResources())
+                                                     .SelectMany(r => r.Scopes));
+
+            return scopes.Where(s => scopeNames.Contains(s.Name))
+                         .Select(s => s.IdentitityServer4Insance);
+        }
+
+        async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeNameAsync(IEnumerable<string> scopeNames)
+        {
+            return (await _resourcedbContext.FindApiResourcesByScopeAsync(scopeNames))
+                        .Select(r => (ApiResource)r.IndentityServer4Instance);
+        }
+
+        async public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeNameAsync(IEnumerable<string> scopeNames)
         {
             List<IdentityResource> identityResources = new List<IdentityResource>();
 
@@ -56,10 +87,10 @@ namespace IdentityServer.Legacy
                 //        break;
                 //}
 
-                var identityResource = await _resourcedbContext.FindIdentityResource(scopeName);
-                if(identityResource!=null)
+                var identityResource = (await _resourcedbContext.FindIdentityResource(scopeName))?.IndentityServer4Instance as IdentityResource;
+                if (identityResource != null)
                 {
-                    if(identityResource.Name=="role")
+                    if (identityResource.Name == "role")
                     {
                         identityResource = new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role });
                     }
@@ -90,7 +121,9 @@ namespace IdentityServer.Legacy
 
             if(_resourcedbContext is IResourceDbContextModify)
             {
-                resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources()).ToArray();
+                resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources())
+                                            .Select(r=>(ApiResource)r.IndentityServer4Instance)
+                                            .ToArray();
             }
 
             return resources;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             {
                 if (_resourceDb != null)
                 {
-                    var identityResource = new IdentityResource()
+                    var identityResource = new IdentityResourceModel()
                     {
                         Name = Input.IdentityResourceName,
                         DisplayName = Input.IdentityResourceDisplayName
@@ -56,7 +57,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             , onException: (ex) => RedirectToPage());
         }
 
-        public IEnumerable<IdentityResource> IdentityResources { get; set; }
+        public IEnumerable<IdentityResourceModel> IdentityResources { get; set; }
 
         [BindProperty]
         public NewIdentityResource Input { get; set; }

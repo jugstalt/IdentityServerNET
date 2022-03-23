@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +27,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            :base(userDbContextConfiguration)
+            IUserStoreFactory userStoreFactory)
+            :base(userStoreFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;

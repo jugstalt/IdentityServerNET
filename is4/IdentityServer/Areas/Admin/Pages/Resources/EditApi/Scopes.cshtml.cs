@@ -1,14 +1,12 @@
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
@@ -95,7 +93,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 {
                     Input.Scope.Name = scopeName;
 
-                    List<Scope> apiScopes = new List<Scope>();
+                    List<ScopeModel> apiScopes = new List<ScopeModel>();
                     if (this.CurrentApiResource.Scopes != null)
                     {
                         apiScopes.AddRange(this.CurrentApiResource.Scopes);
@@ -104,7 +102,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
                     if (CurrentApiResource.Scopes == null)
                     {
-                        CurrentApiResource.Scopes = new Scope[]
+                        CurrentApiResource.Scopes = new ScopeModel[]
                         {
                             Input.Scope
                         };
@@ -112,7 +110,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     else if (CurrentApiResource.Scopes.Where(s => s.Name == Input.Scope.Name).Count() == 0)
                     {
                         // Insert new
-                        List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes);
+                        List<ScopeModel> scopes = new List<ScopeModel>(CurrentApiResource.Scopes);
                         scopes.Add(Input.Scope);
 
                         CurrentApiResource.Scopes = scopes.ToArray();
@@ -120,7 +118,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     else
                     {
                         // Replace
-                        List<Scope> scopes = new List<Scope>(CurrentApiResource.Scopes
+                        List<ScopeModel> scopes = new List<ScopeModel>(CurrentApiResource.Scopes
                             .Where(s => s.Name != Input.Scope.Name && !String.IsNullOrWhiteSpace(s.Name)));
                         scopes.Add(Input.Scope);
 
@@ -142,7 +140,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
         {
             public string ApiName { get; set; }
 
-            public Scope Scope { get; set; }
+            public ScopeModel Scope { get; set; }
         }
     }
 }

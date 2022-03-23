@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-6">
         <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        @if (Model.EditorInfos?.AllowDelete == true)
+        @if ((await Model.EditorInfos())?.AllowDelete == true)
         {
         <p>
             <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
@@ -19,7 +19,7 @@
         <form asp-page="DownloadPersonalData" method="post" class="form-group">
             <button class="btn btn-default" type="submit">Download</button>
         </form>
-        @if (Model.EditorInfos?.AllowDelete == true)
+        @if ((await Model.EditorInfos())?.AllowDelete == true)
         {
         <p>
             <a asp-page="DeletePersonalData" class="btn btn-default">Delete</a>

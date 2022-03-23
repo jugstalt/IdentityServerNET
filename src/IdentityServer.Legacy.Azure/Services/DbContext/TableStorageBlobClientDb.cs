@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
@@ -39,21 +40,21 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
 
         #region IClientDbContext
 
-        async public Task<Client> FindClientByIdAsync(string clientId)
+        async public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
             if (_tablename == null || String.IsNullOrWhiteSpace(clientId))
                 return null;
 
             var tableEntity = await _tableStorage.EntityAsync(_tablename, PartitionKey, clientId);
 
-            return tableEntity.Deserialize<Client>(_cryptoService, _blobSerializer);
+            return tableEntity.Deserialize<ClientModel>(_cryptoService, _blobSerializer);
         }
 
         #endregion
 
         #region IClientDbContextModify
 
-        async public Task AddClientAsync(Client client)
+        async public Task AddClientAsync(ClientModel client)
         {
             if (_tableStorage == null || client == null)
                 return;
@@ -67,7 +68,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task UpdateClientAsync(Client client, IEnumerable<string> propertyNames = null)
+        async public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
             if (_tableStorage == null || client == null)
                 return;
@@ -80,7 +81,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task RemoveClientAsync(Client client)
+        async public Task RemoveClientAsync(ClientModel client)
         {
             if (_tableStorage == null || client == null)
                 return;
@@ -93,13 +94,13 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                                     _blobSerializer));
         }
 
-        async public Task<IEnumerable<Client>> GetAllClients()
+        async public Task<IEnumerable<ClientModel>> GetAllClients()
         {
             if (_tableStorage == null)
-                return new Client[0];
+                return new ClientModel[0];
 
             return (await _tableStorage.AllEntitiesAsync(_tablename, PartitionKey))
-                       .Select(e => e.Deserialize<Client>(_cryptoService, _blobSerializer))
+                       .Select(e => e.Deserialize<ClientModel>(_cryptoService, _blobSerializer))
                        .ToArray();
         }
 

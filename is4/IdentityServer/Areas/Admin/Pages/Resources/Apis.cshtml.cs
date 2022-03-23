@@ -1,7 +1,6 @@
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -41,7 +40,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             {
                 if (_resourceDb != null)
                 {
-                    var apiResource = new ApiResource(apiName, Input.ApiResourceDisplayName);
+                    var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName);
 
                     await _resourceDb.AddApiResourceAsync(apiResource);
                 }
@@ -51,7 +50,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             , onException: (ex) => RedirectToPage());
         }
 
-        public IEnumerable<ApiResource> ApiResources { get; set; }
+        public IEnumerable<ApiResourceModel> ApiResources { get; set; }
 
         [BindProperty]
         public NewApiResource Input { get; set; }
