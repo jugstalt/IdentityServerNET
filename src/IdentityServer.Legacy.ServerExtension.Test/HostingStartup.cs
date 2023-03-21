@@ -9,6 +9,7 @@ using IdentityServer.Legacy.Services.EmailSender;
 using IdentityServer.Legacy.Services.PasswordHasher;
 using IdentityServer.Legacy.Services.Security;
 using IdentityServer.Legacy.Services.Serialize;
+using IdentityServer.Legacy.Services.UI;
 using IdentityServer.Legacy.UserInteraction;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -221,7 +222,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region UI (required)
 
-            services.Configure<UserInterfaceConfiguration>(options =>
+            services.Configure<UserInterfaceServiceOptions>(options =>
             {
                 options.ApplicationTitle = "IdentityServer.Legacy.Test";  // required
                 options.OverrideCssContent = Properties.Resources.is4_overrides;
