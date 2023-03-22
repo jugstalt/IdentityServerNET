@@ -1,13 +1,11 @@
 ﻿using IdentityServer4.Models;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace IdentityServer.Legacy.Models.IdentityServerWrappers
 {
-    
+
 
     public class ApiResourceModel : ResourceModel
     {
@@ -16,7 +14,7 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
         { }
 
         public ApiResourceModel(string name, string displayName)
-            :base(name, displayName)
+            : base(name, displayName)
         {
 
         }
@@ -39,8 +37,8 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
                 apiResource.UserClaims = this.UserClaims;
                 apiResource.Properties = this.Properties;
 
-                apiResource.ApiSecrets = this.ApiSecrets?.Select(s=>s.IdentityServer4Instance).ToList();
-                apiResource.Scopes = this.Scopes?.Select(s=>s.IdentitityServer4Insance.Name).ToList();
+                apiResource.ApiSecrets = this.ApiSecrets?.Select(s => s.IdentityServer4Instance).ToList();
+                apiResource.Scopes = this.Scopes?.Select(s => s.IdentitityServer4Insance.Name).ToList();
 
                 return apiResource;
             }

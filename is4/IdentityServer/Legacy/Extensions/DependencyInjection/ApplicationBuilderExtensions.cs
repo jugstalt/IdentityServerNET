@@ -1,9 +1,5 @@
 ﻿using IdentityServer.Legacy.Middleware;
 using Microsoft.AspNetCore.Builder;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
@@ -14,6 +10,6 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
             appBuilder.UseMiddleware<XForwardedProtoMiddleware>();
 
             return appBuilder;
-        } 
+        }
     }
 }

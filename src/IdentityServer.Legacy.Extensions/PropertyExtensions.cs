@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
 {
@@ -16,17 +14,21 @@ namespace IdentityServer.Legacy.Extensions
         static public string ToClaimArrayString(this object[] array)
         {
             if (array == null)
+            {
                 return String.Empty;
+            }
 
             var stringArray = array.Select(o => o?.ToString()).ToArray();
 
             return String.Join("\n", stringArray);
         }
 
-        static public string[] ToPropertyValueArray(this string propertyValue) 
+        static public string[] ToPropertyValueArray(this string propertyValue)
         {
             if (String.IsNullOrWhiteSpace(propertyValue))
+            {
                 return null;
+            }
 
             return propertyValue
                         .Replace("\r", "")
@@ -39,16 +41,24 @@ namespace IdentityServer.Legacy.Extensions
         static public bool IsPropertySequenceEqual(this string[] array, object[] candidate)
         {
             if (array == null && candidate == null)
+            {
                 return true;
+            }
 
             if (array == null && candidate != null)
+            {
                 return false;
+            }
 
             if (array != null && candidate == null)
+            {
                 return false;
+            }
 
             if (array.Length != candidate.Length)
+            {
                 return false;
+            }
 
             return array.SequenceEqual(candidate.Select(o => o?.ToString()));
         }
@@ -58,7 +68,9 @@ namespace IdentityServer.Legacy.Extensions
         static public double ToPlatformDouble(this string value)
         {
             if (SystemInfo.IsWindows)
+            {
                 return double.Parse(value.Replace(",", "."), SystemInfo.Nhi);
+            }
 
             return double.Parse(value.Replace(",", SystemInfo.Cnf.NumberDecimalSeparator));
         }
@@ -66,7 +78,9 @@ namespace IdentityServer.Legacy.Extensions
         static public float ToPlatformFloat(this string value)
         {
             if (SystemInfo.IsWindows)
+            {
                 return float.Parse(value.Replace(",", "."), SystemInfo.Nhi);
+            }
 
             return float.Parse(value.Replace(",", SystemInfo.Cnf.NumberDecimalSeparator));
         }

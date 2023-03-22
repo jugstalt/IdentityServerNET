@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -52,7 +49,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 }
             }
             , onFinally: () => RedirectToPage(new { id = Input.ClientId })
-            , successMessage: $"{ Input.PropertyName } successfully updated");
+            , successMessage: $"{Input.PropertyName} successfully updated");
         }
 
         [BindProperty]

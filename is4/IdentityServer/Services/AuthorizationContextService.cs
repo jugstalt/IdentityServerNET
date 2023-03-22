@@ -1,14 +1,12 @@
-﻿using IdentityServer.Legacy.Services;
-using IdentityServer4.Models;
+﻿using IdentityServer.Legacy.Extensions;
+using IdentityServer.Legacy.Services;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using IdentityServer.Legacy.Extensions;
 
 namespace IdentityServer.Services
 {

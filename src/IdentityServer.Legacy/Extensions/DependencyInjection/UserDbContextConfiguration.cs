@@ -1,10 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer.Legacy.UserInteraction;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {

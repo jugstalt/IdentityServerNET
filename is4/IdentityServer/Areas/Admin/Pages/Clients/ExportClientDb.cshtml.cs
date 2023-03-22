@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients
 {
@@ -14,7 +12,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
         private IExportClientDbContext _exportClientDb = null;
 
         public ExportClientDbModel(
-            IClientDbContext clientDbContext ,
+            IClientDbContext clientDbContext,
             IExportClientDbContext exportClientDbContext)
         {
             _clientDb = clientDbContext as IClientDbContextModify;
@@ -38,16 +36,16 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
                         await _exportClientDb.AddClientAsync(client);
                     }
 
-                    msg = $"Flushed target Db and exported { count } clients";
+                    msg = $"Flushed target Db and exported {count} clients";
                 }
                 else
                 {
                     msg = "Nothing to export. Target Db untouched";
                 }
-            } 
-            catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                msg = $"Exception: { ex.Message }";
+                msg = $"Exception: {ex.Message}";
             }
 
             return RedirectToPage("./Index", new { exportClientsMessage = msg });

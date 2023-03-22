@@ -1,16 +1,14 @@
-using System;
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
 
 namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {
@@ -35,13 +33,13 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
         public bool IsRoleAdministrator = false;
         public IEnumerable<ApplicationRole> AddableRoles = null;
 
-        async public Task<IActionResult> OnGetAsync(string id) 
+        async public Task<IActionResult> OnGetAsync(string id)
         {
             IsRoleAdministrator = (await _userManager.GetUserAsync(this.User)).IsRoleAdministrator();
 
             await LoadCurrentApplicationUserAsync(id);
 
-            if(IsRoleAdministrator && _roleDbContext is IAdminRoleDbContext)
+            if (IsRoleAdministrator && _roleDbContext is IAdminRoleDbContext)
             {
                 AddableRoles = (await ((IAdminRoleDbContext)_roleDbContext).GetRolesAsync(1000, 0, CancellationToken.None))
                                     .Where(r => CurrentApplicationUser.Roles == null || !CurrentApplicationUser.Roles.Contains(r.Name));
@@ -54,7 +52,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
         {
             return await SecureHandlerAsync(async () =>
             {
-                if(!(await _userManager.GetUserAsync(this.User)).IsRoleAdministrator())
+                if (!(await _userManager.GetUserAsync(this.User)).IsRoleAdministrator())
                 {
                     throw new StatusMessageException("No allowed");
                 }
@@ -65,7 +63,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                 await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: $"Role { roleName } removed");
+            , successMessage: $"Role {roleName} removed");
         }
 
         async public Task<IActionResult> OnGetAddAsync(string id, string roleName)
@@ -83,7 +81,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                 await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: $"Role { roleName } added");
+            , successMessage: $"Role {roleName} added");
         }
     }
 }

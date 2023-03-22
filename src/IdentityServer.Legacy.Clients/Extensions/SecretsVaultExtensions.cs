@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Clients.Extensions
 {
@@ -14,9 +12,9 @@ namespace IdentityServer.Legacy.Clients.Extensions
         static public string SecretsValueSecretName(this string path)
         {
             var parts = path.Split('/');
-            if(parts.Length<2)
+            if (parts.Length < 2)
             {
-                throw new ArgumentException($"Invalid secrets vault path { path }");
+                throw new ArgumentException($"Invalid secrets vault path {path}");
             }
 
             return parts[1];
@@ -32,7 +30,7 @@ namespace IdentityServer.Legacy.Clients.Extensions
 
             if (!long.TryParse(parts[2], out long version))
             {
-                throw new ArgumentException($"Invalid secrets vault path { path }");
+                throw new ArgumentException($"Invalid secrets vault path {path}");
             }
 
             return version;

@@ -5,7 +5,6 @@ using IdentityServer4.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy
@@ -38,8 +37,8 @@ namespace IdentityServer.Legacy
         async public Task<IEnumerable<ApiResource>> FindApiResourcesByNameAsync(IEnumerable<string> apiResourceNames)
         {
             return (await _resourcedbContext.GetAllApiResources())
-                                            .Where(r=> apiResourceNames.Contains(r.Name))
-                                            .Select(r=> (ApiResource)r.IndentityServer4Instance);
+                                            .Where(r => apiResourceNames.Contains(r.Name))
+                                            .Select(r => (ApiResource)r.IndentityServer4Instance);
         }
 
         async public Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
@@ -119,10 +118,10 @@ namespace IdentityServer.Legacy
                 //new IdentityResources.Phone(),
             };
 
-            if(_resourcedbContext is IResourceDbContextModify)
+            if (_resourcedbContext is IResourceDbContextModify)
             {
                 resources.ApiResources = (await ((IResourceDbContextModify)_resourcedbContext).GetAllApiResources())
-                                            .Select(r=>(ApiResource)r.IndentityServer4Instance)
+                                            .Select(r => (ApiResource)r.IndentityServer4Instance)
                                             .ToArray();
             }
 

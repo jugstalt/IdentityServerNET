@@ -5,13 +5,11 @@
 using IdentityModel;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Services.Security;
-using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
-using IdentityServer4.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -99,7 +97,7 @@ namespace IdentityServer
         {
             // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-            
+
             // the user clicked the "cancel" button
             if (button != "login")
             {
@@ -136,7 +134,7 @@ namespace IdentityServer
 
                     if (_captchaCodeRenderer != null)
                     {
-                        if(!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
+                        if (!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
                         {
                             suspicous = true;
                         }
@@ -172,7 +170,7 @@ namespace IdentityServer
 
                     //await HttpContext.SignInAsync(isuser, props);
 
-                    if(_loginBotDetection != null)
+                    if (_loginBotDetection != null)
                     {
                         await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
                     }
@@ -204,8 +202,8 @@ namespace IdentityServer
                         // user might have clicked on a malicious link - should be logged
                         throw new Exception("invalid return URL");
                     }
-                } 
-                else if(result.RequiresTwoFactor)
+                }
+                else if (result.RequiresTwoFactor)
                 {
                     if (_loginBotDetection != null)
                     {
@@ -248,7 +246,7 @@ namespace IdentityServer
             return View(vm);
         }
 
-        
+
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -301,7 +299,7 @@ namespace IdentityServer
 
             //return View("LoggedOut", vm);
 
-            if(!String.IsNullOrWhiteSpace(vm.PostLogoutRedirectUri))
+            if (!String.IsNullOrWhiteSpace(vm.PostLogoutRedirectUri))
             {
                 return Redirect(vm.PostLogoutRedirectUri);
             }

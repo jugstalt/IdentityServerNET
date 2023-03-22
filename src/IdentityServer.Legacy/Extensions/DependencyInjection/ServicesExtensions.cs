@@ -3,11 +3,8 @@ using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.EventSinks;
 using IdentityServer.Legacy.Services.Security;
 using IdentityServer.Legacy.Services.UI;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions.DependencyInjection
 {
@@ -15,7 +12,7 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
     {
         #region UserDbContext
 
-        static public IUserDbContextBuilder AddUserDbContext<T>(this IServiceCollection services) 
+        static public IUserDbContextBuilder AddUserDbContext<T>(this IServiceCollection services)
             where T : class, IUserDbContext
         {
             services.AddTransient<IUserDbContext, T>();
@@ -42,7 +39,7 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
             return services;
         }
 
-        public static IUserDbContextBuilder AddUserDbContextOptions(this IUserDbContextBuilder builder, 
+        public static IUserDbContextBuilder AddUserDbContextOptions(this IUserDbContextBuilder builder,
             Action<UserDbContextConfiguration> setupAction)
         {
             builder.Services.Configure(setupAction);

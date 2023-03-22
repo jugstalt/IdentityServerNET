@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Models
@@ -23,7 +21,7 @@ namespace IdentityServer.Legacy.Models
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error: { (ex is StatusMessageException ? ex.Message : "Internal error") }";
+                StatusMessage = $"Error: {(ex is StatusMessageException ? ex.Message : "Internal error")}";
 
                 if (onException != null)
                 {

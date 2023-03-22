@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 {
-    public static class EditRoleNavPages 
+    public static class EditRoleNavPages
     {
         public static string Index => "Index";
 
@@ -24,7 +21,7 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
         {
             var activePage = viewContext.ViewData["ActivePage"] as string
                 ?? System.IO.Path.GetFileNameWithoutExtension(viewContext.ActionDescriptor.DisplayName);
-            
+
             return string.Equals(activePage, page, StringComparison.OrdinalIgnoreCase) ? "active" : null;
         }
     }

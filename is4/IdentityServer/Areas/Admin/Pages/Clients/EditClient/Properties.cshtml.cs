@@ -1,6 +1,5 @@
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
             this.Input = new InputModel()
             {
                 ClientId = this.CurrentClient.ClientId,
-                Client = this.CurrentClient 
+                Client = this.CurrentClient
             };
 
             return Page();
@@ -69,7 +68,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 if (propertyNames.Count > 0)
                 {
                     await _clientDb.UpdateClientAsync(this.CurrentClient, propertyNames);
-                    this.StatusMessage = $"Properties '{ String.Join(", ", propertyNames) }' updated successfully";
+                    this.StatusMessage = $"Properties '{String.Join(", ", propertyNames)}' updated successfully";
                 }
                 else
                 {

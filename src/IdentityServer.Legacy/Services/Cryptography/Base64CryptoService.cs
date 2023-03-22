@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace IdentityServer.Legacy.Services.Cryptography
@@ -11,7 +10,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
         public string EncryptText(string text, Encoding encoding = null)
         {
             if (String.IsNullOrEmpty(text))
+            {
                 return String.Empty;
+            }
 
             var bytes = encoding == null ?
                 Encoding.UTF8.GetBytes(text) :
@@ -37,7 +38,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return encoding.GetString(decryptedBytes);
         }
 
-        public string DecryptTextConvergent(string base64Text, Encoding encoding=null)
+        public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
         {
             return DecryptText(base64Text, encoding);
         }

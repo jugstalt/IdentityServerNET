@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients
 {
@@ -54,7 +52,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
 
                     #region Apply Client Templates
 
-                    switch(Input.ClientType)
+                    switch (Input.ClientType)
                     {
                         case ClientTemplateType.ApiClient:
                             client.AllowedGrantTypes = GrantTypes.ClientCredentials;
@@ -72,8 +70,8 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
 
                             if (!String.IsNullOrWhiteSpace(Input.ClientUrl))
                             {
-                                client.RedirectUris = new[] { Input.ClientUrl+ "/callback.html" };
-                                client.PostLogoutRedirectUris = new[] { Input.ClientUrl+ "/index.html" };
+                                client.RedirectUris = new[] { Input.ClientUrl + "/callback.html" };
+                                client.PostLogoutRedirectUris = new[] { Input.ClientUrl + "/index.html" };
                                 client.AllowedCorsOrigins = new[] { Input.ClientUrl };
                             };
 
@@ -82,7 +80,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
                                 IdentityServerConstants.StandardScopes.OpenId,
                                 IdentityServerConstants.StandardScopes.Profile
                             };
-                            if(!String.IsNullOrWhiteSpace(Input.ApiScopes))
+                            if (!String.IsNullOrWhiteSpace(Input.ApiScopes))
                             {
                                 ((List<string>)client.AllowedScopes).AddRange(Input.ApiScopes.Split(' '));
                             }
@@ -126,7 +124,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
                     await _clientDb.AddClientAsync(client);
                 }
             }
-            , onFinally: ()=> RedirectToPage("EditClient/Index", new { id = clientId })
+            , onFinally: () => RedirectToPage("EditClient/Index", new { id = clientId })
             , successMessage: "Client successfully created"
             , onException: (ex) => RedirectToPage());
         }

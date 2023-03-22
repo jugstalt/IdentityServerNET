@@ -1,14 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Reflection;
+﻿using IdentityServer.Legacy.Reflection;
 using IdentityServer.Legacy.Stores;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Reflection;
 
 [assembly: HostingStartup(typeof(IdentityServer.Legacy.LegacyHostingStartup))]
 namespace IdentityServer.Legacy
@@ -29,11 +26,11 @@ namespace IdentityServer.Legacy
                 //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
 
                 string legacyAssemblyName = context.Configuration["LegacyAssemblyName"];
-                if(!String.IsNullOrWhiteSpace(legacyAssemblyName))
+                if (!String.IsNullOrWhiteSpace(legacyAssemblyName))
                 {
-                    var legacyAssembly = Assembly.LoadFrom($"{ System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) }/{ legacyAssemblyName }.dll");
+                    var legacyAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{legacyAssemblyName}.dll");
 
-                    foreach(var type in legacyAssembly.GetTypes())
+                    foreach (var type in legacyAssembly.GetTypes())
                     {
                         if (type.GetCustomAttribute<IdentityServerLegacyStartupAttribute>() != null)
                         {

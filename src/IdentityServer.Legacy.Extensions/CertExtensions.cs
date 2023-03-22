@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
@@ -12,13 +10,13 @@ namespace IdentityServer.Legacy.Extensions
         {
             StringBuilder sb = new StringBuilder();
 
-            using(var reader = new StringReader(certString))
+            using (var reader = new StringReader(certString))
             {
                 string line;
-                while((line = reader.ReadLine())!=null)
+                while ((line = reader.ReadLine()) != null)
                 {
                     line = line.Trim();
-                    if(String.IsNullOrWhiteSpace(line) || line.StartsWith("--"))
+                    if (String.IsNullOrWhiteSpace(line) || line.StartsWith("--"))
                     {
                         continue;
                     }

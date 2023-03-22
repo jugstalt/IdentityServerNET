@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
+﻿using IdentityServer.Legacy;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
@@ -30,7 +25,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync(string category)
         {
-            this.Category = String.IsNullOrWhiteSpace(category) ? "Profile" : category; 
+            this.Category = String.IsNullOrWhiteSpace(category) ? "Profile" : category;
 
             await base.LoadUserAsync();
             if (this.ApplicationUser == null)
@@ -44,7 +39,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnPostAsync()
         {
             await base.LoadUserAsync();
-            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ? 
+            base.Category = String.IsNullOrWhiteSpace(Request.Form["_category"].ToString()) ?
                 "Profile" :
                 Request.Form["_category"].ToString();
 
@@ -55,7 +50,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
             if (!(await EditorInfos()).Validate(Request.Form, out string message))
             {
-                StatusMessage = $"Error: { message }";
+                StatusMessage = $"Error: {message}";
                 return Page();
             }
 
@@ -87,7 +82,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(this.ApplicationUser);
-            StatusMessage = $"Your { Category.ToLower() } settings has been updated";
+            StatusMessage = $"Your {Category.ToLower()} settings has been updated";
             return RedirectToPage(new { category = this.Category });
         }
     }

@@ -26,9 +26,9 @@ namespace IdentityServer
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
 
-        public HomeController(IIdentityServerInteractionService interaction, 
-                              IWebHostEnvironment environment, 
-                              ILogger<HomeController> logger, 
+        public HomeController(IIdentityServerInteractionService interaction,
+                              IWebHostEnvironment environment,
+                              ILogger<HomeController> logger,
                               UserManager<ApplicationUser> userManager,
                               IConfiguration config)
         {
@@ -52,7 +52,7 @@ namespace IdentityServer
             {
                 return Redirect(redirectAuth);
             }
-            
+
             if (!String.IsNullOrEmpty(redirectAnonymous) &&
                 String.IsNullOrEmpty(applicationUser?.UserName))
             {

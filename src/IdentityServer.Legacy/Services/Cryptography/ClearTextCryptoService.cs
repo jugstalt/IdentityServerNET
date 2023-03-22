@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace IdentityServer.Legacy.Services.Cryptography
 {
@@ -23,7 +21,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             return base64Text;
         }
 
-        public string DecryptTextConvergent(string base64Text, Encoding encoding=null)
+        public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
         {
             return base64Text;
         }

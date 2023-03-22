@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -42,7 +37,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 await _clientDb.UpdateClientAsync(CurrentClient, new[] { "ClientName", "Description" });
             }
             , onFinally: () => RedirectToPage(new { id = Input.ClientId })
-            , successMessage: "The client has been updated successfully");   
+            , successMessage: "The client has been updated successfully");
         }
 
         [BindProperty]
@@ -53,6 +48,6 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
             public string ClientId { get; set; }
             public string ClientName { get; set; }
             public string ClientDescription { get; set; }
-        } 
+        }
     }
 }

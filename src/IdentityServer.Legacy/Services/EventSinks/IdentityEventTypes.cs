@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace IdentityServer.Legacy.Services.EventSinks
+﻿namespace IdentityServer.Legacy.Services.EventSinks
 {
     public enum IdentityEventTypes
     {

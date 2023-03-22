@@ -1,12 +1,9 @@
-﻿using IdentityModel;
-using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,12 +17,12 @@ namespace IdentityServer.Legacy.Stores
                                   IUserTwoFactorStore<ApplicationUser>,
                                   IUserTwoFactorRecoveryCodeStore<ApplicationUser>,
                                   IUserClaimStore<ApplicationUser>,
-                                  IUserClaimsPrincipalFactory<ApplicationUser>, 
+                                  IUserClaimsPrincipalFactory<ApplicationUser>,
                                   IUserLoginStore<ApplicationUser>,
                                   IUserSecurityStampStore<ApplicationUser>,
                                   IUserRoleStore<ApplicationUser>,
                                   IUserLockoutStore<ApplicationUser>
-                                  
+
     {
         //private IUserDbContext _dbContext;
         //private IPasswordHasher<ApplicationUser> _passwordHasher = null;
@@ -42,7 +39,7 @@ namespace IdentityServer.Legacy.Stores
             //Console.WriteLine("Initialize UserStoreProxy");
             //Console.WriteLine("DbContext:      " + _dbContext.GetType().ToString());
             //Console.WriteLine("PasswordHasher: " + _passwordHasher.GetType().ToString());
-            
+
             // Create Test Users
 
             //if (_appendTestUsers)
@@ -100,7 +97,9 @@ namespace IdentityServer.Legacy.Stores
         public Task<string> GetNormalizedUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
             if (String.IsNullOrWhiteSpace(user?.UserName))
+            {
                 throw new Exception("Invalid username");
+            }
 
             return Task.FromResult(user.UserName?.ToUpper());
         }
@@ -117,7 +116,7 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task SetNormalizedUserNameAsync(ApplicationUser user, string normalizedName, CancellationToken cancellationToken)
         {
-            user.NormalizedUserName = 
+            user.NormalizedUserName =
                 await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.NormalizedUserName, normalizedName, cancellationToken);
         }
 
@@ -266,11 +265,13 @@ namespace IdentityServer.Legacy.Stores
         async public Task<bool> RedeemCodeAsync(ApplicationUser user, string code, CancellationToken cancellationToken)
         {
             if (user.TfaRecoveryCodes == null || !user.TfaRecoveryCodes.Contains(code))
+            {
                 return false;
+            }
 
             user.TfaRecoveryCodes = await (await UserDbContext()).UpdatePropertyAsync<IEnumerable<string>>
                     (user, ApplicationUserProperties.TfaRecoveryCodes,
-                    user.TfaRecoveryCodes.Where(c=>c!=code).ToArray(), 
+                    user.TfaRecoveryCodes.Where(c => c != code).ToArray(),
                     cancellationToken);
 
             return true;
@@ -279,7 +280,9 @@ namespace IdentityServer.Legacy.Stores
         public Task<int> CountCodesAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
             if (user.TfaRecoveryCodes == null)
+            {
                 return Task.FromResult(0);
+            }
 
             return Task.FromResult(user.TfaRecoveryCodes.Count());
         }
@@ -297,7 +300,9 @@ namespace IdentityServer.Legacy.Stores
         {
             var dbContext = await UserDbContext();
             if (dbContext is IUserClaimsDbContext)
+            {
                 await ((IUserClaimsDbContext)dbContext).AddClaimsAsync(user, claims, cancellationToken);
+            }
 
             user.Claims = claims.ToArray();
         }
@@ -306,14 +311,18 @@ namespace IdentityServer.Legacy.Stores
         {
             var dbContext = await UserDbContext();
             if (dbContext is IUserClaimsDbContext)
+            {
                 await ((IUserClaimsDbContext)dbContext).ReplaceClaimAsync(user, claim, newClaim, cancellationToken);
+            }
         }
 
         async public Task RemoveClaimsAsync(ApplicationUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
             var dbContext = await UserDbContext();
             if (dbContext is IUserClaimsDbContext)
+            {
                 await ((IUserClaimsDbContext)dbContext).RemoveClaimsAsync(user, claims, cancellationToken);
+            }
         }
 
         public Task<IList<ApplicationUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)

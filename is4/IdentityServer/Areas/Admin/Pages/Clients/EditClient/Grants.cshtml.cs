@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -18,7 +16,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
         async public Task<IActionResult> OnGetAsync(string id)
         {
             await LoadCurrentClientAsync(id);
-   
+
             return Page();
         }
 

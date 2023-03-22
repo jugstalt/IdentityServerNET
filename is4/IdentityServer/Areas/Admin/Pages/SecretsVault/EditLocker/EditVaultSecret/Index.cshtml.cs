@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret
 {
@@ -24,7 +20,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecr
 
             Input = new InputModel()
             {
-                LockerName=locker,
+                LockerName = locker,
                 Name = CurrentSecret.Name,
                 Description = CurrentSecret.Description
             };
@@ -41,7 +37,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecr
                 CurrentSecret.Description = Input.Description;
                 await _secretsVaultDb.UpadteVaultSecretAsync(Input.LockerName, CurrentSecret, CancellationToken.None);
             }
-            , onFinally: () => RedirectToPage(new { id = Input.Name, locker=Input.LockerName })
+            , onFinally: () => RedirectToPage(new { id = Input.Name, locker = Input.LockerName })
             , successMessage: "The client has been updated successfully");
         }
 

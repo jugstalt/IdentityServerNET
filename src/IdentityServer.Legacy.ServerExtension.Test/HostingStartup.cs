@@ -11,9 +11,7 @@ using IdentityServer.Legacy.Services.EmailSender;
 using IdentityServer.Legacy.Services.PasswordHasher;
 using IdentityServer.Legacy.Services.Security;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer.Legacy.Services.UI;
 using IdentityServer.Legacy.UserInteraction;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,7 +90,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region Add a ResourceDbContext (required) 
 
-            
+
             services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
@@ -107,7 +105,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
                 };
             });
-            
+
 
             /*
             services.AddResourceDbContext<MongoBlobResourceDb>(options =>

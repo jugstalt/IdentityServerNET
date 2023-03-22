@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+﻿using IdentityModel;
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using IdentityServer.Legacy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using IdentityServer.Legacy.UserInteraction;
-using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
-using IdentityModel;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account
 {
@@ -119,8 +119,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account
                 var userDbContext = await _userStoreFactory.CreateUserDbContextInstance();
                 var editor = userDbContext?.ContextConfiguration?.RegisterAccountEditor ?? new RegisterAccountEditor();
 
-                if(!String.IsNullOrEmpty(editor.PromotionCode) &&
-                    editor.PromotionCode!=Input.PromotionCode)
+                if (!String.IsNullOrEmpty(editor.PromotionCode) &&
+                    editor.PromotionCode != Input.PromotionCode)
                 {
                     ModelState.AddModelError("PromotionCode", "Sorry, you are not allowed to register. Invalid/Wrong Promotion Code");
                     return Page();
@@ -145,7 +145,7 @@ namespace IdentityServer.Areas.Identity.Pages.Account
                     user.Claims.Add(new Claim("company", Input.Company));
                 }
 
-                if(userDbContext is IUserDbContextPreActions)
+                if (userDbContext is IUserDbContextPreActions)
                 {
                     user = await ((IUserDbContextPreActions)userDbContext).PreCreateAsync(user, new System.Threading.CancellationToken());
                 }

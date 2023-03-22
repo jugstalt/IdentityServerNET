@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.Signing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Signing
 {
@@ -36,7 +34,7 @@ namespace IdentityServer.Areas.Admin.Pages.Signing
         {
             if (String.IsNullOrEmpty(PayloadJson))
             {
-                PayloadJson = 
+                PayloadJson =
 @"{
   ""sub"":""1"",
   ""name"":""user1"",
@@ -71,7 +69,7 @@ namespace IdentityServer.Areas.Admin.Pages.Signing
                     var token = _customToken.CreateCustomToken(claims, this.Expires > 0 ? this.Expires : 3600);
                     PayloadToken = await _customToken.CreateSecurityTokenAsync(token);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new StatusMessageException(ex.Message);
                 }

@@ -1,11 +1,10 @@
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 {
@@ -42,7 +41,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
                 await _resourceDb.UpdateIdentityResourceAsync(this.CurrentIdentityResource, new[] { "UserClaims" });
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: $"Successfully removed user claim '{ userClaim }'");
+            , successMessage: $"Successfully removed user claim '{userClaim}'");
         }
 
         async public Task<IActionResult> OnPostAsync()

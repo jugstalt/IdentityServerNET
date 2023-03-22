@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
 {

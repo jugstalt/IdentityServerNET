@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.ErrorHandling;
 using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using IdentityServer.Legacy.Services.ErrorHandling;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {
@@ -46,46 +44,46 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 
             return await base.SecureHandlerAsync(async () =>
             {
-               await base.LoadCurrentApplicationUserAsync(userId);
+                await base.LoadCurrentApplicationUserAsync(userId);
 
-               if (this.CurrentApplicationUser == null)
-               {
-                   throw new StatusMessageException($"Unable to load user.");
-               }
+                if (this.CurrentApplicationUser == null)
+                {
+                    throw new StatusMessageException($"Unable to load user.");
+                }
 
-               if (!this.EditorInfos.Validate(Request.Form, out string message))
-               {
-                   throw new StatusMessageException($"Error: { message }");
-               }
+                if (!this.EditorInfos.Validate(Request.Form, out string message))
+                {
+                    throw new StatusMessageException($"Error: {message}");
+                }
 
-               foreach (var formKey in this.Request.Form.Keys)
-               {
-                   var propertyName = formKey;
+                foreach (var formKey in this.Request.Form.Keys)
+                {
+                    var propertyName = formKey;
 
-                   var editorInfo = base.EditorInfos?
-                                        .EditorInfos?
-                                        .Where(p => p.Name == propertyName && this.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase))
-                                        .FirstOrDefault();
+                    var editorInfo = base.EditorInfos?
+                                         .EditorInfos?
+                                         .Where(p => p.Name == propertyName && this.Category.Equals(p.Category, StringComparison.OrdinalIgnoreCase))
+                                         .FirstOrDefault();
 
-                   if (editorInfo == null || editorInfo.EditorType.HasFlag(EditorType.ReadOnly))
-                   {
-                       continue;
-                   }
+                    if (editorInfo == null || editorInfo.EditorType.HasFlag(EditorType.ReadOnly))
+                    {
+                        continue;
+                    }
 
-                   await _userDbContext.UpdatePropertyAsync(
-                       this.CurrentApplicationUser,
-                       editorInfo,
-                       this.Request.Form[formKey].ToString(),
-                       new System.Threading.CancellationToken());
-               }
+                    await _userDbContext.UpdatePropertyAsync(
+                        this.CurrentApplicationUser,
+                        editorInfo,
+                        this.Request.Form[formKey].ToString(),
+                        new System.Threading.CancellationToken());
+                }
 
                 if (_userDbContext is IErrorMessage && ((IErrorMessage)_userDbContext).HasErrors)
                 {
                     throw new StatusMessageException(((IErrorMessage)_userDbContext).LastErrorMessage);
                 }
-           }
+            }
            , onFinally: () => RedirectToPage(new { id = userId, category = this.Category })
-           , successMessage: $"The current users { Category.ToLower() } settings has been updated");
+           , successMessage: $"The current users {Category.ToLower()} settings has been updated");
         }
     }
 }

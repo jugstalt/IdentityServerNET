@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 {
@@ -42,7 +38,7 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
             {
                 await LoadCurrentApplicationRoleAsync(Input.RoleId);
 
-                CurrentApplicationRole.Description = await _roleDbContext.UpdatePropertyAsync(CurrentApplicationRole, "Description", Input.RoleDescription , CancellationToken.None);
+                CurrentApplicationRole.Description = await _roleDbContext.UpdatePropertyAsync(CurrentApplicationRole, "Description", Input.RoleDescription, CancellationToken.None);
             }
             , onFinally: () => RedirectToPage(new { id = Input.RoleId })
             , successMessage: "The client has been updated successfully");

@@ -1,9 +1,5 @@
 ﻿using IdentityServer.Legacy.Services.UI;
-using IdentityServer.Legacy.Services;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.ServerExtension.Test.Services.UI
 {

@@ -1,5 +1,4 @@
 ﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

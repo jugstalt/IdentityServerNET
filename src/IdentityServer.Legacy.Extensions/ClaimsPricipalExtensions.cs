@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
 {
@@ -19,7 +18,9 @@ namespace IdentityServer.Legacy.Extensions
         static public IEnumerable<string> GetRoles(this ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal?.Claims == null)
+            {
                 return new string[0];
+            }
 
             return claimsPrincipal
                     .Claims

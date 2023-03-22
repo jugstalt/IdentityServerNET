@@ -1,8 +1,5 @@
 ﻿using IdentityServer4.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Models.IdentityServerWrappers
 {

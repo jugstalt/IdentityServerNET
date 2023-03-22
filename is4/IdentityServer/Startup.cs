@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
@@ -70,9 +69,9 @@ namespace IdentityServer
                 else
                 {
                     options.AddPolicy("admin-policy",
-                        policy => policy.RequireRole(KnownRoles.UserAdministrator, 
-                                                     KnownRoles.RoleAdministrator, 
-                                                     KnownRoles.ResourceAdministrator, 
+                        policy => policy.RequireRole(KnownRoles.UserAdministrator,
+                                                     KnownRoles.RoleAdministrator,
+                                                     KnownRoles.ResourceAdministrator,
                                                      KnownRoles.ClientAdministrator));
                     options.AddPolicy("admin-user-policy",
                         policy => policy.RequireRole(KnownRoles.UserAdministrator));
@@ -88,8 +87,8 @@ namespace IdentityServer
                        policy => policy.RequireRole(KnownRoles.SigningAdministrator));
                 }
 
-            // DoTo: find a policy that never matches!!
-            options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
+                // DoTo: find a policy that never matches!!
+                options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
             });
 
             services.AddAuthentication("Bearer")
@@ -198,7 +197,7 @@ namespace IdentityServer
             {
                 services.ConfigureApplicationCookie(options =>
                 {
-                    if(!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
+                    if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
                     {
                         options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
                     }
@@ -266,19 +265,19 @@ namespace IdentityServer
             {
                 var overrideCss = userInterface?.OverrideCssContent ?? String.Empty;
 
-                FileInfo fi = new FileInfo($"{ Environment.WebRootPath }/css/is4-overrides.css");
+                FileInfo fi = new FileInfo($"{Environment.WebRootPath}/css/is4-overrides.css");
                 if (fi.Exists)
                 {
                     fi.Delete();
                 }
                 File.WriteAllText(fi.FullName, overrideCss);
 
-                if(userInterface?.MediaContent!=null)
+                if (userInterface?.MediaContent != null)
                 {
-                    foreach(var media in userInterface.MediaContent)
+                    foreach (var media in userInterface.MediaContent)
                     {
-                        fi = new FileInfo($"{ Environment.WebRootPath }/css/media/{ media.Key }");
-                        if(!fi.Directory.Exists)
+                        fi = new FileInfo($"{Environment.WebRootPath}/css/media/{media.Key}");
+                        if (!fi.Directory.Exists)
                         {
                             fi.Directory.Create();
                         }
@@ -351,7 +350,7 @@ namespace IdentityServer
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                
+
             });
         }
     }

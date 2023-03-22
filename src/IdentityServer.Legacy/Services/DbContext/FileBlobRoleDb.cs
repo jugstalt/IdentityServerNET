@@ -19,10 +19,12 @@ namespace IdentityServer.Legacy.Services.DbContext
         private ICryptoService _cryptoService = null;
         private IBlobSerializer _blobSerializer;
 
-        public FileBlobRoleDb(IOptions<RoleDbContextConfiguration> options=null)
+        public FileBlobRoleDb(IOptions<RoleDbContextConfiguration> options = null)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("FileBlobRoleDb: no connection string defined");
+            }
 
             _rootPath = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
@@ -41,7 +43,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             role.Id = RolenameToId(role);
 
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ role.Id }.role");
+            FileInfo fi = new FileInfo($"{_rootPath}/{role.Id}.role");
 
             if (fi.Exists)
             {
@@ -66,7 +68,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task<IdentityResult> DeleteAsync(ApplicationRole role, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ role.Id }.role");
+            FileInfo fi = new FileInfo($"{_rootPath}/{role.Id}.role");
 
             if (fi.Exists)
             {
@@ -78,7 +80,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<ApplicationRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ roleId }.role");
+            FileInfo fi = new FileInfo($"{_rootPath}/{roleId}.role");
 
             if (!fi.Exists)
             {
@@ -102,7 +104,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ role.Id }.role");
+            FileInfo fi = new FileInfo($"{_rootPath}/{role.Id}.role");
 
             if (!fi.Exists)
             {

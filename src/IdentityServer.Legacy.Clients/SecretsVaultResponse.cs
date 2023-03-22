@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Clients
 {
@@ -16,9 +14,9 @@ namespace IdentityServer.Legacy.Clients
 
         public string GetValue()
         {
-            if(this.Success==false)
+            if (this.Success == false)
             {
-                throw new Exception($"GetSecret causes an error: { this.ErrorMessage }");
+                throw new Exception($"GetSecret causes an error: {this.ErrorMessage}");
             }
 
             return this.Secret?.Secret;

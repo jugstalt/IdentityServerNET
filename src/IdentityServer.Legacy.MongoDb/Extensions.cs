@@ -1,15 +1,12 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.MongoDb
 {
     static class Extensions
     {
-        static public string ClientIdToHexId(this string name, ICryptoService cryptoService = null) 
+        static public string ClientIdToHexId(this string name, ICryptoService cryptoService = null)
         {
-            return $"client.{ name.NameToHexId(cryptoService) }";
+            return $"client.{name.NameToHexId(cryptoService)}";
         }
 
         static public bool IsValidClientHexId(this string id)
@@ -19,7 +16,7 @@ namespace IdentityServer.Legacy.MongoDb
 
         static public string ApiNameToHexId(this string name, ICryptoService cryptoService = null)
         {
-            return $"api.{ name.NameToHexId(cryptoService) }";
+            return $"api.{name.NameToHexId(cryptoService)}";
         }
 
         static public bool IsValidApiResourceHexId(this string id)
@@ -29,7 +26,7 @@ namespace IdentityServer.Legacy.MongoDb
 
         static public string IdentityNameToHexId(this string name, ICryptoService cryptoService = null)
         {
-            return $"identity.{ name.NameToHexId(cryptoService) }";
+            return $"identity.{name.NameToHexId(cryptoService)}";
         }
 
         static public bool IsValidIdentityResourceHexId(this string id)

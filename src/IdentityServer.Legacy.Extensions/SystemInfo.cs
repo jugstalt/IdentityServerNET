@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace IdentityServer.Legacy.Extensions
 {
@@ -20,13 +17,19 @@ namespace IdentityServer.Legacy.Extensions
             get
             {
                 if (IsLinux)
+                {
                     return OSPlatform.Linux.ToString();
+                }
 
                 if (IsOSX)
+                {
                     return OSPlatform.OSX.ToString();
+                }
 
                 if (IsWindows)
+                {
                     return OSPlatform.Windows.ToString();
+                }
 
                 return "Unknown";
             }

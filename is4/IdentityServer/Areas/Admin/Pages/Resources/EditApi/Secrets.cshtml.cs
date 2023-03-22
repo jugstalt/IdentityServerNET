@@ -63,7 +63,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     {
                         Type = Input.SecretType,
                         Value = Input.Secret.Trim().ToSha256(),
-                        Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
+                        Description = $"{Input.SecretDescription} (created {DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()})",
                         Expiration = Input.Expiration
                     };
 

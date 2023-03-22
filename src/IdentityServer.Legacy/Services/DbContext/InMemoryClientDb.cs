@@ -1,12 +1,10 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
@@ -17,14 +15,14 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public InMemoryClientDb(IOptions<ClientDbContextConfiguration> options = null)
         {
-            if(_clients==null)
+            if (_clients == null)
             {
                 _clients = new ConcurrentDictionary<string, ClientModel>();
 
                 // Init from configuration
-                if(options?.Value?.IntialClients != null)
+                if (options?.Value?.IntialClients != null)
                 {
-                    foreach(var client in options.Value.IntialClients)
+                    foreach (var client in options.Value.IntialClients)
                     {
                         _clients[client.ClientId] = client;
                     }
@@ -41,7 +39,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                 return Task.FromResult(_clients[clientId]);
             }
 
-            return Task.FromResult < ClientModel>(null);
+            return Task.FromResult<ClientModel>(null);
         }
 
         #endregion
@@ -50,9 +48,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task AddClientAsync(ClientModel client)
         {
-            if(_clients.ContainsKey(client.ClientId))
+            if (_clients.ContainsKey(client.ClientId))
             {
-                throw new Exception($"Client with clientId { client.ClientId } already exists");
+                throw new Exception($"Client with clientId {client.ClientId} already exists");
             }
 
             _clients[client.ClientId] = client;
@@ -64,7 +62,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_clients.ContainsKey(client.ClientId))
             {
-                throw new Exception($"Client with clientId { client.ClientId } not exists");
+                throw new Exception($"Client with clientId {client.ClientId} not exists");
             }
 
             _clients[client.ClientId] = client;
@@ -76,10 +74,10 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_clients.ContainsKey(client.ClientId))
             {
-                throw new Exception($"Client with clientId { client.ClientId } not exists");
+                throw new Exception($"Client with clientId {client.ClientId} not exists");
             }
 
-            if(!_clients.TryRemove(client.ClientId, out client))
+            if (!_clients.TryRemove(client.ClientId, out client))
             {
                 throw new Exception($"Can't remove client");
             }

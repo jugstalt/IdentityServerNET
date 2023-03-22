@@ -1,15 +1,14 @@
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Roles
 {
@@ -46,7 +45,7 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
 
         async public Task<IActionResult> OnGetAsync(int skip = 0)
         {
-            if(_roleDb is IAdminRoleDbContext)
+            if (_roleDb is IAdminRoleDbContext)
             {
                 this.ApplicationRoles = await ((IAdminRoleDbContext)_roleDb).GetRolesAsync(100, skip, CancellationToken.None);
             }
@@ -60,12 +59,12 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
 
             return await SecureHandlerAsync(async () =>
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     throw new StatusMessageException($"Type a valid role name.");
                 }
 
-                var role = new ApplicationRole() { Id = CreateInput.Rolename, Name = CreateInput.Rolename, Description=CreateInput.Description };
+                var role = new ApplicationRole() { Id = CreateInput.Rolename, Name = CreateInput.Rolename, Description = CreateInput.Description };
                 await _roleDb.CreateAsync(role, CancellationToken.None);
 
                 roleId = role.Id;
@@ -89,9 +88,9 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
                                     .Where(r => r.Name == name)
                                     .FirstOrDefault();
 
-                if(knownRole==null)
+                if (knownRole == null)
                 {
-                    throw new StatusMessageException($"Unknown role { name }");
+                    throw new StatusMessageException($"Unknown role {name}");
                 }
 
                 var existsingRole = await _roleDb.FindByNameAsync(knownRole.Name, CancellationToken.None);
@@ -116,14 +115,14 @@ namespace IdentityServer.Areas.Admin.Pages.Roles
 
             return await SecureHandlerAsync(async () =>
             {
-                if(String.IsNullOrWhiteSpace(FindInput.Rolename))
+                if (String.IsNullOrWhiteSpace(FindInput.Rolename))
                 {
                     throw new StatusMessageException("Please type a rolename");
                 }
                 var role = await _roleDb.FindByNameAsync(FindInput.Rolename?.ToString(), CancellationToken.None);
                 if (role == null)
                 {
-                    throw new StatusMessageException($"Unknown role { FindInput.Rolename }");
+                    throw new StatusMessageException($"Unknown role {FindInput.Rolename}");
                 }
 
                 roleId = role.Id;

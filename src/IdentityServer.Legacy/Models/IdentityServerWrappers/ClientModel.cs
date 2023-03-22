@@ -1,10 +1,8 @@
 ﻿using IdentityServer4.Models;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 
 namespace IdentityServer.Legacy.Models.IdentityServerWrappers
 {
@@ -198,7 +196,7 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
                     EnableLocalLogin = this.EnableLocalLogin,
                     IdentityProviderRestrictions = this.IdentityProviderRestrictions,
                     Claims = this.Claims?
-                                    .Select(c=>new ClientClaim(c.Type, c.Value, c.ValueType))
+                                    .Select(c => new ClientClaim(c.Type, c.Value, c.ValueType))
                                     .ToList(),
                     AlwaysSendClientClaims = this.AlwaysSendClientClaims,
                     ClientClaimsPrefix = this.ClientClaimsPrefix,
@@ -233,6 +231,6 @@ namespace IdentityServer.Legacy.Models.IdentityServerWrappers
                     AllowRememberConsent = this.AllowRememberConsent
                 };
             }
-        } 
+        }
     }
 }

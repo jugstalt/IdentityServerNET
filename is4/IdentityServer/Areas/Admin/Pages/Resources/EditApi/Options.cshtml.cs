@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
@@ -35,7 +31,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { option });
                 }
             }
-            , onFinally: () => RedirectToPage( new { id = id })
+            , onFinally: () => RedirectToPage(new { id = id })
             , successMessage: "");
         }
     }

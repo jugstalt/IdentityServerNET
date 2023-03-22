@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Text;
-
-namespace IdentityServer.Legacy.CaptchaRenderers
+﻿namespace IdentityServer.Legacy.CaptchaRenderers
 {
     public class CaptchaCodeRendererOptions
     {

@@ -1,8 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,7 +27,7 @@ namespace IdentityServer.Legacy.Stores
 
         public void Dispose()
         {
-            if(_roleDbContext is IDisposable)
+            if (_roleDbContext is IDisposable)
             {
                 ((IDisposable)_roleDbContext).Dispose();
             }
@@ -60,7 +58,7 @@ namespace IdentityServer.Legacy.Stores
             return Task.FromResult(role.Name);
         }
 
-       async  public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
+        async public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
         {
             role.NormalizedName =
                 await _roleDbContext.UpdatePropertyAsync<string>(role, ApplicationRoleProperties.NormalizedName, normalizedName, cancellationToken);

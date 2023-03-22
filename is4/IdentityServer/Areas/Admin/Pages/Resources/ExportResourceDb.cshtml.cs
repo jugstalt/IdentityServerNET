@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
@@ -25,7 +23,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
         {
             var apiResources = await _resourcetDb.GetAllApiResources();
             var identityResources = await _resourcetDb.GetAllIdentityResources();
-            
+
             var count = apiResources.Count() + identityResources.Count();
 
             string msg = String.Empty;
@@ -41,12 +39,12 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
                         await _exportResourceDb.AddApiResourceAsync(apiResource);
                     }
 
-                    foreach(var indentityResource in identityResources)
+                    foreach (var indentityResource in identityResources)
                     {
                         await _exportResourceDb.AddIdentityResourceAsync(indentityResource);
                     }
 
-                    msg = $"Flushed target Db and exported { count } resources";
+                    msg = $"Flushed target Db and exported {count} resources";
                 }
                 else
                 {
@@ -55,7 +53,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             }
             catch (Exception ex)
             {
-                msg = $"Exception: { ex.Message }";
+                msg = $"Exception: {ex.Message}";
             }
 
             return RedirectToPage("./Index", new { exportResourcesMessage = msg });

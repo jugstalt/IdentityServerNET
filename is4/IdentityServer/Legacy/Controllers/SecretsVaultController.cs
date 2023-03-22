@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy.Services.Cryptography;
-using System.Text;
+using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.SecretsVault;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Controllers
 {
@@ -35,10 +29,10 @@ namespace IdentityServer.Legacy.Controllers
             {
                 string[] pathParts = path.Split('/');
 
-                if (!this.User.GetScopes().Contains($"secrets-vault.{ pathParts[0] }") &&
+                if (!this.User.GetScopes().Contains($"secrets-vault.{pathParts[0]}") &&
                     !this.User.IsInRole(KnownRoles.SecretsVaultAdministrator))
                 {
-                    throw new StatusMessageException($"Unauthorized user or client \"{ this.User.GetUsernameOrClientId() }\"");
+                    throw new StatusMessageException($"Unauthorized user or client \"{this.User.GetUsernameOrClientId()}\"");
                     //return Unauthorized();
                 }
 

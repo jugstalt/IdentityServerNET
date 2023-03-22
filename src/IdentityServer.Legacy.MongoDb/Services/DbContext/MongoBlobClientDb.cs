@@ -4,13 +4,11 @@ using IdentityServer.Legacy.MongoDb.MongoDocuments;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.MongoDb.Services.DbContext
@@ -27,7 +25,9 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
         public MongoBlobClientDb(IOptions<ClientDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("MongoBlobClientDb: no connection string defined");
+            }
 
             _connectionString = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
@@ -42,7 +42,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             var collection = GetCollection();
 
-            var document = await(await collection.FindAsync<ClientBlobDocument>(
+            var document = await (await collection.FindAsync<ClientBlobDocument>(
                 filter: Builders<ClientBlobDocument>.Filter.Eq("_id", id))
                 ).FirstOrDefaultAsync();
 
@@ -125,7 +125,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             string id = client.ClientId.ClientIdToHexId(_cryptoService);
 
-            UpdateDefinition<ClientBlobDocument> update =  Builders<ClientBlobDocument>
+            UpdateDefinition<ClientBlobDocument> update = Builders<ClientBlobDocument>
                 .Update
                 .Set("BlobData", _cryptoService.EncryptText(_blobSerializer.SerializeObject(client)));
 

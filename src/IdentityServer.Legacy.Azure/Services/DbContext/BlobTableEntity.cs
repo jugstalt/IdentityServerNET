@@ -1,9 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.Serialize;
 using Microsoft.Azure.Cosmos.Table;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
 {
@@ -53,7 +50,7 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
 
             //var blobBase64 = properties["Blob"]?.StringValue;
 
-            if(entity?.Blob==null)
+            if (entity?.Blob == null)
             {
                 return default(T);
             }

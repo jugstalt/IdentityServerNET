@@ -19,7 +19,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
         public DefaultCryptoService(byte[] passwordBytes)
         {
             _defaultPasswordBytes = passwordBytes;
-            if(_defaultPasswordBytes.Length<24)
+            if (_defaultPasswordBytes.Length < 24)
             {
                 throw new Exception("DefaultCryptoService Password is too short!");
             }
@@ -35,13 +35,15 @@ namespace IdentityServer.Legacy.Services.Cryptography
         public string EncryptText(string text, Encoding encoding = null)
         {
             if (String.IsNullOrEmpty(text))
+            {
                 return String.Empty;
+            }
 
             var bytes = encoding == null ?
                 DefaultEncoding.GetBytes(text) :
                 encoding.GetBytes(text);
 
-            
+
             return Convert.ToBase64String(AES_Encrypt(bytes, _defaultPasswordBytes, keySize: 128, useRandomSalt: true));
         }
 
@@ -52,7 +54,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
                 byte[] passwordBytes = _defaultPasswordBytes.Take(24).ToArray();
 
                 if (encoding == null)
+                {
                     encoding = DefaultEncoding;
+                }
 
                 var inputbuffer = Encoding.UTF8.GetBytes(text);
 
@@ -76,7 +80,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
             var decryptedBytes = AES_Decrypt(Convert.FromBase64String(base64Text), _defaultPasswordBytes,
                 keySize: 128, useRandomSalt: true);
 
-            if(encoding == null)
+            if (encoding == null)
             {
                 return DefaultEncoding.GetString(decryptedBytes);
             }
@@ -97,7 +101,10 @@ namespace IdentityServer.Legacy.Services.Cryptography
                 byte[] bytesDecrypted = transform.TransformFinalBlock(inputbuffer.ToArray(), 0, inputbuffer.Length);
 
                 if (encoding == null)
+                {
                     encoding = DefaultEncoding;
+                }
+
                 string result = encoding.GetString(bytesDecrypted);
 
                 return result;
@@ -122,13 +129,17 @@ namespace IdentityServer.Legacy.Services.Cryptography
                 {
                     var dataBlock = data.Skip(pos).Take(blocksize).ToArray();
                     if (dataBlock.Length == 0)
+                    {
                         break;
+                    }
 
                     encrypted.AddRange(rsa.Encrypt(dataBlock, strengh));
 
                     pos += 128;
                     if (dataBlock.Length < blocksize || pos >= data.Length)
+                    {
                         break;
+                    }
                 }
 
                 return encrypted.ToArray();
@@ -146,7 +157,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
                 {
                     var dataBlock = data.Skip(pos).Take(blocksize).ToArray();
                     if (dataBlock.Length == 0)
+                    {
                         break;
+                    }
 
                     decrypted.AddRange(rsa.Decrypt(dataBlock, strengh));
 
@@ -359,7 +372,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
         public static bool VerifyPassword(string cleanPassword, string hash, string username = "")
         {
             if (Hash64(cleanPassword + username?.Trim().ToLower()) == hash)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -377,7 +392,10 @@ namespace IdentityServer.Legacy.Services.Cryptography
                 int NumberChars = input.Length;
                 byte[] bytes = new byte[NumberChars / 2];
                 for (int i = 0; i < NumberChars; i += 2)
+                {
                     bytes[i / 2] = Convert.ToByte(input.Substring(i, 2), 16);
+                }
+
                 return bytes;
             }
 
@@ -398,7 +416,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
                              (c >= 'A' && c <= 'F'));
 
                     if (!isHex)
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
@@ -414,7 +434,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
                              (c >= 'A' && c <= 'Z'));
 
                     if (!isHex)
+                    {
                         return false;
+                    }
                 }
                 return true;
             }

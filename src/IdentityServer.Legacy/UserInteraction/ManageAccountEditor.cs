@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IdentityServer.Legacy.UserInteraction
+﻿namespace IdentityServer.Legacy.UserInteraction
 {
     public class ManageAccountEditor : EditorInfoCollection
     {

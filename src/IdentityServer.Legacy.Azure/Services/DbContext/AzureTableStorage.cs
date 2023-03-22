@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
@@ -40,7 +39,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
             catch (StorageException ex)
             {
                 if (ex.Message.Contains("(409)"))
+                {
                     throw new TableStorageEntityAlreadyExitsException(tableName, entity, ex);
+                }
 
                 throw ex;
             }
@@ -171,7 +172,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         {
             T tableEntity = await Entity(tableName, partitionKey, rowKey);
             if (tableEntity != null)
+            {
                 return tableEntity;
+            }
 
             return default(T);
         }
@@ -185,7 +188,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         {
             var tableEntity = await Entity(tableName, partitionKey, rowKey);
             if (tableEntity == null)
+            {
                 return false;
+            }
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
 
@@ -218,7 +223,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async private Task<T> Entity(string tableName, string partitionKey, string rowKey, CloudTableClient tableClient = null)
         {
             if (tableClient == null)
+            {
                 tableClient = CreateTableClient();
+            }
 
             // Create the CloudTable object that represents the "people" table.
             CloudTable table = tableClient.GetTableReference(tableName);

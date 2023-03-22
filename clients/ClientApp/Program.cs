@@ -1,11 +1,11 @@
 ﻿using IdentityModel.Client;
+using IdentityServer.Legacy.Clients;
+using IdentityServer.Legacy.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
-using IdentityServer.Legacy.Extensions;
 using System.Security.Cryptography.X509Certificates;
-using IdentityServer.Legacy.Clients;
+using System.Threading.Tasks;
 
 namespace ClientApp
 {
@@ -87,7 +87,7 @@ namespace ClientApp
 
                 ClientId = "client",
                 ClientSecret = "secret1",
-                
+
                 Scope = "api1"
             });
 
@@ -123,7 +123,7 @@ namespace ClientApp
                 Address = disco.TokenEndpoint,
 
                 ClientId = "client",
-                ClientAssertion=  clientAssertion,
+                ClientAssertion = clientAssertion,
 
                 Scope = "api1",
             });
@@ -156,8 +156,8 @@ namespace ClientApp
                 ClientId = "client",
                 ClientSecret = "secret1",
 
-                UserName="test@xyz.com",
-                Password="Pwd#123",
+                UserName = "test@xyz.com",
+                Password = "Pwd#123",
 
                 Scope = "openid profile api1 api2"
             });
@@ -194,9 +194,9 @@ namespace ClientApp
                 return;
             }
 
-            foreach(var claim in response.Claims)
+            foreach (var claim in response.Claims)
             {
-                Console.WriteLine($"{ claim.Type } = { claim.Value }");
+                Console.WriteLine($"{claim.Type} = {claim.Value}");
             }
         }
 
@@ -272,18 +272,18 @@ namespace ClientApp
             var singingApiClient = new SigningApiClient(clientId, clientSecret);
             var signingResponse = await singingApiClient.SignData(issuerAddress, "data-i-want-to-sign");
 
-            if(signingResponse.Succeded==false)
+            if (signingResponse.Succeded == false)
             {
-                Console.WriteLine($"Signing response error: { signingResponse.ErrorMessage }");
+                Console.WriteLine($"Signing response error: {signingResponse.ErrorMessage}");
                 return;
             }
 
-            Console.WriteLine($"Signing-Token: { signingResponse.SecurityToken }");
+            Console.WriteLine($"Signing-Token: {signingResponse.SecurityToken}");
 
             Console.WriteLine("Try validate signing-token:");
             var data = await SigningApiClient.GetValidatedDataFromToken(signingResponse.SecurityToken, issuerAddress);
 
-            Console.WriteLine($"Signed-data: { data }");
+            Console.WriteLine($"Signed-data: {data}");
         }
     }
 }

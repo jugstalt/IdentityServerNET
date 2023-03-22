@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text;
 
@@ -11,7 +9,9 @@ namespace IdentityServer.Legacy.UserInteraction
         static public object GetPropertyValue(object instance, EditorInfo editorInfo)
         {
             if (instance == null)
+            {
                 return null;
+            }
 
             object propertyValue = null;
             var propertyInfo = instance.GetType().GetProperty(editorInfo.Name);
@@ -64,12 +64,12 @@ namespace IdentityServer.Legacy.UserInteraction
             if (editorInfo.EditorType.HasFlag(EditorType.EmailAddress))
             {
                 type = "email";
-                sb.Append($@" data-val-email=""The { editorInfo.DisplayName } field is not a valid e-mail address""");
+                sb.Append($@" data-val-email=""The {editorInfo.DisplayName} field is not a valid e-mail address""");
             }
             else if (editorInfo.EditorType.HasFlag(EditorType.Phone))
             {
                 type = "tel";
-                sb.Append($@" data-val-phone=""The { editorInfo.DisplayName } field is not a valid phone number""");
+                sb.Append($@" data-val-phone=""The {editorInfo.DisplayName} field is not a valid phone number""");
             }
             else if (editorInfo.EditorType.HasFlag(EditorType.Password))
             {
@@ -86,7 +86,7 @@ namespace IdentityServer.Legacy.UserInteraction
             else if (editorInfo.EditorType.HasFlag(EditorType.Url))
             {
                 type = "url";
-                sb.Append($@" data-val-phone=""The { editorInfo.DisplayName } field is not a valid fully-qualified http, https, or ftp URL.""");
+                sb.Append($@" data-val-phone=""The {editorInfo.DisplayName} field is not a valid fully-qualified http, https, or ftp URL.""");
             }
 
             #endregion
@@ -96,9 +96,15 @@ namespace IdentityServer.Legacy.UserInteraction
             if (type == "text")
             {
                 if (editorInfo.PropertyType == typeof(DateTime))
+                {
                     type = "date";
+                }
+
                 if (editorInfo.PropertyType == typeof(int))
+                {
                     type = "number";
+                }
+
                 if (editorInfo.PropertyType == typeof(double) ||
                     editorInfo.PropertyType == typeof(float) ||
                     editorInfo.PropertyType == typeof(decimal))
@@ -107,15 +113,19 @@ namespace IdentityServer.Legacy.UserInteraction
                     type = "number";
                 }
                 if (editorInfo.PropertyType == typeof(bool))
+                {
                     type = "checkbox";
+                }
             }
 
             #endregion
 
-            sb.Append($@" type=""{ type }""");
+            sb.Append($@" type=""{type}""");
 
             if (editorInfo.EditorType.HasFlag(EditorType.Required))
-                sb.Append($@" data-val-required=""The { editorInfo.DisplayName } field is required.""");
+            {
+                sb.Append($@" data-val-required=""The {editorInfo.DisplayName} field is required.""");
+            }
 
             if (sb.ToString().Contains("data-val-"))
             {
@@ -123,11 +133,13 @@ namespace IdentityServer.Legacy.UserInteraction
             }
 
             if (editorInfo.EditorType.HasFlag(EditorType.ReadOnly))
+            {
                 sb.Append(" readonly");
+            }
 
-            sb.Append($@" id=""{ editorInfo.Name.Replace(".", "_") }""");
+            sb.Append($@" id=""{editorInfo.Name.Replace(".", "_")}""");
 
-            if(editorInfo.PropertyType.IsArray)
+            if (editorInfo.PropertyType.IsArray)
             {
                 sb.Append($" rows='5'");
             }

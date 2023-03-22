@@ -1,12 +1,9 @@
-﻿using IdentityServer.Legacy.Services.Cryptography;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.SigningCredential
@@ -18,7 +15,7 @@ namespace IdentityServer.Legacy.Services.SigningCredential
         private readonly ICertificateSerializer _certificateSerializer;
 
         public SigningCredentialCertificateStorage(
-                IConfiguration configuration, 
+                IConfiguration configuration,
                 ICertificateFactory certificateFactory,
                 ICertificateSerializer certificateSerializer = null)
         {
@@ -27,7 +24,7 @@ namespace IdentityServer.Legacy.Services.SigningCredential
             _certificateSerializer = certificateSerializer ?? new SimpleCertificateSerializer(configuration);
 
             var di = new DirectoryInfo(_validationKeyStoragePath);
-            if(!di.Exists)
+            if (!di.Exists)
             {
                 di.Create();
             }
@@ -43,7 +40,7 @@ namespace IdentityServer.Legacy.Services.SigningCredential
             DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
             List<X509Certificate2> certs = new List<X509Certificate2>();
 
-            foreach(var certFile in di.GetFiles("*.pfx")
+            foreach (var certFile in di.GetFiles("*.pfx")
                                       .Where(f => f.CreationTime > DateTime.Now.AddDays(-60)))
             {
                 X509Certificate2 cert = await _certificateSerializer.LoadFromFileAsync(certFile.FullName);
@@ -69,17 +66,17 @@ namespace IdentityServer.Legacy.Services.SigningCredential
         async public Task<X509Certificate2> GetCertificateAsync(string subject)
         {
             string filename = subject;
-            foreach(var s in subject.Split(',').Select(s=>s.Trim()))
+            foreach (var s in subject.Split(',').Select(s => s.Trim()))
             {
-                if(s.ToLower().StartsWith("cn="))
+                if (s.ToLower().StartsWith("cn="))
                 {
                     filename = subject.Substring(3).Trim();
                     break;
                 }
             }
 
-            FileInfo certFile = new FileInfo($"{ _validationKeyStoragePath }/{ filename }.pfx");
-            if(!certFile.Exists)
+            FileInfo certFile = new FileInfo($"{_validationKeyStoragePath}/{filename}.pfx");
+            if (!certFile.Exists)
             {
                 return null;
             }
@@ -116,11 +113,11 @@ namespace IdentityServer.Legacy.Services.SigningCredential
 
                 var cert = _certificateFactory.CreateNewX509Certificate(name, expireDays);
 
-                await _certificateSerializer.WriteToFileAsync($@"{ _validationKeyStoragePath }/{ name }.pfx", cert, X509ContentType.Pfx);
+                await _certificateSerializer.WriteToFileAsync($@"{_validationKeyStoragePath}/{name}.pfx", cert, X509ContentType.Pfx);
             }
         }
 
-        
+
         #endregion
     }
 }

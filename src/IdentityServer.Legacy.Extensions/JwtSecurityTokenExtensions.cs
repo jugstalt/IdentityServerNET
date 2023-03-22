@@ -7,11 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +25,7 @@ namespace IdentityServer.Legacy.Extensions
         async static public Task<JwtSecurityToken> ToValidatedJwtSecurityToken(this string jwtEncodedString, string issuerUrl, string audience = null)
         {
             IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
-                   new ConfigurationManager<OpenIdConnectConfiguration>($"{ issuerUrl }/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+                   new ConfigurationManager<OpenIdConnectConfiguration>($"{issuerUrl}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
             OpenIdConnectConfiguration openIdConfiguration = await configurationManager.GetConfigurationAsync(CancellationToken.None);
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -106,11 +104,11 @@ namespace IdentityServer.Legacy.Extensions
 
             try
             {
-                return Convert.FromBase64String($"{ base64 }==");
+                return Convert.FromBase64String($"{base64}==");
             }
             catch { }
 
-            return Convert.FromBase64String($"{ base64 }=");
+            return Convert.FromBase64String($"{base64}=");
         }
     }
 }

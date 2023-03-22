@@ -1,17 +1,13 @@
-﻿using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.Serialize;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer.Legacy.Models.IdentityServerWrappers;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
@@ -24,7 +20,9 @@ namespace IdentityServer.Legacy.Services.DbContext
         public FileBlobClientDb(IOptions<ClientDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("FileBlobClientDb: no connection string defined");
+            }
 
             _rootPath = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
@@ -36,9 +34,9 @@ namespace IdentityServer.Legacy.Services.DbContext
                 di.Create();
 
                 // Initialize Api Clients
-                if(options.Value.IntialClients!=null)
+                if (options.Value.IntialClients != null)
                 {
-                    foreach(var client in options.Value.IntialClients)
+                    foreach (var client in options.Value.IntialClients)
                     {
                         AddClientAsync(client).Wait();
                     }
@@ -50,9 +48,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ clientId.NameToHexId(_cryptoService) }.client");
+            FileInfo fi = new FileInfo($"{_rootPath}/{clientId.NameToHexId(_cryptoService)}.client");
 
-            if(!fi.Exists)
+            if (!fi.Exists)
             {
                 return null;
             }
@@ -73,7 +71,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         async public Task AddClientAsync(ClientModel client)
         {
             string id = client.ClientId.NameToHexId(_cryptoService);
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.client");
+            FileInfo fi = new FileInfo($"{_rootPath}/{id}.client");
 
             if (fi.Exists)
             {
@@ -92,7 +90,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task RemoveClientAsync(ClientModel client)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ client.ClientId.NameToHexId(_cryptoService) }.client");
+            FileInfo fi = new FileInfo($"{_rootPath}/{client.ClientId.NameToHexId(_cryptoService)}.client");
 
             if (fi.Exists)
             {
@@ -108,12 +106,12 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ client.ClientId.NameToHexId(_cryptoService) }.client");
+            FileInfo fi = new FileInfo($"{_rootPath}/{client.ClientId.NameToHexId(_cryptoService)}.client");
 
             if (fi.Exists)
             {
                 fi.Delete();
-            } 
+            }
             else
             {
                 throw new Exception("Client not exists");
@@ -126,7 +124,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             List<ClientModel> clients = new List<ClientModel>();
 
-            foreach(var fi in new DirectoryInfo(_rootPath).GetFiles("*.client"))
+            foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.client"))
             {
                 using (var reader = File.OpenText(fi.FullName))
                 {

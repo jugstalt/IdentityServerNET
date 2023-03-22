@@ -1,19 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using IdentityServer.Legacy.Extensions;
-using System.ComponentModel.DataAnnotations;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
 {
@@ -59,7 +52,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
 
                 secretName = secret.Name;
             }
-            , onFinally: () => RedirectToPage("EditVaultSecret/Index", new { id = secretName, locker = Input.LockerName  })
+            , onFinally: () => RedirectToPage("EditVaultSecret/Index", new { id = secretName, locker = Input.LockerName })
             , successMessage: ""
             , onException: (ex) => Page());
         }

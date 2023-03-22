@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Users
 {
@@ -21,11 +19,11 @@ namespace IdentityServer.Areas.Admin.Pages.Users
         private IUserDbContext _userDb = null;
 
         public IndexModel(
-            IPasswordHasher<ApplicationUser> passwordHasher, 
+            IPasswordHasher<ApplicationUser> passwordHasher,
             IUserDbContext userDbContext)
         {
             _passwordHasher = passwordHasher;
-            _userDb = userDbContext as IUserDbContext;
+            _userDb = userDbContext;
         }
 
         public IEnumerable<ApplicationUser> ApplicationUsers { get; set; }
@@ -78,7 +76,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users
 
                 var user = new ApplicationUser()
                 {
-                    Id=Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid().ToString(),
                     UserName = CreateInput.Username
                 };
 
@@ -87,7 +85,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users
                     throw new StatusMessageException("User already exisits");
                 }
 
-                if(Regex.Match(user.UserName, ValidationExtensions.EmailAddressRegex).Success == true)
+                if (Regex.Match(user.UserName, ValidationExtensions.EmailAddressRegex).Success == true)
                 {
                     user.Email = user.UserName;
                     user.EmailConfirmed = true;
@@ -96,7 +94,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users
                 user.PasswordHash = _passwordHasher.HashPassword(user, CreateInput.Password);
 
                 var result = await _userDb.CreateAsync(user, CancellationToken.None);
-                if(result.Succeeded==false)
+                if (result.Succeeded == false)
                 {
                     throw new StatusMessageException("Unkonwn error. Can't create user");
                 }
@@ -111,14 +109,14 @@ namespace IdentityServer.Areas.Admin.Pages.Users
 
         async public Task<IActionResult> OnPostFindAsync()
         {
-            string userId=String.Empty;
+            string userId = String.Empty;
 
             return await SecureHandlerAsync(async () =>
             {
                 var user = await _userDb.FindByNameAsync(FindInput.Username?.ToString(), CancellationToken.None);
-                if(user==null)
+                if (user == null)
                 {
-                    throw new StatusMessageException($"Unknown user { FindInput.Username }");
+                    throw new StatusMessageException($"Unknown user {FindInput.Username}");
                 }
 
                 userId = user.Id;

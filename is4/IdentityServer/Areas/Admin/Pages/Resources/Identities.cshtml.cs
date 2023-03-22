@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
@@ -24,7 +20,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
             if (_resourceDb != null)
             {
                 this.IdentityResources = await _resourceDb.GetAllIdentityResources();
-                
+
                 Input = new NewIdentityResource();
             }
 
@@ -38,7 +34,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
                 return Page();
             }
             string identityName = Input.IdentityResourceName.Trim().ToLower();
-            
+
             return await SecureHandlerAsync(async () =>
             {
                 if (_resourceDb != null)

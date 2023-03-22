@@ -3,7 +3,6 @@ using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -19,13 +18,15 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         private IBlobSerializer _blobSerializer = null;
 
         private string _tablename = "IdentityServer";
-        internal static readonly  string PartitionKey = "identityserver-clients";
+        internal static readonly string PartitionKey = "identityserver-clients";
         private AzureTableStorage<BlobTableEntity> _tableStorage;
 
         public TableStorageBlobClientDb(IOptions<ClientDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("TableStorageBlobClientDb: no connection string defined");
+            }
 
             _connectionString = options.Value.ConnectionString;
             _tablename = !String.IsNullOrWhiteSpace(options.Value.TableName) ?
@@ -43,7 +44,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async public Task<ClientModel> FindClientByIdAsync(string clientId)
         {
             if (_tablename == null || String.IsNullOrWhiteSpace(clientId))
+            {
                 return null;
+            }
 
             var tableEntity = await _tableStorage.EntityAsync(_tablename, PartitionKey, clientId);
 
@@ -57,7 +60,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async public Task AddClientAsync(ClientModel client)
         {
             if (_tableStorage == null || client == null)
+            {
                 return;
+            }
 
             await _tableStorage.CreateTableAsync(_tablename);
             await _tableStorage.InsertEntityAsync(_tablename,
@@ -71,7 +76,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async public Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null)
         {
             if (_tableStorage == null || client == null)
+            {
                 return;
+            }
 
             await _tableStorage.MergeEntity(_tablename,
                 new BlobTableEntity(TableStorageBlobClientDb.PartitionKey,
@@ -84,7 +91,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async public Task RemoveClientAsync(ClientModel client)
         {
             if (_tableStorage == null || client == null)
+            {
                 return;
+            }
 
             await _tableStorage.DeleteEntityAsync(_tablename,
                 new BlobTableEntity(TableStorageBlobClientDb.PartitionKey,
@@ -97,7 +106,9 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
         async public Task<IEnumerable<ClientModel>> GetAllClients()
         {
             if (_tableStorage == null)
+            {
                 return new ClientModel[0];
+            }
 
             return (await _tableStorage.AllEntitiesAsync(_tablename, PartitionKey))
                        .Select(e => e.Deserialize<ClientModel>(_cryptoService, _blobSerializer))

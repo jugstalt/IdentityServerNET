@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace IdentityServer.Legacy.UserInteraction
 {
@@ -24,12 +22,12 @@ namespace IdentityServer.Legacy.UserInteraction
 
     public class EditorInfo
     {
-        public EditorInfo() 
+        public EditorInfo()
         {
             this.EditorType = EditorType.Editable;
         }
         public EditorInfo(string name, Type propertyType)
-            :this()
+            : this()
         {
             this.Name = name;
             this.DisplayName = name;

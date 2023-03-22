@@ -1,9 +1,5 @@
 ﻿using IdentityModel;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityServer.Legacy.UserInteraction
 {
@@ -42,7 +38,7 @@ namespace IdentityServer.Legacy.UserInteraction
             return new EditorInfo("FamilyName", "Familyname", typeof(string), "Profile")
             {
                 EditorType = action,
-                ClaimName=JwtClaimTypes.FamilyName
+                ClaimName = JwtClaimTypes.FamilyName
             };
         }
 

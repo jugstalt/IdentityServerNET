@@ -7,7 +7,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Clients
@@ -48,7 +47,7 @@ namespace IdentityServer.Legacy.Clients
                                                                          .Select(k => new KeyValuePair<string, string>(k, claims[k]))
                                                                          .ToArray()))
                 {
-                    var httpResponse = await httpClient.PostAsync($"{ identityServerAddress }/api/signing?lifetime={ lifeTime }", httpContext);
+                    var httpResponse = await httpClient.PostAsync($"{identityServerAddress}/api/signing?lifetime={lifeTime}", httpContext);
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
@@ -57,7 +56,7 @@ namespace IdentityServer.Legacy.Clients
                     }
                     else
                     {
-                        throw new Exception($"Connection to singing-api failed. Status code: { httpResponse.StatusCode }");
+                        throw new Exception($"Connection to singing-api failed. Status code: {httpResponse.StatusCode}");
                     }
                 }
             }

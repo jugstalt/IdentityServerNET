@@ -1,14 +1,10 @@
-﻿using IdentityServer.Legacy.Services.Signing;
-using Microsoft.AspNetCore.Http;
+﻿using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Services.Signing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy.Exceptions;
-using Microsoft.AspNetCore.Authorization;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Controllers
 {
@@ -36,7 +32,7 @@ namespace IdentityServer.Legacy.Controllers
 
                 NameValueCollection claims = new NameValueCollection();
 
-                foreach(string formKey in Request.Form.Keys)
+                foreach (string formKey in Request.Form.Keys)
                 {
                     if (!formKey.Equals("lifetime", StringComparison.InvariantCultureIgnoreCase))
                     {

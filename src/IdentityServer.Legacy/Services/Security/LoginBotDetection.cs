@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ namespace IdentityServer.Legacy.Services.Security
     {
         private readonly IDistributedCache _cache;
         private readonly LoginBotDetectionOptions _options;
-        
+
         public LoginBotDetection(IDistributedCache cache, IOptionsMonitor<LoginBotDetectionOptions> options)
         {
             _cache = cache;
@@ -25,7 +24,9 @@ namespace IdentityServer.Legacy.Services.Security
         async public Task<bool> IsSuspiciousUserAsync(string username)
         {
             if (String.IsNullOrWhiteSpace(username))
+            {
                 throw new ArgumentException("Username required");
+            }
 
             var suspiciousUser = SuspiciousUser.FromString(await _cache.GetStringAsync(username));
 
@@ -101,8 +102,10 @@ namespace IdentityServer.Legacy.Services.Security
 
         async public Task BlockSuspicousUser(string username)
         {
-            if (_suspiciousUserBlocks.ContainsKey(username) && (DateTime.UtcNow - _suspiciousUserBlocks[username]).TotalSeconds < (double)_options.BlockSuspiciousUserSeconds)
+            if (_suspiciousUserBlocks.ContainsKey(username) && (DateTime.UtcNow - _suspiciousUserBlocks[username]).TotalSeconds < _options.BlockSuspiciousUserSeconds)
+            {
                 throw new Exception("Suspicous bot request detected");
+            }
 
             _suspiciousUserBlocks.TryAdd(username, DateTime.UtcNow);
             await Task.Delay(_options.BlockSuspiciousUserSeconds * 1000);
@@ -123,7 +126,7 @@ namespace IdentityServer.Legacy.Services.Security
             {
                 this.Username = username;
                 this.TimeStamp = DateTime.Now;
-                
+
             }
 
             [JsonProperty("un")]

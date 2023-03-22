@@ -24,34 +24,34 @@ namespace IdentityServer.Legacy.Clients
         private string _currentIdentityServerAddress;
         async public Task OpenLocker(string identityServerAddress, string lockerName)
         {
-            if(!lockerName.Equals(_currentLocker))
+            if (!lockerName.Equals(_currentLocker))
             {
-                await GetAccessToken(_currentIdentityServerAddress = identityServerAddress, new string[] { "secrets-vault", $"secrets-vault.{ _currentLocker = lockerName }" });
+                await GetAccessToken(_currentIdentityServerAddress = identityServerAddress, new string[] { "secrets-vault", $"secrets-vault.{_currentLocker = lockerName}" });
             }
         }
 
         async public Task<SecretsVaultResponse> GetSecret(string secretName, long versionTimeStamp = 0)
         {
-            if(String.IsNullOrEmpty(_currentLocker) || String.IsNullOrEmpty(this.AccessToken))
+            if (String.IsNullOrEmpty(_currentLocker) || String.IsNullOrEmpty(this.AccessToken))
             {
                 throw new Exception("No current locker or no access to locker. Please successfully run \"OpenLocker\" methode first");
             }
 
-            string path = versionTimeStamp > 0 ? $"{ _currentLocker }/{ secretName }/{ versionTimeStamp }" : $"{ _currentLocker }/{ secretName }";
+            string path = versionTimeStamp > 0 ? $"{_currentLocker}/{secretName}/{versionTimeStamp}" : $"{_currentLocker}/{secretName}";
 
             var httpClient = GetHttpClient();
             httpClient.SetBearerToken(this.AccessToken);
 
-            var response = await httpClient.GetAsync($"{ _currentIdentityServerAddress }/api/secretsvault?v=1.0&path={ path }");
-            
+            var response = await httpClient.GetAsync($"{_currentIdentityServerAddress}/api/secretsvault?v=1.0&path={path}");
+
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"Secret request failed with statuscode { response.StatusCode }");
+                throw new Exception($"Secret request failed with statuscode {response.StatusCode}");
             }
             else
             {
                 var secretJson = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<SecretsVaultResponse>(secretJson);    
+                return JsonConvert.DeserializeObject<SecretsVaultResponse>(secretJson);
             }
         }
 
@@ -60,4 +60,4 @@ namespace IdentityServer.Legacy.Clients
             throw new NotImplementedException();
         }
     }
- };
+};

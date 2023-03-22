@@ -1,7 +1,6 @@
 ﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer4.Models;
 using System.Collections.Generic;
 
 namespace IdentityServer.Legacy.Extensions.DependencyInjection
@@ -14,6 +13,6 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
         public string ConnectionString { get; set; }
         public string TableName { get; set; }
         public ICryptoService CryptoService { get; set; }
-        public IBlobSerializer BlobSerializer { get; set; } 
+        public IBlobSerializer BlobSerializer { get; set; }
     }
 }

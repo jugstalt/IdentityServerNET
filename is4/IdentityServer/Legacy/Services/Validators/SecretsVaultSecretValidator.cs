@@ -3,7 +3,6 @@ using IdentityServer4.Models;
 using IdentityServer4.Validation;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,10 +20,10 @@ namespace IdentityServer.Legacy.Services.Validators
         async public Task<SecretValidationResult> ValidateAsync(IEnumerable<Secret> secrets, ParsedSecret parsedSecret)
         {
             foreach (var secret in secrets
-                     .Where(s=> "SecretsVault-Secret".Equals(s.Type, StringComparison.CurrentCultureIgnoreCase)))
+                     .Where(s => "SecretsVault-Secret".Equals(s.Type, StringComparison.CurrentCultureIgnoreCase)))
             {
                 var secretsVersion = await _secretsVaultManager.GetSecretVersion(secret.Value);
-                if(parsedSecret.Credential?.ToString() == secretsVersion.Secret)
+                if (parsedSecret.Credential?.ToString() == secretsVersion.Secret)
                 {
                     return new SecretValidationResult()
                     {

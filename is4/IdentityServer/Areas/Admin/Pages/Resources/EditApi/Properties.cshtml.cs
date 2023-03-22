@@ -1,14 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
@@ -72,7 +70,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 if (propertyNames.Count > 0)
                 {
                     await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, propertyNames);
-                    this.StatusMessage = $"Properties '{ String.Join(", ", propertyNames) }' updated successfully";
+                    this.StatusMessage = $"Properties '{String.Join(", ", propertyNames)}' updated successfully";
                 }
                 else
                 {

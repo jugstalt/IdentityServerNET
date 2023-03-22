@@ -1,10 +1,8 @@
 ﻿using IdentityModel.Client;
 using IdentityServer.Legacy.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Clients
@@ -34,7 +32,9 @@ namespace IdentityServer.Legacy.Clients
         protected HttpClient GetHttpClient()
         {
             if (_httpClient == null)
+            {
                 _httpClient = new HttpClient();
+            }
 
             return _httpClient;
         }

@@ -1,7 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.SigningCredential;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -59,7 +58,9 @@ namespace IdentityServer.Legacy.Services.Cryptography
             //
 
             if (String.IsNullOrEmpty(text))
+            {
                 return String.Empty;
+            }
 
             var bytes = encoding == null ?
                 Encoding.Unicode.GetBytes(text) :
@@ -97,7 +98,7 @@ namespace IdentityServer.Legacy.Services.Cryptography
         async private Task<byte[]> DecryptToBytesAsync(EncryptedObject encryptedObject)
         {
             X509Certificate2 cert = await _validationKeyStorage.GetCertificateAsync(encryptedObject.CertSubject);
-            if(cert==null)
+            if (cert == null)
             {
                 throw new Exception("Can't decrypt object. Unknown encryption certificate");
             }

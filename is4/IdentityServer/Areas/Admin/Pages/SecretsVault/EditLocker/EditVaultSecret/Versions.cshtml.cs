@@ -1,19 +1,13 @@
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy.Models;
 using System.Threading;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Services.Cryptography;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret
 {
@@ -61,7 +55,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecr
                     await _secretsVaultDb.CreateVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, secretVersion, CancellationToken.None);
                 }
             }
-            , onFinally: () => RedirectToPage(new { id = Input.SecretName, locker=Input.LockerName })
+            , onFinally: () => RedirectToPage(new { id = Input.SecretName, locker = Input.LockerName })
             , successMessage: "Secret version created successfully");
         }
 
@@ -91,7 +85,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecr
         {
             public string LockerName { get; set; }
             public string SecretName { get; set; }
-           
+
             public string Secret { get; set; }
         }
     }

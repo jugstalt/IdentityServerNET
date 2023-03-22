@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using IdentityServer.Legacy;
+using IdentityServer4.Events;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
-using IdentityServer.Legacy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using IdentityServer4.Services;
-using IdentityServer4.Events;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account
 {

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IdentityServer.Legacy.Token.ErrorHandling
+﻿namespace IdentityServer.Legacy.Token.ErrorHandling
 {
     public class TokenExpiredException : TokenValidationException
     {
-        public TokenExpiredException() 
+        public TokenExpiredException()
             : base("token expired")
         {
 

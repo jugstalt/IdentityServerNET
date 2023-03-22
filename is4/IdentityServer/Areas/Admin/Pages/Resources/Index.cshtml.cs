@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources
 {
@@ -30,7 +25,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources
         public string ExportClientsMessage { get; set; }
         public string ExportResourcesMessage { get; set; }
 
-        public void OnGet(string exportClientsMessage=null, string exportResourcesMessage = null)
+        public void OnGet(string exportClientsMessage = null, string exportResourcesMessage = null)
         {
             ExportClientsMessage = exportClientsMessage;
             ExportResourcesMessage = exportResourcesMessage;

@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Exceptions;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -37,7 +33,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 if (Input.ConfirmClientId == CurrentClient.ClientId)
                 {
                     await _clientDb.RemoveClientAsync(this.CurrentClient);
-                } 
+                }
                 else
                 {
                     throw new StatusMessageException("Please type the correct client id");

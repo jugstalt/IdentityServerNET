@@ -1,18 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IdentityServer.Legacy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.ComponentModel;
+using System.Text;
 
 namespace IdentityServer.Areas.Admin.Pages
 {
     public class RandomSecretGeneratorModel : PageModel
     {
-        public IActionResult OnGet(int secretLength = 0, int chars= 0)
+        public IActionResult OnGet(int secretLength = 0, int chars = 0)
         {
             StringBuilder sb = new StringBuilder();
             var random = new Random();
@@ -46,7 +42,7 @@ namespace IdentityServer.Areas.Admin.Pages
 
         public IActionResult OnPost()
         {
-            return RedirectToPage(new { secretLength = Input.SecretLength, chars=Input.SecretCharacters });
+            return RedirectToPage(new { secretLength = Input.SecretLength, chars = Input.SecretCharacters });
         }
 
         [BindProperty]

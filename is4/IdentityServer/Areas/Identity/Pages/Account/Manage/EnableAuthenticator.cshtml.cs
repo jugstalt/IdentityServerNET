@@ -1,20 +1,14 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer.Legacy;
+﻿using IdentityServer.Legacy;
+using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.UI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using IdentityServer.Legacy.Services.UI;
-using IdentityServer.Legacy.Services.DbContext;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {

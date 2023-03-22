@@ -7,7 +7,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +20,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public InMemoryUserDb(IOptionsMonitor<UserDbContextConfiguration> optionsMonitor = null)
         {
-            _config = optionsMonitor?.CurrentValue ?? new UserDbContextConfiguration();    
+            _config = optionsMonitor?.CurrentValue ?? new UserDbContextConfiguration();
         }
 
         #region IUserDbContext
@@ -174,12 +173,12 @@ namespace IdentityServer.Legacy.Services.DbContext
         public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
         {
             var roles = new List<string>();
-            if(user.Roles!=null)
+            if (user.Roles != null)
             {
                 roles.AddRange(user.Roles);
             }
 
-            if(!roles.Contains(roleName))
+            if (!roles.Contains(roleName))
             {
                 roles.Add(roleName);
             }
@@ -194,7 +193,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             if (user.Roles != null)
             {
                 var roles = new List<string>(user.Roles);
-                if(roles.Contains(roleName))
+                if (roles.Contains(roleName))
                 {
                     roles.Remove(roleName);
                     user.Roles = roles;

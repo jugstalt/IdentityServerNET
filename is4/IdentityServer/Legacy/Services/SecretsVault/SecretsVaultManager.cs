@@ -3,7 +3,6 @@ using IdentityServer.Legacy.Models;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -26,7 +25,7 @@ namespace IdentityServer.Legacy.Services.SecretsVault
 
         async public Task<VaultSecretVersion> GetSecretVersion(string path)
         {
-            if(_secretsVaultDb==null || _vaultSecrtesCryptoService==null)
+            if (_secretsVaultDb == null || _vaultSecrtesCryptoService == null)
             {
                 throw new ArgumentException("Scretsvault not initialized. No SecretsVaultDbContext or VautlSecretCryptService definied");
             }
@@ -35,7 +34,7 @@ namespace IdentityServer.Legacy.Services.SecretsVault
 
             if (pathParts.Length < 2 || pathParts.Length > 3)
             {
-                throw new StatusMessageException($"Invalid path: { path }");
+                throw new StatusMessageException($"Invalid path: {path}");
             }
 
             VaultSecretVersion secretVersion = null;
@@ -43,7 +42,7 @@ namespace IdentityServer.Legacy.Services.SecretsVault
             {
                 if (!long.TryParse(pathParts[2], out long versionTimeStamp))
                 {
-                    throw new StatusMessageException($"Invalid version time stamp: { pathParts[2] }");
+                    throw new StatusMessageException($"Invalid version time stamp: {pathParts[2]}");
                 }
 
                 secretVersion = await _secretsVaultDb.GetSecretVersionAsync(pathParts[0], pathParts[1], versionTimeStamp, CancellationToken.None);
@@ -57,7 +56,7 @@ namespace IdentityServer.Legacy.Services.SecretsVault
 
             if (secretVersion == null)
             {
-                throw new StatusMessageException($"Secret { path } not found");
+                throw new StatusMessageException($"Secret {path} not found");
             }
 
             secretVersion.Secret =

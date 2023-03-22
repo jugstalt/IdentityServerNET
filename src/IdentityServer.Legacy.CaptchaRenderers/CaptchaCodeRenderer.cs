@@ -1,11 +1,9 @@
 ﻿using IdentityServer.Legacy.Services.Security;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Text;
 
 namespace IdentityServer.Legacy.CaptchaRenderers
 {
@@ -32,7 +30,7 @@ namespace IdentityServer.Legacy.CaptchaRenderers
 
                 var bgColor = Color.White;
 
-                switch(_options.BackgroundType)
+                switch (_options.BackgroundType)
                 {
                     case ColorType.Monochrome:
                         bgColor = Color.White;
@@ -95,7 +93,11 @@ namespace IdentityServer.Legacy.CaptchaRenderers
 
                         float x = i * fontSize + rand.Next(-shiftPx, shiftPx) + rand.Next(-shiftPx, shiftPx);
                         int maxY = height - fontSize;
-                        if (maxY < 0) maxY = 0;
+                        if (maxY < 0)
+                        {
+                            maxY = 0;
+                        }
+
                         float y = rand.Next(0, maxY);
 
                         graph.DrawString(captchaCode[i].ToString(), font, fontBrush, x, y);
@@ -135,8 +137,8 @@ namespace IdentityServer.Legacy.CaptchaRenderers
                     {
                         for (int y = 0; y < nHeight; ++y)
                         {
-                            xo = ((double)nWave * Math.Sin(2.0 * 3.1415 * (float)y / 128.0));
-                            yo = ((double)nWave * Math.Cos(2.0 * 3.1415 * (float)x / 128.0));
+                            xo = (nWave * Math.Sin(2.0 * 3.1415 * y / 128.0));
+                            yo = (nWave * Math.Cos(2.0 * 3.1415 * x / 128.0));
 
                             newX = (x + xo);
                             newY = (y + yo);

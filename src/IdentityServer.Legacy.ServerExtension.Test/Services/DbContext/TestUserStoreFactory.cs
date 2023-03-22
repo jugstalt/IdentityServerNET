@@ -1,9 +1,6 @@
 ﻿using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.ServerExtension.Test.Services.DbContext

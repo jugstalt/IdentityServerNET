@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
 {
@@ -31,7 +27,7 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
             return Page();
         }
 
-        async public  Task<IActionResult> OnPostAsync()
+        async public Task<IActionResult> OnPostAsync()
         {
             return await SecureHandlerAsync(async () =>
             {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IdentityServer.Legacy.Models
+﻿namespace IdentityServer.Legacy.Models
 {
     public class SecretsLocker
     {

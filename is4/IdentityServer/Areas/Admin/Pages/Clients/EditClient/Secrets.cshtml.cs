@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using IdentityModel;
+using IdentityServer.Legacy;
+using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Extensions;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Legacy.Services.SecretsVault;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Services.SecretsVault;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -52,7 +50,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 
                 var inputSecret = Input.Secret.Trim();
 
-                switch(Input.SecretType)
+                switch (Input.SecretType)
                 {
                     case IdentityServerConstants.SecretTypes.SharedSecret:
                         inputSecret = inputSecret.Sha256();
@@ -66,14 +64,14 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                             var secretsVersion = await _secretsVaultManager.GetSecretVersion(inputSecret);
                             if (secretsVersion == null)
                             {
-                                throw new StatusMessageException($"Secret with path { inputSecret } not exits in secrets vault");
+                                throw new StatusMessageException($"Secret with path {inputSecret} not exits in secrets vault");
                             }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             throw new StatusMessageException(ex.Message);
                         }
-                        
+
                         break;
                     default:
                         throw new Exception("Unknown secret type");
@@ -85,7 +83,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                     {
                         Type = Input.SecretType,
                         Value = inputSecret,
-                        Description = $"{ Input.SecretDescription } (created { DateTime.Now.ToShortDateString() } { DateTime.Now.ToLongTimeString() })",
+                        Description = $"{Input.SecretDescription} (created {DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()})",
                         Expiration = Input.Expiration
                     };
 
@@ -133,7 +131,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
         public class NewSecretModel
         {
             public string ClientId { get; set; }
-           
+
             public string Secret { get; set; }
             public string SecretType { get; set; }
             public string SecretDescription { get; set; }

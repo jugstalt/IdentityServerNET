@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using IdentityServer.Legacy;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 {
@@ -91,14 +89,14 @@ namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 
                 if (user == null)
                 {
-                    throw new StatusMessageException($"Unknown user { Input.Username }");
+                    throw new StatusMessageException($"Unknown user {Input.Username}");
                 }
 
                 await _userDbContext.AddToRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
                 await _signInManager.RefreshSignInAsync(user);
             }
             , onFinally: () => RedirectToPage(new { id = Input.RoleId })
-            , successMessage: $"User { Input.Username } successfully added to role"
+            , successMessage: $"User {Input.Username} successfully added to role"
             , onException: (ex) => Page());
         }
 

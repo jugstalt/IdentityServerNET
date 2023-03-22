@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin
 {
@@ -14,8 +10,8 @@ namespace IdentityServer.Areas.Admin
     {
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            IUserDbContext userDbContext = null, 
-            IRoleDbContext roleDbContext = null, 
+            IUserDbContext userDbContext = null,
+            IRoleDbContext roleDbContext = null,
             IResourceDbContext resourceDbContxt = null,
             IClientDbContext clientDbContext = null)
         {

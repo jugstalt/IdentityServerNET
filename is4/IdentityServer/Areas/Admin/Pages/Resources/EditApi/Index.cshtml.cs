@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
@@ -40,7 +36,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
                 await _resourceDb.UpdateApiResourceAsync(CurrentApiResource, new[] { "DisplayName", "Description" });
             }
-            , onFinally: ()=> RedirectToPage(new { id = Input.Name })
+            , onFinally: () => RedirectToPage(new { id = Input.Name })
             , successMessage: "Api resource successfully updated");
         }
 

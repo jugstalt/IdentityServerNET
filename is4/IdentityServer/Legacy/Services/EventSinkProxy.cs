@@ -3,7 +3,6 @@ using IdentityServer4.Events;
 using IdentityServer4.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services
@@ -22,23 +21,25 @@ namespace IdentityServer.Legacy.Services
         async public Task PersistAsync(Event evt)
         {
             if (_identityEventSinks == null)
+            {
                 return;
+            }
 
             string username = String.Empty;
-            if(evt is UserLoginFailureEvent)
+            if (evt is UserLoginFailureEvent)
             {
                 username = ((UserLoginFailureEvent)evt).Username;
             }
-            else if(evt is UserLoginSuccessEvent)
+            else if (evt is UserLoginSuccessEvent)
             {
                 username = ((UserLoginSuccessEvent)evt).Username;
             }
-            else if(evt is UserLogoutSuccessEvent)
+            else if (evt is UserLogoutSuccessEvent)
             {
                 username = ((UserLogoutSuccessEvent)evt).DisplayName;
             }
 
-            foreach(var identityEventSink in _identityEventSinks)
+            foreach (var identityEventSink in _identityEventSinks)
             {
                 await identityEventSink.PersistAsync(new IdentityEvent()
                 {

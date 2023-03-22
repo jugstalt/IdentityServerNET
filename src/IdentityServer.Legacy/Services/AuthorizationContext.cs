@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IdentityServer.Legacy.Services
+﻿namespace IdentityServer.Legacy.Services
 {
     public class AuthorizationContext
     {

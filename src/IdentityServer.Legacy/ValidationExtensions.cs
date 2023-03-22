@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace IdentityServer.Legacy
@@ -77,11 +75,13 @@ namespace IdentityServer.Legacy
             return @namespace.CheckRegex(NamespaceRegex);
         }
 
-        
+
         public static bool CheckRegex(this string input, string regex)
         {
             if (String.IsNullOrWhiteSpace(regex))
+            {
                 return true;
+            }
 
             return new Regex(regex).IsMatch(input);
         }

@@ -2,7 +2,6 @@
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -43,7 +42,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                     }
                 }
                 // Initialize Identity Resources
-                if(options.Value.InitialIdentityResources !=null)
+                if (options.Value.InitialIdentityResources != null)
                 {
 
                 }
@@ -55,7 +54,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         async public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
             string id = apiResource.Name.NameToHexId(_cryptoService);
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.api");
+            FileInfo fi = new FileInfo($"{_rootPath}/{id}.api");
 
             if (fi.Exists)
             {
@@ -74,7 +73,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<ApiResourceModel> FindApiResourceAsync(string name)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ name.NameToHexId(_cryptoService) }.api");
+            FileInfo fi = new FileInfo($"{_rootPath}/{name.NameToHexId(_cryptoService)}.api");
 
             if (!fi.Exists)
             {
@@ -96,7 +95,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
             foreach (var scopeName in scopeNames)
             {
-                if (new FileInfo($"{ _rootPath }/{ scopeName.NameToHexId(_cryptoService) }.api").Exists)
+                if (new FileInfo($"{_rootPath}/{scopeName.NameToHexId(_cryptoService)}.api").Exists)
                 {
                     apiResources.Add(await FindApiResourceAsync(scopeName));
                 }
@@ -107,7 +106,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task RemoveApiResourceAsync(ApiResourceModel apiResource)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
+            FileInfo fi = new FileInfo($"{_rootPath}/{apiResource.Name.NameToHexId(_cryptoService)}.api");
 
             if (fi.Exists)
             {
@@ -119,7 +118,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task UpdateApiResourceAsync(ApiResourceModel apiResource, IEnumerable<string> propertyNames = null)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
+            FileInfo fi = new FileInfo($"{_rootPath}/{apiResource.Name.NameToHexId(_cryptoService)}.api");
 
             if (fi.Exists)
             {
@@ -149,7 +148,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ name.NameToHexId(_cryptoService) }.identity");
+            FileInfo fi = new FileInfo($"{_rootPath}/{name.NameToHexId(_cryptoService)}.identity");
 
             if (!fi.Exists)
             {
@@ -186,7 +185,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         async public Task AddIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             string id = identityResource.Name.NameToHexId(_cryptoService);
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.identity");
+            FileInfo fi = new FileInfo($"{_rootPath}/{id}.identity");
 
             if (fi.Exists)
             {
@@ -205,7 +204,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
+            FileInfo fi = new FileInfo($"{_rootPath}/{identityResource.Name.NameToHexId(_cryptoService)}.identity");
 
             if (fi.Exists)
             {
@@ -217,7 +216,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
+            FileInfo fi = new FileInfo($"{_rootPath}/{identityResource.Name.NameToHexId(_cryptoService)}.identity");
 
             if (fi.Exists)
             {

@@ -49,7 +49,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 }
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: $"Successfully removed scope '{ scopeName }'");
+            , successMessage: $"Successfully removed scope '{scopeName}'");
 
         }
 
@@ -67,13 +67,13 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                 }
 
                 if (String.IsNullOrWhiteSpace(Input.Scope?.Name) ||
-                   Input.Scope.Name.Trim().Length<3)
+                   Input.Scope.Name.Trim().Length < 3)
                 {
                     throw new StatusMessageException("Invalid scope name: min. 3 letters, mumbers, . - _");
                 }
 
                 var regEx = new Regex(@"^[a-z0-9_\-\.]+$");
-                if(!regEx.IsMatch(Input.Scope.Name))
+                if (!regEx.IsMatch(Input.Scope.Name))
                 {
                     throw new StatusMessageException("Invalid scope name: Only lowercase letters, numbers,-,_,.");
                 }
@@ -83,7 +83,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                     if (Input.Scope.Name != this.CurrentApiResource.Name &&
                        !Input.Scope.Name.StartsWith(this.CurrentApiResource.Name + "."))
                     {
-                        throw new StatusMessageException($"Bad name convention: Scope names for this API resource shold start with '{ CurrentApiResource.Name }.'. If you want to overrule this convonention, type @@ befor your scope name...");
+                        throw new StatusMessageException($"Bad name convention: Scope names for this API resource shold start with '{CurrentApiResource.Name}.'. If you want to overrule this convonention, type @@ befor your scope name...");
                     }
                 }
 

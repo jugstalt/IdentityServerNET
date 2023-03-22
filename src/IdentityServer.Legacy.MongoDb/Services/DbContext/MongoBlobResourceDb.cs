@@ -4,7 +4,6 @@ using IdentityServer.Legacy.MongoDb.MongoDocuments;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.Serialize;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -56,7 +55,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
             //}
         }
 
-        
+
 
         #region IResourceDbContext
 
@@ -66,7 +65,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             var collection = GetApiResourceCollection();
 
-            var document = await(await collection.FindAsync<ApiResourceDocument>(
+            var document = await (await collection.FindAsync<ApiResourceDocument>(
                 filter: Builders<ApiResourceDocument>.Filter.Eq("_id", id))
                 ).FirstOrDefaultAsync();
 
@@ -101,7 +100,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
 
             var collection = GetIdentityResourceCollection();
 
-            var document = await(await collection.FindAsync<IdentityResourceDocument>(
+            var document = await (await collection.FindAsync<IdentityResourceDocument>(
                 filter: Builders<IdentityResourceDocument>.Filter.Eq("_id", id))
                 ).FirstOrDefaultAsync();
 
@@ -176,7 +175,7 @@ namespace IdentityServer.Legacy.MongoDb.Services.DbContext
                 return;
             }
 
-            if(await FindApiResourceAsync(apiResource.Name)!=null)
+            if (await FindApiResourceAsync(apiResource.Name) != null)
             {
                 throw new Exception("Api resource alread exists");
             }

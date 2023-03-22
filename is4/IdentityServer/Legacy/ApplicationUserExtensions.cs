@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy
 {
@@ -14,12 +12,14 @@ namespace IdentityServer.Legacy
         static public string ApplicationUserName(this ApplicationUser user)
         {
             if (user == null)
-                return String.Empty;
-
-            if(user.Claims!=null)
             {
-                string name = $"{ user.Claims.Where(c => c.Type == JwtClaimTypes.GivenName).FirstOrDefault()?.Value } { user.Claims.Where(c => c.Type == JwtClaimTypes.MiddleName).FirstOrDefault()?.Value} { user.Claims.Where(c => c.Type == JwtClaimTypes.FamilyName).FirstOrDefault()?.Value}";
-                if(!String.IsNullOrWhiteSpace(name))
+                return String.Empty;
+            }
+
+            if (user.Claims != null)
+            {
+                string name = $"{user.Claims.Where(c => c.Type == JwtClaimTypes.GivenName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.MiddleName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.FamilyName).FirstOrDefault()?.Value}";
+                if (!String.IsNullOrWhiteSpace(name))
                 {
                     return name;
                 }
@@ -46,10 +46,14 @@ namespace IdentityServer.Legacy
         static public bool IsUserAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.UserAdministrator);
         }
@@ -57,10 +61,14 @@ namespace IdentityServer.Legacy
         static public bool IsRoleAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.RoleAdministrator);
         }
@@ -68,10 +76,14 @@ namespace IdentityServer.Legacy
         static public bool IsResourceAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.ResourceAdministrator);
         }
@@ -79,10 +91,14 @@ namespace IdentityServer.Legacy
         static public bool IsClientAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.ClientAdministrator);
         }
@@ -90,10 +106,14 @@ namespace IdentityServer.Legacy
         static public bool IsSecretVaultAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.SecretsVaultAdministrator);
         }
@@ -101,10 +121,14 @@ namespace IdentityServer.Legacy
         static public bool IsSignungUIAdministrator(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
             return user.Roles.Contains(KnownRoles.SigningAdministrator);
         }
@@ -112,14 +136,18 @@ namespace IdentityServer.Legacy
         static public bool HasAdministratorRole(this ApplicationUser user)
         {
             if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+            {
                 return true;
+            }
 
             if (user?.Roles == null)
+            {
                 return false;
+            }
 
-            return user.IsUserAdministrator() || 
-                   user.IsRoleAdministrator() || 
-                   user.IsResourceAdministrator() || 
+            return user.IsUserAdministrator() ||
+                   user.IsRoleAdministrator() ||
+                   user.IsResourceAdministrator() ||
                    user.IsClientAdministrator() ||
                    user.IsSecretVaultAdministrator() ||
                    user.IsSignungUIAdministrator();

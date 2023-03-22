@@ -1,6 +1,5 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -31,7 +30,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                 }
             }
 
-            if(_identityResources==null)
+            if (_identityResources == null)
             {
                 _identityResources = new ConcurrentDictionary<string, IdentityResourceModel>();
 
@@ -66,9 +65,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
-            if(_apiResources.ContainsKey(apiResource.Name))
+            if (_apiResources.ContainsKey(apiResource.Name))
             {
-                throw new Exception($"Api { apiResource.Name } already exists");
+                throw new Exception($"Api {apiResource.Name} already exists");
             }
 
             _apiResources[apiResource.Name] = apiResource;
@@ -80,7 +79,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_apiResources.ContainsKey(resource.Name))
             {
-                throw new Exception($"Api { resource.Name } not exists");
+                throw new Exception($"Api {resource.Name} not exists");
             }
 
             _apiResources[resource.Name] = resource;
@@ -92,10 +91,10 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_apiResources.ContainsKey(apiResource.Name))
             {
-                throw new Exception($"Api with clientId { apiResource.Name } not exists");
+                throw new Exception($"Api with clientId {apiResource.Name} not exists");
             }
 
-            if(!_apiResources.TryRemove(apiResource.Name, out apiResource))
+            if (!_apiResources.TryRemove(apiResource.Name, out apiResource))
             {
                 throw new Exception($"Can't remove api");
             }
@@ -110,7 +109,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
-            if(_identityResources.ContainsKey(name))
+            if (_identityResources.ContainsKey(name))
             {
                 return Task.FromResult(_identityResources[name]);
             }
@@ -127,7 +126,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (_identityResources.ContainsKey(identityResource.Name))
             {
-                throw new Exception($"Identity resource { identityResource.Name } already exists");
+                throw new Exception($"Identity resource {identityResource.Name} already exists");
             }
 
             _identityResources[identityResource.Name] = identityResource;
@@ -139,7 +138,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_identityResources.ContainsKey(identityResource.Name))
             {
-                throw new Exception($"Api with clientId { identityResource.Name } not exists");
+                throw new Exception($"Api with clientId {identityResource.Name} not exists");
             }
 
             _identityResources[identityResource.Name] = identityResource;
@@ -151,7 +150,7 @@ namespace IdentityServer.Legacy.Services.DbContext
         {
             if (!_identityResources.ContainsKey(identityResource.Name))
             {
-                throw new Exception($"Identity { identityResource.Name } not exists");
+                throw new Exception($"Identity {identityResource.Name} not exists");
             }
 
             if (!_identityResources.TryRemove(identityResource.Name, out identityResource))

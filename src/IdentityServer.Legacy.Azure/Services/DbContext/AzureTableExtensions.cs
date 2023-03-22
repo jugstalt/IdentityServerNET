@@ -1,5 +1,4 @@
 ﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
 {

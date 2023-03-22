@@ -1,10 +1,9 @@
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.DbContext;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -26,7 +25,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
             await LoadCurrentClientAsync(id);
 
             List<ResourceScope> resourceScopes = new List<ResourceScope>();
-            if(_resourceDb!=null)
+            if (_resourceDb != null)
             {
                 var identityResources = await _resourceDb.GetAllIdentityResources();
                 var apiResources = await _resourceDb.GetAllApiResources();
@@ -38,7 +37,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                     .ToArray() ??
                     new string[0];
 
-                if(identityResources!=null)
+                if (identityResources != null)
                 {
                     resourceScopes.AddRange(identityResources
                         .Where(i => this.CurrentClient.AllowedScopes == null || !this.CurrentClient.AllowedScopes.Contains(i.Name))
@@ -52,7 +51,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 }
                 if (apiResources != null)
                 {
-                    foreach(var apiResource in apiResources.Where(a=>a.Scopes!=null))
+                    foreach (var apiResource in apiResources.Where(a => a.Scopes != null))
                     {
                         resourceScopes.AddRange(apiResource.Scopes
                             .Where(s => this.CurrentClient.AllowedScopes == null || !this.CurrentClient.AllowedScopes.Contains(s.Name))
@@ -92,7 +91,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "AllowedScopes" });
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , $"Successfully removed scope { scopeName }");
+            , $"Successfully removed scope {scopeName}");
         }
 
         async public Task<IActionResult> OnGetAddAsync(string id, string scopeName)
@@ -119,7 +118,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 }
             }
             , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: $"Scope '{ scopeName }' addes successfully");
+            , successMessage: $"Scope '{scopeName}' addes successfully");
         }
 
 
@@ -147,7 +146,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 }
             }
             , onFinally: () => RedirectToPage(new { id = Input.ClientId })
-            , successMessage: $"Scope '{ Input.ScopeName }' addes successfully");
+            , successMessage: $"Scope '{Input.ScopeName}' addes successfully");
         }
 
         [BindProperty]

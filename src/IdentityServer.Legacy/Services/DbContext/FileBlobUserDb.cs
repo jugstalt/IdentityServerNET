@@ -22,10 +22,12 @@ namespace IdentityServer.Legacy.Services.DbContext
         private IBlobSerializer _blobSerializer;
         private UserDbContextConfiguration _config;
 
-        public FileBlobUserDb(IOptionsMonitor<UserDbContextConfiguration> options=null)
+        public FileBlobUserDb(IOptionsMonitor<UserDbContextConfiguration> options = null)
         {
             if (String.IsNullOrEmpty(options?.CurrentValue?.ConnectionString))
+            {
                 throw new ArgumentException("FileBlobUserDb: no connection string defined");
+            }
 
             _config = options.CurrentValue;
             _rootPath = _config.ConnectionString;
@@ -33,7 +35,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
 
             DirectoryInfo di = new DirectoryInfo(_rootPath);
-            if(!di.Exists)
+            if (!di.Exists)
             {
                 di.Create();
             }
@@ -45,7 +47,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            if(user.UserName.ToUpper() != user.Email.ToUpper())
+            if (user.UserName.ToUpper() != user.Email.ToUpper())
             {
                 return IdentityResult.Failed(new IdentityError()
                 {
@@ -56,7 +58,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
             user.Id = UsernameToId(user);
 
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ user.Id }.user");
+            FileInfo fi = new FileInfo($"{_rootPath}/{user.Id}.user");
 
             if (fi.Exists)
             {
@@ -81,9 +83,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         public Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ user.Id }.user");
+            FileInfo fi = new FileInfo($"{_rootPath}/{user.Id}.user");
 
-            if(fi.Exists)
+            if (fi.Exists)
             {
                 fi.Delete();
             }
@@ -98,9 +100,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ userId }.user");
+            FileInfo fi = new FileInfo($"{_rootPath}/{userId}.user");
 
-            if(!fi.Exists)
+            if (!fi.Exists)
             {
                 return null;
             }
@@ -124,7 +126,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         async public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            FileInfo fi = new FileInfo($"{ _rootPath }/{ user.Id }.user");
+            FileInfo fi = new FileInfo($"{_rootPath}/{user.Id}.user");
 
             if (!fi.Exists)
             {
@@ -161,7 +163,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                     throw new Exception("username and email must be idential");
                 }
 
-                
+
 
                 await UpdateAsync(user, cancellation);
             }
@@ -182,7 +184,7 @@ namespace IdentityServer.Legacy.Services.DbContext
                 }
 
                 await UpdateAsync(user, cancellation);
-            } 
+            }
             else
             {
                 if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
@@ -211,7 +213,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             List<ApplicationUser> users = new List<ApplicationUser>();
             foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.user").Skip(skip))
             {
-                if (limit>0 && users.Count >= limit)
+                if (limit > 0 && users.Count >= limit)
                 {
                     break;
                 }

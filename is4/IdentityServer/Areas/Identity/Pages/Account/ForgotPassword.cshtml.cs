@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+﻿using IdentityServer.Legacy;
 using Microsoft.AspNetCore.Authorization;
-using IdentityServer.Legacy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account
 {
@@ -21,10 +20,10 @@ namespace IdentityServer.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, 
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager,
                                    IEmailSender emailSender, IConfiguration configuration)
         {
-            if(configuration.DenyForgotPasswordChallange())
+            if (configuration.DenyForgotPasswordChallange())
             {
                 throw new Exception("Not allowed");
             }

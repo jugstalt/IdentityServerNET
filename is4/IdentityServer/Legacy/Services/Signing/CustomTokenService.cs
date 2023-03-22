@@ -1,5 +1,4 @@
 ﻿using IdentityServer4.Configuration;
-using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -91,7 +89,7 @@ namespace IdentityServer.Legacy.Services.Signing
         private string AppUrl()
         {
             var forwardedFor = _httpContext?.Request.Headers["X-Forwarded-For"].ToString();
-            if(!String.IsNullOrEmpty(forwardedFor))
+            if (!String.IsNullOrEmpty(forwardedFor))
             {
                 return forwardedFor;
             }
