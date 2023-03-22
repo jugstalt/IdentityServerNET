@@ -111,7 +111,9 @@ namespace IdentityServer.Legacy.Services.DbContext
 
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return _blobSerializer.DeserializeObject<ApplicationUser>(fileText);
+                var applicationUser = _blobSerializer.DeserializeObject<ApplicationUser>(fileText);
+
+                return applicationUser;
             }
         }
 

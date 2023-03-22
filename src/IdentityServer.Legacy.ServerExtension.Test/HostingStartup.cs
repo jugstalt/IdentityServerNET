@@ -3,6 +3,8 @@ using IdentityServer.Legacy.CaptchaRenderers;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Reflection;
+using IdentityServer.Legacy.ServerExtension.Test.Services.DbContext;
+using IdentityServer.Legacy.ServerExtension.Test.Services.UI;
 using IdentityServer.Legacy.Services.Cryptography;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.EmailSender;
@@ -34,6 +36,7 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region Add an UserDbContext (required)
 
+            services.AddTransient<IUserStoreFactory, TestUserStoreFactory>();
             services.AddUserDbContext<FileBlobUserDb>(options =>
             {
                 options.ConnectionString = @"c:\temp\identityserver_legacy\storage\users";
@@ -222,10 +225,10 @@ namespace IdentityServer.Legacy.ServerExtension.Test
 
             #region UI (required)
 
-            services.Configure<UserInterfaceServiceOptions>(options =>
+            services.AddUserInterfaceService<TestUserInterfaceService>(options =>
             {
-                options.ApplicationTitle = "IdentityServer.Legacy.Test";  // required
-                options.OverrideCssContent = Properties.Resources.is4_overrides;
+                options.ApplicationTitle = context.Configuration["ApplicationTitle"];  // required
+                options.OverrideCssContent = Properties.Resources.is4_overrides + Properties.Resources.openid_logo;
                 options.MediaContent = new Dictionary<string, byte[]>()
                 {
                     { "openid-logo.png", Properties.Resources.openid_logo }

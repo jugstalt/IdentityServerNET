@@ -64,6 +64,8 @@ namespace IdentityServer
                         policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                     options.AddPolicy("admin-secretsvault-policy",
                        policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                    options.AddPolicy("admin-signing-ui-policy",
+                       policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                 }
                 else
                 {
