@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create Signed Tokens</h2>
+<div class="admin-users">
+    <h4>Edit/Create Lockers</h4>
+    <hr />
+    <div class="row">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        <div class="col-md-9">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("scripts", required: false)
+}

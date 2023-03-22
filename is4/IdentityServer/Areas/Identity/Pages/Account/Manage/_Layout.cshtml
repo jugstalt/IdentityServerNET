@@ -16,7 +16,7 @@
 
             </div>
 
-            <partial name="_ManageNav" model="Model?.EditorInfos" />
+            <partial name="_ManageNav" model="(await Model?.EditorInfos())" />
         </div>
         <div class="col-md-9">
             @RenderBody()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -87,7 +89,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
         public class InputModel
         {
             public string ApiName { get; set; }
-            public ApiResource ApiResource { get; set; }
+            public ApiResourceModel ApiResource { get; set; }
             public string[] IgnoreProperties => new string[] { "Name", "DisplayName", "Description" };
         }
     }

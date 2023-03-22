@@ -9,6 +9,7 @@ using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using IdentityServer.Legacy.Services.ErrorHandling;
 
 namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {
@@ -77,6 +78,11 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                        this.Request.Form[formKey].ToString(),
                        new System.Threading.CancellationToken());
                }
+
+                if (_userDbContext is IErrorMessage && ((IErrorMessage)_userDbContext).HasErrors)
+                {
+                    throw new StatusMessageException(((IErrorMessage)_userDbContext).LastErrorMessage);
+                }
            }
            , onFinally: () => RedirectToPage(new { id = userId, category = this.Category })
            , successMessage: $"The current users { Category.ToLower() } settings has been updated");

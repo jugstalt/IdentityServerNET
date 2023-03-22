@@ -1,35 +1,28 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-using IdentityServer.Legacy;
+﻿using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.Factories;
 using IdentityServer.Legacy.Services;
-using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.SecretsVault;
+using IdentityServer.Legacy.Services.Signing;
 using IdentityServer.Legacy.Services.SigningCredential;
+using IdentityServer.Legacy.Services.UI;
 using IdentityServer.Legacy.Services.Validators;
-using IdentityServer4;
+using IdentityServer.Services;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace IdentityServer
 {
@@ -89,6 +82,8 @@ namespace IdentityServer
                         policy => policy.RequireRole(KnownRoles.ClientAdministrator));
                     options.AddPolicy("admin-secretsvault-policy",
                        policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
+                    options.AddPolicy("admin-signing-ui-policy",
+                       policy => policy.RequireRole(KnownRoles.SigningAdministrator));
                 }
 
             // DoTo: find a policy that never matches!!
@@ -98,10 +93,17 @@ namespace IdentityServer
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "https://localhost:44300";
+                    options.Authority = Configuration["IdentityServer:PublicOrigin"];
                     options.RequireHttpsMetadata = false;
 
                     options.Audience = "secrets-vault";
+                })
+                .AddJwtBearer("Bearer-Signing", options =>
+                {
+                    options.Authority = Configuration["IdentityServer:PublicOrigin"];
+                    options.RequireHttpsMetadata = false;
+
+                    options.Audience = "signing-api";
                 });
 
             services.AddMvc()
@@ -114,6 +116,7 @@ namespace IdentityServer
                     options.Conventions.AuthorizeAreaFolder("Admin", "/resources", Configuration.DenyAdminResources() ? "_forbidden" : "admin-resource-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration.DenyAdminClients() ? "_forbidden" : "admin-client-policy");
                     options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
+                    options.Conventions.AuthorizeAreaFolder("Admin", "/signing", Configuration.DenySigningUI() ? "_forbidden" : "admin-signing-ui-policy");
 
                     if (Configuration.DenyManageAccount() == true)
                     {
@@ -157,14 +160,16 @@ namespace IdentityServer
                     CookieLifetime = TimeSpan.FromHours(10), // ID server cookie timeout set to 10 hours
                     CookieSlidingExpiration = true,
                 };
-                if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
-                {
-                    options.PublicOrigin = Configuration["IdentityServer:PublicOrigin"];
-                }
+
+                // use ForwaredHeaders: https://github.com/IdentityServer/IdentityServer4/issues/4631
+                //if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
+                //{
+                //    options.PublicOrigin = Configuration["IdentityServer:PublicOrigin"];
+                //}
             })
             // Add Jwt Client Assertation (get token from certificate)
             .AddSecretParser<JwtBearerClientAssertionSecretParser>()
-            .AddSecretValidator<PrivateKeyJwtSecretValidator>()
+            .AddSecretValidator<PrivateKeyJwtSecretValidator>()   // Requires IReplayCache
             .AddSecretValidator<SecretsVaultSecretValidator>()
             // Add Identity
             .AddAspNetIdentity<ApplicationUser>()
@@ -172,7 +177,18 @@ namespace IdentityServer
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
-            
+
+            builder.Services.AddTransient<IReplayCache, DefaultReplayCache>();
+            builder.Services.AddTransient<IAuthorizationContextService, AuthorizationContextService>();
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
 
             services.AddSingleton<IEventSink, EventSinkProxy>();
 
@@ -181,13 +197,24 @@ namespace IdentityServer
                 services.ConfigureApplicationCookie(options =>
                 {
                     if(!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
-                         options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
+                    {
+                        options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Domain"]))
+                    {
                         options.Cookie.Domain = Configuration["IdentityServer:Cookie:Domain"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Path"]))
+                    {
                         options.Cookie.Path = Configuration["IdentityServer:Cookie:Path"];
+                    }
+
                     if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:ExpireDays"]))
+                    {
                         options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(Configuration["IdentityServer:Cookie:ExpireDays"]));
+                    }
                 });
             }
 
@@ -219,20 +246,23 @@ namespace IdentityServer
             }
 
             services.AddTransient<IEmailSender, EmailSenderProxy>();
+
+            services.AddScoped<CustomTokenService>();
         }
 
-        public void Configure(IApplicationBuilder app, IOptions<UserInterfaceConfiguration> userInterfaceConfig = null)
+        public void Configure(IApplicationBuilder app, IUserInterfaceService userInterface = null)
         {
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
             }
 
             #region UserInterface (Styling)
 
             try
             {
-                var overrideCss = userInterfaceConfig?.Value?.OverrideCssContent ?? String.Empty;
+                var overrideCss = userInterface?.OverrideCssContent ?? String.Empty;
 
                 FileInfo fi = new FileInfo($"{ Environment.WebRootPath }/css/is4-overrides.css");
                 if (fi.Exists)
@@ -241,9 +271,9 @@ namespace IdentityServer
                 }
                 File.WriteAllText(fi.FullName, overrideCss);
 
-                if(userInterfaceConfig?.Value?.MediaContent!=null)
+                if(userInterface?.MediaContent!=null)
                 {
-                    foreach(var media in userInterfaceConfig.Value.MediaContent)
+                    foreach(var media in userInterface.MediaContent)
                     {
                         fi = new FileInfo($"{ Environment.WebRootPath }/css/media/{ media.Key }");
                         if(!fi.Directory.Exists)
@@ -258,7 +288,7 @@ namespace IdentityServer
                     }
                 }
             }
-            catch (Exception ex)
+            catch /*(Exception ex)*/
             {
                 Console.WriteLine("Exception: Styling overrrides not updated");
             }
@@ -288,6 +318,8 @@ namespace IdentityServer
             }
 
             #endregion
+
+            app.UseForwardedHeaders();
 
             app.UseStaticFiles();
             app.UseRouting();

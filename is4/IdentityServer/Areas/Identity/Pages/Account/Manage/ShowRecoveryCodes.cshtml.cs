@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,9 +15,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
     public class ShowRecoveryCodesModel : ManageAccountPageModel
     {
-        public ShowRecoveryCodesModel(
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base(userDbContextConfiguration)
+        public ShowRecoveryCodesModel(IUserStoreFactory userStoreFactory)
+            : base(userStoreFactory)
         {
 
         }

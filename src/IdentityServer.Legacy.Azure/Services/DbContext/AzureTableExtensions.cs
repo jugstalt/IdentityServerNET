@@ -1,23 +1,21 @@
-﻿using IdentityServer4.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 
 namespace IdentityServer.Legacy.Azure.Services.DbContext
 {
     static class AzureTableExtensions
     {
-        static public string RowKey(this Client client)
+        static public string RowKey(this ClientModel client)
         {
             return client.ClientId;
         }
 
-        static public string RowKey(this ApiResource apiResource)
+        static public string RowKey(this ApiResourceModel apiResource)
         {
             return apiResource.Name;
         }
 
-        static public string RowKey(this IdentityResource identityResource)
+        static public string RowKey(this IdentityResourceModel identityResource)
         {
             return identityResource.Name;
         }

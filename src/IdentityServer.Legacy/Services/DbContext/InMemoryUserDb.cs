@@ -1,6 +1,7 @@
 ﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
 using IdentityServer.Legacy.UserInteraction;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,7 +17,16 @@ namespace IdentityServer.Legacy.Services.DbContext
     {
         private static ConcurrentDictionary<string, ApplicationUser> _users = new ConcurrentDictionary<string, ApplicationUser>();
 
+        private readonly UserDbContextConfiguration _config;
+
+        public InMemoryUserDb(IOptionsMonitor<UserDbContextConfiguration> optionsMonitor = null)
+        {
+            _config = optionsMonitor?.CurrentValue ?? new UserDbContextConfiguration();    
+        }
+
         #region IUserDbContext
+
+        public UserDbContextConfiguration ContextConfiguration => _config;
 
         async public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {

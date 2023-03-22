@@ -32,7 +32,11 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                 var apiResources = await _resourceDb.GetAllApiResources();
 
                 IdentityResourceScopes = identityResources?.Select(s => s.Name).ToArray() ?? new string[0];
-                ApiResouceScopes = apiResources?.SelectMany(m => m.Scopes.Select(s => s.Name)).ToArray() ?? new string[0];
+                ApiResouceScopes = apiResources?
+                    .Where(m => m.Scopes != null)
+                    .SelectMany(m => m.Scopes.Select(s => s.Name))
+                    .ToArray() ??
+                    new string[0];
 
                 if(identityResources!=null)
                 {

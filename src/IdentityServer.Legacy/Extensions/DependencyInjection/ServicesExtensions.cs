@@ -2,6 +2,7 @@
 using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer.Legacy.Services.EventSinks;
 using IdentityServer.Legacy.Services.Security;
+using IdentityServer.Legacy.Services.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -26,6 +27,16 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
             where T : class, IUserDbContext
         {
             services.Configure(setupAction);
+            services.AddTransient<IUserDbContext, T>();
+
+            return services;
+        }
+
+        static public IServiceCollection AddUserDbContext<T, TOptions>(this IServiceCollection services, Action<TOptions> setupAction)
+            where T : class, IUserDbContext
+            where TOptions : UserDbContextConfiguration
+        {
+            services.Configure<TOptions>(setupAction);
             services.AddTransient<IUserDbContext, T>();
 
             return services;
@@ -273,6 +284,19 @@ namespace IdentityServer.Legacy.Extensions.DependencyInjection
         {
             services.Configure<TSinkOpitonsType>(optionsSetup);
             return services.AddIdentityEventSink<TSinkType>();
+        }
+
+        #endregion
+
+        #region UserInterface 
+
+        static public IServiceCollection AddUserInterfaceService<T>(this IServiceCollection services, Action<UserInterfaceServiceOptions> configureService)
+            where T : class, IUserInterfaceService
+        {
+            services.Configure<UserInterfaceServiceOptions>(configureService);
+            services.AddTransient<IUserInterfaceService, T>();
+
+            return services;
         }
 
         #endregion

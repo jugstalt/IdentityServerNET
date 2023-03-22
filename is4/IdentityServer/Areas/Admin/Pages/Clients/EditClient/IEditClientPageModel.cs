@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
     public interface IEditClientPageModel
     {
-        public Client CurrentClient { get; set; }
+        public ClientModel CurrentClient { get; set; }
     }
 }

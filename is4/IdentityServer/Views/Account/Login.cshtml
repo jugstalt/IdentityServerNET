@@ -1,7 +1,8 @@
 @using IdentityServer.Legacy; 
 @using IdentityServer.Legacy.Extensions.DependencyInjection;
 @using Microsoft.Extensions.Options;
-@inject IOptions<UserInterfaceConfiguration> userInterfaceConfig;
+@using IdentityServer.Legacy.Services.UI; 
+@inject IUserInterfaceService userInterface;
 @inject Microsoft.Extensions.Configuration.IConfiguration configuration; 
 
 @model LoginViewModel
@@ -23,7 +24,7 @@
                                     <div class="panel-logo"></div>
                                 </td>
                                 <td>
-                                    <h3 class="panel-title">@userInterfaceConfig.Value.ApplicationTitle</h3>
+                                    <h3 class="panel-title">@userInterface.ApplicationTitle</h3>
                                     <div>Login</div>
                                 </td>
                             </tr>
@@ -66,7 +67,7 @@
                                 </div>
                             </fieldset>
                         </form>
-                        @if (!configuration.DenyForgotPasswordChallange())
+                        @if (configuration.DenyForgotPasswordChallange() == false && userInterface.DenyForgotPasswordChallange == false)
                         {
                             <p>
                                 <a href="~/Identity/Account/ForgotPassword">Forgot Password?</a>

@@ -20,7 +20,7 @@ namespace IdentityServer.Legacy
 
         async public Task<Client> FindClientByIdAsync(string clientId)
         {
-            return await _clientDbContext.FindClientByIdAsync(clientId);
+            return (await _clientDbContext.FindClientByIdAsync(clientId))?.IdentityServer4Instance;
         }
     }
 }

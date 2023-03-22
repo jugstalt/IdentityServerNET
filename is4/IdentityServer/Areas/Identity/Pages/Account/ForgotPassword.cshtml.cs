@@ -21,7 +21,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, 
+                                   IEmailSender emailSender, IConfiguration configuration)
         {
             if(configuration.DenyForgotPasswordChallange())
             {

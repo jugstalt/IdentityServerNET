@@ -13,6 +13,7 @@ using IdentityServer.Legacy.Extensions;
 using IdentityServer.Legacy;
 using IdentityServer.Legacy.Services.SecretsVault;
 using IdentityServer.Legacy.Exceptions;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 {
@@ -80,7 +81,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
 
                 if (!String.IsNullOrWhiteSpace(Input.Secret))
                 {
-                    var secret = new Secret()
+                    var secret = new SecretModel()
                     {
                         Type = Input.SecretType,
                         Value = inputSecret,
@@ -88,7 +89,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                         Expiration = Input.Expiration
                     };
 
-                    List<Secret> clientSecrets = new List<Secret>();
+                    List<SecretModel> clientSecrets = new List<SecretModel>();
                     if (this.CurrentClient.ClientSecrets != null)
                     {
                         clientSecrets.AddRange(this.CurrentClient.ClientSecrets);

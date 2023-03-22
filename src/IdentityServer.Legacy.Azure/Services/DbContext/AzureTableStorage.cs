@@ -125,10 +125,15 @@ namespace IdentityServer.Legacy.Azure.Services.DbContext
                         .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
             List<T> entities = new List<T>();
-            foreach (var entity in await ExecuteQueryAsync(table, query))
+
+            try
             {
-                entities.Add(entity);
+                foreach (var entity in await ExecuteQueryAsync(table, query))
+                {
+                    entities.Add(entity);
+                }
             }
+            catch { }
 
             return entities.ToArray();
         }

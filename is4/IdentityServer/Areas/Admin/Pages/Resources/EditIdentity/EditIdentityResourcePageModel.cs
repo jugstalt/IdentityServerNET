@@ -1,4 +1,5 @@
-﻿using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
@@ -17,7 +18,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 
         #region IEditIdentityResourcePageModel
 
-        public IdentityResource CurrentIdentityResource { get; set; }
+        public IdentityResourceModel CurrentIdentityResource { get; set; }
 
         #endregion
 

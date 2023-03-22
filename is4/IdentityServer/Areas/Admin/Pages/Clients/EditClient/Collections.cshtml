@@ -8,7 +8,7 @@
 <h4>@ViewData["Title"]</h4>
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
-    @foreach (var field in typeof(IdentityServer4.Models.Client).GetProperties())
+    @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.ClientModel).GetProperties())
     {
         if (!Model.Input.IgnoreProperties.Contains(field.Name) &&
             field.CanWrite && field.CanRead &&

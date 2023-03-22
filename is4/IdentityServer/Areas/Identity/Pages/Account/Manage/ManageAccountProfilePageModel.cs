@@ -16,15 +16,11 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
     public class ManageAccountProfilePageModel : PageModel, IManageAccountPageModel
     {
-        protected IUserDbContext _userDbContext;
+        protected IUserStoreFactory _userStoreFactory;
 
-        protected ManageAccountProfilePageModel(
-            IUserDbContext userManager,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration)
+        protected ManageAccountProfilePageModel(IUserStoreFactory userStoreFactory)
         {
-            _userDbContext = userManager;
-            EditorInfos =
-                userDbContextConfiguration?.Value?.ManageAccountEditor;
+            _userStoreFactory = userStoreFactory;
         }
 
         [TempData]
@@ -34,11 +30,14 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 
         public string Category { get; set; }
 
-        public ManageAccountEditor EditorInfos { get; set; }
-        
+        async public Task<ManageAccountEditor> EditorInfos() => (await _userStoreFactory.CreateUserDbContextInstance())?.ContextConfiguration?.ManageAccountEditor;
+
+        async protected Task<IUserDbContext> CurrentUserDbContext() => await _userStoreFactory.CreateUserDbContextInstance();
+
         async protected Task LoadUserAsync()
         {
-            this.ApplicationUser = await _userDbContext.FindByNameAsync(User.Identity?.Name, new System.Threading.CancellationToken());
+            var userDbContext = await _userStoreFactory.CreateUserDbContextInstance();
+            this.ApplicationUser = await userDbContext.FindByNameAsync(User.Identity?.Name, new System.Threading.CancellationToken());
         }
     }
 }

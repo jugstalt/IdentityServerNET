@@ -11,7 +11,7 @@
         <h4>@ViewData["Title"]</h4>
         <div class="col-md-6">
             <ul class="nav nav-pills nav-stacked">
-                @foreach (var field in typeof(IdentityServer4.Models.IdentityResource).GetProperties())
+                @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.IdentityResourceModel).GetProperties())
                 {
                     if (field.CanWrite && field.PropertyType == typeof(bool))
                     {

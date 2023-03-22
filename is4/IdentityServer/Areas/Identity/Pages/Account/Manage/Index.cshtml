@@ -10,7 +10,7 @@
 <partial name="_StatusMessage" model="Model.StatusMessage" />
 <div class="row">
     <div class="col-md-6">
-        @if (Model.EditorInfos?.EditorInfos != null && Model.EditorInfos.EditorInfos.Count()>0)
+        @if ((await Model.EditorInfos())?.EditorInfos != null && (await Model.EditorInfos()).EditorInfos.Count()>0)
         {
          <form id="profile-form" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>

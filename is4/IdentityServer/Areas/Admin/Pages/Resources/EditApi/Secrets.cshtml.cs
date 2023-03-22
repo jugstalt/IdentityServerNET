@@ -1,12 +1,11 @@
+using IdentityModel;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.DbContext;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 {
@@ -60,7 +59,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
 
                 if (!String.IsNullOrWhiteSpace(Input.Secret))
                 {
-                    var secret = new Secret()
+                    var secret = new SecretModel()
                     {
                         Type = Input.SecretType,
                         Value = Input.Secret.Trim().ToSha256(),
@@ -68,7 +67,7 @@ namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
                         Expiration = Input.Expiration
                     };
 
-                    List<Secret> clientSecrets = new List<Secret>();
+                    List<SecretModel> clientSecrets = new List<SecretModel>();
                     if (this.CurrentApiResource.ApiSecrets != null)
                     {
                         clientSecrets.AddRange(this.CurrentApiResource.ApiSecrets);

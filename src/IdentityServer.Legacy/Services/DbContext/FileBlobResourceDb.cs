@@ -1,15 +1,14 @@
-﻿using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
+﻿using IdentityServer.Legacy.Extensions.DependencyInjection;
+using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer.Legacy.Services.Cryptography;
+using IdentityServer.Legacy.Services.Serialize;
 using IdentityServer4.Models;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IdentityServer.Legacy.Services.Serialize;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
@@ -22,7 +21,9 @@ namespace IdentityServer.Legacy.Services.DbContext
         public FileBlobResourceDb(IOptions<ResourceDbContextConfiguration> options)
         {
             if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
+            {
                 throw new ArgumentException("FileBlobResourceDb: no connection string defined");
+            }
 
             _rootPath = options.Value.ConnectionString;
             _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
@@ -51,7 +52,7 @@ namespace IdentityServer.Legacy.Services.DbContext
 
         #region IResourceDbContext
 
-        async public Task AddApiResourceAsync(ApiResource apiResource)
+        async public Task AddApiResourceAsync(ApiResourceModel apiResource)
         {
             string id = apiResource.Name.NameToHexId(_cryptoService);
             FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.api");
@@ -71,7 +72,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
         }
 
-        async public Task<ApiResource> FindApiResourceAsync(string name)
+        async public Task<ApiResourceModel> FindApiResourceAsync(string name)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ name.NameToHexId(_cryptoService) }.api");
 
@@ -85,13 +86,13 @@ namespace IdentityServer.Legacy.Services.DbContext
                 var fileText = await reader.ReadToEndAsync();
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return _blobSerializer.DeserializeObject<ApiResource>(fileText);
+                return _blobSerializer.DeserializeObject<ApiResourceModel>(fileText);
             }
         }
 
-        async public Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
+        async public Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
-            List<ApiResource> apiResources = new List<ApiResource>();
+            List<ApiResourceModel> apiResources = new List<ApiResourceModel>();
 
             foreach (var scopeName in scopeNames)
             {
@@ -104,7 +105,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return apiResources;
         }
 
-        public Task RemoveApiResourceAsync(ApiResource apiResource)
+        public Task RemoveApiResourceAsync(ApiResourceModel apiResource)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
 
@@ -116,7 +117,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             return Task.CompletedTask;
         }
 
-        async public Task UpdateApiResourceAsync(ApiResource apiResource, IEnumerable<string> propertyNames = null)
+        async public Task UpdateApiResourceAsync(ApiResourceModel apiResource, IEnumerable<string> propertyNames = null)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ apiResource.Name.NameToHexId(_cryptoService) }.api");
 
@@ -128,9 +129,9 @@ namespace IdentityServer.Legacy.Services.DbContext
             await AddApiResourceAsync(apiResource);
         }
 
-        async public Task<IEnumerable<ApiResource>> GetAllApiResources()
+        async public Task<IEnumerable<ApiResourceModel>> GetAllApiResources()
         {
-            List<ApiResource> apiResources = new List<ApiResource>();
+            List<ApiResourceModel> apiResources = new List<ApiResourceModel>();
 
             foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.api"))
             {
@@ -139,14 +140,14 @@ namespace IdentityServer.Legacy.Services.DbContext
                     var fileText = await reader.ReadToEndAsync();
                     fileText = _cryptoService.DecryptText(fileText);
 
-                    apiResources.Add(_blobSerializer.DeserializeObject<ApiResource>(fileText));
+                    apiResources.Add(_blobSerializer.DeserializeObject<ApiResourceModel>(fileText));
                 }
             }
 
             return apiResources;
         }
 
-        async public Task<IdentityResource> FindIdentityResource(string name)
+        async public Task<IdentityResourceModel> FindIdentityResource(string name)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ name.NameToHexId(_cryptoService) }.identity");
 
@@ -160,13 +161,13 @@ namespace IdentityServer.Legacy.Services.DbContext
                 var fileText = await reader.ReadToEndAsync();
                 fileText = _cryptoService.DecryptText(fileText);
 
-                return _blobSerializer.DeserializeObject<IdentityResource>(fileText);
+                return _blobSerializer.DeserializeObject<IdentityResourceModel>(fileText);
             }
         }
 
-        async public Task<IEnumerable<IdentityResource>> GetAllIdentityResources()
+        async public Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources()
         {
-            List<IdentityResource> identityResources = new List<IdentityResource>();
+            List<IdentityResourceModel> identityResources = new List<IdentityResourceModel>();
 
             foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.identity"))
             {
@@ -175,14 +176,14 @@ namespace IdentityServer.Legacy.Services.DbContext
                     var fileText = await reader.ReadToEndAsync();
                     fileText = _cryptoService.DecryptText(fileText);
 
-                    identityResources.Add(_blobSerializer.DeserializeObject<IdentityResource>(fileText));
+                    identityResources.Add(_blobSerializer.DeserializeObject<IdentityResourceModel>(fileText));
                 }
             }
 
             return identityResources;
         }
 
-        async public Task AddIdentityResourceAsync(IdentityResource identityResource)
+        async public Task AddIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             string id = identityResource.Name.NameToHexId(_cryptoService);
             FileInfo fi = new FileInfo($"{ _rootPath }/{ id }.identity");
@@ -202,7 +203,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             }
         }
 
-        async public Task UpdateIdentityResourceAsync(IdentityResource identityResource, IEnumerable<string> propertyNames)
+        async public Task UpdateIdentityResourceAsync(IdentityResourceModel identityResource, IEnumerable<string> propertyNames)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
 
@@ -214,7 +215,7 @@ namespace IdentityServer.Legacy.Services.DbContext
             await AddIdentityResourceAsync(identityResource);
         }
 
-        public Task RemoveIdentityResourceAsync(IdentityResource identityResource)
+        public Task RemoveIdentityResourceAsync(IdentityResourceModel identityResource)
         {
             FileInfo fi = new FileInfo($"{ _rootPath }/{ identityResource.Name.NameToHexId(_cryptoService) }.identity");
 

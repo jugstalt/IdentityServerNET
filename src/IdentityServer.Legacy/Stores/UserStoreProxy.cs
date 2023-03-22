@@ -27,18 +27,21 @@ namespace IdentityServer.Legacy.Stores
                                   IUserLockoutStore<ApplicationUser>
                                   
     {
-        private IUserDbContext _dbContext;
-        private IPasswordHasher<ApplicationUser> _passwordHasher = null;
+        //private IUserDbContext _dbContext;
+        //private IPasswordHasher<ApplicationUser> _passwordHasher = null;
+        private readonly IUserStoreFactory _userStoreFactory;
 
-        public UserStoreProxy(IPasswordHasher<ApplicationUser> passwordHasher, IUserDbContext dbContext = null)
+        public UserStoreProxy(IUserStoreFactory userStoreFactory)
         {
-            _dbContext = dbContext ?? new InMemoryUserDb();
-            _passwordHasher = passwordHasher;
+            _userStoreFactory = userStoreFactory;
+
+            //_dbContext = dbContextes.FirstOrDefault() ?? new InMemoryUserDb();
+            //_passwordHasher = passwordHashers.FirstOrDefault();
 
             // ToDo: ILogging instead of Console.WriteLine
-            Console.WriteLine("Initialize UserStoreProxy");
-            Console.WriteLine("DbContext:      " + _dbContext.GetType().ToString());
-            Console.WriteLine("PasswordHasher: " + _passwordHasher.GetType().ToString());
+            //Console.WriteLine("Initialize UserStoreProxy");
+            //Console.WriteLine("DbContext:      " + _dbContext.GetType().ToString());
+            //Console.WriteLine("PasswordHasher: " + _passwordHasher.GetType().ToString());
             
             // Create Test Users
 
@@ -70,12 +73,12 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            return await _dbContext.CreateAsync(user, cancellationToken);
+            return await (await UserDbContext()).CreateAsync(user, cancellationToken);
         }
 
         async public Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            return await _dbContext.DeleteAsync(user, cancellationToken);
+            return await (await UserDbContext()).DeleteAsync(user, cancellationToken);
         }
 
         public void Dispose()
@@ -86,12 +89,12 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return await _dbContext.FindByIdAsync(userId, cancellationToken);
+            return await (await UserDbContext()).FindByIdAsync(userId, cancellationToken);
         }
 
         async public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await _dbContext.FindByNameAsync(normalizedUserName, cancellationToken);
+            return await (await UserDbContext()).FindByNameAsync(normalizedUserName, cancellationToken);
         }
 
         public Task<string> GetNormalizedUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -115,18 +118,18 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetNormalizedUserNameAsync(ApplicationUser user, string normalizedName, CancellationToken cancellationToken)
         {
             user.NormalizedUserName = 
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.NormalizedUserName, normalizedName, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.NormalizedUserName, normalizedName, cancellationToken);
         }
 
         async public Task SetUserNameAsync(ApplicationUser user, string userName, CancellationToken cancellationToken)
         {
             user.UserName =
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.UserName, userName, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.UserName, userName, cancellationToken);
         }
 
         async public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            return await _dbContext.UpdateAsync(user, cancellationToken);
+            return await (await UserDbContext()).UpdateAsync(user, cancellationToken);
         }
 
         #endregion
@@ -135,7 +138,7 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task<ApplicationUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            return await _dbContext.FindByEmailAsync(normalizedEmail, cancellationToken);
+            return await (await UserDbContext()).FindByEmailAsync(normalizedEmail, cancellationToken);
         }
 
         public Task<string> GetEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -156,19 +159,19 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetEmailAsync(ApplicationUser user, string email, CancellationToken cancellationToken)
         {
             user.Email =
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.Email, email, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.Email, email, cancellationToken);
         }
 
         async public Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
         {
             user.EmailConfirmed =
-                await _dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.EmailConfirmed, confirmed, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<bool>(user, ApplicationUserProperties.EmailConfirmed, confirmed, cancellationToken);
         }
 
         async public Task SetNormalizedEmailAsync(ApplicationUser user, string normalizedEmail, CancellationToken cancellationToken)
         {
             user.NormalizedEmail =
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.NormalizedEmail, normalizedEmail, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.NormalizedEmail, normalizedEmail, cancellationToken);
         }
 
         #endregion
@@ -178,7 +181,7 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetPasswordHashAsync(ApplicationUser user, string passwordHash, CancellationToken cancellationToken)
         {
             user.PasswordHash =
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.PasswordHash, passwordHash, cancellationToken);
+                await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.PasswordHash, passwordHash, cancellationToken);
         }
 
         public Task<string> GetPasswordHashAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -198,7 +201,7 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetPhoneNumberAsync(ApplicationUser user, string phoneNumber, CancellationToken cancellationToken)
         {
             user.PhoneNumber =
-               await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.PhoneNumber, phoneNumber, cancellationToken);
+               await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.PhoneNumber, phoneNumber, cancellationToken);
         }
 
         public Task<string> GetPhoneNumberAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -214,7 +217,7 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetPhoneNumberConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
         {
             user.PhoneNumberConfirmed =
-               await _dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.PhoneNumberConfirmed, confirmed, cancellationToken);
+               await (await UserDbContext()).UpdatePropertyAsync<bool>(user, ApplicationUserProperties.PhoneNumberConfirmed, confirmed, cancellationToken);
         }
 
         #endregion
@@ -224,7 +227,7 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetAuthenticatorKeyAsync(ApplicationUser user, string key, CancellationToken cancellationToken)
         {
             user.AuthenticatorKey =
-               await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.AuthenticatorKey, key, cancellationToken);
+               await (await UserDbContext()).UpdatePropertyAsync<string>(user, ApplicationUserProperties.AuthenticatorKey, key, cancellationToken);
         }
 
         public Task<string> GetAuthenticatorKeyAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -239,7 +242,7 @@ namespace IdentityServer.Legacy.Stores
         async public Task SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled, CancellationToken cancellationToken)
         {
             user.TwoFactorEnabled =
-               await _dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.TwoFactorEnabled, enabled, cancellationToken);
+               await (await UserDbContext()).UpdatePropertyAsync<bool>(user, ApplicationUserProperties.TwoFactorEnabled, enabled, cancellationToken);
         }
 
         public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -256,7 +259,7 @@ namespace IdentityServer.Legacy.Stores
             user.TfaRecoveryCodes = recoveryCodes;
 
             user.TfaRecoveryCodes =
-               await _dbContext.UpdatePropertyAsync<IEnumerable<string>>
+               await (await UserDbContext()).UpdatePropertyAsync<IEnumerable<string>>
                     (user, ApplicationUserProperties.TfaRecoveryCodes, recoveryCodes, cancellationToken);
         }
 
@@ -265,7 +268,7 @@ namespace IdentityServer.Legacy.Stores
             if (user.TfaRecoveryCodes == null || !user.TfaRecoveryCodes.Contains(code))
                 return false;
 
-            user.TfaRecoveryCodes = await _dbContext.UpdatePropertyAsync<IEnumerable<string>>
+            user.TfaRecoveryCodes = await (await UserDbContext()).UpdatePropertyAsync<IEnumerable<string>>
                     (user, ApplicationUserProperties.TfaRecoveryCodes,
                     user.TfaRecoveryCodes.Where(c=>c!=code).ToArray(), 
                     cancellationToken);
@@ -292,22 +295,25 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task AddClaimsAsync(ApplicationUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
-            if (_dbContext is IUserClaimsDbContext)
-                await ((IUserClaimsDbContext)_dbContext).AddClaimsAsync(user, claims, cancellationToken);
+            var dbContext = await UserDbContext();
+            if (dbContext is IUserClaimsDbContext)
+                await ((IUserClaimsDbContext)dbContext).AddClaimsAsync(user, claims, cancellationToken);
 
             user.Claims = claims.ToArray();
         }
 
         async public Task ReplaceClaimAsync(ApplicationUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
         {
-            if (_dbContext is IUserClaimsDbContext)
-                await ((IUserClaimsDbContext)_dbContext).ReplaceClaimAsync(user, claim, newClaim, cancellationToken);
+            var dbContext = await UserDbContext();
+            if (dbContext is IUserClaimsDbContext)
+                await ((IUserClaimsDbContext)dbContext).ReplaceClaimAsync(user, claim, newClaim, cancellationToken);
         }
 
         async public Task RemoveClaimsAsync(ApplicationUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
         {
-            if (_dbContext is IUserClaimsDbContext)
-                await ((IUserClaimsDbContext)_dbContext).RemoveClaimsAsync(user, claims, cancellationToken);
+            var dbContext = await UserDbContext();
+            if (dbContext is IUserClaimsDbContext)
+                await ((IUserClaimsDbContext)dbContext).RemoveClaimsAsync(user, claims, cancellationToken);
         }
 
         public Task<IList<ApplicationUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
@@ -354,8 +360,10 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task SetSecurityStampAsync(ApplicationUser user, string stamp, CancellationToken cancellationToken)
         {
-             user.SecurityStamp =
-                await _dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.SecurityStamp, stamp, cancellationToken);
+            var dbContext = await UserDbContext();
+
+            user.SecurityStamp =
+                await dbContext.UpdatePropertyAsync<string>(user, ApplicationUserProperties.SecurityStamp, stamp, cancellationToken);
         }
 
         public Task<string> GetSecurityStampAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -367,24 +375,24 @@ namespace IdentityServer.Legacy.Stores
 
         #region IUserRoleStore
 
-        public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        async public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
         {
-            if(_dbContext is IUserRoleDbContext)
-            {
-                return ((IUserRoleDbContext)_dbContext).AddToRoleAsync(user, roleName, cancellationToken);
-            }
+            var dbContext = await UserDbContext();
 
-            return Task.CompletedTask;
+            if (dbContext is IUserRoleDbContext)
+            {
+                await ((IUserRoleDbContext)dbContext).AddToRoleAsync(user, roleName, cancellationToken);
+            }
         }
 
-        public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+        async public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
         {
-            if (_dbContext is IUserRoleDbContext)
-            {
-                return ((IUserRoleDbContext)_dbContext).RemoveFromRoleAsync(user, roleName, cancellationToken);
-            }
+            var dbContext = await UserDbContext();
 
-            return Task.CompletedTask;
+            if (dbContext is IUserRoleDbContext)
+            {
+                await ((IUserRoleDbContext)dbContext).RemoveFromRoleAsync(user, roleName, cancellationToken);
+            }
         }
 
         public Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -399,14 +407,16 @@ namespace IdentityServer.Legacy.Stores
             return Task.FromResult(isInRole);
         }
 
-        public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        async public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            if (_dbContext is IUserRoleDbContext)
+            var dbContext = await UserDbContext();
+
+            if (dbContext is IUserRoleDbContext)
             {
-                return ((IUserRoleDbContext)_dbContext).GetUsersInRoleAsync(roleName, cancellationToken);
+                return await ((IUserRoleDbContext)dbContext).GetUsersInRoleAsync(roleName, cancellationToken);
             }
 
-            return Task.FromResult<IList<ApplicationUser>>(new ApplicationUser[0]);
+            return new ApplicationUser[0];
         }
 
         #endregion
@@ -420,22 +430,28 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task SetLockoutEndDateAsync(ApplicationUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
         {
+            var dbContext = await UserDbContext();
+
             user.LockoutEnd =
-                await _dbContext.UpdatePropertyAsync<DateTimeOffset?>(user, ApplicationUserProperties.LockoutEnd, lockoutEnd, cancellationToken);
+                await dbContext.UpdatePropertyAsync<DateTimeOffset?>(user, ApplicationUserProperties.LockoutEnd, lockoutEnd, cancellationToken);
         }
 
         async public Task<int> IncrementAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
+            var dbContext = await UserDbContext();
+
             user.AccessFailedCount =
-                await _dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, user.AccessFailedCount + 1, cancellationToken);
+                await dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, user.AccessFailedCount + 1, cancellationToken);
 
             return user.AccessFailedCount;
         }
 
         async public Task ResetAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
+            var dbContext = await UserDbContext();
+
             user.AccessFailedCount =
-                await _dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, 0, cancellationToken);
+                await dbContext.UpdatePropertyAsync<int>(user, ApplicationUserProperties.AccessFailedCount, 0, cancellationToken);
         }
 
         public Task<int> GetAccessFailedCountAsync(ApplicationUser user, CancellationToken cancellationToken)
@@ -450,8 +466,19 @@ namespace IdentityServer.Legacy.Stores
 
         async public Task SetLockoutEnabledAsync(ApplicationUser user, bool enabled, CancellationToken cancellationToken)
         {
+            var dbContext = await UserDbContext();
+
             user.LockoutEnabled =
-                await _dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.LockoutEnabled, enabled, cancellationToken);
+                await dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.LockoutEnabled, enabled, cancellationToken);
+        }
+
+        #endregion
+
+        #region Helper
+
+        private Task<IUserDbContext> UserDbContext()
+        {
+            return _userStoreFactory.CreateUserDbContextInstance();
         }
 
         #endregion

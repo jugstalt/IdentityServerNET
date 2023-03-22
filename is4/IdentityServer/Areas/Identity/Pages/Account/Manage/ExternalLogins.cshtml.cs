@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
+﻿using IdentityServer.Legacy;
+using IdentityServer.Legacy.Services.DbContext;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage
 {
@@ -20,8 +18,8 @@ namespace IdentityServer.Areas.Identity.Pages.Account.Manage
         public ExternalLoginsModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration = null)
-            : base(userDbContextConfiguration)
+            IUserStoreFactory userStoreFactory)
+            : base(userStoreFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;

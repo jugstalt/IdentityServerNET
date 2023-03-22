@@ -1,18 +1,17 @@
-﻿using IdentityServer4.Models;
-using System;
+﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+using IdentityServer4.Models;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Legacy.Services.DbContext
 {
     public interface IResourceDbContext
     {
-        Task<ApiResource> FindApiResourceAsync(string name);
-        Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames);
-        Task<IEnumerable<ApiResource>> GetAllApiResources();
+        Task<ApiResourceModel> FindApiResourceAsync(string name);
+        Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames);
+        Task<IEnumerable<ApiResourceModel>> GetAllApiResources();
 
-        Task<IdentityResource> FindIdentityResource(string name);
-        Task<IEnumerable<IdentityResource>> GetAllIdentityResources();
+        Task<IdentityResourceModel> FindIdentityResource(string name);
+        Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources();
     }
 }
