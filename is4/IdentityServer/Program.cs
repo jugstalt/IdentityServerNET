@@ -62,13 +62,14 @@ namespace IdentityServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddJsonFile("_config/identityserver.legacy.json",
+                    var settingsPrefix = Environment.GetEnvironmentVariable("IDENTITY_SERVER_SETTINGS_PREFIX") ?? "default";
+                    config.AddJsonFile($"_config/{settingsPrefix}.identityserver.legacy.json",
                         optional: true,
                         reloadOnChange: false);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
+                    webBuilder 
                         .UseSetting(WebHostDefaults.ApplicationKey, typeof(Program).Assembly.GetName().Name)
                         //.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, typeof(IdentityServer.Legacy.LegacyHostingStartup).Assembly.GetName().Name);
                         .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, string.Join(";", StartupAssemblies));
