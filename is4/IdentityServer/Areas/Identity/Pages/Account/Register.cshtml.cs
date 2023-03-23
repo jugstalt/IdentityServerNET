@@ -30,7 +30,6 @@ namespace IdentityServer.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly RegisterAccountEditor _editor;
         private readonly IUserStoreFactory _userStoreFactory;
 
         public RegisterModel(

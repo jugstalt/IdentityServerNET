@@ -74,7 +74,7 @@ namespace IdentityServer
                         .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, string.Join(";", StartupAssemblies));
 
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseSerilog();
-                });
+                })
+                .UseSerilog();
     }
 }

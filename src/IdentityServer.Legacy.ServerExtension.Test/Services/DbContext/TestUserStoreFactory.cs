@@ -14,9 +14,9 @@ namespace IdentityServer.Legacy.ServerExtension.Test.Services.DbContext
             _userDbContextes = userContextes;
         }
 
-        async protected override Task<IUserDbContext> GetUserDbContectAsync()
+        protected override Task<IUserDbContext> GetUserDbContectAsync()
         {
-            return _userDbContextes.FirstOrDefault();
+            return Task.FromResult(_userDbContextes.FirstOrDefault());
         }
     }
 }

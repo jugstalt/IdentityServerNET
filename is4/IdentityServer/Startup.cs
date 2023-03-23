@@ -230,7 +230,6 @@ namespace IdentityServer
             {
                 services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
 
-
                 #region Refresh Certificate Store and add SigningCredentials
 
                 var sp = services.BuildServiceProvider();

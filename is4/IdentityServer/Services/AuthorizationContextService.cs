@@ -16,8 +16,6 @@ namespace IdentityServer.Services
         private readonly string _clientId;
         private readonly IIdentityServerInteractionService _interaction;
 
-        private readonly string _authorization;
-
         public AuthorizationContextService(IHttpContextAccessor httpContextAccessor,
                                            IIdentityServerInteractionService interaction)
         {
