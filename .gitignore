@@ -345,3 +345,4 @@ _config/identityserver.legacy.json
 /is4/IdentityServer/wwwroot/css/media
 
 _config/
+*.jwk
