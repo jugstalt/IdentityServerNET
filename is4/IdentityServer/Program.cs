@@ -1,8 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -69,7 +65,9 @@ namespace IdentityServer
                         settingsPrefix = "default";
                     }
 
-                    config.AddJsonFile($"_config/{settingsPrefix}.identityserver.legacy.json",
+                    var configFile = $"_config/{settingsPrefix}.identityserver.legacy.json";
+                    Console.WriteLine($"Use config file: {configFile} ({(System.IO.File.Exists(configFile) ? "exits" : "not- exits")})");
+                    config.AddJsonFile(configFile,
                         optional: true,
                         reloadOnChange: false);
                 })
