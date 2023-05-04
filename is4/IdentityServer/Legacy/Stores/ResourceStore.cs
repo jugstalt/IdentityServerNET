@@ -46,6 +46,7 @@ namespace IdentityServer.Legacy
             List<ScopeModel> scopes = new List<ScopeModel>();
 
             scopes.AddRange((await _resourcedbContext.GetAllApiResources())
+                                                     .Where(r=>r.Scopes!=null)
                                                      .SelectMany(r => r.Scopes));
 
             return scopes.Where(s => scopeNames.Contains(s.Name))
