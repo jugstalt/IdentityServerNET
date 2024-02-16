@@ -341,6 +341,7 @@ healthchecksdb
 
 _config/identityserver.legacy.json
 /is4/IdentityServer/_config/identityserver.legacy.json
+/is4/IdentityServer/_config/default.identityserver.legacy.json
 /is4/IdentityServer/wwwroot/css/is4-overrides.css
 /is4/IdentityServer/wwwroot/css/media
 
