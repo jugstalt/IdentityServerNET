@@ -15,7 +15,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
     public class UserRolesModel : EditUserPageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        //private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UserRolesModel(
             UserManager<ApplicationUser> userManager,
@@ -26,7 +26,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
             : base(userDbContext, userDbContextConfiguration, roleDbContext)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+            //_signInManager = signInManager;
         }
 
         public string[] UserRoles;
@@ -60,7 +60,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                 await LoadCurrentApplicationUserAsync(id);
 
                 await ((IUserRoleDbContext)_userDbContext).RemoveFromRoleAsync(CurrentApplicationUser, roleName, CancellationToken.None);
-                await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
+                //await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
             }
             , onFinally: () => RedirectToPage(new { id = id })
             , successMessage: $"Role {roleName} removed");
@@ -78,7 +78,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
                 await LoadCurrentApplicationUserAsync(id);
 
                 await ((IUserRoleDbContext)_userDbContext).AddToRoleAsync(CurrentApplicationUser, roleName, CancellationToken.None);
-                await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
+                //await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
             }
             , onFinally: () => RedirectToPage(new { id = id })
             , successMessage: $"Role {roleName} added");
