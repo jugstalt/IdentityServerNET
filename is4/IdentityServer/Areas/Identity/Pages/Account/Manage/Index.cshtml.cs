@@ -1,6 +1,6 @@
-﻿using IdentityServer.Legacy;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.UserInteraction;
+﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;

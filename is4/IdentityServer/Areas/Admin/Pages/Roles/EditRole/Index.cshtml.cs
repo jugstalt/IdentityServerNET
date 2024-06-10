@@ -1,5 +1,5 @@
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Extensions.DependencyInjection;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;

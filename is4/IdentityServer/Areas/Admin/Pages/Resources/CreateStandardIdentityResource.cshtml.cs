@@ -1,5 +1,5 @@
-using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Models.IdentityServerWrappers;
+using IdentityServer.Nova.Services.DbContext;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;

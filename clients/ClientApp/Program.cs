@@ -1,6 +1,6 @@
 ﻿using IdentityModel.Client;
-using IdentityServer.Legacy.Clients;
-using IdentityServer.Legacy.Extensions;
+using IdentityServer.Nova.Clients;
+using IdentityServer.Nova.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;

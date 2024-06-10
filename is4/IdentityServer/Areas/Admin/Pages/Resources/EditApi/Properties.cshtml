@@ -13,7 +13,7 @@
         <form id="-form" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="Input.ApiName" />
-            @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.ApiResourceModel).GetProperties())
+            @foreach (var field in typeof(IdentityServer.Nova.Models.IdentityServerWrappers.ApiResourceModel).GetProperties())
             {
                 if (!Model.Input.IgnoreProperties.Contains(field.Name) && field.CanWrite && field.CanRead &&
                     (field.PropertyType == typeof(string) || field.PropertyType == typeof(int)))

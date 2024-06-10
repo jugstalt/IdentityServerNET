@@ -1,8 +1,8 @@
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.Services.ErrorHandling;
-using IdentityServer.Legacy.UserInteraction;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Extensions.DependencyInjection;
+using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Services.ErrorHandling;
+using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;

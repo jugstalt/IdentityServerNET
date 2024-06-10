@@ -1,6 +1,6 @@
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Extensions.DependencyInjection;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Extensions.DependencyInjection;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;

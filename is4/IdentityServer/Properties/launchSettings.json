@@ -12,7 +12,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "IDENTITY_SERVER_SETTINGS_PREFIX": "webportal"
+        "IDENTITY_SERVER_SETTINGS_PREFIX_": "webportal"
       },
       "applicationUrl": "https://localhost:44300"
     }

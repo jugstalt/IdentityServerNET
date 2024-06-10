@@ -12,7 +12,7 @@
 
             <ul class="nav nav-pills nav-stacked">
                 @{ var count = 0; }
-                @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.ClientModel).GetProperties())
+                @foreach (var field in typeof(IdentityServer.Nova.Models.IdentityServerWrappers.ClientModel).GetProperties())
                 {
                     if (field.CanWrite && field.PropertyType == typeof(bool))
                     {

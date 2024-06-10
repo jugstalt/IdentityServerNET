@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage

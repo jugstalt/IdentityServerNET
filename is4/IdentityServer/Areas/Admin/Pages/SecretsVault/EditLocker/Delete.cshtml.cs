@@ -1,5 +1,5 @@
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;

@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy;
+﻿using IdentityServer.Nova;
 
 namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
 {

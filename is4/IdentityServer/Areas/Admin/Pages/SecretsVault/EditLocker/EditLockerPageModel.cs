@@ -1,5 +1,5 @@
-﻿using IdentityServer.Legacy.Models;
-using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Services.DbContext;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

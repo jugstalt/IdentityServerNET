@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.Models;
+﻿using IdentityServer.Nova.Models;
 
 namespace IdentityServer.Areas.Admin.Pages
 {

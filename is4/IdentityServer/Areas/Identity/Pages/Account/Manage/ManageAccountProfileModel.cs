@@ -1,5 +1,5 @@
-﻿using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.UserInteraction;
+﻿using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
 

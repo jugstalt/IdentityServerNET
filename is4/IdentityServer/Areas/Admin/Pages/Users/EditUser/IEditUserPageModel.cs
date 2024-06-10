@@ -1,5 +1,5 @@
-﻿using IdentityServer.Legacy;
-using IdentityServer.Legacy.UserInteraction;
+﻿using IdentityServer.Nova;
+using IdentityServer.Nova.UserInteraction;
 
 namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
 {

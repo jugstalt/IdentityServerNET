@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.Models.IdentityServerWrappers;
+﻿using IdentityServer.Nova.Models.IdentityServerWrappers;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
 {

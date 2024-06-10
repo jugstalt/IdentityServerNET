@@ -3,8 +3,8 @@
 
 
 using IdentityModel;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Services.Security;
+using IdentityServer.Nova;
+using IdentityServer.Nova.Services.Security;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;

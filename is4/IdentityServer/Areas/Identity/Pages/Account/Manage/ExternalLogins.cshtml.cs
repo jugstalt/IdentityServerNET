@@ -1,5 +1,5 @@
-﻿using IdentityServer.Legacy;
-using IdentityServer.Legacy.Services.DbContext;
+﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

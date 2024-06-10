@@ -1,7 +1,7 @@
 ﻿using IdentityModel;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.UserInteraction;
+using IdentityServer.Nova;
+using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

@@ -1,0 +1,48 @@
+﻿using IdentityServer.Nova.Reflection;
+using IdentityServer.Nova.Stores;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Reflection;
+
+[assembly: HostingStartup(typeof(IdentityServer.Nova.LegacyHostingStartup))]
+namespace IdentityServer.Nova
+{
+    public class LegacyHostingStartup : IHostingStartup
+    {
+        public LegacyHostingStartup()
+        {
+        }
+
+        public void Configure(IWebHostBuilder builder)
+        {
+            builder.ConfigureServices((context, services) =>
+            {
+                services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
+                services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
+
+                //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
+
+                string legacyAssemblyName = context.Configuration["LegacyAssemblyName"];
+                if (!String.IsNullOrWhiteSpace(legacyAssemblyName))
+                {
+                    var legacyAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{legacyAssemblyName}.dll");
+
+                    foreach (var type in legacyAssembly.GetTypes())
+                    {
+                        if (type.GetCustomAttribute<IdentityServerLegacyStartupAttribute>() != null)
+                        {
+                            if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerLegacyStartup))))
+                            {
+                                var hostingStartup = Activator.CreateInstance(type) as IIdentityServerLegacyStartup;
+                                hostingStartup.ConfigureServices(context, services);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+}

@@ -1,10 +1,10 @@
 using IdentityModel;
-using IdentityServer.Legacy;
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer.Legacy.Services.DbContext;
-using IdentityServer.Legacy.Services.SecretsVault;
+using IdentityServer.Nova;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Extensions;
+using IdentityServer.Nova.Models.IdentityServerWrappers;
+using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Services.SecretsVault;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +58,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
                     case IdentityServerConstants.SecretTypes.X509CertificateBase64:
                         inputSecret = inputSecret.ParseCertBase64String();
                         break;
-                    case IdentityServerLegacyConstants.SecretTypes.SecretsVaultSecret:
+                    case IdentityServerNovaConstants.SecretTypes.SecretsVaultSecret:
                         try
                         {
                             var secretsVersion = await _secretsVaultManager.GetSecretVersion(inputSecret);

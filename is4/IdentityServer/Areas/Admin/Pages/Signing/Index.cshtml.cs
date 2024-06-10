@@ -1,6 +1,6 @@
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models;
-using IdentityServer.Legacy.Services.Signing;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Services.Signing;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;

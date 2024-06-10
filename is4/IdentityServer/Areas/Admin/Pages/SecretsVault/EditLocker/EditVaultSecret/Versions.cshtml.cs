@@ -1,7 +1,7 @@
-using IdentityServer.Legacy.Exceptions;
-using IdentityServer.Legacy.Models;
-using IdentityServer.Legacy.Services.Cryptography;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Services.Cryptography;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

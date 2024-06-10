@@ -22,9 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\is4-libs\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj" />
     <ProjectReference Include="..\..\is4-libs\IdentityServer4\src\IdentityServer4.csproj" />
-    <ProjectReference Include="..\..\src\IdentityServer.Legacy.Extensions\IdentityServer.Legacy.Extensions.csproj" />
-    <ProjectReference Include="..\..\src\IdentityServer.Legacy.ServerExtension.Test\IdentityServer.Legacy.ServerExtension.Test.csproj" />
-    <ProjectReference Include="..\..\src\IdentityServer.Legacy\IdentityServer.Legacy.csproj" />
+    <ProjectReference Include="..\..\src\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\IdentityServer.Nova.ServerExtension.Test\IdentityServer.Nova.ServerExtension.Test.csproj" />
+    <ProjectReference Include="..\..\src\IdentityServer.Nova\IdentityServer.Nova.csproj" />
   </ItemGroup>
  
 </Project>

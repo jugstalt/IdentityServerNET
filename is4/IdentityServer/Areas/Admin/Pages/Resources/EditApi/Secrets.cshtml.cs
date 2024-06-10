@@ -1,6 +1,6 @@
 using IdentityModel;
-using IdentityServer.Legacy.Models.IdentityServerWrappers;
-using IdentityServer.Legacy.Services.DbContext;
+using IdentityServer.Nova.Models.IdentityServerWrappers;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy.UserInteraction;
+﻿using IdentityServer.Nova.UserInteraction;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Identity.Pages.Account.Manage

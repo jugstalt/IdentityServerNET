@@ -1,4 +1,4 @@
-﻿using IdentityServer.Legacy;
+﻿using IdentityServer.Nova;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

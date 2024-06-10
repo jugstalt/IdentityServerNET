@@ -11,7 +11,7 @@
     <div class="col-md-6">
 
         <ul class="nav nav-pills nav-stacked">
-            @foreach (var field in typeof(IdentityServer.Legacy.Models.IdentityServerWrappers.ApiResourceModel).GetProperties())
+            @foreach (var field in typeof(IdentityServer.Nova.Models.IdentityServerWrappers.ApiResourceModel).GetProperties())
             {
                 if (field.CanWrite && field.PropertyType == typeof(bool))
                 {

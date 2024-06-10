@@ -50,7 +50,7 @@ namespace IdentityServer
 
         private static string[] StartupAssemblies = new[]
         {
-            "IdentityServer.Legacy"
+            "IdentityServer.Nova"
             //, "IdentityServer.Legacy.ServerExtension.Test"
         };
 

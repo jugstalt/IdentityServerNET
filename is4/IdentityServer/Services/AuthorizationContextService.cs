@@ -1,5 +1,5 @@
-﻿using IdentityServer.Legacy.Extensions;
-using IdentityServer.Legacy.Services;
+﻿using IdentityServer.Nova.Extensions;
+using IdentityServer.Nova.Services;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;

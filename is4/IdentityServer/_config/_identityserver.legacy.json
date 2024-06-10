@@ -1,5 +1,5 @@
 {
-  "LegacyAssemblyName": "IdentityServer.Legacy.ServerExtension.Test",
+  "LegacyAssemblyName": "IdentityServer.Nova.ServerExtension.Test",
   "ConnectionStrings": {
     "MongoDb": "mongodb://localhost:27017"
   }
