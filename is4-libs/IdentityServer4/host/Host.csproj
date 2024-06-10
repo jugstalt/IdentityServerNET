@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="8.0.6" />
+    
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
+    <!--<PackageReference Include="IdentityServer4.EntityFramework" />-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="All" Version="8.0.6" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+    
+    <ProjectReference Include="..\src\IdentityServer4.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MinVer" Version="5.0.0" />
+  </ItemGroup>
+</Project>
