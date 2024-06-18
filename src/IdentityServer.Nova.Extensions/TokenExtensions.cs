@@ -1,6 +1,6 @@
 ﻿//using IdentityModel;
 //using IdentityModel.Client;
-//using IdentityServer.Legacy.Token.ErrorHandling;
+//using IdentityServer.Nova.Token.ErrorHandling;
 //using Newtonsoft.Json;
 //using System;
 //using System.Collections.Concurrent;
@@ -9,7 +9,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace IdentityServer.Legacy.Token
+//namespace IdentityServer.Nova.Token
 //{
 //    public static class TokenExtensions
 //    {

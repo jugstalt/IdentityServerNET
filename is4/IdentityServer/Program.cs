@@ -51,7 +51,6 @@ namespace IdentityServer
         private static string[] StartupAssemblies = new[]
         {
             "IdentityServer.Nova"
-            //, "IdentityServer.Legacy.ServerExtension.Test"
         };
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -65,7 +64,7 @@ namespace IdentityServer
                         settingsPrefix = "default";
                     }
 
-                    var configFile = $"_config/{settingsPrefix}.identityserver.legacy.json";
+                    var configFile = $"_config/{settingsPrefix}.identityserver.nova.json";
                     Console.WriteLine($"Use config file: {configFile} ({(System.IO.File.Exists(configFile) ? "exits" : "not- exits")})");
                     config.AddJsonFile(configFile,
                         optional: true,
@@ -75,7 +74,6 @@ namespace IdentityServer
                 {
                     webBuilder
                         .UseSetting(WebHostDefaults.ApplicationKey, typeof(Program).Assembly.GetName().Name)
-                        //.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, typeof(IdentityServer.Legacy.LegacyHostingStartup).Assembly.GetName().Name);
                         .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, string.Join(";", StartupAssemblies));
 
                     webBuilder.UseStartup<Startup>();

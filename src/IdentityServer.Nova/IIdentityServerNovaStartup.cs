@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityServer.Nova
 {
-    public interface IIdentityServerLegacyStartup
+    public interface IIdentityServerNovaStartup
     {
         void ConfigureServices(WebHostBuilderContext context, IServiceCollection services);
     }

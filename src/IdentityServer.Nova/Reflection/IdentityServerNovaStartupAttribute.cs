@@ -2,7 +2,7 @@
 
 namespace IdentityServer.Nova.Reflection
 {
-    public class IdentityServerLegacyStartupAttribute : Attribute
+    public class IdentityServerNovaStartupAttribute : Attribute
     {
     }
 }

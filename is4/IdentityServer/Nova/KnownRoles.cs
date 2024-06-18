@@ -2,12 +2,12 @@
 {
     public class KnownRoles
     {
-        public const string UserAdministrator = "identityserver-legacy-user-administrator";
-        public const string RoleAdministrator = "identityserver-legacy-role-administrator";
-        public const string ResourceAdministrator = "identityserver-legacy-resource-administrator";
-        public const string ClientAdministrator = "identityserver-legacy-client-administrator";
-        public const string SecretsVaultAdministrator = "identityserver-legacy-secretsvault-administrator";
-        public const string SigningAdministrator = "identityserver-legacy-signing-administrator";
+        public const string UserAdministrator = "identityserver-nova-user-administrator";
+        public const string RoleAdministrator = "identityserver-nova-role-administrator";
+        public const string ResourceAdministrator = "identityserver-nova-resource-administrator";
+        public const string ClientAdministrator = "identityserver-nova-client-administrator";
+        public const string SecretsVaultAdministrator = "identityserver-nova-secretsvault-administrator";
+        public const string SigningAdministrator = "identityserver-nova-signing-administrator";
 
         public ApplicationRole UserAdministratorRole()
         {

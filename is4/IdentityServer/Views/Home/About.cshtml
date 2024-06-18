@@ -1,6 +1,6 @@
 @{
     var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
-    var version_legacy = typeof(IdentityServer.Nova.ApplicationUser).Assembly.GetName().Version.ToString();
+    var version_nova = typeof(IdentityServer.Nova.ApplicationUser).Assembly.GetName().Version.ToString();
 }
 
     <div class="welcome-page">
@@ -8,7 +8,7 @@
             <div class="col-sm-10">
                 <h1>
                     <img class="icon" src="~/icon.jpg">
-                    Welcome to IdentityServer-Legacy
+                    Welcome to IdentityServer.Nova
 
                 </h1>
             </div>
@@ -27,12 +27,12 @@
         <div class="row">
             <div class="col-sm-8">
                 <h4>
-                    IdentityServer.Legacy
-                    <small>(version @version_legacy)</small>
+                    IdentityServer.Nova
+                    <small>(version @version_nova)</small>
                 </h4>
                 <p>
                     Here are links to the
-                    <a href="https://github.com/jugstalt/identityserver-legacy">source code repository</a>
+                    <a href="https://github.com/jugstalt/identityserver.nova">source code repository</a>
                 </p>
             </div>
         </div>

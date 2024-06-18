@@ -1,6 +1,6 @@
 ﻿//using System;
 //using IdentityServer.Data;
-//using IdentityServer.Legacy;
+//using IdentityServer.Nova;
 //using IdentityServer4.Configuration;
 //using Microsoft.AspNetCore.Hosting;
 //using Microsoft.AspNetCore.Identity;

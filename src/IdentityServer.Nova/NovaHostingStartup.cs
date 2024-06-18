@@ -7,12 +7,12 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-[assembly: HostingStartup(typeof(IdentityServer.Nova.LegacyHostingStartup))]
+[assembly: HostingStartup(typeof(IdentityServer.Nova.NovaHostingStartup))]
 namespace IdentityServer.Nova
 {
-    public class LegacyHostingStartup : IHostingStartup
+    public class NovaHostingStartup : IHostingStartup
     {
-        public LegacyHostingStartup()
+        public NovaHostingStartup()
         {
         }
 
@@ -25,18 +25,18 @@ namespace IdentityServer.Nova
 
                 //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
 
-                string legacyAssemblyName = context.Configuration["LegacyAssemblyName"];
-                if (!String.IsNullOrWhiteSpace(legacyAssemblyName))
+                string novaAssemblyName = context.Configuration["NovaAssemblyName"];
+                if (!String.IsNullOrWhiteSpace(novaAssemblyName))
                 {
-                    var legacyAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{legacyAssemblyName}.dll");
+                    var novaAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{novaAssemblyName}.dll");
 
-                    foreach (var type in legacyAssembly.GetTypes())
+                    foreach (var type in novaAssembly.GetTypes())
                     {
-                        if (type.GetCustomAttribute<IdentityServerLegacyStartupAttribute>() != null)
+                        if (type.GetCustomAttribute<IdentityServerNovaStartupAttribute>() != null)
                         {
-                            if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerLegacyStartup))))
+                            if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerNovaStartup))))
                             {
-                                var hostingStartup = Activator.CreateInstance(type) as IIdentityServerLegacyStartup;
+                                var hostingStartup = Activator.CreateInstance(type) as IIdentityServerNovaStartup;
                                 hostingStartup.ConfigureServices(context, services);
                             }
                         }

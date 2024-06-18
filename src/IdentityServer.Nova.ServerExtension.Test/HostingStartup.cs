@@ -18,11 +18,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using static IdentityModel.OidcConstants;
 
-//[assembly: HostingStartup(typeof(IdentityServer.Legacy.ServerExtension.Test.HostingStartup))]
+//[assembly: HostingStartup(typeof(IdentityServer.Nova.ServerExtension.Test.HostingStartup))]
 namespace IdentityServer.Nova.ServerExtension.Test
 {
-    [IdentityServerLegacyStartup]
-    public class TestHostingStartup : IIdentityServerLegacyStartup
+    [IdentityServerNovaStartup]
+    public class TestHostingStartup : IIdentityServerNovaStartup
     {
         public void ConfigureServices(WebHostBuilderContext context, IServiceCollection services)
         {
@@ -37,7 +37,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
             services.AddTransient<IUserStoreFactory, TestUserStoreFactory>();
             services.AddUserDbContext<FileBlobUserDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\users";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\users";
                 options.CryptoService = new DefaultCryptoService("My super pa33wo4d 1234567890");
 
                 options.ManageAccountEditor = new ManageAccountEditor()
@@ -83,7 +83,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
             //services.AddRoleDbContext<InMemoryRoleDb>();
             services.AddRoleDbContext<FileBlobRoleDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\roles";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\roles";
             });
 
             #endregion
@@ -93,7 +93,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
 
             services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\resources";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
                 options.CryptoService = new Base64CryptoService();
                 options.InitialApiResources = new ApiResourceModel[]
                 {
@@ -125,7 +125,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
 
             services.AddClientDbContext<FileBlobClientDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\clients";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\clients";
                 options.CryptoService = new Base64CryptoService();
                 options.IntialClients = new ClientModel[]
                 {
@@ -187,7 +187,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
 
             services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage-export\clients";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage-export\clients";
                 options.CryptoService = new ClearTextCryptoService();
                 options.BlobSerializer = new JsonBlobSerializer()
                 {
@@ -201,7 +201,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
 
             services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage-export\resources";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage-export\resources";
                 options.CryptoService = new ClearTextCryptoService();
                 options.BlobSerializer = new JsonBlobSerializer()
                 {
@@ -215,7 +215,7 @@ namespace IdentityServer.Nova.ServerExtension.Test
 
             services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb, SigningCredentialCertStoreCryptoService>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_legacy\storage\secretsvault";
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\secretsvault";
                 options.CryptoService = new Base64CryptoService();
             });
 

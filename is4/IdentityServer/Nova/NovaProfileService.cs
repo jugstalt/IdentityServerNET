@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Nova
 {
-    public class LegacyProfileService : IProfileService
+    public class NovaProfileService : IProfileService
     {
         private UserManager<ApplicationUser> _userManager;
 
-        public LegacyProfileService(UserManager<ApplicationUser> userManager)
+        public NovaProfileService(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }

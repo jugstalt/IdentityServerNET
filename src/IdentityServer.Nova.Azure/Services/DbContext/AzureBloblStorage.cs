@@ -6,7 +6,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace IdentityServer.Legacy.Azure.Services.DbContext
+//namespace IdentityServer.Nova.Azure.Services.DbContext
 //{
 //    class AzureBloblStorage
 //    {

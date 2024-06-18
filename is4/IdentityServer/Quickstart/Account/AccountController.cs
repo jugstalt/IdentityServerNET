@@ -32,7 +32,7 @@ namespace IdentityServer
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser>/*LegacyUserManager*/ _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
@@ -43,7 +43,7 @@ namespace IdentityServer
         private readonly IConfiguration _configuration;
 
         public AccountController(
-            UserManager<ApplicationUser>/*LegacyUserManager*/ userManager,
+            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,

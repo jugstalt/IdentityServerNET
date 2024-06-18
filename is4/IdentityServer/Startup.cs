@@ -147,7 +147,6 @@ namespace IdentityServer
 
             services.AddTransient<SecretsVaultManager>();
 
-            //services.AddTransient<IProfileService, LegacyProfileService>();
             var builder = services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -174,7 +173,6 @@ namespace IdentityServer
             .AddSecretValidator<SecretsVaultSecretValidator>()
             // Add Identity
             .AddAspNetIdentity<ApplicationUser>()
-            //.AddProfileService<LegacyProfileService>()
             // Add Strores
             .AddResourceStore<ResourceStore>()
             .AddClientStore<ClientStore>();
