@@ -26,5 +26,11 @@
     <ProjectReference Include="..\..\src\IdentityServer.Nova.ServerExtension.Test\IdentityServer.Nova.ServerExtension.Test.csproj" />
     <ProjectReference Include="..\..\src\IdentityServer.Nova\IdentityServer.Nova.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Update="_config\default.identityserver.nova.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
  
 </Project>
