@@ -5,7 +5,6 @@ using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
-using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
