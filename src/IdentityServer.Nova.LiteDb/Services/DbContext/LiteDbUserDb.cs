@@ -8,8 +8,13 @@ using IdentityServer.Nova.Services.Serialize;
 using IdentityServer.Nova.UserInteraction;
 using IdentityServer4.Models;
 using LiteDB;
+using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Converters;
+using System.Linq.Expressions;
+using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace IdentityServer.Nova.LiteDb.Services.DbContext;
 
@@ -46,18 +51,25 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
             return IdentityResult.Success;
         }
 
-        user.UserName = user.UserName?.ToLowerInvariant();
-        user.Email = user.Email?.ToLowerInvariant();
+        user.UserName = user.UserName?.Trim().ToLowerInvariant();
+        user.Email = user.Email?.Trim().ToLowerInvariant();
 
-        if (String.IsNullOrEmpty(user.UserName)) throw new ArgumentException("Invalid username");
-        if (string.IsNullOrEmpty(user.Email)) throw new ArgumentException("Invalid email");
+        if (String.IsNullOrEmpty(user.UserName))
+        {
+            throw new ArgumentException("Invalid username");
+        }
+
+        if (string.IsNullOrEmpty(user.Email))
+        {
+            throw new ArgumentException("Invalid email");
+        }
 
         if (await FindByNameAsync(user.UserName, cancellationToken) != null)
         {
             throw new Exception($"User with name {user.UserName} alread exists");
         }
 
-        if (await FindByEmailAsync(user.Email, cancellationToken)!= null)
+        if (await FindByEmailAsync(user.Email, cancellationToken) != null)
         {
             throw new Exception($"User with name {user.UserName} alread exists");
         }
@@ -66,14 +78,19 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
         {
             Name = user.UserName,
             AltName = user.Email,
-            BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user))
+            //BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user))
         };
 
         using (var db = new LiteDatabase(_connectionString))
         {
             var collection = db.GetBlobDocumentCollection(UsersCollectionName);
 
-            collection.Insert(blob);
+            var id = collection.Insert(blob);
+
+            user.Id = id.RawValue.ToString();
+            blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user));
+
+            collection.Update(blob);
 
             return IdentityResult.Success;
         }
@@ -81,37 +98,160 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     public Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+                collection.DeleteMany(b => b.Name == user.UserName);
+
+                return Task.FromResult(IdentityResult.Success);
+            }
+        }
+        catch(Exception ex)
+        {
+            return Task.FromResult(IdentityResult.Failed(
+                new IdentityError() { Code = "999", Description = ex.Message }));
+        }
     }
 
-    public Task<ApplicationUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+    public Task<ApplicationUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using (var db = new LiteDatabase(_connectionString))
+        {
+            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+            var blob = collection.Query()
+                                 .Where(x => x.AltName == normalizedEmail)
+                                 .FirstOrDefault();
+
+            if (blob != null)
+            {
+                return Task.FromResult<ApplicationUser?>(
+                        _blobSerializer.DeserializeObject<ApplicationUser>(
+                        _cryptoService.DecryptText(blob.BlobData))
+                    );
+            }
+
+            return Task.FromResult<ApplicationUser?>(null);
+        }
     }
 
-    public Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+    public Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using (var db = new LiteDatabase(_connectionString))
+        {
+            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+            ObjectId userObjectId = new ObjectId(userId);
+            var blob = collection.FindById(userObjectId);
+
+            if (blob != null)
+            {
+                return Task.FromResult<ApplicationUser?>(
+                        _blobSerializer.DeserializeObject<ApplicationUser>(
+                        _cryptoService.DecryptText(blob.BlobData))
+                    );
+            }
+
+            return Task.FromResult<ApplicationUser?>(null);
+        }
     }
 
-    public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+    public Task<ApplicationUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using (var db = new LiteDatabase(_connectionString))
+        {
+            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+            var blob = collection.Query()
+                                 .Where(x => x.Name == normalizedUserName)
+                                 .FirstOrDefault();
+
+            if (blob != null)
+            {
+                return Task.FromResult<ApplicationUser?>(
+                        _blobSerializer.DeserializeObject<ApplicationUser>(
+                        _cryptoService.DecryptText(blob.BlobData))
+                    );
+            }
+
+            return Task.FromResult<ApplicationUser?>(null);
+        }
     }
 
     public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+                user.UserName = user.UserName?.Trim().ToLowerInvariant();
+                user.Email = user.Email?.Trim().ToLowerInvariant(); 
+
+                var blob = collection.FindOne(b => b.Name == user.UserName);
+                if (blob == null)
+                {
+                    throw new Exception($"Resource with name = {user.UserName} not exists");
+                }
+
+                blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user));
+
+                collection.Update(blob);
+
+                return Task.FromResult(IdentityResult.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(IdentityResult.Failed(
+                [
+                    new IdentityError() { Code = "999", Description = ex.Message }
+                ]));
+        }
     }
 
-    public Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation)
+    async public Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation)
     {
-        throw new NotImplementedException();
+        var propertyInfo = user.GetType().GetProperty(applicationUserProperty);
+        if (propertyInfo != null)
+        {
+            propertyInfo.SetValue(user, propertyValue);
+    
+            await UpdateAsync(user, cancellation);
+        }
+
+        return propertyValue;
     }
 
-    public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+    async public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
     {
-        throw new NotImplementedException();
+        var propertyInfo = user.GetType().GetProperty(dbPropertyInfo.Name);
+        if (propertyInfo != null)
+        {
+            propertyInfo.SetValue(user, Convert.ChangeType(propertyValue, dbPropertyInfo.PropertyType));
+
+            await UpdateAsync(user, cancellation);
+        }
+        else
+        {
+            if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
+            {
+                List<Claim> claims = new List<Claim>(user.Claims
+                    .Where(c => c.Type != dbPropertyInfo.ClaimName));
+
+                if (!String.IsNullOrWhiteSpace(propertyValue?.ToString()))
+                {
+                    claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()));
+                }
+
+                user.Claims = claims;
+            }
+
+            await UpdateAsync(user, cancellation);
+        }
     }
 
     #endregion
@@ -147,19 +287,61 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     #region IUserRoleDbContext
 
-    public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    async public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var updateUser = await FindByIdAsync(user.Id, cancellationToken); // reload user
+
+        if(updateUser is null)
+        {
+            throw new Exception("Can't update unknown user");
+        }
+
+        if (updateUser.Roles == null)
+        {
+            updateUser.Roles = new string[] { roleName };
+
+            await UpdateAsync(updateUser, cancellationToken);
+        }
+        else
+        {
+            List<string> roles = new List<string>(updateUser.Roles);
+            if (!roles.Contains(roleName))
+            {
+                roles.Add(roleName);
+                updateUser.Roles = roles.ToArray();
+
+                await UpdateAsync(updateUser, cancellationToken);
+            }
+        }
+
+        user.Roles = updateUser.Roles;
     }
 
-    public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    async public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var updateUser = await FindByIdAsync(user.Id, cancellationToken); // reload user
+
+        if (updateUser is null)
+        {
+            throw new Exception("Can't update unknown user");
+        }
+
+        if (updateUser.Roles != null && updateUser.Roles.Contains(roleName))
+        {
+            updateUser.Roles = updateUser.Roles.Where(r => r != roleName).ToArray();
+            await UpdateAsync(updateUser, cancellationToken);
+        }
+
+        user.Roles = updateUser.Roles;
     }
 
-    public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+    async public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var users = await GetUsersAsync(0, 0, cancellationToken);
+
+        return users
+                .Where(u => u.Roles != null && u.Roles.Contains(roleName))
+                .ToList();
     }
 
     #endregion

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.ServerExtension.Test.Services.DbContext
+namespace IdentityServer.Nova.ServerExtension.Default.Services.DbContext
 {
-    internal class TestUserStoreFactory : UserStoreFactory
+    internal class DefaultUserStoreFactory : UserStoreFactory
     {
         private readonly IEnumerable<IUserDbContext> _userDbContextes;
 
-        public TestUserStoreFactory(IEnumerable<IUserDbContext> userContextes)
+        public DefaultUserStoreFactory(IEnumerable<IUserDbContext> userContextes)
         {
             _userDbContextes = userContextes;
         }

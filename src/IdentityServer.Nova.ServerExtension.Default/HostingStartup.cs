@@ -2,22 +2,23 @@
 using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.LiteDb.Services.DbContext;
 using IdentityServer.Nova.Reflection;
-using IdentityServer.Nova.ServerExtension.Test.Services.DbContext;
-using IdentityServer.Nova.ServerExtension.Test.Services.UI;
+using IdentityServer.Nova.ServerExtension.Default.Extensions;
+using IdentityServer.Nova.ServerExtension.Default.Services.DbContext;
+using IdentityServer.Nova.ServerExtension.Default.Services.UI;
 using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.EmailSender;
 using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
 using IdentityServer.Nova.Services.Serialize;
-using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
-//[assembly: HostingStartup(typeof(IdentityServer.Nova.ServerExtension.Test.HostingStartup))]
-namespace IdentityServer.Nova.ServerExtension.Test;
+namespace IdentityServer.Nova.ServerExtension.Default;
 
 [IdentityServerNovaStartup]
 public class TestHostingStartup : IIdentityServerNovaStartup
@@ -32,57 +33,51 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add an UserDbContext (required)
 
-        services.AddTransient<IUserStoreFactory, TestUserStoreFactory>();
-        services.AddUserDbContext<FileBlobUserDb>(options =>
+        services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>();
+
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:Files"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage\users";
-            options.CryptoService = new DefaultCryptoService("My super pa33wo4d 1234567890");
-
-            options.ManageAccountEditor = new ManageAccountEditor()
+            services.AddUserDbContext<FileBlobUserDb>(options =>
             {
-                AllowDelete = false,
-                ShowChangeEmailPage = true,
-                ShowChangePasswordPage = true,
-                ShowTfaPage = true,
-                EditorInfos = new[]
-                {
-                    KnownUserEditorInfos.ReadOnlyUserName(),
-                    KnownUserEditorInfos.ReadOnlyEmail(),
-                    KnownUserEditorInfos.GivenName(),
-                    KnownUserEditorInfos.FamilyName(),
-                    KnownUserEditorInfos.Organisation(),
-                    KnownUserEditorInfos.PhoneNumber(),
-                    KnownUserEditorInfos.BirthDate(),
-                    new EditorInfo("Ranking", typeof(int)) { Category="Advanced", ClaimName="ranking" },
-                    new EditorInfo("Cost", typeof(double)) { Category="Advanced", ClaimName="cost" },
-                    new EditorInfo("SendInfos", typeof(bool)) { Category="Privacy", ClaimName="send_infos"}
-                }
-            };
-
-            options.AdminAccountEditor = new AdminAccountEditor()
+                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:Files"], "users");
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        {
+            services.AddUserDbContext<LiteDbUserDb>(options =>
             {
-                AllowDelete = true,
-                AllowSetPassword = true,
-                EditorInfos = new[]
-                  {
-                    KnownUserEditorInfos.EditableEmail(),
-                    KnownUserEditorInfos.GivenName(),
-                    KnownUserEditorInfos.FamilyName(),
-                    new EditorInfo("Ranking", typeof(int)) { Category="Advanced", ClaimName="ranking" },
-                    new EditorInfo("Cost", typeof(double)) { Category="Advanced", ClaimName="cost" },
-                  }
-            };
-        });
+                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else
+        {
+            services.AddUserDbContext<InMemoryUserDb>();
+        }
 
         #endregion
 
         #region Add RoleDbContext (optional) 
 
-        //services.AddRoleDbContext<InMemoryRoleDb>();
-        services.AddRoleDbContext<FileBlobRoleDb>(options =>
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:Files"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage\roles";
-        });
+            services.AddRoleDbContext<FileBlobRoleDb>(options =>
+            {
+                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:Files"], "roles");
+            });
+        }
+        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        {
+            services.AddRoleDbContext<LiteDbRoleDb>(options =>
+            {
+                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
+            });
+        }
+        else
+        {
+            services.AddRoleDbContext<InMemoryRoleDb>();
+        }
 
         #endregion
 
@@ -233,7 +228,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region UI (required)
 
-        services.AddUserInterfaceService<TestUserInterfaceService>(options =>
+        services.AddUserInterfaceService<DefaultUserInterfaceService>(options =>
         {
             options.ApplicationTitle = context.Configuration["ApplicationTitle"];  // required
             options.OverrideCssContent = Properties.Resources.is4_overrides + Properties.Resources.openid_logo;

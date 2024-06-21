@@ -246,9 +246,15 @@ namespace IdentityServer
             services.AddTransient<IEmailSender, EmailSenderProxy>();
 
             services.AddScoped<CustomTokenService>();
+
+            services.AddTransient<SetupService>();
         }
 
-        public void Configure(IApplicationBuilder app, IUserInterfaceService userInterface = null)
+        public void Configure(
+                    IApplicationBuilder app, 
+                    SetupService setupService = null,
+                    IUserInterfaceService userInterface = null
+            )
         {
             if (Environment.IsDevelopment())
             {

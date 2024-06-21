@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace IdentityServer.Nova.ServerExtension.Test.Properties {
+namespace IdentityServer.Nova.ServerExtension.Default.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace IdentityServer.Nova.ServerExtension.Test.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IdentityServer.Nova.ServerExtension.Test.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IdentityServer.Nova.ServerExtension.Default.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
