@@ -1,7 +1,9 @@
 ﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,10 +16,20 @@ public class SetupService
             IConfiguration config,
             IUserDbContext userDb,
             IPasswordHasher<ApplicationUser> passwordHasher,
-            IRoleDbContext roleDb = null
+            IRoleDbContext roleDb = null,
+            IClientDbContext clientDb = null,
+            IResourceDbContext resourceDb = null
         )
     {
+        Console.WriteLine("################# Setup ##################");
+
+        LogInstance(userDb);
+        LogInstance(roleDb);
+        LogInstance(clientDb);
+        LogInstance(resourceDb);
+
         var adminUser = userDb.FindByNameAsync("admin", CancellationToken.None).GetAwaiter().GetResult();
+        
         if (adminUser is null)
         {
             if(roleDb is not null)
@@ -46,11 +58,16 @@ public class SetupService
                     }
             };
 
-            var adminPassword = "admin";
+            var adminPassword = PasswordGenerator.GenerateSecurePassword(16);
+
             adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
 
             userDb.CreateAsync(adminUser, CancellationToken.None).GetAwaiter().GetResult();
+
+            Console.WriteLine("User admin created");
+            Console.WriteLine($"Password: {adminPassword}");
         }
+        Console.WriteLine("#########################################");
     }
 
     async private Task<bool> TryCreateRole(IRoleDbContext roleDb,  string role)
@@ -68,5 +85,10 @@ public class SetupService
             return result == IdentityResult.Success;
         } 
         catch { return false; }
+    }
+
+    private void LogInstance<T>(T instance)
+    {
+        Console.WriteLine($"{typeof(T).Name}: {(instance is null ? "not registered" : instance.GetType())}");
     }
 }

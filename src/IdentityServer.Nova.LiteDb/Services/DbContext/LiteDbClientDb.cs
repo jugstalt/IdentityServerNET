@@ -22,7 +22,7 @@ public class LiteDbClientDb : IClientDbContextModify
     {
         if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
         {
-            throw new ArgumentException("MongoBlobClientDb: no connection string defined");
+            throw new ArgumentException("LiteDbClientDb: no connection string defined");
         }
 
         _connectionString = options.Value.ConnectionString;

@@ -156,7 +156,7 @@ namespace IdentityServer.Areas.Admin.Pages.Clients
             public ClientTemplateType ClientType { get; set; }
 
             [DisplayName("Client Url")]
-            [Url]
+            [RegularExpression(@"^(https?:\/\/)([a-z\d\.-]+)(:\d+)?([\/\w \.-]*)*\/?$", ErrorMessage = "Invalid Url")]
             public string ClientUrl { get; set; }
 
             [DisplayName("Api Scopes")]

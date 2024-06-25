@@ -65,7 +65,7 @@ namespace IdentityServer
                     }
 
                     var configFile = $"_config/{settingsPrefix}.identityserver.nova.json";
-                    Console.WriteLine($"Use config file: {configFile} ({(System.IO.File.Exists(configFile) ? "exits" : "not- exits")})");
+                    Console.WriteLine($"Using config file: {configFile} ({(System.IO.File.Exists(configFile) ? "exits" : "not- exits")})");
                     config.AddJsonFile(configFile,
                         optional: true,
                         reloadOnChange: false);

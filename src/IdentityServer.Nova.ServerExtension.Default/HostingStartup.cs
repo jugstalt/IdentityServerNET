@@ -35,11 +35,11 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>();
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:Files"]))
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
         {
             services.AddUserDbContext<FileBlobUserDb>(options =>
             {
-                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:Files"], "users");
+                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:FilesDb"], "users");
                 options.AddDefaults(context.Configuration);
             });
         }
@@ -53,18 +53,20 @@ public class TestHostingStartup : IIdentityServerNovaStartup
         }
         else
         {
-            services.AddUserDbContext<InMemoryUserDb>();
+            services.AddUserDbContext<InMemoryUserDb>(options =>
+                    options.AddDefaults(context.Configuration)
+                );
         }
 
         #endregion
 
         #region Add RoleDbContext (optional) 
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:Files"]))
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
         {
             services.AddRoleDbContext<FileBlobRoleDb>(options =>
             {
-                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:Files"], "roles");
+                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:FilesDb"], "roles");
             });
         }
         else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
@@ -83,27 +85,29 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add a ResourceDbContext (required) 
 
-        /*
-        services.AddResourceDbContext<FileBlobResourceDb>(options =>
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
-            options.CryptoService = new Base64CryptoService();
-            options.InitialApiResources = new ApiResourceModel[]
+            services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
-                new ApiResourceModel("api1","My Api1"),
-                new ApiResourceModel("api2","My Api2")
-            };
-            options.InitialIdentityResources = new IdentityResourceModel[]
-            {
-
-            };
-        });
-        */
-
-        services.AddResourceDbContext<LiteDbResourceDb>(options =>
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
-        });
+            services.AddResourceDbContext<LiteDbResourceDb>(options =>
+            {
+                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else
+        {
+            services.AddResourceDbContext<InMemoryResourceDb>(options =>
+                    options.AddDefaults(context.Configuration)
+                );
+        }
+
 
         /*
         services.AddResourceDbContext<MongoBlobResourceDb>(options =>
@@ -117,62 +121,33 @@ public class TestHostingStartup : IIdentityServerNovaStartup
             options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
         });
         */
+
         #endregion
 
         #region Add a ClientDbContext (required)
 
-        /*
-        services.AddClientDbContext<FileBlobClientDb>(options =>
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage\clients";
-            options.CryptoService = new Base64CryptoService();
-            options.IntialClients = new ClientModel[]
+            services.AddClientDbContext<FileBlobClientDb>(options =>
             {
-                new ClientModel()
-                {
-                    ClientId = "client",
-                    ClientSecrets = new SecretModel[]
-                    {
-                        new SecretModel()
-                        {
-                            Value = "secret1".ToSha256()
-                        },
-                        new SecretModel()
-                        {
-                            Value = "secret2".ToSha256()
-                        }
-                    },
-                    AllowedGrantTypes = { GrantTypes.ClientCredentials, GrantTypes.Password },
-                    AllowedScopes = { "api1", "api2", "profile", "openid" }
-                },
-                new ClientModel()
-                {
-                    ClientId = "mvc",
-                    ClientSecrets = new SecretModel[]
-                    {
-                        new SecretModel() { Value ="secret".ToSha256() }
-                    },
-                    AllowedGrantTypes = { GrantTypes.AuthorizationCode },
-                    AllowedScopes = { "openid", "profile", "api1", "email", "role", "address", "phone" },
-
-                    AlwaysSendClientClaims = true,
-                    AlwaysIncludeUserClaimsInIdToken = true,
-
-                    AllowOfflineAccess = true,
-                    RequireConsent = false,
-                    RequirePkce = true,
-
-                    RedirectUris = new string[] { "https://localhost:44356/signin-oidc" },
-                    PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
-                }
-            };
-        });
-        */
-
-        services.AddClientDbContext<LiteDbClientDb>(options =>
+                options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
-        });
+            services.AddClientDbContext<LiteDbClientDb>(options =>
+            {
+                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
+                options.AddDefaults(context.Configuration);
+            });
+        }
+        else
+        {
+            services.AddClientDbContext<InMemoryClientDb>(options =>
+                    options.AddDefaults(context.Configuration)
+                );
+        }
 
         /*
         services.AddClientDbContext<MongoBlobClientDb>(options =>
