@@ -43,6 +43,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.LiteDb"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.ServerExtension.Default", "src\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj", "{9837099B-A5FB-4CAC-AD6C-5C419D7A4319}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{1FF5F57D-A87B-4F01-846A-03CA77767B71}"
+	ProjectSection(SolutionItems) = preProject
+		http\secret-request.http = http\secret-request.http
+		http\signing-request.http = http\signing-request.http
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

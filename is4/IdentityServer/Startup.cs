@@ -92,7 +92,7 @@ namespace IdentityServer
             });
 
             services.AddAuthentication("Bearer")
-                .AddJwtBearer("Bearer", options =>
+                .AddJwtBearer("Bearer-Secrets", options =>
                 {
                     options.Authority = Configuration["IdentityServer:PublicOrigin"];
                     options.RequireHttpsMetadata = false;

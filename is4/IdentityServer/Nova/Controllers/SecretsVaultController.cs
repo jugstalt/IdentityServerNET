@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace IdentityServer.Nova.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
+    [Authorize(AuthenticationSchemes = "Bearer-Secrets,Identity.Application")]
     [ApiController]
     public class SecretsVaultController : ControllerBase
     {
