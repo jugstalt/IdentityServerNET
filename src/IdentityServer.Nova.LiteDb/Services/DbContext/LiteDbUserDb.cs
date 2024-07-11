@@ -12,6 +12,7 @@ using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Xml.Linq;
@@ -51,48 +52,63 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
             return IdentityResult.Success;
         }
 
-        user.UserName = user.UserName?.Trim().ToLowerInvariant();
-        user.Email = user.Email?.Trim().ToLowerInvariant();
-
-        if (String.IsNullOrEmpty(user.UserName))
+        try
         {
-            throw new ArgumentException("Invalid username");
+            user.UserName = user.UserName?.Trim().ToLowerInvariant();
+            user.Email = user.Email?.Trim().ToLowerInvariant();
+
+            if (String.IsNullOrEmpty(user.UserName))
+            {
+                throw new ArgumentException("Invalid username");
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                throw new ArgumentException("Invalid email");
+            }
+
+            if (await FindByNameAsync(user.UserName, cancellationToken) != null)
+            {
+                throw new ArgumentException($"User with name {user.UserName} alread exists");
+            }
+
+            if (await FindByEmailAsync(user.Email, cancellationToken) != null)
+            {
+                throw new ArgumentException($"User with name {user.UserName} alread exists");
+            }
+
+            var blob = new LiteDbBlobDocument()
+            {
+                Name = user.UserName,
+                AltName = user.Email,
+                //BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user))
+            };
+
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+                var id = collection.Insert(blob);
+
+                user.Id = id.RawValue.ToString();
+                blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user));
+
+                collection.Update(blob);
+
+                return IdentityResult.Success;
+            }
         }
-
-        if (string.IsNullOrEmpty(user.Email))
+        catch(ArgumentException argEx)
         {
-            throw new ArgumentException("Invalid email");
+            return IdentityResult.Failed(
+                new IdentityError() { Code = "999", Description = argEx.Message }
+            );
         }
-
-        if (await FindByNameAsync(user.UserName, cancellationToken) != null)
+        catch
         {
-            throw new Exception($"User with name {user.UserName} alread exists");
-        }
-
-        if (await FindByEmailAsync(user.Email, cancellationToken) != null)
-        {
-            throw new Exception($"User with name {user.UserName} alread exists");
-        }
-
-        var blob = new LiteDbBlobDocument()
-        {
-            Name = user.UserName,
-            AltName = user.Email,
-            //BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user))
-        };
-
-        using (var db = new LiteDatabase(_connectionString))
-        {
-            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
-
-            var id = collection.Insert(blob);
-
-            user.Id = id.RawValue.ToString();
-            blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user));
-
-            collection.Update(blob);
-
-            return IdentityResult.Success;
+            return IdentityResult.Failed(
+                new IdentityError() { Code = "999", Description = "Unknown error" }
+            );
         }
     }
 
@@ -272,6 +288,30 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
                     blobs
                         .Skip(skip)
                         .Take(limit)
+                        .Select(blob =>
+                            _blobSerializer.DeserializeObject<ApplicationUser>(
+                            _cryptoService.DecryptText(blob.BlobData))
+                        ).ToArray()
+                    );
+            }
+
+            return Task.FromResult<IEnumerable<ApplicationUser>>(Array.Empty<ApplicationUser>());
+        }
+    }
+
+    public Task<IEnumerable<ApplicationUser>> FindUsers(string term, CancellationToken cancellationToken)
+    {
+        using (var db = new LiteDatabase(_connectionString))
+        {
+            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
+
+            var blobs = collection.Find(u => u.Name.Contains(term));
+
+            if (blobs != null)
+            {
+                return Task.FromResult<IEnumerable<ApplicationUser>>(
+                    blobs
+                        .Take(1000)
                         .Select(blob =>
                             _blobSerializer.DeserializeObject<ApplicationUser>(
                             _cryptoService.DecryptText(blob.BlobData))

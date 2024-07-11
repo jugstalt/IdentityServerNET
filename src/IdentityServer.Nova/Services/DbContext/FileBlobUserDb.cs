@@ -231,6 +231,33 @@ namespace IdentityServer.Nova.Services.DbContext
             return users.OrderBy(u => u.UserName);
         }
 
+        async public Task<IEnumerable<ApplicationUser>> FindUsers(string term, CancellationToken cancellationToken)
+        {
+            List<ApplicationUser> users = new List<ApplicationUser>();
+            foreach (var fi in new DirectoryInfo(_rootPath).GetFiles("*.user"))
+            {
+                using (var reader = File.OpenText(fi.FullName))
+                {
+                    var fileText = await reader.ReadToEndAsync();
+
+                    fileText = _cryptoService.DecryptText(fileText);
+                    var user = _blobSerializer.DeserializeObject<ApplicationUser>(fileText);
+
+                    if (user.UserName.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    {
+                        users.Add(user);
+                    }
+                }
+
+                if (users.Count > 1000)
+                {
+                    break;
+                }
+            }
+
+            return users.OrderBy(u => u.UserName);
+        }
+
         #endregion
 
         #region IUserRoleDbContext

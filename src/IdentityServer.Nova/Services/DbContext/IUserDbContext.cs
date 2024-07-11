@@ -1,6 +1,7 @@
 ﻿using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.UserInteraction;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 

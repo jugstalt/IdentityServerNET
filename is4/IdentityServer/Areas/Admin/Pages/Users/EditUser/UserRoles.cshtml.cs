@@ -42,7 +42,7 @@ namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
             if (IsRoleAdministrator && _roleDbContext is IAdminRoleDbContext)
             {
                 AddableRoles = (await ((IAdminRoleDbContext)_roleDbContext).GetRolesAsync(1000, 0, CancellationToken.None))
-                                    .Where(r => CurrentApplicationUser.Roles == null || !CurrentApplicationUser.Roles.Contains(r.Name));
+                                    .Where(r => CurrentApplicationUser.Roles?.Any() != true || !CurrentApplicationUser.Roles.Contains(r.Name));
             }
 
             return Page();

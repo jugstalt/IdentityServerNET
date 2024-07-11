@@ -162,10 +162,15 @@ namespace IdentityServer.Nova.Services.DbContext
         #region IAdminUserDbContext
 
         public Task<IEnumerable<ApplicationUser>> GetUsersAsync(int limit, int skip, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<IEnumerable<ApplicationUser>>(_users.Values.Skip(skip).Take(limit));
-        }
+            => Task.FromResult(
+                    _users.Values.Skip(skip).Take(limit)
+                );
 
+        public Task<IEnumerable<ApplicationUser>> FindUsers(string term, CancellationToken cancellationToken)
+            => Task.FromResult(
+                    _users.Values.Where(u => u.UserName.Contains(term, StringComparison.OrdinalIgnoreCase))
+                );
+        
         #endregion
 
         #region IUserRoleContext
