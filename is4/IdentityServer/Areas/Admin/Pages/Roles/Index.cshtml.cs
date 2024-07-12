@@ -24,11 +24,11 @@ public class IndexModel : SecurePageModel
     public IEnumerable<ApplicationRole> ApplicationRoles { get; set; }
 
     [BindProperty]
-    public FindInputModel FindInput { get; set; }
+    public FilterModel Filter { get; set; }
 
-    public class FindInputModel
+    public class FilterModel
     {
-        public string Rolename { get; set; }
+        public string Term { get; set; }
     }
 
     [BindProperty]
@@ -109,25 +109,30 @@ public class IndexModel : SecurePageModel
         onException: (ex) => RedirectToPage());
     }
 
-    async public Task<IActionResult> OnPostFindAsync()
+    async public Task<IActionResult> OnPostFilterAsync()
     {
-        string roleId = String.Empty;
+        if (String.IsNullOrWhiteSpace(Filter.Term))
+        {
+            Filter.Term = "";
+            return await OnGetAsync();
+        }
 
         return await SecureHandlerAsync(async () =>
         {
-            if (String.IsNullOrWhiteSpace(FindInput.Rolename))
+            this.ApplicationRoles = _roleDb switch
             {
-                throw new StatusMessageException("Please type a rolename");
-            }
-            var role = await _roleDb.FindByNameAsync(FindInput.Rolename?.ToString(), CancellationToken.None);
-            if (role == null)
-            {
-                throw new StatusMessageException($"Unknown role {FindInput.Rolename}");
-            }
+                IAdminRoleDbContext adminUserDb =>
+                       await adminUserDb.FindRoles(Filter.Term, CancellationToken.None) ?? [],
+                _ => [await _roleDb.FindByNameAsync(Filter.Term?.ToString(), CancellationToken.None)]
+            };
 
-            roleId = role.Id;
+            this.ApplicationRoles = this.ApplicationRoles.Where(u => u != null).ToArray();
+            if (this.ApplicationRoles?.Any() == false)
+            {
+                throw new StatusMessageException($"{Filter.Term} do not match any role");
+            }
         },
-        onFinally: () => RedirectToPage("EditRole/Index", new { id = roleId }),
+        onFinally: () => Page(), //RedirectToPage("EditRole/Index", new { id = roleId }),
         successMessage: "",
         onException: (ex) => RedirectToPage());
     }

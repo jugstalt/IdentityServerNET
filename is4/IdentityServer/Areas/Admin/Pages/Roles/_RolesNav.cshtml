@@ -5,13 +5,12 @@
         <a asp-page="../Index">..</a>
     </li>
     <li style="padding:10px">
-        <form id="find-user-form" method="post" asp-page-handler="Find" >
-            <div asp-validation-summary="All" class="text-danger"></div>
+        <form id="find-user-form" method="post" asp-page-handler="Filter" >
+            @* <div asp-validation-summary="All" class="text-danger"></div> *@
             <div class="form-group">
-                <label asp-for="FindInput.Rolename"></label>
-                <input asp-for="FindInput.Rolename" class="form-control" placeholder="Find Role..." />
+                <input asp-for="Filter.Term" class="form-control" placeholder="Filter roles..." />
             </div>
-            <button type="submit" class="btn btn-default">Find</button>
+            <button type="submit" class="btn btn-default">Set Filter</button>
         </form>
     </li>
 </ul>

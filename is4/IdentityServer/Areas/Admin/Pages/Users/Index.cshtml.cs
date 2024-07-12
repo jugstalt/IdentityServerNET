@@ -108,7 +108,7 @@ public class IndexModel : SecurePageModel
         onException: (ex) => RedirectToPage());
     }
 
-    async public Task<IActionResult> OnPostFindAsync()
+    async public Task<IActionResult> OnPostFilterAsync()
     {
         //string userId = String.Empty;
 
