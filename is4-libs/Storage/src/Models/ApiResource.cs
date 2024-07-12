@@ -16,7 +16,7 @@ namespace IdentityServer4.Models
     public class ApiResource : Resource
     {
         private string DebuggerDisplay => Name ?? $"{{{typeof(ApiResource)}}}";
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiResource"/> class.
         /// </summary>
@@ -62,7 +62,10 @@ namespace IdentityServer4.Models
         /// <exception cref="System.ArgumentNullException">name</exception>
         public ApiResource(string name, string displayName, IEnumerable<string> userClaims)
         {
-            if (name.IsMissing()) throw new ArgumentNullException(nameof(name));
+            if (name.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
 
             Name = name;
             DisplayName = displayName;

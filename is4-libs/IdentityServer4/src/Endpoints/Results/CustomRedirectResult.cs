@@ -2,84 +2,90 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System;
-using System.Threading.Tasks;
+using IdentityServer4.Configuration;
+using IdentityServer4.Extensions;
 using IdentityServer4.Hosting;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Http;
-using IdentityServer4.Extensions;
-using IdentityServer4.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
-namespace IdentityServer4.Endpoints.Results
+namespace IdentityServer4.Endpoints.Results;
+
+/// <summary>
+/// Result for a custom redirect
+/// </summary>
+/// <seealso cref="IdentityServer4.Hosting.IEndpointResult" />
+public class CustomRedirectResult : IEndpointResult
 {
+    private readonly ValidatedAuthorizeRequest _request;
+    private readonly string _url;
+
     /// <summary>
-    /// Result for a custom redirect
+    /// Initializes a new instance of the <see cref="CustomRedirectResult"/> class.
     /// </summary>
-    /// <seealso cref="IdentityServer4.Hosting.IEndpointResult" />
-    public class CustomRedirectResult : IEndpointResult
+    /// <param name="request">The request.</param>
+    /// <param name="url">The URL.</param>
+    /// <exception cref="System.ArgumentNullException">
+    /// request
+    /// or
+    /// url
+    /// </exception>
+    public CustomRedirectResult(ValidatedAuthorizeRequest request, string url)
     {
-        private readonly ValidatedAuthorizeRequest _request;
-        private readonly string _url;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CustomRedirectResult"/> class.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="url">The URL.</param>
-        /// <exception cref="System.ArgumentNullException">
-        /// request
-        /// or
-        /// url
-        /// </exception>
-        public CustomRedirectResult(ValidatedAuthorizeRequest request, string url)
+        if (request == null)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (url.IsMissing()) throw new ArgumentNullException(nameof(url));
-
-            _request = request;
-            _url = url;
+            throw new ArgumentNullException(nameof(request));
         }
 
-        internal CustomRedirectResult(
-            ValidatedAuthorizeRequest request,
-            string url,
-            IdentityServerOptions options) 
-            : this(request, url)
+        if (url.IsMissing())
         {
-            _options = options;
+            throw new ArgumentNullException(nameof(url));
         }
 
-        private IdentityServerOptions _options;
+        _request = request;
+        _url = url;
+    }
 
-        private void Init(HttpContext context)
+    internal CustomRedirectResult(
+        ValidatedAuthorizeRequest request,
+        string url,
+        IdentityServerOptions options)
+        : this(request, url)
+    {
+        _options = options;
+    }
+
+    private IdentityServerOptions _options;
+
+    private void Init(HttpContext context)
+    {
+        _options = _options ?? context.RequestServices.GetRequiredService<IdentityServerOptions>();
+    }
+
+    /// <summary>
+    /// Executes the result.
+    /// </summary>
+    /// <param name="context">The HTTP context.</param>
+    /// <returns></returns>
+    public Task ExecuteAsync(HttpContext context)
+    {
+        Init(context);
+
+        var returnUrl = context.GetIdentityServerBasePath().EnsureTrailingSlash() + Constants.ProtocolRoutePaths.Authorize;
+        returnUrl = returnUrl.AddQueryString(_request.Raw.ToQueryString());
+
+        if (!_url.IsLocalUrl())
         {
-            _options = _options ?? context.RequestServices.GetRequiredService<IdentityServerOptions>();
+            // this converts the relative redirect path to an absolute one if we're 
+            // redirecting to a different server
+            returnUrl = context.GetIdentityServerBaseUrl().EnsureTrailingSlash() + returnUrl.RemoveLeadingSlash();
         }
 
-        /// <summary>
-        /// Executes the result.
-        /// </summary>
-        /// <param name="context">The HTTP context.</param>
-        /// <returns></returns>
-        public Task ExecuteAsync(HttpContext context)
-        {
-            Init(context);
+        var url = _url.AddQueryString(_options.UserInteraction.CustomRedirectReturnUrlParameter, returnUrl);
+        context.Response.RedirectToAbsoluteUrl(url);
 
-            var returnUrl = context.GetIdentityServerBasePath().EnsureTrailingSlash() + Constants.ProtocolRoutePaths.Authorize;
-            returnUrl = returnUrl.AddQueryString(_request.Raw.ToQueryString());
-
-            if (!_url.IsLocalUrl())
-            {
-                // this converts the relative redirect path to an absolute one if we're 
-                // redirecting to a different server
-                returnUrl = context.GetIdentityServerBaseUrl().EnsureTrailingSlash() + returnUrl.RemoveLeadingSlash();
-            }
-
-            var url = _url.AddQueryString(_options.UserInteraction.CustomRedirectReturnUrlParameter, returnUrl);
-            context.Response.RedirectToAbsoluteUrl(url);
-
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

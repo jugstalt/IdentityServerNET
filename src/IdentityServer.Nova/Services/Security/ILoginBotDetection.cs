@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.Security
+namespace IdentityServer.Nova.Services.Security;
+
+public interface ILoginBotDetection
 {
-    public interface ILoginBotDetection
-    {
-        Task<bool> IsSuspiciousUserAsync(string username);
-        Task AddSuspiciousUserAsync(string username);
-        Task RemoveSuspiciousUserAsync(string username);
+    Task<bool> IsSuspiciousUserAsync(string username);
+    Task AddSuspiciousUserAsync(string username);
+    Task RemoveSuspiciousUserAsync(string username);
 
-        Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username);
-        Task<bool> VerifyCaptchaCodeAsync(string username, string code);
+    Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username);
+    Task<bool> VerifyCaptchaCodeAsync(string username, string code);
 
-        Task BlockSuspicousUser(string username);
-    }
+    Task BlockSuspicousUser(string username);
 }

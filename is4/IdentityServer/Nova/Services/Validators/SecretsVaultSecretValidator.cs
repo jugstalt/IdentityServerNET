@@ -6,38 +6,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.Validators
+namespace IdentityServer.Nova.Services.Validators;
+
+public class SecretsVaultSecretValidator : ISecretValidator
 {
-    public class SecretsVaultSecretValidator : ISecretValidator
+    private SecretsVaultManager _secretsVaultManager;
+
+    public SecretsVaultSecretValidator(SecretsVaultManager secretsVaultManager)
     {
-        private SecretsVaultManager _secretsVaultManager;
+        _secretsVaultManager = secretsVaultManager;
+    }
 
-        public SecretsVaultSecretValidator(SecretsVaultManager secretsVaultManager)
+    async public Task<SecretValidationResult> ValidateAsync(IEnumerable<Secret> secrets, ParsedSecret parsedSecret)
+    {
+        foreach (var secret in secrets
+                 .Where(s => "SecretsVault-Secret".Equals(s.Type, StringComparison.CurrentCultureIgnoreCase)))
         {
-            _secretsVaultManager = secretsVaultManager;
-        }
-
-        async public Task<SecretValidationResult> ValidateAsync(IEnumerable<Secret> secrets, ParsedSecret parsedSecret)
-        {
-            foreach (var secret in secrets
-                     .Where(s => "SecretsVault-Secret".Equals(s.Type, StringComparison.CurrentCultureIgnoreCase)))
+            var secretsVersion = await _secretsVaultManager.GetSecretVersion(secret.Value);
+            if (parsedSecret.Credential?.ToString() == secretsVersion.Secret)
             {
-                var secretsVersion = await _secretsVaultManager.GetSecretVersion(secret.Value);
-                if (parsedSecret.Credential?.ToString() == secretsVersion.Secret)
+                return new SecretValidationResult()
                 {
-                    return new SecretValidationResult()
-                    {
-                        Success = true
-                    };
-                }
+                    Success = true
+                };
             }
-
-            var result = new SecretValidationResult()
-            {
-                Success = false
-            };
-
-            return result;
         }
+
+        var result = new SecretValidationResult()
+        {
+            Success = false
+        };
+
+        return result;
     }
 }

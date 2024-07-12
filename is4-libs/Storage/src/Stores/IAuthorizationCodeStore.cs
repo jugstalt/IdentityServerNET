@@ -32,5 +32,5 @@ namespace IdentityServer4.Stores
         /// <param name="code">The code.</param>
         /// <returns></returns>
         Task RemoveAuthorizationCodeAsync(string code);
-   }
+    }
 }

@@ -1,4 +1,6 @@
 ﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
@@ -29,10 +31,10 @@ public class SetupService
         LogInstance(resourceDb);
 
         var adminUser = userDb.FindByNameAsync("admin", CancellationToken.None).GetAwaiter().GetResult();
-        
+
         if (adminUser is null)
         {
-            if(roleDb is not null)
+            if (roleDb is not null)
             {
                 TryCreateRole(roleDb, KnownRoles.UserAdministrator).GetAwaiter().GetResult();
                 TryCreateRole(roleDb, KnownRoles.RoleAdministrator).GetAwaiter().GetResult();
@@ -42,12 +44,12 @@ public class SetupService
                 TryCreateRole(roleDb, KnownRoles.SecretsVaultAdministrator).GetAwaiter().GetResult();
             }
 
-            adminUser = new Nova.ApplicationUser()
+            adminUser = new Nova.Models.ApplicationUser()
             {
                 UserName = "admin",
                 Email = "admin@admin.com",
                 EmailConfirmed = true,
-                Roles = 
+                Roles =
                     new string[] {
                         KnownRoles.UserAdministrator,
                         KnownRoles.RoleAdministrator,
@@ -70,7 +72,7 @@ public class SetupService
         Console.WriteLine("#########################################");
     }
 
-    async private Task<bool> TryCreateRole(IRoleDbContext roleDb,  string role)
+    async private Task<bool> TryCreateRole(IRoleDbContext roleDb, string role)
     {
         try
         {
@@ -78,12 +80,12 @@ public class SetupService
                     new ApplicationRole()
                     {
                         Name = role
-                    }, 
+                    },
                     CancellationToken.None
                 );
 
             return result == IdentityResult.Success;
-        } 
+        }
         catch { return false; }
     }
 

@@ -2,76 +2,72 @@
 using IdentityServer.Nova.Services.Signing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Controllers
+namespace IdentityServer.Nova.Controllers;
+
+[Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = "Bearer-Signing, Identity.Application")]
+[ApiController]
+public class SigningController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = "Bearer-Signing, Identity.Application")]
-    [ApiController]
-    public class SigningController : ControllerBase
+    private readonly CustomTokenService _customToken;
+
+    public SigningController(CustomTokenService customToken)
     {
-        private readonly CustomTokenService _customToken;
+        _customToken = customToken;
+    }
 
-        public SigningController(CustomTokenService customToken)
+    [HttpPost]
+    async public Task<IActionResult> Post(int lifeTime = 3600)
+    {
+        try
         {
-            _customToken = customToken;
+            if (!Request.HasFormContentType)
+            {
+                throw new StatusMessageException("No form data to sign");
+            }
+
+            NameValueCollection claims = new NameValueCollection();
+
+            foreach (string formKey in Request.Form.Keys)
+            {
+                if (!formKey.Equals("lifetime", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    claims[formKey] = Request.Form[formKey];
+                }
+            }
+
+            var token = _customToken.CreateCustomToken(claims, lifeTime);
+            var tokenString = await _customToken.CreateSecurityTokenAsync(token);
+
+            //var jwtToken = await tokenString.ToValidatedJwtSecurityToken(token.Issuer);
+
+            return new JsonResult(new
+            {
+                success = true,
+                token = tokenString
+            });
         }
-
-        [HttpPost]
-        async public Task<IActionResult> Post(int lifeTime = 3600)
+        catch (StatusMessageException sme)
         {
-            try
-            {
-                if (!Request.HasFormContentType)
+            return new JsonResult(
+                new
                 {
-                    throw new StatusMessageException("No form data to sign");
-                }
-
-                NameValueCollection claims = new NameValueCollection();
-
-                foreach (string formKey in Request.Form.Keys)
-                {
-                    if (!formKey.Equals("lifetime", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        claims[formKey] = Request.Form[formKey];
-                    }
-                }
-
-                var token = _customToken.CreateCustomToken(claims, lifeTime);
-                var tokenString = await _customToken.CreateSecurityTokenAsync(token);
-
-                //var jwtToken = await tokenString.ToValidatedJwtSecurityToken(token.Issuer);
-
-                return new JsonResult(new
-                {
-                    success = true,
-                    token = tokenString
+                    success = false,
+                    errorMessage = sme.Message
                 });
-            }
-            catch (StatusMessageException sme)
-            {
-                return new JsonResult(
-                    new
-                    {
-                        success = false,
-                        errorMessage = sme.Message
-                    });
-            }
-            catch /*(Exception ex)*/
-            {
-                return new JsonResult(
-                    new
-                    {
-                        success = false,
-                        errorMessage = "Internal error."
-                    });
-            }
+        }
+        catch /*(Exception ex)*/
+        {
+            return new JsonResult(
+                new
+                {
+                    success = false,
+                    errorMessage = "Internal error."
+                });
         }
     }
 }

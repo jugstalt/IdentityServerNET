@@ -1,73 +1,72 @@
+using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Exceptions;
-using IdentityServer.Nova.Extensions.DependencyInjection;
-using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Users.EditUser
+namespace IdentityServer.Areas.Admin.Pages.Users.EditUser;
+
+public class DeleteUserModel : EditUserPageModel
 {
-    public class DeleteUserModel : EditUserPageModel
+    public DeleteUserModel(
+        IUserDbContext userDbContext,
+        IOptions<UserDbContextConfiguration> userDbContextConfiguration,
+        IRoleDbContext roleDbContext = null)
+        : base(userDbContext, userDbContextConfiguration, roleDbContext)
     {
-        public DeleteUserModel(
-            IUserDbContext userDbContext,
-            IOptions<UserDbContextConfiguration> userDbContextConfiguration,
-            IRoleDbContext roleDbContext = null)
-            : base(userDbContext, userDbContextConfiguration, roleDbContext)
+    }
+
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    public class InputModel
+    {
+        [HiddenInput]
+        public string CurrentUserId { get; set; }
+
+        [Display(Name = "Confirm Username")]
+        public string ConfirmUsername { get; set; }
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await base.LoadCurrentApplicationUserAsync(id);
+        if (this.CurrentApplicationUser == null)
         {
+            return NotFound($"Unable to load user.");
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
+        this.Input = new InputModel()
         {
-            [HiddenInput]
-            public string CurrentUserId { get; set; }
+            CurrentUserId = this.CurrentApplicationUser.Id,
+        };
 
-            [Display(Name = "Confirm Username")]
-            public string ConfirmUsername { get; set; }
-        }
+        return Page();
+    }
 
-        async public Task<IActionResult> OnGetAsync(string id)
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await base.SecureHandlerAsync(async () =>
         {
-            await base.LoadCurrentApplicationUserAsync(id);
-            if (this.CurrentApplicationUser == null)
+            await base.LoadCurrentApplicationUserAsync(Input.CurrentUserId);
+
+            #region Verify Username
+
+            if (!this.CurrentApplicationUser.UserName.Equals(Input.ConfirmUsername))
             {
-                return NotFound($"Unable to load user.");
+                throw new StatusMessageException("Please type the correct username.");
             }
 
-            this.Input = new InputModel()
-            {
-                CurrentUserId = this.CurrentApplicationUser.Id,
-            };
 
-            return Page();
+            #endregion
+
+            await _userDbContext.DeleteAsync(this.CurrentApplicationUser, CancellationToken.None);
         }
-
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await base.SecureHandlerAsync(async () =>
-            {
-                await base.LoadCurrentApplicationUserAsync(Input.CurrentUserId);
-
-                #region Verify Username
-
-                if (!this.CurrentApplicationUser.UserName.Equals(Input.ConfirmUsername))
-                {
-                    throw new StatusMessageException("Please type the correct username.");
-                }
-
-
-                #endregion
-
-                await _userDbContext.DeleteAsync(this.CurrentApplicationUser, CancellationToken.None);
-            }
-            , onFinally: () => RedirectToPage("../Index")
-            , successMessage: ""
-            , onException: (ex) => RedirectToPage(new { id = Input.CurrentUserId }));
-        }
+        , onFinally: () => RedirectToPage("../Index")
+        , successMessage: ""
+        , onException: (ex) => RedirectToPage(new { id = Input.CurrentUserId }));
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace IdentityServer.Nova.Extensions.DependencyInjection
+﻿namespace IdentityServer.Nova.Extensions.DependencyInjection;
+
+static public class ServiceCollectionExtensions
 {
-    static public class ServiceCollectionExtensions
-    {
-    }
 }

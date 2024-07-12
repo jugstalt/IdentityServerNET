@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova;
+﻿using IdentityServer.Nova.Models;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,101 +10,100 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Identity.Pages.Account
+namespace IdentityServer.Areas.Identity.Pages.Account;
+
+[AllowAnonymous]
+public class LoginWith2faModel : PageModel
 {
-    [AllowAnonymous]
-    public class LoginWith2faModel : PageModel
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ILogger<LoginWith2faModel> _logger;
+    private readonly IEventService _events;
+
+    public LoginWith2faModel(
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<LoginWith2faModel> logger,
+        IEventService events)
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<LoginWith2faModel> _logger;
-        private readonly IEventService _events;
+        _signInManager = signInManager;
+        _logger = logger;
+        _events = events;
+    }
 
-        public LoginWith2faModel(
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<LoginWith2faModel> logger,
-            IEventService events)
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    public bool RememberMe { get; set; }
+
+    public string ReturnUrl { get; set; }
+
+    public class InputModel
+    {
+        [Required]
+        [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Text)]
+        [Display(Name = "Authenticator code")]
+        public string TwoFactorCode { get; set; }
+
+        [Display(Name = "Remember this machine")]
+        public bool RememberMachine { get; set; }
+    }
+
+    public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null)
+    {
+        // Ensure the user has gone through the username & password screen first
+        var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+        if (user == null)
         {
-            _signInManager = signInManager;
-            _logger = logger;
-            _events = events;
+            throw new InvalidOperationException($"Unable to load two-factor authentication user.");
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        ReturnUrl = returnUrl;
+        RememberMe = rememberMe;
 
-        public bool RememberMe { get; set; }
+        return Page();
+    }
 
-        public string ReturnUrl { get; set; }
-
-        public class InputModel
+    public async Task<IActionResult> OnPostAsync(bool rememberMe, string returnUrl = null)
+    {
+        if (!ModelState.IsValid)
         {
-            [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Text)]
-            [Display(Name = "Authenticator code")]
-            public string TwoFactorCode { get; set; }
-
-            [Display(Name = "Remember this machine")]
-            public bool RememberMachine { get; set; }
-        }
-
-        public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null)
-        {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
-
-            ReturnUrl = returnUrl;
-            RememberMe = rememberMe;
-
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(bool rememberMe, string returnUrl = null)
+        returnUrl = returnUrl ?? Url.Content("~/");
+
+        var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user == null)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+            throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+        }
 
-            returnUrl = returnUrl ?? Url.Content("~/");
+        var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
+        var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
 
-            var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
+            await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
+            return LocalRedirect(returnUrl);
+        }
+        else if (result.IsLockedOut)
+        {
+            _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+            await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "account locked out"));
 
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
-                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+            return RedirectToPage("./Lockout");
+        }
+        else
+        {
+            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
+            await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "invalid authenticator code entered"));
 
-                return LocalRedirect(returnUrl);
-            }
-            else if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
-                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "account locked out"));
-
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
-                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "invalid authenticator code entered"));
-
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
-                return Page();
-            }
+            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+            return Page();
         }
     }
 }

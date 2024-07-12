@@ -1,6 +1,10 @@
-﻿using IdentityServer.Nova.Extensions.DependencyInjection;
+﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.Services;
+using IdentityServer.Nova.Abstractions.Services.Serialize;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
+using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.Serialize;
@@ -199,6 +203,30 @@ public class LiteDbRoleDb : IRoleDbContext, IAdminRoleDbContext
                     blobs
                         .Skip(skip)
                         .Take(limit)
+                        .Select(blob =>
+                            _blobSerializer.DeserializeObject<ApplicationRole>(
+                            _cryptoService.DecryptText(blob.BlobData))
+                        ).ToArray()
+                    );
+            }
+
+            return Task.FromResult<IEnumerable<ApplicationRole>>(Array.Empty<ApplicationRole>());
+        }
+    }
+
+    public Task<IEnumerable<ApplicationRole>> FindRoles(string term, CancellationToken cancellationToken)
+    {
+        using (var db = new LiteDatabase(_connectionString))
+        {
+            var collection = db.GetBlobDocumentCollection(RolesCollectionName);
+
+            var blobs = collection.Find(u => u.Name.Contains(term));
+
+            if (blobs != null)
+            {
+                return Task.FromResult<IEnumerable<ApplicationRole>>(
+                    blobs
+                        .Take(1000)
                         .Select(blob =>
                             _blobSerializer.DeserializeObject<ApplicationRole>(
                             _cryptoService.DecryptText(blob.BlobData))

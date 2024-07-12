@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityServer.Nova.Extensions.DependencyInjection
+namespace IdentityServer.Nova.Extensions.DependencyInjection;
+
+public interface IBuilder
 {
-    public interface IBuilder
-    {
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
 }

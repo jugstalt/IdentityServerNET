@@ -1,4 +1,5 @@
-﻿using IdentityServer.Nova.Reflection;
+﻿using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Reflection;
 using IdentityServer.Nova.Stores;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -8,41 +9,40 @@ using System.Linq;
 using System.Reflection;
 
 [assembly: HostingStartup(typeof(IdentityServer.Nova.NovaHostingStartup))]
-namespace IdentityServer.Nova
+namespace IdentityServer.Nova;
+
+public class NovaHostingStartup : IHostingStartup
 {
-    public class NovaHostingStartup : IHostingStartup
+    public NovaHostingStartup()
     {
-        public NovaHostingStartup()
-        {
-        }
+    }
 
-        public void Configure(IWebHostBuilder builder)
+    public void Configure(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices((context, services) =>
         {
-            builder.ConfigureServices((context, services) =>
+            services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
+            services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
+
+            //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
+
+            string novaAssemblyName = context.Configuration["NovaAssemblyName"];
+            if (!String.IsNullOrWhiteSpace(novaAssemblyName))
             {
-                services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
-                services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
+                var novaAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{novaAssemblyName}.dll");
 
-                //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
-
-                string novaAssemblyName = context.Configuration["NovaAssemblyName"];
-                if (!String.IsNullOrWhiteSpace(novaAssemblyName))
+                foreach (var type in novaAssembly.GetTypes())
                 {
-                    var novaAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{novaAssemblyName}.dll");
-
-                    foreach (var type in novaAssembly.GetTypes())
+                    if (type.GetCustomAttribute<IdentityServerNovaStartupAttribute>() != null)
                     {
-                        if (type.GetCustomAttribute<IdentityServerNovaStartupAttribute>() != null)
+                        if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerNovaStartup))))
                         {
-                            if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerNovaStartup))))
-                            {
-                                var hostingStartup = Activator.CreateInstance(type) as IIdentityServerNovaStartup;
-                                hostingStartup.ConfigureServices(context, services);
-                            }
+                            var hostingStartup = Activator.CreateInstance(type) as IIdentityServerNovaStartup;
+                            hostingStartup.ConfigureServices(context, services);
                         }
                     }
                 }
-            });
-        }
+            }
+        });
     }
 }

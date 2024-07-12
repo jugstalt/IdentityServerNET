@@ -4,39 +4,38 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace IdentityServer
+namespace IdentityServer;
+
+public static class Extensions
 {
-    public static class Extensions
+    /// <summary>
+    /// Determines whether the client is configured to use PKCE.
+    /// </summary>
+    /// <param name="store">The store.</param>
+    /// <param name="client_id">The client identifier.</param>
+    /// <returns></returns>
+    public static async Task<bool> IsPkceClientAsync(this IClientStore store, string client_id)
     {
-        /// <summary>
-        /// Determines whether the client is configured to use PKCE.
-        /// </summary>
-        /// <param name="store">The store.</param>
-        /// <param name="client_id">The client identifier.</param>
-        /// <returns></returns>
-        public static async Task<bool> IsPkceClientAsync(this IClientStore store, string client_id)
+        if (!string.IsNullOrWhiteSpace(client_id))
         {
-            if (!string.IsNullOrWhiteSpace(client_id))
-            {
-                var client = await store.FindEnabledClientByIdAsync(client_id);
-                return client?.RequirePkce == true;
-            }
-
-            return false;
+            var client = await store.FindEnabledClientByIdAsync(client_id);
+            return client?.RequirePkce == true;
         }
 
-        public static bool IsNativeClient(this AuthorizationRequest context)
-        {
-            return !context.RedirectUri.StartsWith("https", StringComparison.Ordinal)
-               && !context.RedirectUri.StartsWith("http", StringComparison.Ordinal);
-        }
+        return false;
+    }
 
-        public static IActionResult LoadingPage(this Controller controller, string viewName, string redirectUri)
-        {
-            controller.HttpContext.Response.StatusCode = 200;
-            controller.HttpContext.Response.Headers["Location"] = "";
+    public static bool IsNativeClient(this AuthorizationRequest context)
+    {
+        return !context.RedirectUri.StartsWith("https", StringComparison.Ordinal)
+           && !context.RedirectUri.StartsWith("http", StringComparison.Ordinal);
+    }
 
-            return controller.View(viewName, new RedirectViewModel { RedirectUrl = redirectUri });
-        }
+    public static IActionResult LoadingPage(this Controller controller, string viewName, string redirectUri)
+    {
+        controller.HttpContext.Response.StatusCode = 200;
+        controller.HttpContext.Response.Headers["Location"] = "";
+
+        return controller.View(viewName, new RedirectViewModel { RedirectUrl = redirectUri });
     }
 }

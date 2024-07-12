@@ -1,13 +1,12 @@
 ﻿using IdentityServer.Nova.Services.UI;
 using Microsoft.Extensions.Options;
 
-namespace IdentityServer.Nova.ServerExtension.Default.Services.UI
+namespace IdentityServer.Nova.ServerExtension.Default.Services.UI;
+
+internal class DefaultUserInterfaceService : UserInterfaceService
 {
-    internal class DefaultUserInterfaceService : UserInterfaceService
+    public DefaultUserInterfaceService(IOptionsMonitor<UserInterfaceServiceOptions> optionsMonitor)
+        : base(optionsMonitor)
     {
-        public DefaultUserInterfaceService(IOptionsMonitor<UserInterfaceServiceOptions> optionsMonitor)
-            : base(optionsMonitor)
-        {
-        }
     }
 }

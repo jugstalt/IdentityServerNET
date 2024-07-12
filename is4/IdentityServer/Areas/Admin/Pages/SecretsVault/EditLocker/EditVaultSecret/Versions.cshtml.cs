@@ -1,7 +1,7 @@
+using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Models;
-using IdentityServer.Nova.Services.Cryptography;
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Servivces.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,84 +9,83 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret
+namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker.EditVaultSecret;
+
+public class VersionsModel : EditVaultSecretPageModel
 {
-    public class VersionsModel : EditVaultSecretPageModel
+    private readonly IVaultSecretCryptoService _vaultSecrtesCryptoService;
+
+    public VersionsModel(ISecretsVaultDbContext secretsVaultDb, IVaultSecretCryptoService vaultSecrtesCryptoService)
+        : base(secretsVaultDb)
     {
-        private readonly IVaultSecretCryptoService _vaultSecrtesCryptoService;
+        _vaultSecrtesCryptoService = vaultSecrtesCryptoService;
+    }
 
-        public VersionsModel(ISecretsVaultDbContext secretsVaultDb, IVaultSecretCryptoService vaultSecrtesCryptoService)
-            : base(secretsVaultDb)
+    async public Task<IActionResult> OnGetAsync(string id, string locker)
+    {
+        await LoadCurrentSecretAsync(locker, id);
+
+        Input = new CreateSecretVersionModel()
         {
-            _vaultSecrtesCryptoService = vaultSecrtesCryptoService;
-        }
+            LockerName = locker,
+            SecretName = id
+        };
 
-        async public Task<IActionResult> OnGetAsync(string id, string locker)
+        this.VaultSecretVersions = await _secretsVaultDb.GetVaultSecretVersionsAsync(locker, id, CancellationToken.None);
+
+        return Page();
+    }
+
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
+        {
+            await LoadCurrentSecretAsync(Input.LockerName, Input.SecretName);
+
+            var inputSecret = Input.Secret.Trim();
+
+            if (!String.IsNullOrWhiteSpace(Input.Secret))
+            {
+                var secretVersion = new VaultSecretVersion()
+                {
+                    VersionTimeStamp = DateTime.UtcNow.Ticks,
+                    Secret = _vaultSecrtesCryptoService.EncryptText(Input.Secret, Encoding.Unicode)
+                };
+
+                await _secretsVaultDb.CreateVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, secretVersion, CancellationToken.None);
+            }
+        }
+        , onFinally: () => RedirectToPage(new { id = Input.SecretName, locker = Input.LockerName })
+        , successMessage: "Secret version created successfully");
+    }
+
+    async public Task<IActionResult> OnGetRemoveAsync(string id, string locker, long stamp)
+    {
+        return await SecureHandlerAsync(async () =>
         {
             await LoadCurrentSecretAsync(locker, id);
 
-            Input = new CreateSecretVersionModel()
+            if (CurrentSecret == null)
             {
-                LockerName = locker,
-                SecretName = id
-            };
-
-            this.VaultSecretVersions = await _secretsVaultDb.GetVaultSecretVersionsAsync(locker, id, CancellationToken.None);
-
-            return Page();
-        }
-
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentSecretAsync(Input.LockerName, Input.SecretName);
-
-                var inputSecret = Input.Secret.Trim();
-
-                if (!String.IsNullOrWhiteSpace(Input.Secret))
-                {
-                    var secretVersion = new VaultSecretVersion()
-                    {
-                        VersionTimeStamp = DateTime.UtcNow.Ticks,
-                        Secret = _vaultSecrtesCryptoService.EncryptText(Input.Secret, Encoding.Unicode)
-                    };
-
-                    await _secretsVaultDb.CreateVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, secretVersion, CancellationToken.None);
-                }
+                throw new StatusMessageException("unknown secret");
             }
-            , onFinally: () => RedirectToPage(new { id = Input.SecretName, locker = Input.LockerName })
-            , successMessage: "Secret version created successfully");
+
+            await _secretsVaultDb.RemoveVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, stamp, CancellationToken.None);
         }
+        , onFinally: () => RedirectToPage(new { id = id, locker = locker })
+        , successMessage: "Successfully removed secret");
+    }
 
-        async public Task<IActionResult> OnGetRemoveAsync(string id, string locker, long stamp)
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentSecretAsync(locker, id);
+    public IEnumerable<VaultSecretVersion> VaultSecretVersions { get; set; }
 
-                if (CurrentSecret == null)
-                {
-                    throw new StatusMessageException("unknown secret");
-                }
+    [BindProperty]
+    public CreateSecretVersionModel Input { get; set; }
 
-                await _secretsVaultDb.RemoveVaultSecretVersionAsync(this.LockerName, this.CurrentSecret.Name, stamp, CancellationToken.None);
-            }
-            , onFinally: () => RedirectToPage(new { id = id, locker = locker })
-            , successMessage: "Successfully removed secret");
-        }
+    public class CreateSecretVersionModel
+    {
+        public string LockerName { get; set; }
+        public string SecretName { get; set; }
 
-        public IEnumerable<VaultSecretVersion> VaultSecretVersions { get; set; }
-
-        [BindProperty]
-        public CreateSecretVersionModel Input { get; set; }
-
-        public class CreateSecretVersionModel
-        {
-            public string LockerName { get; set; }
-            public string SecretName { get; set; }
-
-            public string Secret { get; set; }
-        }
+        public string Secret { get; set; }
     }
 }

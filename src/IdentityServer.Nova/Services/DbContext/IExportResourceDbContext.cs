@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext
+namespace IdentityServer.Nova.Services.DbContext;
+
+public interface IExportResourceDbContext : IResourceDbContextModify
 {
-    public interface IExportResourceDbContext : IResourceDbContextModify
-    {
-        Task FlushDb();
-    }
+    Task FlushDb();
 }

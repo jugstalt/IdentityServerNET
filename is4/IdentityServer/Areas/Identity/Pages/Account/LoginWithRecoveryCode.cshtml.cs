@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova;
+﻿using IdentityServer.Nova.Models;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,93 +10,92 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Identity.Pages.Account
+namespace IdentityServer.Areas.Identity.Pages.Account;
+
+[AllowAnonymous]
+public class LoginWithRecoveryCodeModel : PageModel
 {
-    [AllowAnonymous]
-    public class LoginWithRecoveryCodeModel : PageModel
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
+    private readonly IEventService _events;
+
+    public LoginWithRecoveryCodeModel(
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<LoginWithRecoveryCodeModel> logger,
+        IEventService events)
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
-        private readonly IEventService _events;
+        _signInManager = signInManager;
+        _logger = logger;
+        _events = events;
+    }
 
-        public LoginWithRecoveryCodeModel(
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<LoginWithRecoveryCodeModel> logger,
-            IEventService events)
-        {
-            _signInManager = signInManager;
-            _logger = logger;
-            _events = events;
-        }
+    [BindProperty]
+    public InputModel Input { get; set; }
 
+    public string ReturnUrl { get; set; }
+
+    public class InputModel
+    {
         [BindProperty]
-        public InputModel Input { get; set; }
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Recovery Code")]
+        public string RecoveryCode { get; set; }
+    }
 
-        public string ReturnUrl { get; set; }
-
-        public class InputModel
+    public async Task<IActionResult> OnGetAsync(string returnUrl = null)
+    {
+        // Ensure the user has gone through the username & password screen first
+        var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user == null)
         {
-            [BindProperty]
-            [Required]
-            [DataType(DataType.Text)]
-            [Display(Name = "Recovery Code")]
-            public string RecoveryCode { get; set; }
+            throw new InvalidOperationException($"Unable to load two-factor authentication user.");
         }
 
-        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
+        ReturnUrl = returnUrl;
+
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+    {
+        if (!ModelState.IsValid)
         {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
-
-            ReturnUrl = returnUrl;
-
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user == null)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+            throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+        }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
+        var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
 
-            var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
+        var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
-            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
+            await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
-                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+            return LocalRedirect(returnUrl ?? Url.Content("~/"));
+        }
 
-                return LocalRedirect(returnUrl ?? Url.Content("~/"));
-            }
+        if (result.IsLockedOut)
+        {
+            _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+            await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "account locked out"));
 
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
-                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "account locked out"));
+            return RedirectToPage("./Lockout");
+        }
+        else
+        {
+            _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
+            await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "Invalid recovery code entered "));
+            ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
 
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", user.Id);
-                await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "Invalid recovery code entered "));
-                ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
-
-                return Page();
-            }
+            return Page();
         }
     }
 }

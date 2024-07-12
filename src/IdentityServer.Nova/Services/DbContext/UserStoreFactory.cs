@@ -1,25 +1,25 @@
-﻿using System.Threading.Tasks;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext
+namespace IdentityServer.Nova.Services.DbContext;
+
+public abstract class UserStoreFactory : IUserStoreFactory
 {
-    public abstract class UserStoreFactory : IUserStoreFactory
+    private IUserDbContext _userDbContext = null;
+
+    public UserStoreFactory()
     {
-        private IUserDbContext _userDbContext = null;
-
-        public UserStoreFactory()
-        {
-        }
-
-        async public Task<IUserDbContext> CreateUserDbContextInstance()
-        {
-            if (_userDbContext != null)
-            {
-                return _userDbContext;
-            }
-
-            return await GetUserDbContectAsync();
-        }
-
-        abstract protected Task<IUserDbContext> GetUserDbContectAsync();
     }
+
+    async public Task<IUserDbContext> CreateUserDbContextInstance()
+    {
+        if (_userDbContext != null)
+        {
+            return _userDbContext;
+        }
+
+        return await GetUserDbContectAsync();
+    }
+
+    abstract protected Task<IUserDbContext> GetUserDbContectAsync();
 }

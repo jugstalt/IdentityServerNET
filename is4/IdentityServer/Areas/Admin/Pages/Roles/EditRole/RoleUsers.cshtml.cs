@@ -1,7 +1,7 @@
-using IdentityServer.Nova;
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Extensions.DependencyInjection;
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,118 +11,117 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
+namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole;
+
+public class RoleUsersModel : EditRolePageModel
 {
-    public class RoleUsersModel : EditRolePageModel
+    private readonly SignInManager<ApplicationUser> _signInManager;
+
+    public RoleUsersModel(
+        SignInManager<ApplicationUser> signInManager,
+        IRoleDbContext roleDbContext,
+        IUserDbContext userDbContext,
+        IOptions<RoleDbContextConfiguration> roleDbContextConfiguration = null)
+        : base(roleDbContext, roleDbContextConfiguration)
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        _signInManager = signInManager;
+        _userDbContext = userDbContext as IUserRoleDbContext;
+    }
 
-        public RoleUsersModel(
-            SignInManager<ApplicationUser> signInManager,
-            IRoleDbContext roleDbContext,
-            IUserDbContext userDbContext,
-            IOptions<RoleDbContextConfiguration> roleDbContextConfiguration = null)
-            : base(roleDbContext, roleDbContextConfiguration)
+    private IUserRoleDbContext _userDbContext;
+
+    public IEnumerable<ApplicationUser> RoleUsers;
+
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    public class InputModel
+    {
+        public string RoleId { get; set; }
+
+        [DisplayName("Username or Email")]
+        public string Username { get; set; }
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        return await SecureHandlerAsync(async () =>
         {
-            _signInManager = signInManager;
-            _userDbContext = userDbContext as IUserRoleDbContext;
-        }
+            await LoadCurrentApplicationRoleAsync(id);
 
-        private IUserRoleDbContext _userDbContext;
-
-        public IEnumerable<ApplicationUser> RoleUsers;
-
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            public string RoleId { get; set; }
-
-            [DisplayName("Username or Email")]
-            public string Username { get; set; }
-        }
-
-        async public Task<IActionResult> OnGetAsync(string id)
-        {
-            return await SecureHandlerAsync(async () =>
+            if (_userDbContext == null)
             {
-                await LoadCurrentApplicationRoleAsync(id);
-
-                if (_userDbContext == null)
-                {
-                    throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
-                }
-
-                this.RoleUsers = await _userDbContext.GetUsersInRoleAsync(CurrentApplicationRole.Name, CancellationToken.None);
-
-                Input = new InputModel()
-                {
-                    RoleId = CurrentApplicationRole.Id
-                };
+                throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
             }
-            , onFinally: () => Page()
-            , successMessage: "");
-        }
 
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
+            this.RoleUsers = await _userDbContext.GetUsersInRoleAsync(CurrentApplicationRole.Name, CancellationToken.None);
+
+            Input = new InputModel()
             {
-                await LoadCurrentApplicationRoleAsync(Input.RoleId);
-
-                if (String.IsNullOrWhiteSpace(Input.Username))
-                {
-                    throw new StatusMessageException("Please type a correct username");
-                }
-
-                if (_userDbContext == null)
-                {
-                    throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
-                }
-
-                var user = await _userDbContext.FindByNameAsync(Input.Username.ToUpper(), CancellationToken.None);
-                if (user == null)
-                {
-                    user = await _userDbContext.FindByEmailAsync(Input.Username.ToUpper(), CancellationToken.None);
-                }
-
-                if (user == null)
-                {
-                    throw new StatusMessageException($"Unknown user {Input.Username}");
-                }
-
-                await _userDbContext.AddToRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
-                await _signInManager.RefreshSignInAsync(user);
-            }
-            , onFinally: () => RedirectToPage(new { id = Input.RoleId })
-            , successMessage: $"User {Input.Username} successfully added to role"
-            , onException: (ex) => Page());
+                RoleId = CurrentApplicationRole.Id
+            };
         }
+        , onFinally: () => Page()
+        , successMessage: "");
+    }
 
-        async public Task<IActionResult> OnGetRemoveAsync(string id, string userId)
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
         {
-            return await SecureHandlerAsync(async () =>
+            await LoadCurrentApplicationRoleAsync(Input.RoleId);
+
+            if (String.IsNullOrWhiteSpace(Input.Username))
             {
-                await LoadCurrentApplicationRoleAsync(id);
-
-                if (_userDbContext == null)
-                {
-                    throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
-                }
-
-                var user = await _userDbContext.FindByIdAsync(userId, CancellationToken.None);
-
-                if (user == null)
-                {
-                    throw new StatusMessageException($"Unknown user");
-                }
-
-                await _userDbContext.RemoveFromRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
-                await _signInManager.RefreshSignInAsync(user);
+                throw new StatusMessageException("Please type a correct username");
             }
-            , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: "Successfully removed user");
+
+            if (_userDbContext == null)
+            {
+                throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
+            }
+
+            var user = await _userDbContext.FindByNameAsync(Input.Username.ToUpper(), CancellationToken.None);
+            if (user == null)
+            {
+                user = await _userDbContext.FindByEmailAsync(Input.Username.ToUpper(), CancellationToken.None);
+            }
+
+            if (user == null)
+            {
+                throw new StatusMessageException($"Unknown user {Input.Username}");
+            }
+
+            await _userDbContext.AddToRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
+            await _signInManager.RefreshSignInAsync(user);
         }
+        , onFinally: () => RedirectToPage(new { id = Input.RoleId })
+        , successMessage: $"User {Input.Username} successfully added to role"
+        , onException: (ex) => Page());
+    }
+
+    async public Task<IActionResult> OnGetRemoveAsync(string id, string userId)
+    {
+        return await SecureHandlerAsync(async () =>
+        {
+            await LoadCurrentApplicationRoleAsync(id);
+
+            if (_userDbContext == null)
+            {
+                throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
+            }
+
+            var user = await _userDbContext.FindByIdAsync(userId, CancellationToken.None);
+
+            if (user == null)
+            {
+                throw new StatusMessageException($"Unknown user");
+            }
+
+            await _userDbContext.RemoveFromRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
+            await _signInManager.RefreshSignInAsync(user);
+        }
+        , onFinally: () => RedirectToPage(new { id = id })
+        , successMessage: "Successfully removed user");
     }
 }

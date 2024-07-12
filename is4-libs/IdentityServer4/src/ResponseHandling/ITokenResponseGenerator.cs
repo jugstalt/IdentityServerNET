@@ -2,21 +2,20 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Threading.Tasks;
 using IdentityServer4.Validation;
+using System.Threading.Tasks;
 
-namespace IdentityServer4.ResponseHandling
+namespace IdentityServer4.ResponseHandling;
+
+/// <summary>
+/// Interface the token response generator
+/// </summary>
+public interface ITokenResponseGenerator
 {
     /// <summary>
-    /// Interface the token response generator
+    /// Processes the response.
     /// </summary>
-    public interface ITokenResponseGenerator
-    {
-        /// <summary>
-        /// Processes the response.
-        /// </summary>
-        /// <param name="validationResult">The validation result.</param>
-        /// <returns></returns>
-        Task<TokenResponse> ProcessAsync(TokenRequestValidationResult validationResult);
-    }
+    /// <param name="validationResult">The validation result.</param>
+    /// <returns></returns>
+    Task<TokenResponse> ProcessAsync(TokenRequestValidationResult validationResult);
 }

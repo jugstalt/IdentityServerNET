@@ -1,8 +1,7 @@
-﻿namespace IdentityServer.Nova.CaptchaRenderers
+﻿namespace IdentityServer.Nova.CaptchaRenderers;
+
+public enum ColorType
 {
-    public enum ColorType
-    {
-        Random = 0,
-        Monochrome = 1
-    }
+    Random = 0,
+    Monochrome = 1
 }

@@ -1,55 +1,54 @@
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Servivces.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
+namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker;
+
+public class IndexModel : EditLockerPageModel
 {
-    public class IndexModel : EditLockerPageModel
+    public IndexModel(ISecretsVaultDbContext secretsVaultDb)
+        : base(secretsVaultDb)
     {
-        public IndexModel(ISecretsVaultDbContext secretsVaultDb)
-            : base(secretsVaultDb)
+
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentLockerAsync(id);
+
+        Input = new InputModel()
         {
+            Name = CurrentLocker.Name,
+            Description = CurrentLocker.Description
+        };
 
-        }
+        return Page();
+    }
 
-        async public Task<IActionResult> OnGetAsync(string id)
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
         {
-            await LoadCurrentLockerAsync(id);
+            await LoadCurrentLockerAsync(Input.Name);
 
-            Input = new InputModel()
-            {
-                Name = CurrentLocker.Name,
-                Description = CurrentLocker.Description
-            };
-
-            return Page();
+            CurrentLocker.Description = Input.Description;
+            await _secretsVaultDb.UpadteLockerAsync(CurrentLocker, CancellationToken.None);
         }
+        , onFinally: () => RedirectToPage(new { id = Input.Name })
+        , successMessage: "The client has been updated successfully");
+    }
 
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentLockerAsync(Input.Name);
+    [BindProperty]
+    public InputModel Input { get; set; }
 
-                CurrentLocker.Description = Input.Description;
-                await _secretsVaultDb.UpadteLockerAsync(CurrentLocker, CancellationToken.None);
-            }
-            , onFinally: () => RedirectToPage(new { id = Input.Name })
-            , successMessage: "The client has been updated successfully");
-        }
+    public class InputModel
+    {
+        [DisplayName("Name")]
+        public string Name { get; set; }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [DisplayName("Name")]
-            public string Name { get; set; }
-
-            [DisplayName("Description")]
-            public string Description { get; set; }
-        }
+        [DisplayName("Description")]
+        public string Description { get; set; }
     }
 }

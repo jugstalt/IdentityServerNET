@@ -6,7 +6,7 @@ namespace IdentityServer4
 {
     internal static class Constants
     {
-        public const string IdentityServerName               = "IdentityServer4";
+        public const string IdentityServerName = "IdentityServer4";
         public const string IdentityServerAuthenticationType = IdentityServerName;
-   }
+    }
 }

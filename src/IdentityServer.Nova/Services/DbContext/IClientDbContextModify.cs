@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext
-{
-    public interface IClientDbContextModify : IClientDbContext
-    {
-        Task AddClientAsync(ClientModel client);
-        Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null);
-        Task RemoveClientAsync(ClientModel client);
+namespace IdentityServer.Nova.Services.DbContext;
 
-        Task<IEnumerable<ClientModel>> GetAllClients();
-    }
+public interface IClientDbContextModify : IClientDbContext
+{
+    Task AddClientAsync(ClientModel client);
+    Task UpdateClientAsync(ClientModel client, IEnumerable<string> propertyNames = null);
+    Task RemoveClientAsync(ClientModel client);
+
+    Task<IEnumerable<ClientModel>> GetAllClients();
 }

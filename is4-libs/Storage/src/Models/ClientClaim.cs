@@ -16,7 +16,7 @@ namespace IdentityServer4.Models
         /// The claim type
         /// </summary>
         public string Type { get; set; }
-        
+
         /// <summary>
         /// The claim value
         /// </summary>
@@ -61,7 +61,7 @@ namespace IdentityServer4.Models
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            unchecked 
+            unchecked
             {
                 int hash = 17;
 
@@ -75,7 +75,11 @@ namespace IdentityServer4.Models
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
+            if (obj is null)
+            {
+                return false;
+            }
+
             if (obj is ClientClaim c)
             {
                 return (string.Equals(Type, c.Type, StringComparison.Ordinal) &&

@@ -1,6 +1,5 @@
-﻿namespace IdentityServer.Areas.Admin.Pages.Resources
+﻿namespace IdentityServer.Areas.Admin.Pages.Resources;
+
+internal class IdentityResourcesModel
 {
-    internal class IdentityResourcesModel
-    {
-    }
 }

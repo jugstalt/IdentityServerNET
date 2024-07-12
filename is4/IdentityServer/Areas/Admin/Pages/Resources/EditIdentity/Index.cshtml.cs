@@ -1,53 +1,52 @@
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Abstractions.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity;
+
+public class IndexModel : EditIdentityResourcePageModel
 {
-    public class IndexModel : EditIdentityResourcePageModel
+    public IndexModel(IResourceDbContext resourceDbContext)
+         : base(resourceDbContext)
     {
-        public IndexModel(IResourceDbContext resourceDbContext)
-             : base(resourceDbContext)
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentIdentityResourceAsync(id);
+
+        Input = new InputModel()
         {
-        }
+            Name = CurrentIdentityResource.Name,
+            DisplayName = CurrentIdentityResource.DisplayName,
+            Decription = CurrentIdentityResource.Description
+        };
 
-        async public Task<IActionResult> OnGetAsync(string id)
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
         {
-            await LoadCurrentIdentityResourceAsync(id);
+            await LoadCurrentIdentityResourceAsync(Input.Name);
 
-            Input = new InputModel()
-            {
-                Name = CurrentIdentityResource.Name,
-                DisplayName = CurrentIdentityResource.DisplayName,
-                Decription = CurrentIdentityResource.Description
-            };
+            CurrentIdentityResource.DisplayName = Input.DisplayName;
+            CurrentIdentityResource.Description = Input.Decription;
 
-            return Page();
+            await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource, new[] { "DisplayName", "Description" });
         }
+        , onFinally: () => RedirectToPage(new { id = Input.Name })
+        , successMessage: "Identity resource successfully updated");
+    }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentIdentityResourceAsync(Input.Name);
+    [BindProperty]
+    public InputModel Input { get; set; }
 
-                CurrentIdentityResource.DisplayName = Input.DisplayName;
-                CurrentIdentityResource.Description = Input.Decription;
-
-                await _resourceDb.UpdateIdentityResourceAsync(CurrentIdentityResource, new[] { "DisplayName", "Description" });
-            }
-            , onFinally: () => RedirectToPage(new { id = Input.Name })
-            , successMessage: "Identity resource successfully updated");
-        }
-
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            public string Name { get; set; }
-            public string DisplayName { get; set; }
-            public string Decription { get; set; }
-        }
+    public class InputModel
+    {
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string Decription { get; set; }
     }
 }

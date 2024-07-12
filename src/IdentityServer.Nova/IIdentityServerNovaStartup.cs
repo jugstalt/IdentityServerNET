@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityServer.Nova
+namespace IdentityServer.Nova;
+
+public interface IIdentityServerNovaStartup
 {
-    public interface IIdentityServerNovaStartup
-    {
-        void ConfigureServices(WebHostBuilderContext context, IServiceCollection services);
-    }
+    void ConfigureServices(WebHostBuilderContext context, IServiceCollection services);
 }

@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.EventSinks
+namespace IdentityServer.Nova.Services.EventSinks;
+
+public interface IIdentityEventSink
 {
-    public interface IIdentityEventSink
-    {
-        Task PersistAsync(IdentityEvent evt);
-    }
+    Task PersistAsync(IdentityEvent evt);
 }

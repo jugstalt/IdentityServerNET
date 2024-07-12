@@ -1,22 +1,22 @@
-﻿using IdentityServer.Nova.Services.DbContext;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Services.DbContext;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.ServerExtension.Default.Services.DbContext
+namespace IdentityServer.Nova.ServerExtension.Default.Services.DbContext;
+
+internal class DefaultUserStoreFactory : UserStoreFactory
 {
-    internal class DefaultUserStoreFactory : UserStoreFactory
+    private readonly IEnumerable<IUserDbContext> _userDbContextes;
+
+    public DefaultUserStoreFactory(IEnumerable<IUserDbContext> userContextes)
     {
-        private readonly IEnumerable<IUserDbContext> _userDbContextes;
+        _userDbContextes = userContextes;
+    }
 
-        public DefaultUserStoreFactory(IEnumerable<IUserDbContext> userContextes)
-        {
-            _userDbContextes = userContextes;
-        }
-
-        protected override Task<IUserDbContext> GetUserDbContectAsync()
-        {
-            return Task.FromResult(_userDbContextes.FirstOrDefault());
-        }
+    protected override Task<IUserDbContext> GetUserDbContectAsync()
+    {
+        return Task.FromResult(_userDbContextes.FirstOrDefault());
     }
 }

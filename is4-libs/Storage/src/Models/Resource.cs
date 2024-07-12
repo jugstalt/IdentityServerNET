@@ -29,7 +29,7 @@ namespace IdentityServer4.Models
         /// Display name of the resource.
         /// </summary>
         public string DisplayName { get; set; }
-        
+
         /// <summary>
         /// Description of the resource.
         /// </summary>

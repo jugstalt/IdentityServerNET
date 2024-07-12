@@ -1,24 +1,24 @@
-﻿using Newtonsoft.Json;
+﻿using IdentityServer.Nova.Abstractions.Services.Serialize;
+using Newtonsoft.Json;
 
-namespace IdentityServer.Nova.Services.Serialize
+namespace IdentityServer.Nova.Services.Serialize;
+
+public class JsonBlobSerializer : IBlobSerializer
 {
-    public class JsonBlobSerializer : IBlobSerializer
+    public JsonBlobSerializer()
     {
-        public JsonBlobSerializer()
-        {
-            this.JsonFormatting = Formatting.None;
-        }
-
-        public T DeserializeObject<T>(string text)
-        {
-            return JsonConvert.DeserializeObject<T>(text);
-        }
-
-        public string SerializeObject(object obj)
-        {
-            return JsonConvert.SerializeObject(obj, JsonFormatting);
-        }
-
-        public Formatting JsonFormatting { get; set; }
+        this.JsonFormatting = Formatting.None;
     }
+
+    public T DeserializeObject<T>(string text)
+    {
+        return JsonConvert.DeserializeObject<T>(text);
+    }
+
+    public string SerializeObject(object obj)
+    {
+        return JsonConvert.SerializeObject(obj, JsonFormatting);
+    }
+
+    public Formatting JsonFormatting { get; set; }
 }

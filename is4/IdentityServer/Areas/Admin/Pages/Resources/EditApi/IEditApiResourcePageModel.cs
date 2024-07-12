@@ -1,9 +1,8 @@
 ﻿using IdentityServer.Nova.Models.IdentityServerWrappers;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi;
+
+public interface IEditApiResourcePageModel
 {
-    public interface IEditApiResourcePageModel
-    {
-        public ApiResourceModel CurrentApiResource { get; set; }
-    }
+    public ApiResourceModel CurrentApiResource { get; set; }
 }

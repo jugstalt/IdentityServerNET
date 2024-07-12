@@ -3,33 +3,32 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
 
-namespace IdentityServer.Nova.Extensions
+namespace IdentityServer.Nova.Extensions;
+
+static public class ClaimExtensions
 {
-    static public class ClaimExtensions
+    static public string ToClaimDateValue(this DateTime dateTime)
     {
-        static public string ToClaimDateValue(this DateTime dateTime)
-        {
-            return dateTime.ToString("yyyy-MM-dd"); // HH:mm
-        }
+        return dateTime.ToString("yyyy-MM-dd"); // HH:mm
+    }
 
-        static public DateTime FromClaimDateValue(this string dateString)
-        {
-            return DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        }
+    static public DateTime FromClaimDateValue(this string dateString)
+    {
+        return DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
 
-        static public bool TryAddClaim(this List<Claim> claims, string type, string value)
+    static public bool TryAddClaim(this List<Claim> claims, string type, string value)
+    {
+        if (!String.IsNullOrEmpty(value))
         {
-            if (!String.IsNullOrEmpty(value))
+            try
             {
-                try
-                {
-                    claims.Add(new Claim(type, value));
-                    return true;
-                }
-                catch { }
+                claims.Add(new Claim(type, value));
+                return true;
             }
-
-            return false;
+            catch { }
         }
+
+        return false;
     }
 }

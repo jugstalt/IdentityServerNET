@@ -2,49 +2,48 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using IdentityServer4.Extensions;
 using IdentityServer4.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
-using IdentityServer4.Extensions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace IdentityServer4.Endpoints.Results
+namespace IdentityServer4.Endpoints.Results;
+
+/// <summary>
+/// Result for introspection
+/// </summary>
+/// <seealso cref="IdentityServer4.Hosting.IEndpointResult" />
+public class IntrospectionResult : IEndpointResult
 {
     /// <summary>
-    /// Result for introspection
+    /// Gets the result.
     /// </summary>
-    /// <seealso cref="IdentityServer4.Hosting.IEndpointResult" />
-    public class IntrospectionResult : IEndpointResult
+    /// <value>
+    /// The result.
+    /// </value>
+    public Dictionary<string, object> Entries { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IntrospectionResult"/> class.
+    /// </summary>
+    /// <param name="entries">The result.</param>
+    /// <exception cref="System.ArgumentNullException">result</exception>
+    public IntrospectionResult(Dictionary<string, object> entries)
     {
-        /// <summary>
-        /// Gets the result.
-        /// </summary>
-        /// <value>
-        /// The result.
-        /// </value>
-        public Dictionary<string, object> Entries { get; }
+        Entries = entries ?? throw new ArgumentNullException(nameof(entries));
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IntrospectionResult"/> class.
-        /// </summary>
-        /// <param name="entries">The result.</param>
-        /// <exception cref="System.ArgumentNullException">result</exception>
-        public IntrospectionResult(Dictionary<string, object> entries)
-        {
-            Entries = entries ?? throw new ArgumentNullException(nameof(entries));
-        }
+    /// <summary>
+    /// Executes the result.
+    /// </summary>
+    /// <param name="context">The HTTP context.</param>
+    /// <returns></returns>
+    public Task ExecuteAsync(HttpContext context)
+    {
+        context.Response.SetNoCache();
 
-        /// <summary>
-        /// Executes the result.
-        /// </summary>
-        /// <param name="context">The HTTP context.</param>
-        /// <returns></returns>
-        public Task ExecuteAsync(HttpContext context)
-        {
-            context.Response.SetNoCache();
-            
-            return context.Response.WriteJsonAsync(Entries);
-        }
+        return context.Response.WriteJsonAsync(Entries);
     }
 }

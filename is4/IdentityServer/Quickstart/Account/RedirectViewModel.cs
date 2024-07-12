@@ -3,10 +3,9 @@
 
 
 
-namespace IdentityServer
+namespace IdentityServer;
+
+public class RedirectViewModel
 {
-    public class RedirectViewModel
-    {
-        public string RedirectUrl { get; set; }
-    }
+    public string RedirectUrl { get; set; }
 }

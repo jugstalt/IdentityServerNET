@@ -1,0 +1,30 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Users.EditUser.UserEmailModel
+@{
+    ViewData["Title"] = "User Email";
+    ViewData["ActivePage"] = EditUserNavPages.UserEmail;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="change-email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input asp-for="Input.CurrentUserId" />
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <input asp-for="Input.IsEmailConfirmed" />
+                <label asp-for="Input.IsEmailConfirmed"></label>
+            </div>
+            <button type="submit" class="btn btn-default">Update</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace IdentityServer.Nova.Services.UI
+namespace IdentityServer.Nova.Services.UI;
+
+public interface IUserInterfaceService
 {
-    public interface IUserInterfaceService
-    {
-        string ApplicationTitle { get; }
+    string ApplicationTitle { get; }
 
-        string OverrideCssContent { get; }
+    string OverrideCssContent { get; }
 
-        IDictionary<string, byte[]> MediaContent { get; }
+    IDictionary<string, byte[]> MediaContent { get; }
 
-        string LoginLayoutBodyClass { get; }
+    string LoginLayoutBodyClass { get; }
 
-        bool DenyForgotPasswordChallange { get; }
-    }
+    bool DenyForgotPasswordChallange { get; }
 }

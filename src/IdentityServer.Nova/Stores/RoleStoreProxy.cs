@@ -1,78 +1,79 @@
-﻿using IdentityServer.Nova.Services.DbContext;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Stores
+namespace IdentityServer.Nova.Stores;
+
+public class RoleStoreProxy : IRoleStore<ApplicationRole>
 {
-    public class RoleStoreProxy : IRoleStore<ApplicationRole>
+    private IRoleDbContext _roleDbContext = null;
+
+    public RoleStoreProxy(IRoleDbContext roleDbContext = null)
     {
-        private IRoleDbContext _roleDbContext = null;
+        _roleDbContext = roleDbContext ?? new InMemoryRoleDb();
+    }
 
-        public RoleStoreProxy(IRoleDbContext roleDbContext = null)
-        {
-            _roleDbContext = roleDbContext ?? new InMemoryRoleDb();
-        }
+    public Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return _roleDbContext.CreateAsync(role, cancellationToken);
+    }
 
-        public Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)
-        {
-            return _roleDbContext.CreateAsync(role, cancellationToken);
-        }
+    public Task<IdentityResult> DeleteAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return _roleDbContext.DeleteAsync(role, cancellationToken);
+    }
 
-        public Task<IdentityResult> DeleteAsync(ApplicationRole role, CancellationToken cancellationToken)
+    public void Dispose()
+    {
+        if (_roleDbContext is IDisposable)
         {
-            return _roleDbContext.DeleteAsync(role, cancellationToken);
+            ((IDisposable)_roleDbContext).Dispose();
         }
+    }
 
-        public void Dispose()
-        {
-            if (_roleDbContext is IDisposable)
-            {
-                ((IDisposable)_roleDbContext).Dispose();
-            }
-        }
+    public Task<ApplicationRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+    {
+        return _roleDbContext.FindByIdAsync(roleId, cancellationToken);
+    }
 
-        public Task<ApplicationRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
-        {
-            return _roleDbContext.FindByIdAsync(roleId, cancellationToken);
-        }
+    public Task<ApplicationRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+    {
+        return _roleDbContext.FindByNameAsync(normalizedRoleName, cancellationToken);
+    }
 
-        public Task<ApplicationRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
-        {
-            return _roleDbContext.FindByNameAsync(normalizedRoleName, cancellationToken);
-        }
+    public Task<string> GetNormalizedRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<string>(role.Name.ToUpper());
+    }
 
-        public Task<string> GetNormalizedRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<string>(role.Name.ToUpper());
-        }
+    public Task<string> GetRoleIdAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(role.Id);
+    }
 
-        public Task<string> GetRoleIdAsync(ApplicationRole role, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(role.Id);
-        }
+    public Task<string> GetRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(role.Name);
+    }
 
-        public Task<string> GetRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(role.Name);
-        }
+    async public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
+    {
+        role.NormalizedName =
+            await _roleDbContext.UpdatePropertyAsync<string>(role, ApplicationRoleProperties.NormalizedName, normalizedName, cancellationToken);
+    }
 
-        async public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
-        {
-            role.NormalizedName =
-                await _roleDbContext.UpdatePropertyAsync<string>(role, ApplicationRoleProperties.NormalizedName, normalizedName, cancellationToken);
-        }
+    async public Task SetRoleNameAsync(ApplicationRole role, string roleName, CancellationToken cancellationToken)
+    {
+        role.Name =
+            await _roleDbContext.UpdatePropertyAsync<string>(role, ApplicationRoleProperties.Name, roleName, cancellationToken);
+    }
 
-        async public Task SetRoleNameAsync(ApplicationRole role, string roleName, CancellationToken cancellationToken)
-        {
-            role.Name =
-                await _roleDbContext.UpdatePropertyAsync<string>(role, ApplicationRoleProperties.Name, roleName, cancellationToken);
-        }
-
-        public Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
-        {
-            return _roleDbContext.UpdateAsync(role, cancellationToken);
-        }
+    public Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
+    {
+        return _roleDbContext.UpdateAsync(role, cancellationToken);
     }
 }

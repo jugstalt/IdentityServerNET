@@ -16,7 +16,7 @@ namespace IdentityServer4.Models
     public class IdentityResource : Resource
     {
         private string DebuggerDisplay => Name ?? $"{{{typeof(IdentityResource)}}}";
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityResource"/> class.
         /// </summary>
@@ -44,13 +44,20 @@ namespace IdentityServer4.Models
         /// <exception cref="System.ArgumentException">Must provide at least one claim type - claimTypes</exception>
         public IdentityResource(string name, string displayName, IEnumerable<string> userClaims)
         {
-            if (name.IsMissing()) throw new ArgumentNullException(nameof(name));
-            if (userClaims.IsNullOrEmpty()) throw new ArgumentException("Must provide at least one claim type", nameof(userClaims));
+            if (name.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (userClaims.IsNullOrEmpty())
+            {
+                throw new ArgumentException("Must provide at least one claim type", nameof(userClaims));
+            }
 
             Name = name;
             DisplayName = displayName;
 
-            foreach(var type in userClaims)
+            foreach (var type in userClaims)
             {
                 UserClaims.Add(type);
             }

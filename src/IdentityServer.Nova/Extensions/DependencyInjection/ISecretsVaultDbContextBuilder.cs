@@ -1,6 +1,5 @@
-﻿namespace IdentityServer.Nova.Extensions.DependencyInjection
+﻿namespace IdentityServer.Nova.Extensions.DependencyInjection;
+
+public interface ISecretsVaultDbContextBuilder : IBuilder
 {
-    public interface ISecretsVaultDbContextBuilder : IBuilder
-    {
-    }
 }

@@ -1,9 +1,8 @@
 ﻿using IdentityServer.Nova.Models;
 
-namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
+namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker;
+
+public interface IEditLockerPageModel
 {
-    public interface IEditLockerPageModel
-    {
-        SecretsLocker CurrentLocker { get; set; }
-    }
+    SecretsLocker CurrentLocker { get; set; }
 }

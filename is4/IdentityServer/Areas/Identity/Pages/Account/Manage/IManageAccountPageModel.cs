@@ -1,10 +1,9 @@
-﻿using IdentityServer.Nova.UserInteraction;
+﻿using IdentityServer.Nova.Models.UserInteraction;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace IdentityServer.Areas.Identity.Pages.Account.Manage;
+
+public interface IManageAccountPageModel
 {
-    public interface IManageAccountPageModel
-    {
-        Task<ManageAccountEditor> EditorInfos();
-    }
+    Task<ManageAccountEditor> EditorInfos();
 }

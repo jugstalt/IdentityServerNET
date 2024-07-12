@@ -2,55 +2,54 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Threading.Tasks;
+using IdentityModel;
 using IdentityServer4.Extensions;
-using Microsoft.Extensions.Primitives;
 using IdentityServer4.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
-using IdentityModel;
+using System.Threading.Tasks;
 
-namespace IdentityServer4.Endpoints.Results
+namespace IdentityServer4.Endpoints.Results;
+
+internal class ProtectedResourceErrorResult : IEndpointResult
 {
-    internal class ProtectedResourceErrorResult : IEndpointResult
+    public string Error;
+    public string ErrorDescription;
+
+    public ProtectedResourceErrorResult(string error, string errorDescription = null)
     {
-        public string Error;
-        public string ErrorDescription;
+        Error = error;
+        ErrorDescription = errorDescription;
+    }
 
-        public ProtectedResourceErrorResult(string error, string errorDescription = null)
+    public Task ExecuteAsync(HttpContext context)
+    {
+        context.Response.StatusCode = 401;
+        context.Response.SetNoCache();
+
+        if (Constants.ProtectedResourceErrorStatusCodes.ContainsKey(Error))
         {
-            Error = error;
-            ErrorDescription = errorDescription;
+            context.Response.StatusCode = Constants.ProtectedResourceErrorStatusCodes[Error];
         }
 
-        public Task ExecuteAsync(HttpContext context)
+        if (Error == OidcConstants.ProtectedResourceErrors.ExpiredToken)
         {
-            context.Response.StatusCode = 401;
-            context.Response.SetNoCache();
-
-            if (Constants.ProtectedResourceErrorStatusCodes.ContainsKey(Error))
-            {
-                context.Response.StatusCode = Constants.ProtectedResourceErrorStatusCodes[Error];
-            }
-
-            if (Error == OidcConstants.ProtectedResourceErrors.ExpiredToken)
-            {
-                Error = OidcConstants.ProtectedResourceErrors.InvalidToken;
-                ErrorDescription = "The access token expired";
-            }
-
-            var errorString = string.Format($"error=\"{Error}\"");
-            if (ErrorDescription.IsMissing())
-            {
-                context.Response.Headers.Append(HeaderNames.WWWAuthenticate, new StringValues(new[] { "Bearer realm=\"IdentityServer\"", errorString }).ToString());
-            }
-            else
-            {
-                var errorDescriptionString = string.Format($"error_description=\"{ErrorDescription}\"");
-                context.Response.Headers.Append(HeaderNames.WWWAuthenticate, new StringValues(new[] { "Bearer realm=\"IdentityServer\"", errorString, errorDescriptionString }).ToString());
-            }
-
-            return Task.CompletedTask;
+            Error = OidcConstants.ProtectedResourceErrors.InvalidToken;
+            ErrorDescription = "The access token expired";
         }
+
+        var errorString = string.Format($"error=\"{Error}\"");
+        if (ErrorDescription.IsMissing())
+        {
+            context.Response.Headers.Append(HeaderNames.WWWAuthenticate, new StringValues(new[] { "Bearer realm=\"IdentityServer\"", errorString }).ToString());
+        }
+        else
+        {
+            var errorDescriptionString = string.Format($"error_description=\"{ErrorDescription}\"");
+            context.Response.Headers.Append(HeaderNames.WWWAuthenticate, new StringValues(new[] { "Bearer realm=\"IdentityServer\"", errorString, errorDescriptionString }).ToString());
+        }
+
+        return Task.CompletedTask;
     }
 }

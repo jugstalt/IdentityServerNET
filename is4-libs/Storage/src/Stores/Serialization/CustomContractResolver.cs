@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace IdentityServer4.Stores.Serialization
 {
-    public class CustomContractResolver: DefaultContractResolver
+    public class CustomContractResolver : DefaultContractResolver
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {

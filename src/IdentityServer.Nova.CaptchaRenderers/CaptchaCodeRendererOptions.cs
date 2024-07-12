@@ -1,24 +1,23 @@
-﻿namespace IdentityServer.Nova.CaptchaRenderers
+﻿namespace IdentityServer.Nova.CaptchaRenderers;
+
+public class CaptchaCodeRendererOptions
 {
-    public class CaptchaCodeRendererOptions
+    public CaptchaCodeRendererOptions()
     {
-        public CaptchaCodeRendererOptions()
-        {
-            Width = 200;
-            Height = 60;
+        Width = 200;
+        Height = 60;
 
-            BackgroundType =
-            TextColorType = ColorType.Random;
+        BackgroundType =
+        TextColorType = ColorType.Random;
 
-            DisorderLinePenWidth = 4;
-        }
-
-        public int Width { get; set; }
-        public int Height { get; set; }
-
-        public ColorType BackgroundType { get; set; }
-        public ColorType TextColorType { get; set; }
-
-        public int DisorderLinePenWidth { get; set; }
+        DisorderLinePenWidth = 4;
     }
+
+    public int Width { get; set; }
+    public int Height { get; set; }
+
+    public ColorType BackgroundType { get; set; }
+    public ColorType TextColorType { get; set; }
+
+    public int DisorderLinePenWidth { get; set; }
 }

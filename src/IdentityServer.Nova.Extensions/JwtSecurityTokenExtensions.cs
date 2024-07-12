@@ -13,102 +13,101 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Extensions
+namespace IdentityServer.Nova.Extensions;
+
+static public class JwtSecurityTokenExtensions
 {
-    static public class JwtSecurityTokenExtensions
+    static public JwtSecurityToken ToJwtSecurityToken(this string jwtEncodedString)
     {
-        static public JwtSecurityToken ToJwtSecurityToken(this string jwtEncodedString)
+        return new JwtSecurityToken(jwtEncodedString);
+    }
+
+    async static public Task<JwtSecurityToken> ToValidatedJwtSecurityToken(this string jwtEncodedString, string issuerUrl, string audience = null)
+    {
+        IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
+               new ConfigurationManager<OpenIdConnectConfiguration>($"{issuerUrl}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+        OpenIdConnectConfiguration openIdConfiguration = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters()
         {
-            return new JwtSecurityToken(jwtEncodedString);
+            ValidIssuer = issuerUrl,
+            ValidAudience = audience,
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = !String.IsNullOrEmpty(audience),
+            IssuerSigningKeys = openIdConfiguration.SigningKeys
+        };
+
+        try
+        {
+            SecurityToken validatedToken;
+            IPrincipal principal = tokenHandler.ValidateToken(jwtEncodedString, validationParameters, out validatedToken);
         }
-
-        async static public Task<JwtSecurityToken> ToValidatedJwtSecurityToken(this string jwtEncodedString, string issuerUrl, string audience = null)
+        catch (Exception)
         {
-            IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
-                   new ConfigurationManager<OpenIdConnectConfiguration>($"{issuerUrl}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
-            OpenIdConnectConfiguration openIdConfiguration = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+            throw new TokenValidationException("Invalid token");
+        }
+        return jwtEncodedString.ToJwtSecurityToken();
+    }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var validationParameters = new TokenValidationParameters()
+    async static public Task<string> GetValidatedClaimValue(this string jwtEncodedString, string issuerUrl, string claimType, string audience = null)
+    {
+        var jwtToken = await jwtEncodedString.ToValidatedJwtSecurityToken(issuerUrl);
+
+        return jwtToken?
+                    .Claims?
+                    .Where(c => claimType.Equals(c.Type))
+                    .FirstOrDefault()?
+                    .Value;
+    }
+
+    static public JwtSecurityToken ToAssertionToken(this X509Certificate2 cert, string clientId, string issuer)
+    {
+        var now = DateTime.UtcNow;
+        string tokenEndpoint = issuer + "/connect/token";
+
+        var token = new JwtSecurityToken(
+            clientId,
+            tokenEndpoint,
+            new List<Claim>
             {
-                ValidIssuer = issuerUrl,
-                ValidAudience = audience,
-                ValidateIssuerSigningKey = true,
-                ValidateAudience = !String.IsNullOrEmpty(audience),
-                IssuerSigningKeys = openIdConfiguration.SigningKeys
-            };
+                new Claim("jti", Guid.NewGuid().ToString()),
+                new Claim(JwtClaimTypes.Subject, clientId),
+                new Claim(JwtClaimTypes.IssuedAt, now.ToEpochTime().ToString(), ClaimValueTypes.Integer64)
+            },
+            now,
+            now.AddMinutes(1),
+            new SigningCredentials(
+                new X509SecurityKey(cert),
+                SecurityAlgorithms.RsaSha256
+            )
+        );
 
-            try
-            {
-                SecurityToken validatedToken;
-                IPrincipal principal = tokenHandler.ValidateToken(jwtEncodedString, validationParameters, out validatedToken);
-            }
-            catch (Exception)
-            {
-                throw new TokenValidationException("Invalid token");
-            }
-            return jwtEncodedString.ToJwtSecurityToken();
-        }
+        return token;
+    }
 
-        async static public Task<string> GetValidatedClaimValue(this string jwtEncodedString, string issuerUrl, string claimType, string audience = null)
+    static public string ToTokenString(this JwtSecurityToken token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return tokenString;
+    }
+
+    static public byte[] BytesFromBase64(this string base64)
+    {
+        try
         {
-            var jwtToken = await jwtEncodedString.ToValidatedJwtSecurityToken(issuerUrl);
-
-            return jwtToken?
-                        .Claims?
-                        .Where(c => claimType.Equals(c.Type))
-                        .FirstOrDefault()?
-                        .Value;
+            return Convert.FromBase64String(base64);
         }
+        catch { }
 
-        static public JwtSecurityToken ToAssertionToken(this X509Certificate2 cert, string clientId, string issuer)
+        try
         {
-            var now = DateTime.UtcNow;
-            string tokenEndpoint = issuer + "/connect/token";
-
-            var token = new JwtSecurityToken(
-                clientId,
-                tokenEndpoint,
-                new List<Claim>
-                {
-                    new Claim("jti", Guid.NewGuid().ToString()),
-                    new Claim(JwtClaimTypes.Subject, clientId),
-                    new Claim(JwtClaimTypes.IssuedAt, now.ToEpochTime().ToString(), ClaimValueTypes.Integer64)
-                },
-                now,
-                now.AddMinutes(1),
-                new SigningCredentials(
-                    new X509SecurityKey(cert),
-                    SecurityAlgorithms.RsaSha256
-                )
-            );
-
-            return token;
+            return Convert.FromBase64String($"{base64}==");
         }
+        catch { }
 
-        static public string ToTokenString(this JwtSecurityToken token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenString = tokenHandler.WriteToken(token);
-
-            return tokenString;
-        }
-
-        static public byte[] BytesFromBase64(this string base64)
-        {
-            try
-            {
-                return Convert.FromBase64String(base64);
-            }
-            catch { }
-
-            try
-            {
-                return Convert.FromBase64String($"{base64}==");
-            }
-            catch { }
-
-            return Convert.FromBase64String($"{base64}=");
-        }
+        return Convert.FromBase64String($"{base64}=");
     }
 }

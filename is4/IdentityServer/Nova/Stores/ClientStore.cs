@@ -3,20 +3,19 @@ using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova
+namespace IdentityServer.Nova;
+
+class ClientStore : IClientStore
 {
-    class ClientStore : IClientStore
+    public ClientStore(IClientDbContext clientDbContext)
     {
-        public ClientStore(IClientDbContext clientDbContext)
-        {
-            _clientDbContext = clientDbContext;
-        }
+        _clientDbContext = clientDbContext;
+    }
 
-        private IClientDbContext _clientDbContext = null;
+    private IClientDbContext _clientDbContext = null;
 
-        async public Task<Client> FindClientByIdAsync(string clientId)
-        {
-            return (await _clientDbContext.FindClientByIdAsync(clientId))?.IdentityServer4Instance;
-        }
+    async public Task<Client> FindClientByIdAsync(string clientId)
+    {
+        return (await _clientDbContext.FindClientByIdAsync(clientId))?.IdentityServer4Instance;
     }
 }

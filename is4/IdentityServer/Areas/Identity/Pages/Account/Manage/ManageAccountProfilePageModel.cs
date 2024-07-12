@@ -1,36 +1,35 @@
-﻿using IdentityServer.Nova;
-using IdentityServer.Nova.Services.DbContext;
-using IdentityServer.Nova.UserInteraction;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Models.UserInteraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace IdentityServer.Areas.Identity.Pages.Account.Manage;
+
+public class ManageAccountProfilePageModel : PageModel, IManageAccountPageModel
 {
-    public class ManageAccountProfilePageModel : PageModel, IManageAccountPageModel
+    protected IUserStoreFactory _userStoreFactory;
+
+    protected ManageAccountProfilePageModel(IUserStoreFactory userStoreFactory)
     {
-        protected IUserStoreFactory _userStoreFactory;
+        _userStoreFactory = userStoreFactory;
+    }
 
-        protected ManageAccountProfilePageModel(IUserStoreFactory userStoreFactory)
-        {
-            _userStoreFactory = userStoreFactory;
-        }
+    [TempData]
+    public string StatusMessage { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
+    public ApplicationUser ApplicationUser { get; set; }
 
-        public ApplicationUser ApplicationUser { get; set; }
+    public string Category { get; set; }
 
-        public string Category { get; set; }
+    async public Task<ManageAccountEditor> EditorInfos() => (await _userStoreFactory.CreateUserDbContextInstance())?.ContextConfiguration?.ManageAccountEditor;
 
-        async public Task<ManageAccountEditor> EditorInfos() => (await _userStoreFactory.CreateUserDbContextInstance())?.ContextConfiguration?.ManageAccountEditor;
+    async protected Task<IUserDbContext> CurrentUserDbContext() => await _userStoreFactory.CreateUserDbContextInstance();
 
-        async protected Task<IUserDbContext> CurrentUserDbContext() => await _userStoreFactory.CreateUserDbContextInstance();
-
-        async protected Task LoadUserAsync()
-        {
-            var userDbContext = await _userStoreFactory.CreateUserDbContextInstance();
-            this.ApplicationUser = await userDbContext.FindByNameAsync(User.Identity?.Name, new System.Threading.CancellationToken());
-        }
+    async protected Task LoadUserAsync()
+    {
+        var userDbContext = await _userStoreFactory.CreateUserDbContextInstance();
+        this.ApplicationUser = await userDbContext.FindByNameAsync(User.Identity?.Name, new System.Threading.CancellationToken());
     }
 }

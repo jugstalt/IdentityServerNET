@@ -1,65 +1,64 @@
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources
+namespace IdentityServer.Areas.Admin.Pages.Resources;
+
+public class ApisModel : AdminPageModel
 {
-    public class ApisModel : AdminPageModel
+    private IResourceDbContextModify _resourceDb = null;
+    public ApisModel(IResourceDbContext clientDbContext)
     {
-        private IResourceDbContextModify _resourceDb = null;
-        public ApisModel(IResourceDbContext clientDbContext)
+        _resourceDb = clientDbContext as IResourceDbContextModify;
+    }
+
+    async public Task<IActionResult> OnGetAsync()
+    {
+        if (_resourceDb != null)
         {
-            _resourceDb = clientDbContext as IResourceDbContextModify;
+            this.ApiResources = await _resourceDb.GetAllApiResources();
+
+            Input = new NewApiResource();
         }
 
-        async public Task<IActionResult> OnGetAsync()
+        return Page();
+    }
+
+    async public Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
         {
-            if (_resourceDb != null)
-            {
-                this.ApiResources = await _resourceDb.GetAllApiResources();
-
-                Input = new NewApiResource();
-            }
-
             return Page();
         }
 
-        async public Task<IActionResult> OnPostAsync()
+        string apiName = Input.ApiResourceName.Trim().ToLower();
+
+        return await SecureHandlerAsync(async () =>
         {
-            if (!ModelState.IsValid)
+            if (_resourceDb != null)
             {
-                return Page();
+                var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName);
+
+                await _resourceDb.AddApiResourceAsync(apiResource);
             }
-
-            string apiName = Input.ApiResourceName.Trim().ToLower();
-
-            return await SecureHandlerAsync(async () =>
-            {
-                if (_resourceDb != null)
-                {
-                    var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName);
-
-                    await _resourceDb.AddApiResourceAsync(apiResource);
-                }
-            }
-            , onFinally: () => RedirectToPage("EditApi/Index", new { id = apiName })
-            , successMessage: "Api resource successfully created"
-            , onException: (ex) => RedirectToPage());
         }
+        , onFinally: () => RedirectToPage("EditApi/Index", new { id = apiName })
+        , successMessage: "Api resource successfully created"
+        , onException: (ex) => RedirectToPage());
+    }
 
-        public IEnumerable<ApiResourceModel> ApiResources { get; set; }
+    public IEnumerable<ApiResourceModel> ApiResources { get; set; }
 
-        [BindProperty]
-        public NewApiResource Input { get; set; }
+    [BindProperty]
+    public NewApiResource Input { get; set; }
 
-        public class NewApiResource
-        {
-            [Required, MinLength(3), RegularExpression(@"^[a-z0-9_\-\.]+$", ErrorMessage = "Only lowercase letters, numbers,-,_,.")]
-            public string ApiResourceName { get; set; }
-            public string ApiResourceDisplayName { get; set; }
-        }
+    public class NewApiResource
+    {
+        [Required, MinLength(3), RegularExpression(@"^[a-z0-9_\-\.]+$", ErrorMessage = "Only lowercase letters, numbers,-,_,.")]
+        public string ApiResourceName { get; set; }
+        public string ApiResourceDisplayName { get; set; }
     }
 }

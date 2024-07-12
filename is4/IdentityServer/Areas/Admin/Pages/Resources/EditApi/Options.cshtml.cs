@@ -1,38 +1,37 @@
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Abstractions.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
-{
-    public class OptionsModel : EditApiResourcePageModel
-    {
-        public OptionsModel(IResourceDbContext resourceDbContext)
-             : base(resourceDbContext)
-        {
-        }
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi;
 
-        async public Task<IActionResult> OnGetAsync(string id)
+public class OptionsModel : EditApiResourcePageModel
+{
+    public OptionsModel(IResourceDbContext resourceDbContext)
+         : base(resourceDbContext)
+    {
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentApiResourceAsync(id);
+
+        return Page();
+    }
+
+    async public Task<IActionResult> OnGetSetAsync(string id, string option, bool value)
+    {
+        return await SecureHandlerAsync(async () =>
         {
             await LoadCurrentApiResourceAsync(id);
 
-            return Page();
-        }
-
-        async public Task<IActionResult> OnGetSetAsync(string id, string option, bool value)
-        {
-            return await SecureHandlerAsync(async () =>
+            var property = this.CurrentApiResource.GetType().GetProperty(option);
+            if (property != null)
             {
-                await LoadCurrentApiResourceAsync(id);
-
-                var property = this.CurrentApiResource.GetType().GetProperty(option);
-                if (property != null)
-                {
-                    property.SetValue(this.CurrentApiResource, value);
-                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { option });
-                }
+                property.SetValue(this.CurrentApiResource, value);
+                await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { option });
             }
-            , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: "");
         }
+        , onFinally: () => RedirectToPage(new { id = id })
+        , successMessage: "");
     }
 }

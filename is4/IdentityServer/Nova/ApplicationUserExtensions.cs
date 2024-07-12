@@ -1,156 +1,156 @@
 ﻿using IdentityModel;
+using IdentityServer.Nova.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 
-namespace IdentityServer.Nova
+namespace IdentityServer.Nova;
+
+static public class ApplicationUserExtensions
 {
-    static public class ApplicationUserExtensions
+    static public string ApplicationUserName(this ApplicationUser user)
     {
-        static public string ApplicationUserName(this ApplicationUser user)
+        if (user == null)
         {
-            if (user == null)
-            {
-                return String.Empty;
-            }
-
-            if (user.Claims != null)
-            {
-                string name = $"{user.Claims.Where(c => c.Type == JwtClaimTypes.GivenName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.MiddleName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.FamilyName).FirstOrDefault()?.Value}";
-                if (!String.IsNullOrWhiteSpace(name))
-                {
-                    return name;
-                }
-            }
-
-            return user.UserName;
+            return String.Empty;
         }
 
-
-        static public void SetAdministratorUserName(IWebHostEnvironment environment, IConfiguration configuration)
+        if (user.Claims != null)
         {
-            if (environment.IsDevelopment() && !String.IsNullOrWhiteSpace(configuration["IdentityServer:AdminUsername"]))
+            string name = $"{user.Claims.Where(c => c.Type == JwtClaimTypes.GivenName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.MiddleName).FirstOrDefault()?.Value} {user.Claims.Where(c => c.Type == JwtClaimTypes.FamilyName).FirstOrDefault()?.Value}";
+            if (!String.IsNullOrWhiteSpace(name))
             {
-                AdminUserName = configuration["IdentityServer:AdminUsername"];
-            }
-            else
-            {
-                AdminUserName = null;
+                return name;
             }
         }
 
-        static private string AdminUserName { get; set; }
+        return user.UserName;
+    }
 
-        static public bool IsUserAdministrator(this ApplicationUser user)
+
+    static public void SetAdministratorUserName(IWebHostEnvironment environment, IConfiguration configuration)
+    {
+        if (environment.IsDevelopment() && !String.IsNullOrWhiteSpace(configuration["IdentityServer:AdminUsername"]))
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
+            AdminUserName = configuration["IdentityServer:AdminUsername"];
+        }
+        else
+        {
+            AdminUserName = null;
+        }
+    }
 
-            if (user?.Roles == null)
-            {
-                return false;
-            }
+    static private string AdminUserName { get; set; }
 
-            return user.Roles.Contains(KnownRoles.UserAdministrator);
+    static public bool IsUserAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+        {
+            return true;
         }
 
-        static public bool IsRoleAdministrator(this ApplicationUser user)
+        if (user?.Roles == null)
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.Roles.Contains(KnownRoles.RoleAdministrator);
+            return false;
         }
 
-        static public bool IsResourceAdministrator(this ApplicationUser user)
+        return user.Roles.Contains(KnownRoles.UserAdministrator);
+    }
+
+    static public bool IsRoleAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.Roles.Contains(KnownRoles.ResourceAdministrator);
+            return true;
         }
 
-        static public bool IsClientAdministrator(this ApplicationUser user)
+        if (user?.Roles == null)
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.Roles.Contains(KnownRoles.ClientAdministrator);
+            return false;
         }
 
-        static public bool IsSecretVaultAdministrator(this ApplicationUser user)
+        return user.Roles.Contains(KnownRoles.RoleAdministrator);
+    }
+
+    static public bool IsResourceAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.Roles.Contains(KnownRoles.SecretsVaultAdministrator);
+            return true;
         }
 
-        static public bool IsSignungUIAdministrator(this ApplicationUser user)
+        if (user?.Roles == null)
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.Roles.Contains(KnownRoles.SigningAdministrator);
+            return false;
         }
 
-        static public bool HasAdministratorRole(this ApplicationUser user)
+        return user.Roles.Contains(KnownRoles.ResourceAdministrator);
+    }
+
+    static public bool IsClientAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
         {
-            if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
-            {
-                return true;
-            }
-
-            if (user?.Roles == null)
-            {
-                return false;
-            }
-
-            return user.IsUserAdministrator() ||
-                   user.IsRoleAdministrator() ||
-                   user.IsResourceAdministrator() ||
-                   user.IsClientAdministrator() ||
-                   user.IsSecretVaultAdministrator() ||
-                   user.IsSignungUIAdministrator();
+            return true;
         }
+
+        if (user?.Roles == null)
+        {
+            return false;
+        }
+
+        return user.Roles.Contains(KnownRoles.ClientAdministrator);
+    }
+
+    static public bool IsSecretVaultAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+        {
+            return true;
+        }
+
+        if (user?.Roles == null)
+        {
+            return false;
+        }
+
+        return user.Roles.Contains(KnownRoles.SecretsVaultAdministrator);
+    }
+
+    static public bool IsSignungUIAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+        {
+            return true;
+        }
+
+        if (user?.Roles == null)
+        {
+            return false;
+        }
+
+        return user.Roles.Contains(KnownRoles.SigningAdministrator);
+    }
+
+    static public bool HasAdministratorRole(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+        {
+            return true;
+        }
+
+        if (user?.Roles == null)
+        {
+            return false;
+        }
+
+        return user.IsUserAdministrator() ||
+               user.IsRoleAdministrator() ||
+               user.IsResourceAdministrator() ||
+               user.IsClientAdministrator() ||
+               user.IsSecretVaultAdministrator() ||
+               user.IsSignungUIAdministrator();
     }
 }

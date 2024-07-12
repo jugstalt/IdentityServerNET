@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services
+namespace IdentityServer.Nova.Services;
+
+public interface IAuthorizationContextService
 {
-    public interface IAuthorizationContextService
-    {
-        Task<AuthorizationContext> GetContextAsync();
-        string GetClientId();
-        string GetReturnUrlParameter(string parameter);
-    }
+    Task<AuthorizationContext> GetContextAsync();
+    string GetClientId();
+    string GetReturnUrlParameter(string parameter);
 }

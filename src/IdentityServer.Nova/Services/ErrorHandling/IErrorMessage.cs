@@ -1,11 +1,10 @@
-﻿namespace IdentityServer.Nova.Services.ErrorHandling
+﻿namespace IdentityServer.Nova.Services.ErrorHandling;
+
+public interface IErrorMessage
 {
-    public interface IErrorMessage
-    {
-        string LastErrorMessage { get; }
+    string LastErrorMessage { get; }
 
-        bool HasErrors { get; }
+    bool HasErrors { get; }
 
-        void ClearErrors();
-    }
+    void ClearErrors();
 }

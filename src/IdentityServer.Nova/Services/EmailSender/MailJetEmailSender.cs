@@ -8,107 +8,106 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.EmailSender
+namespace IdentityServer.Nova.Services.EmailSender;
+
+public class MailJetEmailSender : ICustomEmailSender
 {
-    public class MailJetEmailSender : ICustomEmailSender
+    //"MailJet": {
+    //	"ApiKey": "xxxxxxxx",
+    //  "ApiSecret": "***********",
+    //	"FromEmail": "identity@server.com",
+    //	"FromName": "Identity Server"
+    //}
+
+    private readonly IConfiguration _configuration;
+
+    public MailJetEmailSender(IConfiguration configuration)
     {
-        //"MailJet": {
-        //	"ApiKey": "xxxxxxxx",
-        //  "ApiSecret": "***********",
-        //	"FromEmail": "identity@server.com",
-        //	"FromName": "Identity Server"
-        //}
+        _configuration = configuration;
+    }
 
-        private readonly IConfiguration _configuration;
+    #region ICustomEmailSender
 
-        public MailJetEmailSender(IConfiguration configuration)
+    async public Task SendEmailAsync(string to, string subject, string htmlMessage)
+    {
+        try
         {
-            _configuration = configuration;
-        }
+            Console.WriteLine($"Try send mail to: {to}");
 
-        #region ICustomEmailSender
+            MailjetClient client = new MailjetClient(
+                _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
+                _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
 
-        async public Task SendEmailAsync(string to, string subject, string htmlMessage)
-        {
-            try
+            MailjetRequest request = new MailjetRequest
             {
-                Console.WriteLine($"Try send mail to: {to}");
+                Resource = Send.Resource,
+            };
 
-                MailjetClient client = new MailjetClient(
-                    _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
-                    _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
+            var email = new TransactionalEmailBuilder()
+                                        .WithFrom(new SendContact(_configuration.GetSection("MailJet").GetValue<string>("FromEmail")))
+                                        .WithSubject(subject)
+                                        .WithHtmlPart(htmlMessage)
+                                        .WithTo(new SendContact(to))
+                                        .Build();
 
-                MailjetRequest request = new MailjetRequest
+            var response = await client.SendTransactionalEmailAsync(email);
+
+            MailMessage msg = new MailMessage();
+
+            if (response.Messages != null)
+            {
+                foreach (var responseMessage in response.Messages)
                 {
-                    Resource = Send.Resource,
-                };
-
-                var email = new TransactionalEmailBuilder()
-                                            .WithFrom(new SendContact(_configuration.GetSection("MailJet").GetValue<string>("FromEmail")))
-                                            .WithSubject(subject)
-                                            .WithHtmlPart(htmlMessage)
-                                            .WithTo(new SendContact(to))
-                                            .Build();
-
-                var response = await client.SendTransactionalEmailAsync(email);
-
-                MailMessage msg = new MailMessage();
-
-                if (response.Messages != null)
-                {
-                    foreach (var responseMessage in response.Messages)
+                    if (responseMessage?.Errors != null)
                     {
-                        if (responseMessage?.Errors != null)
-                        {
-                            Console.WriteLine($"Status: {responseMessage.Status}, Errors: {String.Join(", ", responseMessage.Errors?.Select(e => $"{e.ErrorCode}:{e.ErrorMessage}"))}");
-                        }
+                        Console.WriteLine($"Status: {responseMessage.Status}, Errors: {String.Join(", ", responseMessage.Errors?.Select(e => $"{e.ErrorCode}:{e.ErrorMessage}"))}");
                     }
                 }
-
-                Console.WriteLine("succeeded...");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
             }
 
+            Console.WriteLine("succeeded...");
         }
-
-        async public Task SendEmailAsync_old(string email, string subject, string htmlMessage)
+        catch (Exception ex)
         {
-            try
-            {
-                Console.WriteLine($"Try send mail to: {email}");
-                MailMessage msg = new MailMessage();
-
-                msg.From = new MailAddress(
-                    _configuration.GetSection("MailJet").GetValue<string>("FromEmail"),
-                    _configuration.GetSection("MailJet").GetValue<string>("FromName"));
-                msg.To.Add(new MailAddress(email));
-
-                msg.Subject = subject;
-                msg.Body = htmlMessage;
-                msg.IsBodyHtml = true;
-
-                SmtpClient client = new SmtpClient("in.mailjet.com", 587);
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.EnableSsl = true;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(
-                     _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
-                     _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
-
-                await client.SendMailAsync(msg);
-
-                Console.WriteLine("done...");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-            }
-
+            Console.WriteLine("Exception: " + ex.Message);
         }
 
-        #endregion
     }
+
+    async public Task SendEmailAsync_old(string email, string subject, string htmlMessage)
+    {
+        try
+        {
+            Console.WriteLine($"Try send mail to: {email}");
+            MailMessage msg = new MailMessage();
+
+            msg.From = new MailAddress(
+                _configuration.GetSection("MailJet").GetValue<string>("FromEmail"),
+                _configuration.GetSection("MailJet").GetValue<string>("FromName"));
+            msg.To.Add(new MailAddress(email));
+
+            msg.Subject = subject;
+            msg.Body = htmlMessage;
+            msg.IsBodyHtml = true;
+
+            SmtpClient client = new SmtpClient("in.mailjet.com", 587);
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(
+                 _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
+                 _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
+
+            await client.SendMailAsync(msg);
+
+            Console.WriteLine("done...");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception: " + ex.Message);
+        }
+
+    }
+
+    #endregion
 }

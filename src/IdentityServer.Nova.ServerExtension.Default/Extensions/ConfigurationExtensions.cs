@@ -1,11 +1,9 @@
-﻿using IdentityModel;
-using IdentityServer.Nova.Extensions.DependencyInjection;
+﻿using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
+using IdentityServer.Nova.Models.UserInteraction;
 using IdentityServer.Nova.Services.Cryptography;
-using IdentityServer.Nova.UserInteraction;
 using Microsoft.Extensions.Configuration;
 using System;
-using static IdentityModel.OidcConstants;
 
 namespace IdentityServer.Nova.ServerExtension.Default.Extensions;
 internal static class ConfigurationExtensions
@@ -69,7 +67,7 @@ internal static class ConfigurationExtensions
         {
 
         };
-    }  
+    }
 
     public static void AddDefaults(this ClientDbContextConfiguration options,
                                    IConfiguration config)

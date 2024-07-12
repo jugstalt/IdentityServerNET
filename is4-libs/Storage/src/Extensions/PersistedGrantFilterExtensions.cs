@@ -18,7 +18,10 @@ namespace IdentityServer4.Extensions
         /// <param name="filter"></param>
         public static void Validate(this PersistedGrantFilter filter)
         {
-            if (filter == null) throw new ArgumentNullException(nameof(filter));
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
 
             if (String.IsNullOrWhiteSpace(filter.ClientId) &&
                 String.IsNullOrWhiteSpace(filter.SessionId) &&

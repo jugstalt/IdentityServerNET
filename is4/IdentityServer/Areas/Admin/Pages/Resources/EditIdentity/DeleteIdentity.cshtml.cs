@@ -1,56 +1,55 @@
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Exceptions;
-using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditIdentity;
+
+public class DeleteIdentityModel : EditIdentityResourcePageModel
 {
-    public class DeleteIdentityModel : EditIdentityResourcePageModel
+    public DeleteIdentityModel(IResourceDbContext resourceDbContext)
+         : base(resourceDbContext)
     {
-        public DeleteIdentityModel(IResourceDbContext resourceDbContext)
-             : base(resourceDbContext)
-        {
-        }
+    }
 
-        async public Task<IActionResult> OnGetAsync(string id)
-        {
-            await LoadCurrentIdentityResourceAsync(id);
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentIdentityResourceAsync(id);
 
-            Input = new InputModel()
+        Input = new InputModel()
+        {
+            IdentityName = CurrentIdentityResource.Name
+        };
+
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
+        {
+            await LoadCurrentIdentityResourceAsync(Input.IdentityName);
+
+            if (Input.ConfirmIdentityName == CurrentIdentityResource.Name)
             {
-                IdentityName = CurrentIdentityResource.Name
-            };
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentIdentityResourceAsync(Input.IdentityName);
-
-                if (Input.ConfirmIdentityName == CurrentIdentityResource.Name)
-                {
-                    await _resourceDb.RemoveIdentityResourceAsync(this.CurrentIdentityResource);
-                }
-                else
-                {
-                    throw new StatusMessageException("Please type the correct identity resource name");
-                }
+                await _resourceDb.RemoveIdentityResourceAsync(this.CurrentIdentityResource);
             }
-            , onFinally: () => RedirectToPage("../Identities")
-            , successMessage: "Identity resource successfully deleted"
-            , onException: (ex) => RedirectToPage(new { id = Input.IdentityName }));
+            else
+            {
+                throw new StatusMessageException("Please type the correct identity resource name");
+            }
         }
+        , onFinally: () => RedirectToPage("../Identities")
+        , successMessage: "Identity resource successfully deleted"
+        , onException: (ex) => RedirectToPage(new { id = Input.IdentityName }));
+    }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+    [BindProperty]
+    public InputModel Input { get; set; }
 
-        public class InputModel
-        {
-            public string IdentityName { get; set; }
-            public string ConfirmIdentityName { get; set; }
-        }
+    public class InputModel
+    {
+        public string IdentityName { get; set; }
+        public string ConfirmIdentityName { get; set; }
     }
 }

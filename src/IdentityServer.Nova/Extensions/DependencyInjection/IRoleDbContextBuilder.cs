@@ -1,6 +1,5 @@
-﻿namespace IdentityServer.Nova.Extensions.DependencyInjection
+﻿namespace IdentityServer.Nova.Extensions.DependencyInjection;
+
+public interface IRoleDbContextBuilder : IBuilder
 {
-    public interface IRoleDbContextBuilder : IBuilder
-    {
-    }
 }

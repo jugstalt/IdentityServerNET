@@ -2,26 +2,25 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
-namespace IdentityServer4.Hosting.FederatedSignOut
+namespace IdentityServer4.Hosting.FederatedSignOut;
+
+internal class AuthenticationRequestSignInHandlerWrapper : AuthenticationRequestSignOutHandlerWrapper, IAuthenticationSignInHandler
 {
-    internal class AuthenticationRequestSignInHandlerWrapper : AuthenticationRequestSignOutHandlerWrapper, IAuthenticationSignInHandler
+    private readonly IAuthenticationSignInHandler _inner;
+
+    public AuthenticationRequestSignInHandlerWrapper(IAuthenticationSignInHandler inner, IHttpContextAccessor httpContextAccessor)
+        : base(inner, httpContextAccessor)
     {
-        private readonly IAuthenticationSignInHandler _inner;
+        _inner = inner;
+    }
 
-        public AuthenticationRequestSignInHandlerWrapper(IAuthenticationSignInHandler inner, IHttpContextAccessor httpContextAccessor)
-            : base(inner, httpContextAccessor)
-        {
-            _inner = inner;
-        }
-
-        public Task SignInAsync(ClaimsPrincipal user, AuthenticationProperties properties)
-        {
-            return _inner.SignInAsync(user, properties);
-        }
+    public Task SignInAsync(ClaimsPrincipal user, AuthenticationProperties properties)
+    {
+        return _inner.SignInAsync(user, properties);
     }
 }

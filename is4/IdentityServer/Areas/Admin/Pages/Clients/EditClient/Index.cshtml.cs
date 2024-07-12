@@ -2,52 +2,51 @@ using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient;
+
+public class IndexModel : EditClientPageModel
 {
-    public class IndexModel : EditClientPageModel
+    public IndexModel(IClientDbContext clientDbContext)
+         : base(clientDbContext)
     {
-        public IndexModel(IClientDbContext clientDbContext)
-             : base(clientDbContext)
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentClientAsync(id);
+
+        Input = new InputModel()
         {
-        }
+            ClientId = CurrentClient.ClientId,
+            ClientName = CurrentClient.ClientName,
+            ClientDescription = CurrentClient.Description
+        };
 
-        async public Task<IActionResult> OnGetAsync(string id)
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
         {
-            await LoadCurrentClientAsync(id);
+            await LoadCurrentClientAsync(Input.ClientId);
 
-            Input = new InputModel()
-            {
-                ClientId = CurrentClient.ClientId,
-                ClientName = CurrentClient.ClientName,
-                ClientDescription = CurrentClient.Description
-            };
+            CurrentClient.ClientName = Input.ClientName;
+            CurrentClient.Description = Input.ClientDescription;
 
-            return Page();
+            await _clientDb.UpdateClientAsync(CurrentClient, new[] { "ClientName", "Description" });
         }
+        , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+        , successMessage: "The client has been updated successfully");
+    }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentClientAsync(Input.ClientId);
+    [BindProperty]
+    public InputModel Input { get; set; }
 
-                CurrentClient.ClientName = Input.ClientName;
-                CurrentClient.Description = Input.ClientDescription;
-
-                await _clientDb.UpdateClientAsync(CurrentClient, new[] { "ClientName", "Description" });
-            }
-            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
-            , successMessage: "The client has been updated successfully");
-        }
-
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            public string ClientId { get; set; }
-            public string ClientName { get; set; }
-            public string ClientDescription { get; set; }
-        }
+    public class InputModel
+    {
+        public string ClientId { get; set; }
+        public string ClientName { get; set; }
+        public string ClientDescription { get; set; }
     }
 }

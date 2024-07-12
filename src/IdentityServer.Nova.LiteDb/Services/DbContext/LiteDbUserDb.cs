@@ -1,21 +1,18 @@
-﻿using IdentityServer.Nova.Extensions.DependencyInjection;
+﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.Services;
+using IdentityServer.Nova.Abstractions.Services.Serialize;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
-using IdentityServer.Nova.Models.IdentityServerWrappers;
+using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Models.UserInteraction;
 using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.Serialize;
-using IdentityServer.Nova.UserInteraction;
-using IdentityServer4.Models;
 using LiteDB;
-using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Converters;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Security.Claims;
-using System.Xml.Linq;
 
 namespace IdentityServer.Nova.LiteDb.Services.DbContext;
 
@@ -98,7 +95,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
                 return IdentityResult.Success;
             }
         }
-        catch(ArgumentException argEx)
+        catch (ArgumentException argEx)
         {
             return IdentityResult.Failed(
                 new IdentityError() { Code = "999", Description = argEx.Message }
@@ -125,7 +122,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
                 return Task.FromResult(IdentityResult.Success);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return Task.FromResult(IdentityResult.Failed(
                 new IdentityError() { Code = "999", Description = ex.Message }));
@@ -205,7 +202,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
                 var collection = db.GetBlobDocumentCollection(UsersCollectionName);
 
                 user.UserName = user.UserName?.Trim().ToLowerInvariant();
-                user.Email = user.Email?.Trim().ToLowerInvariant(); 
+                user.Email = user.Email?.Trim().ToLowerInvariant();
 
                 var blob = collection.FindOne(b => b.Name == user.UserName);
                 if (blob == null)
@@ -235,7 +232,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
         if (propertyInfo != null)
         {
             propertyInfo.SetValue(user, propertyValue);
-    
+
             await UpdateAsync(user, cancellation);
         }
 
@@ -331,7 +328,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
     {
         var updateUser = await FindByIdAsync(user.Id, cancellationToken); // reload user
 
-        if(updateUser is null)
+        if (updateUser is null)
         {
             throw new Exception("Can't update unknown user");
         }

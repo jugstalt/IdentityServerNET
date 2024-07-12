@@ -1,7 +1,6 @@
-﻿namespace IdentityServer.Nova.Extensions
-{
-    static public class HttpClientExtensions
-    {
+﻿namespace IdentityServer.Nova.Extensions;
 
-    }
+static public class HttpClientExtensions
+{
+
 }

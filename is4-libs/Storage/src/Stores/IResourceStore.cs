@@ -22,7 +22,7 @@ namespace IdentityServer4.Stores
         /// Gets API scopes by scope name.
         /// </summary>
         Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames);
-        
+
         /// <summary>
         /// Gets API resources by scope name.
         /// </summary>

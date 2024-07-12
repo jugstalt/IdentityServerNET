@@ -1,4 +1,6 @@
-﻿using IdentityServer.Nova.Extensions.DependencyInjection;
+﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.Services;
+using IdentityServer.Nova.Abstractions.Services.Serialize;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
@@ -7,7 +9,6 @@ using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
 using Microsoft.Extensions.Options;
-using System.Xml.Linq;
 
 namespace IdentityServer.Nova.LiteDb.Services.DbContext;
 public class LiteDbClientDb : IClientDbContextModify
@@ -124,7 +125,7 @@ public class LiteDbClientDb : IClientDbContextModify
             var collection = db.GetBlobDocumentCollection(ClientsCollectionName);
 
             var blob = collection.FindOne(b => b.Name == client.ClientId);
-            if(blob == null)
+            if (blob == null)
             {
                 throw new Exception($"client with clientId = {client.ClientId} not exists");
             }

@@ -52,7 +52,7 @@ namespace IdentityServer4.Models
         /// <c>true</c> if this instance is open identifier; otherwise, <c>false</c>.
         /// </value>
         public bool IsOpenId { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the requested scopes.
         /// </summary>

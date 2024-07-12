@@ -1,9 +1,8 @@
-﻿using IdentityServer.Nova;
+﻿using IdentityServer.Nova.Models;
 
-namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole
+namespace IdentityServer.Areas.Admin.Pages.Roles.EditRole;
+
+public interface IEditRolePageModel
 {
-    public interface IEditRolePageModel
-    {
-        public ApplicationRole CurrentApplicationRole { get; set; }
-    }
+    public ApplicationRole CurrentApplicationRole { get; set; }
 }

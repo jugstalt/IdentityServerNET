@@ -1,66 +1,65 @@
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi
+namespace IdentityServer.Areas.Admin.Pages.Resources.EditApi;
+
+public class CollectionsModel : EditApiResourcePageModel
 {
-    public class CollectionsModel : EditApiResourcePageModel
+    public CollectionsModel(IResourceDbContext resourceDbContext)
+        : base(resourceDbContext)
     {
-        public CollectionsModel(IResourceDbContext resourceDbContext)
-            : base(resourceDbContext)
-        {
-        }
+    }
 
-        async public Task<IActionResult> OnGetAsync(string id)
-        {
-            await LoadCurrentApiResourceAsync(id);
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentApiResourceAsync(id);
 
-            this.Input = new InputModel()
+        this.Input = new InputModel()
+        {
+            ApiName = this.CurrentApiResource.Name
+        };
+
+        return Page();
+    }
+
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
+        {
+            await LoadCurrentApiResourceAsync(Input.ApiName);
+
+            string[] values = Input.PropertyValue == null ?
+                                new string[0] :
+                                Input.PropertyValue
+                                    .Replace("\r", "")
+                                    .Split('\n')
+                                    .Select(v => v.Trim())
+                                    .Where(v => !String.IsNullOrEmpty(v))
+                                    .ToArray();
+
+            var propertyInfo = typeof(ApiResourceModel).GetProperty(Input.PropertyName);
+            if (propertyInfo != null)
             {
-                ApiName = this.CurrentApiResource.Name
-            };
-
-            return Page();
-        }
-
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentApiResourceAsync(Input.ApiName);
-
-                string[] values = Input.PropertyValue == null ?
-                                    new string[0] :
-                                    Input.PropertyValue
-                                        .Replace("\r", "")
-                                        .Split('\n')
-                                        .Select(v => v.Trim())
-                                        .Where(v => !String.IsNullOrEmpty(v))
-                                        .ToArray();
-
-                var propertyInfo = typeof(ApiResourceModel).GetProperty(Input.PropertyName);
-                if (propertyInfo != null)
-                {
-                    propertyInfo.SetValue(this.CurrentApiResource, values);
-                    await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { Input.PropertyName });
-                }
+                propertyInfo.SetValue(this.CurrentApiResource, values);
+                await _resourceDb.UpdateApiResourceAsync(this.CurrentApiResource, new[] { Input.PropertyName });
             }
-            , onFinally: () => RedirectToPage(new { id = Input.ApiName })
-            , successMessage: $"{Input.PropertyName} successfully updated");
         }
+        , onFinally: () => RedirectToPage(new { id = Input.ApiName })
+        , successMessage: $"{Input.PropertyName} successfully updated");
+    }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+    [BindProperty]
+    public InputModel Input { get; set; }
 
-        public class InputModel
-        {
-            public string ApiName { get; set; }
-            public string PropertyName { get; set; }
-            public string PropertyValue { get; set; }
-            public string[] IgnoreProperties => new string[] { "" };
-        }
+    public class InputModel
+    {
+        public string ApiName { get; set; }
+        public string PropertyName { get; set; }
+        public string PropertyValue { get; set; }
+        public string[] IgnoreProperties => new string[] { "" };
     }
 }

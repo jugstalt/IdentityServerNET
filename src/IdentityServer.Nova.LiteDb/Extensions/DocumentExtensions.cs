@@ -12,7 +12,7 @@ static internal class DocumentExtensions
         var collection = db.GetCollection<LiteDbBlobDocument>(collectionName);
 
         collection.EnsureIndex(x => x.Id, true);
-        collection.EnsureIndex(x => x.Name, true);  
+        collection.EnsureIndex(x => x.Name, true);
 
         return collection;
     }

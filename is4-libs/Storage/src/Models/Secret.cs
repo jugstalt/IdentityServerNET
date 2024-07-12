@@ -104,12 +104,23 @@ namespace IdentityServer4.Models
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            var other = obj as Secret;
-            if (other == null) return false;
-            if (ReferenceEquals(other, this)) return true;
+            if (obj == null)
+            {
+                return false;
+            }
 
-            return String.Equals(other.Type, Type, StringComparison.Ordinal) && 
+            var other = obj as Secret;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(other, this))
+            {
+                return true;
+            }
+
+            return String.Equals(other.Type, Type, StringComparison.Ordinal) &&
                 String.Equals(other.Value, Value, StringComparison.Ordinal);
         }
     }

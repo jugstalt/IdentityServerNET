@@ -8,62 +8,61 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Controllers
+namespace IdentityServer.Nova.Controllers;
+
+[Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = "Bearer-Secrets,Identity.Application")]
+[ApiController]
+public class SecretsVaultController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = "Bearer-Secrets,Identity.Application")]
-    [ApiController]
-    public class SecretsVaultController : ControllerBase
+    private readonly SecretsVaultManager _secretsVaultManager;
+
+    public SecretsVaultController(SecretsVaultManager secretsVaultManager)
     {
-        private readonly SecretsVaultManager _secretsVaultManager;
+        _secretsVaultManager = secretsVaultManager;
+    }
 
-        public SecretsVaultController(SecretsVaultManager secretsVaultManager)
+    [HttpGet]
+    async public Task<IActionResult> Get(string path)
+    {
+        try
         {
-            _secretsVaultManager = secretsVaultManager;
-        }
+            string[] pathParts = path.Split('/');
 
-        [HttpGet]
-        async public Task<IActionResult> Get(string path)
-        {
-            try
+            if (!this.User.GetScopes().Contains($"secrets-vault.{pathParts[0]}") &&
+                !this.User.IsInRole(KnownRoles.SecretsVaultAdministrator))
             {
-                string[] pathParts = path.Split('/');
+                throw new StatusMessageException($"Unauthorized user or client \"{this.User.GetUsernameOrClientId()}\"");
+                //return Unauthorized();
+            }
 
-                if (!this.User.GetScopes().Contains($"secrets-vault.{pathParts[0]}") &&
-                    !this.User.IsInRole(KnownRoles.SecretsVaultAdministrator))
+            VaultSecretVersion secretVersion = await _secretsVaultManager.GetSecretVersion(path);
+
+            return new JsonResult(
+                new
                 {
-                    throw new StatusMessageException($"Unauthorized user or client \"{this.User.GetUsernameOrClientId()}\"");
-                    //return Unauthorized();
-                }
-
-                VaultSecretVersion secretVersion = await _secretsVaultManager.GetSecretVersion(path);
-
-                return new JsonResult(
-                    new
-                    {
-                        success = true,
-                        path = path,
-                        secret = secretVersion
-                    });
-            }
-            catch (StatusMessageException sme)
-            {
-                return new JsonResult(
-                    new
-                    {
-                        success = false,
-                        errorMessage = sme.Message
-                    });
-            }
-            catch /*(Exception ex)*/
-            {
-                return new JsonResult(
-                    new
-                    {
-                        success = false,
-                        errorMessage = "Internal error."
-                    });
-            }
+                    success = true,
+                    path = path,
+                    secret = secretVersion
+                });
+        }
+        catch (StatusMessageException sme)
+        {
+            return new JsonResult(
+                new
+                {
+                    success = false,
+                    errorMessage = sme.Message
+                });
+        }
+        catch /*(Exception ex)*/
+        {
+            return new JsonResult(
+                new
+                {
+                    success = false,
+                    errorMessage = "Internal error."
+                });
         }
     }
 }

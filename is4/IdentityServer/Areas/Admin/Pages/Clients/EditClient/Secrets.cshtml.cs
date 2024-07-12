@@ -13,129 +13,128 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient;
+
+public class SecretsModel : EditClientPageModel
 {
-    public class SecretsModel : EditClientPageModel
+    private readonly SecretsVaultManager _secretsVaultManager;
+
+    public SecretsModel(
+        IClientDbContext clientDbContext,
+        SecretsVaultManager secretsVaultManager)
+         : base(clientDbContext)
     {
-        private readonly SecretsVaultManager _secretsVaultManager;
+        _secretsVaultManager = secretsVaultManager;
+    }
 
-        public SecretsModel(
-            IClientDbContext clientDbContext,
-            SecretsVaultManager secretsVaultManager)
-             : base(clientDbContext)
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await LoadCurrentClientAsync(id);
+
+        //IdentityServerConstants.SecretTypes.
+
+        Input = new NewSecretModel()
         {
-            _secretsVaultManager = secretsVaultManager;
-        }
+            ClientId = id,
+            SecretType = IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret
+        };
 
-        async public Task<IActionResult> OnGetAsync(string id)
+        return Page();
+    }
+
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await SecureHandlerAsync(async () =>
+        {
+            await LoadCurrentClientAsync(Input.ClientId);
+
+            var inputSecret = Input.Secret.Trim();
+
+            switch (Input.SecretType)
+            {
+                case IdentityServerConstants.SecretTypes.SharedSecret:
+                    inputSecret = inputSecret.Sha256();
+                    break;
+                case IdentityServerConstants.SecretTypes.X509CertificateBase64:
+                    inputSecret = inputSecret.ParseCertBase64String();
+                    break;
+                case IdentityServerNovaConstants.SecretTypes.SecretsVaultSecret:
+                    try
+                    {
+                        var secretsVersion = await _secretsVaultManager.GetSecretVersion(inputSecret);
+                        if (secretsVersion == null)
+                        {
+                            throw new StatusMessageException($"Secret with path {inputSecret} not exits in secrets vault");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new StatusMessageException(ex.Message);
+                    }
+
+                    break;
+                default:
+                    throw new Exception("Unknown secret type");
+            }
+
+            if (!String.IsNullOrWhiteSpace(Input.Secret))
+            {
+                var secret = new SecretModel()
+                {
+                    Type = Input.SecretType,
+                    Value = inputSecret,
+                    Description = $"{Input.SecretDescription} (created {DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()})",
+                    Expiration = Input.Expiration
+                };
+
+                List<SecretModel> clientSecrets = new List<SecretModel>();
+                if (this.CurrentClient.ClientSecrets != null)
+                {
+                    clientSecrets.AddRange(this.CurrentClient.ClientSecrets);
+                }
+                clientSecrets.Add(secret);
+
+                this.CurrentClient.ClientSecrets = clientSecrets.ToArray();
+                await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "ClientSecrets" });
+            }
+        }
+        , onFinally: () => RedirectToPage(new { id = Input.ClientId })
+        , successMessage: "Secrets updated successfully");
+    }
+
+    async public Task<IActionResult> OnGetRemoveAsync(string id, int secretIndex, string secretHash)
+    {
+        return await SecureHandlerAsync(async () =>
         {
             await LoadCurrentClientAsync(id);
 
-            //IdentityServerConstants.SecretTypes.
-
-            Input = new NewSecretModel()
+            if (this.CurrentClient.ClientSecrets != null && secretIndex >= 0 && this.CurrentClient.ClientSecrets.Count() > secretIndex)
             {
-                ClientId = id,
-                SecretType = IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret
-            };
-
-            return Page();
-        }
-
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentClientAsync(Input.ClientId);
-
-                var inputSecret = Input.Secret.Trim();
-
-                switch (Input.SecretType)
+                var deleteSecret = this.CurrentClient.ClientSecrets.ToArray()[secretIndex];
+                if (deleteSecret.Value.ToSha256().StartsWith(secretHash))
                 {
-                    case IdentityServerConstants.SecretTypes.SharedSecret:
-                        inputSecret = inputSecret.Sha256();
-                        break;
-                    case IdentityServerConstants.SecretTypes.X509CertificateBase64:
-                        inputSecret = inputSecret.ParseCertBase64String();
-                        break;
-                    case IdentityServerNovaConstants.SecretTypes.SecretsVaultSecret:
-                        try
-                        {
-                            var secretsVersion = await _secretsVaultManager.GetSecretVersion(inputSecret);
-                            if (secretsVersion == null)
-                            {
-                                throw new StatusMessageException($"Secret with path {inputSecret} not exits in secrets vault");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new StatusMessageException(ex.Message);
-                        }
+                    this.CurrentClient.ClientSecrets = this.CurrentClient.ClientSecrets
+                                                                .Where(s => s != deleteSecret)
+                                                                .ToArray();
 
-                        break;
-                    default:
-                        throw new Exception("Unknown secret type");
-                }
-
-                if (!String.IsNullOrWhiteSpace(Input.Secret))
-                {
-                    var secret = new SecretModel()
-                    {
-                        Type = Input.SecretType,
-                        Value = inputSecret,
-                        Description = $"{Input.SecretDescription} (created {DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()})",
-                        Expiration = Input.Expiration
-                    };
-
-                    List<SecretModel> clientSecrets = new List<SecretModel>();
-                    if (this.CurrentClient.ClientSecrets != null)
-                    {
-                        clientSecrets.AddRange(this.CurrentClient.ClientSecrets);
-                    }
-                    clientSecrets.Add(secret);
-
-                    this.CurrentClient.ClientSecrets = clientSecrets.ToArray();
                     await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "ClientSecrets" });
                 }
             }
-            , onFinally: () => RedirectToPage(new { id = Input.ClientId })
-            , successMessage: "Secrets updated successfully");
         }
+        , onFinally: () => RedirectToPage(new { id = id })
+        , successMessage: "Successfully removed secret");
+    }
 
-        async public Task<IActionResult> OnGetRemoveAsync(string id, int secretIndex, string secretHash)
-        {
-            return await SecureHandlerAsync(async () =>
-            {
-                await LoadCurrentClientAsync(id);
+    [BindProperty]
+    public NewSecretModel Input { get; set; }
 
-                if (this.CurrentClient.ClientSecrets != null && secretIndex >= 0 && this.CurrentClient.ClientSecrets.Count() > secretIndex)
-                {
-                    var deleteSecret = this.CurrentClient.ClientSecrets.ToArray()[secretIndex];
-                    if (deleteSecret.Value.ToSha256().StartsWith(secretHash))
-                    {
-                        this.CurrentClient.ClientSecrets = this.CurrentClient.ClientSecrets
-                                                                    .Where(s => s != deleteSecret)
-                                                                    .ToArray();
+    public class NewSecretModel
+    {
+        public string ClientId { get; set; }
 
-                        await _clientDb.UpdateClientAsync(this.CurrentClient, new[] { "ClientSecrets" });
-                    }
-                }
-            }
-            , onFinally: () => RedirectToPage(new { id = id })
-            , successMessage: "Successfully removed secret");
-        }
-
-        [BindProperty]
-        public NewSecretModel Input { get; set; }
-
-        public class NewSecretModel
-        {
-            public string ClientId { get; set; }
-
-            public string Secret { get; set; }
-            public string SecretType { get; set; }
-            public string SecretDescription { get; set; }
-            public DateTime? Expiration { get; set; }
-        }
+        public string Secret { get; set; }
+        public string SecretType { get; set; }
+        public string SecretDescription { get; set; }
+        public DateTime? Expiration { get; set; }
     }
 }

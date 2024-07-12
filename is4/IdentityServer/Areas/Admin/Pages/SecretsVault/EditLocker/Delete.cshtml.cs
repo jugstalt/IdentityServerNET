@@ -1,68 +1,67 @@
 using IdentityServer.Nova.Exceptions;
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Servivces.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker
+namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker;
+
+public class DeleteModel : EditLockerPageModel
 {
-    public class DeleteModel : EditLockerPageModel
+    public DeleteModel(ISecretsVaultDbContext secretsVaultDb)
+        : base(secretsVaultDb)
     {
-        public DeleteModel(ISecretsVaultDbContext secretsVaultDb)
-            : base(secretsVaultDb)
-        {
 
+    }
+
+    [BindProperty]
+    public InputModel Input { get; set; }
+
+    public class InputModel
+    {
+        [HiddenInput]
+        public string CurrentLockerName { get; set; }
+
+        [Display(Name = "Confirm locker name")]
+        public string ConfirmLockerName { get; set; }
+    }
+
+    async public Task<IActionResult> OnGetAsync(string id)
+    {
+        await base.LoadCurrentLockerAsync(id);
+        if (this.CurrentLocker == null)
+        {
+            return NotFound($"Unable to load locker.");
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
+        this.Input = new InputModel()
         {
-            [HiddenInput]
-            public string CurrentLockerName { get; set; }
+            CurrentLockerName = this.CurrentLocker.Name,
+        };
 
-            [Display(Name = "Confirm locker name")]
-            public string ConfirmLockerName { get; set; }
-        }
+        return Page();
+    }
 
-        async public Task<IActionResult> OnGetAsync(string id)
+    async public Task<IActionResult> OnPostAsync()
+    {
+        return await base.SecureHandlerAsync(async () =>
         {
-            await base.LoadCurrentLockerAsync(id);
-            if (this.CurrentLocker == null)
+            await base.LoadCurrentLockerAsync(Input.CurrentLockerName);
+
+            #region Verify locker name
+
+            if (!this.CurrentLocker.Name.Equals(Input.ConfirmLockerName))
             {
-                return NotFound($"Unable to load locker.");
+                throw new StatusMessageException("Please type the correct locker name.");
             }
 
-            this.Input = new InputModel()
-            {
-                CurrentLockerName = this.CurrentLocker.Name,
-            };
+            #endregion
 
-            return Page();
+            await _secretsVaultDb.RemoveLockerAsync(Input.CurrentLockerName, CancellationToken.None);
         }
-
-        async public Task<IActionResult> OnPostAsync()
-        {
-            return await base.SecureHandlerAsync(async () =>
-            {
-                await base.LoadCurrentLockerAsync(Input.CurrentLockerName);
-
-                #region Verify locker name
-
-                if (!this.CurrentLocker.Name.Equals(Input.ConfirmLockerName))
-                {
-                    throw new StatusMessageException("Please type the correct locker name.");
-                }
-
-                #endregion
-
-                await _secretsVaultDb.RemoveLockerAsync(Input.CurrentLockerName, CancellationToken.None);
-            }
-            , onFinally: () => RedirectToPage("../Index")
-            , successMessage: ""
-            , onException: (ex) => RedirectToPage(new { id = Input.CurrentLockerName }));
-        }
+        , onFinally: () => RedirectToPage("../Index")
+        , successMessage: ""
+        , onException: (ex) => RedirectToPage(new { id = Input.CurrentLockerName }));
     }
 }

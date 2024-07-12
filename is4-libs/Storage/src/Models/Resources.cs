@@ -68,7 +68,7 @@ namespace IdentityServer4.Models
         /// Gets or sets the API resources.
         /// </summary>
         public ICollection<ApiResource> ApiResources { get; set; } = new HashSet<ApiResource>();
-        
+
         /// <summary>
         /// Gets or sets the API scopes.
         /// </summary>

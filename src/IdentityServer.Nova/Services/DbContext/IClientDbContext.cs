@@ -1,10 +1,9 @@
 ﻿using IdentityServer.Nova.Models.IdentityServerWrappers;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext
+namespace IdentityServer.Nova.Services.DbContext;
+
+public interface IClientDbContext
 {
-    public interface IClientDbContext
-    {
-        Task<ClientModel> FindClientByIdAsync(string clientId);
-    }
+    Task<ClientModel> FindClientByIdAsync(string clientId);
 }

@@ -1,9 +1,8 @@
-﻿namespace IdentityServer.Nova.Services
+﻿namespace IdentityServer.Nova.Services;
+
+public class AuthorizationContext
 {
-    public class AuthorizationContext
-    {
-        public string ReturnUrl { get; set; }
-        public string ClientId { get; set; }
-        public string ClientName { get; set; }
-    }
+    public string ReturnUrl { get; set; }
+    public string ClientId { get; set; }
+    public string ClientName { get; set; }
 }

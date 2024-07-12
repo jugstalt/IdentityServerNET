@@ -2,26 +2,25 @@
 using IdentityServer.Nova.Services.DbContext;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient
+namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient;
+
+public class EditClientPageModel : AdminPageModel, IEditClientPageModel
 {
-    public class EditClientPageModel : AdminPageModel, IEditClientPageModel
+    public EditClientPageModel(IClientDbContext clientDbContext)
     {
-        public EditClientPageModel(IClientDbContext clientDbContext)
-        {
-            _clientDb = clientDbContext as IClientDbContextModify;
-        }
-
-        #region IEditClientModel
-
-        public ClientModel CurrentClient { get; set; }
-
-        #endregion
-
-        async public Task LoadCurrentClientAsync(string id)
-        {
-            this.CurrentClient = await _clientDb.FindClientByIdAsync(id);
-        }
-
-        protected IClientDbContextModify _clientDb = null;
+        _clientDb = clientDbContext as IClientDbContextModify;
     }
+
+    #region IEditClientModel
+
+    public ClientModel CurrentClient { get; set; }
+
+    #endregion
+
+    async public Task LoadCurrentClientAsync(string id)
+    {
+        this.CurrentClient = await _clientDb.FindClientByIdAsync(id);
+    }
+
+    protected IClientDbContextModify _clientDb = null;
 }

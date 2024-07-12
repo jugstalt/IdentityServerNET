@@ -4,18 +4,17 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityServer
-{
-    public class LoginInputModel
-    {
-        [Required]
-        public string Username { get; set; }
-        [Required]
-        public string Password { get; set; }
-        public bool RememberLogin { get; set; }
-        public string ReturnUrl { get; set; }
+namespace IdentityServer;
 
-        public string CaptchaCode { get; set; }
-        public byte[] CaptchaImage { get; set; }
-    }
+public class LoginInputModel
+{
+    [Required]
+    public string Username { get; set; }
+    [Required]
+    public string Password { get; set; }
+    public bool RememberLogin { get; set; }
+    public string ReturnUrl { get; set; }
+
+    public string CaptchaCode { get; set; }
+    public byte[] CaptchaImage { get; set; }
 }

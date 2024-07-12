@@ -52,7 +52,10 @@ namespace IdentityServer4
         /// <param name="subjectId">The subject ID</param>
         public IdentityServerUser(string subjectId)
         {
-            if (subjectId.IsMissing()) throw new ArgumentException("SubjectId is mandatory", nameof(subjectId));
+            if (subjectId.IsMissing())
+            {
+                throw new ArgumentException("SubjectId is mandatory", nameof(subjectId));
+            }
 
             SubjectId = subjectId;
         }
@@ -64,7 +67,11 @@ namespace IdentityServer4
         /// <exception cref="ArgumentNullException"></exception>
         public ClaimsPrincipal CreatePrincipal()
         {
-            if (SubjectId.IsMissing()) throw new ArgumentException("SubjectId is mandatory", nameof(SubjectId));
+            if (SubjectId.IsMissing())
+            {
+                throw new ArgumentException("SubjectId is mandatory", nameof(SubjectId));
+            }
+
             var claims = new List<Claim> { new Claim(JwtClaimTypes.Subject, SubjectId) };
 
             if (DisplayName.IsPresent())

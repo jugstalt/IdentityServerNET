@@ -5,88 +5,87 @@ using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Clients
+namespace IdentityServer.Nova.Clients;
+
+public class TokenClient
 {
-    public class TokenClient
+    private readonly string _clientId;
+    private readonly string _clientSecret;
+    private readonly X509Certificate2 _clientCertificate = null;
+
+    public TokenClient(string clientId, string clientSecret)
     {
-        private readonly string _clientId;
-        private readonly string _clientSecret;
-        private readonly X509Certificate2 _clientCertificate = null;
+        _clientId = clientId;
+        _clientSecret = clientSecret;
+    }
 
-        public TokenClient(string clientId, string clientSecret)
+    public TokenClient(string clientId, X509Certificate2 clientCertificate)
+    {
+        _clientId = clientId;
+        _clientCertificate = clientCertificate;
+    }
+
+    public string AccessToken { get; private set; }
+
+    // reuse http client
+    private HttpClient _httpClient = null;
+    protected HttpClient GetHttpClient()
+    {
+        if (_httpClient == null)
         {
-            _clientId = clientId;
-            _clientSecret = clientSecret;
+            _httpClient = new HttpClient();
         }
 
-        public TokenClient(string clientId, X509Certificate2 clientCertificate)
+        return _httpClient;
+    }
+
+    async public Task GetAccessToken(string identityServerAddress, string[] scopes)
+    {
+        var httpClient = GetHttpClient();
+        var disco = await httpClient.GetDiscoveryDocumentAsync(identityServerAddress);
+
+        if (disco.IsError)
         {
-            _clientId = clientId;
-            _clientCertificate = clientCertificate;
+            throw new Exception(disco.Error);
         }
 
-        public string AccessToken { get; private set; }
-
-        // reuse http client
-        private HttpClient _httpClient = null;
-        protected HttpClient GetHttpClient()
+        TokenResponse tokenResponse;
+        if (_clientCertificate != null)
         {
-            if (_httpClient == null)
+            var clientAssertion = new ClientAssertion()
             {
-                _httpClient = new HttpClient();
-            }
+                Type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                Value = _clientCertificate.ToAssertionToken(_clientId, identityServerAddress).ToTokenString()
+            };
 
-            return _httpClient;
+            tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = _clientId,
+                ClientAssertion = clientAssertion,
+
+                Scope = String.Join(" ", scopes)
+            });
+        }
+        else
+        {
+            tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = _clientId,
+                ClientSecret = _clientSecret,
+
+                Scope = String.Join(" ", scopes)
+            });
         }
 
-        async public Task GetAccessToken(string identityServerAddress, string[] scopes)
+        if (tokenResponse.IsError)
         {
-            var httpClient = GetHttpClient();
-            var disco = await httpClient.GetDiscoveryDocumentAsync(identityServerAddress);
-
-            if (disco.IsError)
-            {
-                throw new Exception(disco.Error);
-            }
-
-            TokenResponse tokenResponse;
-            if (_clientCertificate != null)
-            {
-                var clientAssertion = new ClientAssertion()
-                {
-                    Type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                    Value = _clientCertificate.ToAssertionToken(_clientId, identityServerAddress).ToTokenString()
-                };
-
-                tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-
-                    ClientId = _clientId,
-                    ClientAssertion = clientAssertion,
-
-                    Scope = String.Join(" ", scopes)
-                });
-            }
-            else
-            {
-                tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-
-                    ClientId = _clientId,
-                    ClientSecret = _clientSecret,
-
-                    Scope = String.Join(" ", scopes)
-                });
-            }
-
-            if (tokenResponse.IsError)
-            {
-                throw new Exception(tokenResponse.Error);
-            }
-
-            AccessToken = tokenResponse.AccessToken;
+            throw new Exception(tokenResponse.Error);
         }
+
+        AccessToken = tokenResponse.AccessToken;
     }
 }

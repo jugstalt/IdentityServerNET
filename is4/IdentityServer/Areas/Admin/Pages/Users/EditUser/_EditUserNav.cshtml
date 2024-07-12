@@ -15,6 +15,7 @@
         <li class="">
             <a asp-page="../Index">..</a>
         </li>
+
         @if (categories != null)
         {
 
@@ -27,6 +28,11 @@
                 </li>
             }
         }
+
+        <li class="@EditUserNavPages.UserEmailNavClass(ViewContext)">
+            <a asp-page="./UserEmail"
+               asp-route-id="@Model.CurrentApplicationUser.Id">Email</a>
+        </li>
 
         @if (Model.HasRoleDbContext)
         {

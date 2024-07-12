@@ -1,6 +1,7 @@
-using IdentityServer.Nova;
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Models.Extensions;
 using IdentityServer.Nova.Services.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
