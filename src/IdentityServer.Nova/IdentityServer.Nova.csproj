@@ -5,7 +5,7 @@
 	<LangVersion>10</LangVersion>
     <UserSecretsId>45936590-d798-4c10-bbda-57acb544051f</UserSecretsId>
     <AssemblyVersion>2.24.701</AssemblyVersion>
-	<Version>2.23.1202</Version>  
+	 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
