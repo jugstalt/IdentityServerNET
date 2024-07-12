@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Services.Security;
+﻿using IdentityServer.Nova.Abstractions.Security;
 using Microsoft.Extensions.Options;
 using System;
 using System.Drawing;

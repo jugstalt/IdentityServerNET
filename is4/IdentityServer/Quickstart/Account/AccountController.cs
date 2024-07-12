@@ -5,7 +5,7 @@
 using IdentityModel;
 using IdentityServer.Nova;
 using IdentityServer.Nova.Models;
-using IdentityServer.Nova.Services.Security;
+using IdentityServer.Nova.Abstractions.Security;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;

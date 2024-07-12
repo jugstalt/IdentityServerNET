@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Nova.Abstractions.Services.Serialize;
+﻿namespace IdentityServer.Nova.Abstractions.Serialize;
 
 public interface IBlobSerializer
 {

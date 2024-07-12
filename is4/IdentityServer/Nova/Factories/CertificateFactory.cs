@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Services.SigningCredential;
+﻿using IdentityServer.Nova.Abstractions.SigningCredential;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;

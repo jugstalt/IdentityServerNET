@@ -1,4 +1,4 @@
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Abstractions.DbContext;
 using System.Linq;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources;

@@ -1,8 +1,8 @@
 using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.ErrorHandling;
 using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Models.UserInteraction;
-using IdentityServer.Nova.Services.ErrorHandling;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;

@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Abstractions.Services.Serialize;
+﻿using IdentityServer.Nova.Abstractions.Serialize;
 using Newtonsoft.Json;
 
 namespace IdentityServer.Nova.Services.Serialize;

@@ -1,6 +1,6 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Abstractions.DbContext;
-using IdentityServer.Nova.Abstractions.Services.Serialize;
+using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;

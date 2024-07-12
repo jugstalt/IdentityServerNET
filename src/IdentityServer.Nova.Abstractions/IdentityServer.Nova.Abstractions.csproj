@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DbContext\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj" />
   </ItemGroup>
 

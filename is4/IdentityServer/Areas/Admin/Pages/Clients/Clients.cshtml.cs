@@ -1,5 +1,5 @@
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.DbContext;
 using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;

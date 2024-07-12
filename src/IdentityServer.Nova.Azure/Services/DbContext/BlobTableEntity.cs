@@ -1,5 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
-using IdentityServer.Nova.Abstractions.Services.Serialize;
+using IdentityServer.Nova.Abstractions.Serialize;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace IdentityServer.Nova.Azure.Services.DbContext;

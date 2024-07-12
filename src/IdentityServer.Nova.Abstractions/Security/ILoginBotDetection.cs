@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.Security;
+namespace IdentityServer.Nova.Abstractions.Security;
 
 public interface ILoginBotDetection
 {

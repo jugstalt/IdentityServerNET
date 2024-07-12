@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.EmailSender;
 using IdentityServer.Nova.CaptchaRenderers;
 using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.LiteDb.Services.DbContext;

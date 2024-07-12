@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Nova.Services.ErrorHandling;
+﻿namespace IdentityServer.Nova.Abstractions.ErrorHandling;
 
 public interface IErrorMessage
 {

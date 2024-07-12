@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Services.SigningCredential;
 using Newtonsoft.Json;
 using System;

@@ -1,4 +1,4 @@
-using IdentityServer.Nova.Services.DbContext;
+using IdentityServer.Nova.Abstractions.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;

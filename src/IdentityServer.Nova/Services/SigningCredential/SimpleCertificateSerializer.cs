@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityServer.Nova.Abstractions.SigningCredential;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;

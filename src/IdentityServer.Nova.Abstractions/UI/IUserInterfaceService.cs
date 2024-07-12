@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace IdentityServer.Nova.Services.UI;
+namespace IdentityServer.Nova.Abstractions.UI;
 
 public interface IUserInterfaceService
 {

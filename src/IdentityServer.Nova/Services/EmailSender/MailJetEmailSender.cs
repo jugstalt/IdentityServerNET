@@ -1,4 +1,5 @@
-﻿using Mailjet.Client;
+﻿using IdentityServer.Nova.Abstractions.EmailSender;
+using Mailjet.Client;
 using Mailjet.Client.Resources;
 using Mailjet.Client.TransactionalEmails;
 using Microsoft.Extensions.Configuration;

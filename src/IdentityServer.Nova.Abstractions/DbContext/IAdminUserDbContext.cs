@@ -1,10 +1,9 @@
-﻿using IdentityServer.Nova.Abstractions.DbContext;
-using IdentityServer.Nova.Models;
+﻿using IdentityServer.Nova.Models;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext;
+namespace IdentityServer.Nova.Abstractions.DbContext;
 
 public interface IAdminUserDbContext : IUserDbContext
 {

@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.SigningCredential;
+namespace IdentityServer.Nova.Abstractions.SigningCredential;
 
 public interface ICertificateSerializer
 {

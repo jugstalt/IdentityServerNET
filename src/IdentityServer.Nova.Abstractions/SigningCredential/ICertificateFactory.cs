@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 
-namespace IdentityServer.Nova.Services.SigningCredential;
+namespace IdentityServer.Nova.Abstractions.SigningCredential;
 
 public interface ICertificateFactory
 {

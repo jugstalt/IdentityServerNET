@@ -1,4 +1,6 @@
 ﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Abstractions.SigningCredential;
+using IdentityServer.Nova.Abstractions.UI;
 using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.Factories;
 using IdentityServer.Nova.Models;

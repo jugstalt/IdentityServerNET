@@ -1,11 +1,11 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
-using IdentityServer.Nova.Abstractions.Services.Serialize;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.Services.Cryptography;
-using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
 using Microsoft.Extensions.Options;

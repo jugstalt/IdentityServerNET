@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.EventSinks;
+namespace IdentityServer.Nova.Abstractions.EventSinks;
 
 public interface IIdentityEventSink
 {

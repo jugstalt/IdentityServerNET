@@ -1,9 +1,9 @@
 using IdentityModel;
 using IdentityServer.Nova;
+using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.SecretsVault;
 using IdentityServer4;
 using IdentityServer4.Models;

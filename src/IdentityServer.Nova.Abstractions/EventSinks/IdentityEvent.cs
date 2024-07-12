@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace IdentityServer.Nova.Services.EventSinks;
+namespace IdentityServer.Nova.Abstractions.EventSinks;
 
 public class IdentityEvent
 {

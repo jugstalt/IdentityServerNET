@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Nova.Services.EventSinks;
+﻿namespace IdentityServer.Nova.Abstractions.EventSinks;
 
 public enum IdentityEventTypes
 {

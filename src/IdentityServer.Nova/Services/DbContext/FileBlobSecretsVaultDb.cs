@@ -1,6 +1,6 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
-using IdentityServer.Nova.Abstractions.Services.Serialize;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;

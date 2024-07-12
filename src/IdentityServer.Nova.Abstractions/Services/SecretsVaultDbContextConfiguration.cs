@@ -1,5 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
-using IdentityServer.Nova.Abstractions.Services.Serialize;
+using IdentityServer.Nova.Abstractions.Serialize;
 
 namespace IdentityServer.Nova.Abstractions.Services;
 

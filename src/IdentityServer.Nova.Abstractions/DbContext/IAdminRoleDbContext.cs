@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.DbContext;
+namespace IdentityServer.Nova.Abstractions.DbContext;
 
 public interface IAdminRoleDbContext
 {

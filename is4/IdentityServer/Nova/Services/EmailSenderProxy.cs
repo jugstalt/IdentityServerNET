@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Services.EmailSender;
+﻿using IdentityServer.Nova.Abstractions.EmailSender;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Threading.Tasks;
 

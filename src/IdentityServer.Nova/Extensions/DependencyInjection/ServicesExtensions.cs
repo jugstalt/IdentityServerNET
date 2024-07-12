@@ -1,13 +1,13 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.EventSinks;
 using IdentityServer.Nova.Abstractions.Services;
-using IdentityServer.Nova.Services.DbContext;
-using IdentityServer.Nova.Services.EventSinks;
-using IdentityServer.Nova.Services.Security;
+using IdentityServer.Nova.Abstractions.Security;
 using IdentityServer.Nova.Services.UI;
 using IdentityServer.Nova.Servivces.DbContext;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using IdentityServer.Nova.Abstractions.UI;
 
 namespace IdentityServer.Nova.Extensions.DependencyInjection;
 

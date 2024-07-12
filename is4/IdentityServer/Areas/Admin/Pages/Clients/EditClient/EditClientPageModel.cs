@@ -1,5 +1,5 @@
-﻿using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.DbContext;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Models.IdentityServerWrappers;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient;

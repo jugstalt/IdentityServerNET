@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Services.DbContext;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using System.Threading.Tasks;

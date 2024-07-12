@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Services.EmailSender;
+namespace IdentityServer.Nova.Abstractions.EmailSender;
 
 public interface ICustomEmailSender
 {

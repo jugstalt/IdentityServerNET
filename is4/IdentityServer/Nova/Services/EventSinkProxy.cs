@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova.Services.EventSinks;
+﻿using IdentityServer.Nova.Abstractions.EventSinks;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
 using System;
