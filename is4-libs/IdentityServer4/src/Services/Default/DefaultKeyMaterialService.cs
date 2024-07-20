@@ -38,7 +38,7 @@ public class DefaultKeyMaterialService : IKeyMaterialService
     {
         if (_signingCredentialStores.Any())
         {
-            if (allowedAlgorithms.IsNullOrEmpty())
+            if (allowedAlgorithms.IsEmptyOrNull())
             {
                 return await _signingCredentialStores.First().GetSigningCredentialsAsync();
             }

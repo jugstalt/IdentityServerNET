@@ -33,9 +33,9 @@ public class RoleUsersModel : EditRolePageModel
     public IEnumerable<ApplicationUser> RoleUsers;
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public AddUserModel AddUserInput { get; set; }
 
-    public class InputModel
+    public class AddUserModel
     {
         public string RoleId { get; set; }
 
@@ -56,7 +56,7 @@ public class RoleUsersModel : EditRolePageModel
 
             this.RoleUsers = await _userDbContext.GetUsersInRoleAsync(CurrentApplicationRole.Name, CancellationToken.None);
 
-            Input = new InputModel()
+            AddUserInput = new AddUserModel()
             {
                 RoleId = CurrentApplicationRole.Id
             };
@@ -69,9 +69,9 @@ public class RoleUsersModel : EditRolePageModel
     {
         return await SecureHandlerAsync(async () =>
         {
-            await LoadCurrentApplicationRoleAsync(Input.RoleId);
+            await LoadCurrentApplicationRoleAsync(AddUserInput.RoleId);
 
-            if (String.IsNullOrWhiteSpace(Input.Username))
+            if (String.IsNullOrWhiteSpace(AddUserInput.Username))
             {
                 throw new StatusMessageException("Please type a correct username");
             }
@@ -81,22 +81,27 @@ public class RoleUsersModel : EditRolePageModel
                 throw new StatusMessageException("IUserRoleDbContext is not implemented with current user database");
             }
 
-            var user = await _userDbContext.FindByNameAsync(Input.Username.ToUpper(), CancellationToken.None);
+            var user = await _userDbContext.FindByNameAsync(AddUserInput.Username.ToUpper(), CancellationToken.None);
             if (user == null)
             {
-                user = await _userDbContext.FindByEmailAsync(Input.Username.ToUpper(), CancellationToken.None);
+                user = await _userDbContext.FindByEmailAsync(AddUserInput.Username.ToUpper(), CancellationToken.None);
             }
 
             if (user == null)
             {
-                throw new StatusMessageException($"Unknown user {Input.Username}");
+                throw new StatusMessageException($"Unknown user {AddUserInput.Username}");
             }
 
             await _userDbContext.AddToRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
-            await _signInManager.RefreshSignInAsync(user);
+
+            if (user.UserName.Equals(this.User.Identity?.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                // refresh credentials
+                await _signInManager.RefreshSignInAsync(user);
+            }
         }
-        , onFinally: () => RedirectToPage(new { id = Input.RoleId })
-        , successMessage: $"User {Input.Username} successfully added to role"
+        , onFinally: () => RedirectToPage(new { id = AddUserInput.RoleId })
+        , successMessage: $"User {AddUserInput.Username} successfully added to role"
         , onException: (ex) => Page());
     }
 
@@ -119,7 +124,12 @@ public class RoleUsersModel : EditRolePageModel
             }
 
             await _userDbContext.RemoveFromRoleAsync(user, CurrentApplicationRole.Name, CancellationToken.None);
-            await _signInManager.RefreshSignInAsync(user);
+
+            if (user.UserName.Equals(this.User.Identity?.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                // refresh credentials
+                await _signInManager.RefreshSignInAsync(user);
+            }
         }
         , onFinally: () => RedirectToPage(new { id = id })
         , successMessage: "Successfully removed user");

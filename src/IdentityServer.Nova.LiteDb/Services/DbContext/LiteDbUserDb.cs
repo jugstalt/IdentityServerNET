@@ -373,7 +373,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     async public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
     {
-        var users = await GetUsersAsync(0, 0, cancellationToken);
+        var users = await GetUsersAsync(int.MaxValue, 0, cancellationToken);
 
         return users
                 .Where(u => u.Roles != null && u.Roles.Contains(roleName))
