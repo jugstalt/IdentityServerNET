@@ -13,14 +13,14 @@ namespace IdentityServer.Nova.Clients;
 
 public class SigningApiClient : TokenClient
 {
-    public SigningApiClient(string clientId, string clientSecret)
-        : base(clientId, clientSecret)
+    public SigningApiClient(string clientId, string clientSecret, HttpClient httpClient = null)
+        : base(clientId, clientSecret, httpClient)
     {
 
     }
 
-    public SigningApiClient(string clientId, X509Certificate2 clientCertificate)
-        : base(clientId, clientCertificate)
+    public SigningApiClient(string clientId, X509Certificate2 clientCertificate, HttpClient httpClient = null)
+        : base(clientId, clientCertificate, httpClient)
     {
 
     }

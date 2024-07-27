@@ -168,29 +168,27 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add ExportClientDbContext (optional)
 
-        services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:ExportPath"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage-export\clients";
-            options.CryptoService = new ClearTextCryptoService();
-            options.BlobSerializer = new JsonBlobSerializer()
+            services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
             {
-                JsonFormatting = Newtonsoft.Json.Formatting.Indented
-            };
-        });
+                options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
+                options.AddDefaults(context.Configuration);
+            });
+        }
 
         #endregion
 
         #region Add ExportResourceDbContext (optional)
 
-        services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
+        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:ExportPath"]))
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage-export\resources";
-            options.CryptoService = new ClearTextCryptoService();
-            options.BlobSerializer = new JsonBlobSerializer()
+            services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
             {
-                JsonFormatting = Newtonsoft.Json.Formatting.Indented
-            };
-        });
+                options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
+                options.AddDefaults(context.Configuration);
+            });
+        }
 
         #endregion
 

@@ -2,6 +2,7 @@
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.Models.UserInteraction;
 using IdentityServer.Nova.Services.Cryptography;
+using IdentityServer.Nova.Services.Serialize;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -115,6 +116,26 @@ internal static class ConfigurationExtensions
                 //    RedirectUris = new string[] { "https://localhost:44356/signin-oidc" },
                 //    PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
                 //}
+        };
+    }
+
+    public static void AddDefaults(this ExportClientDbContextConfiguration options,
+                                   IConfiguration config)
+    {
+        options.CryptoService = new ClearTextCryptoService();
+        options.BlobSerializer = new JsonBlobSerializer()
+        {
+            JsonFormatting = Newtonsoft.Json.Formatting.Indented
+        };
+    }
+
+    public static void AddDefauts(this ExportResourceDbContextConfiguration options,
+                                  IConfiguration config)
+    {
+        options.CryptoService = new ClearTextCryptoService();
+        options.BlobSerializer = new JsonBlobSerializer()
+        {
+            JsonFormatting = Newtonsoft.Json.Formatting.Indented
         };
     }
 }

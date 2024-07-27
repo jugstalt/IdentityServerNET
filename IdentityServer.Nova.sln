@@ -49,9 +49,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{1FF5F57D-A
 		http\signing-request.http = http\signing-request.http
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Nova.Abstractions", "src\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj", "{A1EF539D-EBBE-476B-89C8-4E89078FAE1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Abstractions", "src\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj", "{A1EF539D-EBBE-476B-89C8-4E89078FAE1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Nova.Models", "src\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj", "{9BE087FF-8991-4ACD-B3E3-894C3CD691A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Models", "src\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj", "{9BE087FF-8991-4ACD-B3E3-894C3CD691A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

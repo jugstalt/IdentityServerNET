@@ -2,7 +2,7 @@
 
 namespace IdentityServer.Nova.Clients.Extensions;
 
-static public class SecretsVaultExtensions
+static internal class SecretsVaultExtensions
 {
     static public string SecretsVaultLockerName(this string path)
     {

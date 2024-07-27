@@ -1,6 +1,7 @@
 ﻿using IdentityModel.Client;
 using Newtonsoft.Json;
 using System;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -8,14 +9,14 @@ namespace IdentityServer.Nova.Clients;
 
 public class SecretsVaultClient : TokenClient
 {
-    public SecretsVaultClient(string clientId, string clientSecret)
-        : base(clientId, clientSecret)
+    public SecretsVaultClient(string clientId, string clientSecret, HttpClient httpClient = null)
+        : base(clientId, clientSecret, httpClient)
     {
 
     }
 
-    public SecretsVaultClient(string clientId, X509Certificate2 clientCertificate)
-        : base(clientId, clientCertificate)
+    public SecretsVaultClient(string clientId, X509Certificate2 clientCertificate, HttpClient httpClient = null)
+        : base(clientId, clientCertificate, httpClient)
     {
 
     }
@@ -53,10 +54,5 @@ public class SecretsVaultClient : TokenClient
             var secretJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<SecretsVaultResponse>(secretJson);
         }
-    }
-
-    public object OpenLocker(string secretsVaultServer, object p)
-    {
-        throw new NotImplementedException();
     }
 }
