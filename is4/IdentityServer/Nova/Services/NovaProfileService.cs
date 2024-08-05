@@ -4,7 +4,7 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova;
+namespace IdentityServer.Nova.Services;
 
 public class NovaProfileService : IProfileService
 {

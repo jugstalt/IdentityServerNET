@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace IdentityServer.Nova;
+namespace IdentityServer.Nova.Extensions;
 
 static public class ConfigurationExtensions
 {

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Controllers;
+namespace IdentityServer.Api.Controllers;
 
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = "Bearer-Signing, Identity.Application")]

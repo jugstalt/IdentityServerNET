@@ -1,5 +1,4 @@
 ﻿using IdentityServer.Nova.Extensions;
-using IdentityServer.Nova.Services;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -8,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace IdentityServer.Services;
+namespace IdentityServer.Nova.Services;
 
 public class AuthorizationContextService : IAuthorizationContextService
 {
@@ -28,9 +27,9 @@ public class AuthorizationContextService : IAuthorizationContextService
             _returnUrl = (httpRequest.HasFormContentType ? (string)httpRequest.Form["ReturnUrl"] : null) ?? httpRequest.Query["ReturnUrl"];
             _clientId = (httpRequest.HasFormContentType ? (string)httpRequest.Form["client_id"] : null) ?? httpRequest.Query["client_id"];
 
-            if (String.IsNullOrEmpty(_returnUrl) &&
-                String.IsNullOrEmpty(_clientId) &&
-                !String.IsNullOrEmpty(httpRequest.Headers["Authorization"]) &&
+            if (string.IsNullOrEmpty(_returnUrl) &&
+                string.IsNullOrEmpty(_clientId) &&
+                !string.IsNullOrEmpty(httpRequest.Headers["Authorization"]) &&
                 httpRequest.Headers["Authorization"].ToString().ToLower().StartsWith("bearer "))  // get Client Id from Bearer Token
             {
                 try
@@ -50,13 +49,13 @@ public class AuthorizationContextService : IAuthorizationContextService
         }
         else
         {
-            _returnUrl = _clientId = String.Empty;
+            _returnUrl = _clientId = string.Empty;
         }
     }
 
     async public Task<AuthorizationContext> GetContextAsync()
     {
-        if (!String.IsNullOrEmpty(_returnUrl))
+        if (!string.IsNullOrEmpty(_returnUrl))
         {
             var context = await _interaction.GetAuthorizationContextAsync(_returnUrl);
 
@@ -67,7 +66,7 @@ public class AuthorizationContextService : IAuthorizationContextService
                 ClientName = context?.Client?.ClientName
             };
         }
-        else if (!String.IsNullOrEmpty(_clientId))
+        else if (!string.IsNullOrEmpty(_clientId))
         {
             return new AuthorizationContext()
             {
@@ -79,25 +78,25 @@ public class AuthorizationContextService : IAuthorizationContextService
 
     public string GetClientId()
     {
-        if (!String.IsNullOrEmpty(_returnUrl) && _returnUrl.Contains("?"))
+        if (!string.IsNullOrEmpty(_returnUrl) && _returnUrl.Contains("?"))
         {
             var returnUrlQueryString = HttpUtility.ParseQueryString(_returnUrl.Substring(_returnUrl.IndexOf("?")));
 
-            return returnUrlQueryString["client_id"] ?? String.Empty;
+            return returnUrlQueryString["client_id"] ?? string.Empty;
         }
-        else if (!String.IsNullOrEmpty(_clientId))
+        else if (!string.IsNullOrEmpty(_clientId))
         {
             return _clientId;
         }
 
-        return String.Empty;
+        return string.Empty;
     }
 
     public string GetReturnUrlParameter(string parameter)
     {
         try
         {
-            if (!String.IsNullOrEmpty(_returnUrl) && _returnUrl.Contains("?"))
+            if (!string.IsNullOrEmpty(_returnUrl) && _returnUrl.Contains("?"))
             {
                 var queryString = HttpUtility.ParseQueryString(_returnUrl.Substring(_returnUrl.IndexOf("?")));
 
@@ -106,7 +105,7 @@ public class AuthorizationContextService : IAuthorizationContextService
         }
         catch { }
 
-        return String.Empty;
+        return string.Empty;
     }
 
     #region Classes

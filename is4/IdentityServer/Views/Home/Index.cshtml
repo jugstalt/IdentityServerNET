@@ -1,5 +1,6 @@
 @model IdentityServer.Nova.Models.ApplicationUser;
 @using IdentityServer.Nova;
+@using IdentityServer.Nova.Extensions
 @inject Microsoft.Extensions.Configuration.IConfiguration configuration;
 @{
     var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();

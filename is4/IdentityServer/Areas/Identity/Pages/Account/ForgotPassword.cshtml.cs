@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

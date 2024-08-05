@@ -1,4 +1,5 @@
-﻿using IdentityServer.Nova.Exceptions;
+﻿using IdentityServer.Nova;
+using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.SecretsVault;
@@ -8,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Nova.Controllers;
+namespace IdentityServer.Api.Controllers;
 
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = "Bearer-Secrets,Identity.Application")]

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 
-namespace IdentityServer.Nova;
+namespace IdentityServer.Nova.Extensions;
 
 static public class ApplicationUserExtensions
 {

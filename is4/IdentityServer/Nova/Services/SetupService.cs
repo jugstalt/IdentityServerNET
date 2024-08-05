@@ -8,7 +8,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Services;
+namespace IdentityServer.Nova.Services;
 
 public class SetupService
 {
@@ -43,7 +43,7 @@ public class SetupService
                 TryCreateRole(roleDb, KnownRoles.SecretsVaultAdministrator).GetAwaiter().GetResult();
             }
 
-            adminUser = new Nova.Models.ApplicationUser()
+            adminUser = new ApplicationUser()
             {
                 UserName = "admin",
                 Email = "admin@admin.com",
