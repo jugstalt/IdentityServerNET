@@ -8,14 +8,14 @@ First, ensure your configuration file (e.g., `appsettings.json`) includes the ne
 
 ```json
 {
-    "IdentityFromOpenIdConnect": {
+    "OpenIdConnectAuthentication": {
         "Authority": "https://your-authority-url.com",
         "ClientId": "your-client-id",
         "ClientSecret": "your-client-secret",
         "RequireHttpsMetadata": "false", // Optional, default is false
         "GetClaimsFromUserInfoEndpoint": "true", // Optional, default is true
         "SaveTokens": "true", // Optional, default is true
-        "Scopes": "openid,profile,email", // Optional, default is empty
+        "Scopes": "openid,profile,email", // Optional, default is "openid"
         "NameClaim": "name", // Optional, default is null
         "RoleClaim": "role", // Optional, default is null
         "MapAllClaimActionsExcept": "iss,nbf,exp,aud,nonce,iat,c_hash" // Optional, default is a predefined list
@@ -60,11 +60,23 @@ public void ConfigureServices(IServiceCollection services)
                 options.Scope.Add(scope);
             }
 
-            options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+            if (!String.IsNullOrEmpty(configuration.OpenIdConnectNameClaim()) ||
+                !String.IsNullOrEmpty(configuration.OpenIdConnectRoleClaimType())
+               )
             {
-                NameClaimType = configuration.OpenIdConnectNameClaim() ?? "name",
-                RoleClaimType = configuration.OpenIdConnectRoleClaimType() ?? "role"
-            };
+                var validationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters();
+                if (!String.IsNullOrEmpty(configuration.OpenIdConnectNameClaim()))
+                {
+                    validationParameters.NameClaimType = configuration.OpenIdConnectNameClaim();
+                }
+
+                if (!String.IsNullOrEmpty(configuration.OpenIdConnectRoleClaimType()))
+                {
+                    validationParameters.RoleClaimType = configuration.OpenIdConnectRoleClaimType();
+                }
+
+                options.TokenValidationParameters = validationParameters;
+            }
 
             options.ClaimActions.MapAllExcept(configuration.OpenIdConnectMapAllClaimActionsExcept());
         });
