@@ -1,0 +1,56 @@
+﻿@using IdentityServer.Nova.Extensions
+@using Microsoft.AspNetCore.Identity
+@using IdentityServer.Nova.Models
+@using IdentityServer.Nova
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+@if (SignInManager.IsSignedIn(User))
+{
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="~/Home/Index" title="Manage">
+                    <div class="nav-icon sketchpen-icon-basic-bg-light-16 home"></div>
+                    Home
+                </a>
+            </li>
+            <li>
+                @if (Configuration.DenyManageAccount())
+                {
+                    <a href="~/Home/Index" title="Manage">
+                        <div class="nav-icon sketchpen-icon-basic-bg-light-16 account"></div>
+                        Hello @UserManager.GetUserName(User)!
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                        <div class="nav-icon sketchpen-icon-basic-bg-light-16 account"></div>
+                        Account: @UserManager.GetUserName(User)
+                    </a>
+                }
+            </li>
+            <li>
+                <a href="~/Account/Logout" title="Logout">
+                    <div class="nav-icon sketchpen-icon-basic-bg-light-16 account-logout"></div>
+                    Logout
+                </a>
+            </li>
+        </ul>
+}
+else
+{
+<ul class="nav navbar-nav navbar-right">
+    @if (!Configuration.DenyRegisterAccount())
+    {
+        <li>
+            <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+    }
+    <li>
+        <a href="~/Account/Login" title="Login">Login</a>
+    </li>
+</ul>
+}

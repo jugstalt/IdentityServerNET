@@ -1,0 +1,40 @@
+﻿@model IEditClientPageModel
+
+    <ul class="nav nav-pills nav-stacked">
+        <li class="">
+            <a asp-page="../Clients"
+           asp-route-id="@Model?.CurrentClient?.ClientId">«</a>
+        </li>
+        <li class="@EditClientNavPages.IndexNavClass(ViewContext)">
+            <a asp-page="./Index"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Name</a>
+        </li>
+        <li class="@EditClientNavPages.SecretsNavClass(ViewContext)">
+            <a asp-page="./Secrets"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Client Secrets</a>
+        </li>
+        <li class="@EditClientNavPages.GrantsNavClass(ViewContext)">
+            <a asp-page="./Grants"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Allowed Grants</a>
+        </li>
+        <li class="@EditClientNavPages.ScopesNavClass(ViewContext)">
+            <a asp-page="./Scopes"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Allowed Scopes</a>
+        </li>
+        <li class="@EditClientNavPages.OptionsNavClass(ViewContext)">
+            <a asp-page="./Options"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Options</a>
+        </li>
+        <li class="@EditClientNavPages.CollectionsNavClass(ViewContext)">
+            <a asp-page="./Collections"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Collections</a>
+        </li>
+        <li class="@EditClientNavPages.PropertiesNavClass(ViewContext)">
+            <a asp-page="./Properties"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Advanced Properties</a>
+        </li>
+        <li class="@EditClientNavPages.DeleteClientNavClass(ViewContext)">
+            <a asp-page="./DeleteClient"
+               asp-route-id="@Model?.CurrentClient?.ClientId">Delete</a>
+        </li>
+    </ul>

@@ -1,0 +1,89 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Clients.EditClient.ScopesModel
+@{
+    ViewData["Title"] = "Allowed Scopes";
+    ViewData["ActivePage"] = EditClientNavPages.Scopes;
+}
+
+    
+    <div class="row">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        <div class="col-md-6">
+            <h4>@ViewData["Title"]</h4>
+            @if (Model.CurrentClient.AllowedScopes != null)
+            {
+                <ul class="nav nav-pills nav-stacked">
+
+                    @foreach (var scope in Model.CurrentClient.AllowedScopes.OrderBy(s=>s))
+                    {
+                        var icon = "";
+                        if(Model.IdentityResourceScopes.Contains(scope))
+                        {
+                            icon = "edit-text";
+                        }
+                        else if(Model.ApiResouceScopes.Contains(scope))
+                        {
+                            icon = "share";
+                        }
+                        <li class="ui-list-item">
+                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 @icon"></div>
+                            <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope)</div>
+                            <a style="display:inline-block;float:right"
+                               asp-page-handler="Remove"
+                               asp-route-id="@Model.CurrentClient.ClientId"
+                               asp-route-scopeName="@scope">Remove</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="col-md-6">
+            <div class="row collapsable-tool">
+                <h4>New Scope</h4>
+                <form id="-form" method="post">
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <input type="hidden" asp-for="Input.ClientId" />
+                    <div class="form-group">
+                        <input asp-for="Input.ScopeName" class="form-control" placeholder="New scope name" />
+                        <span asp-validation-for="Input.ScopeName" class="text-danger"></span>
+                    </div>
+                    <button id="add-scope-button" type="submit" class="btn btn-default">Add</button>
+                </form>
+            </div>
+                @if (Model.PossibleResourceScopes != null)
+                {
+        <div class="row collapsable-tool">
+            <h4>Add existing resource scope</h4>
+            <ul class="nav nav-pills nav-stacked">
+                @foreach (var resourceScope in Model.PossibleResourceScopes)
+                {
+                    var icon = "edit-text";
+                    if (resourceScope.ResourceType == "API")
+                    {
+                        icon = "share";
+                    }
+
+                    <li class="ui-list-item">
+                        <a asp-page-handler="Add"
+                           asp-route-id="@Model.CurrentClient.ClientId"
+                           asp-route-scopeName="@resourceScope.Name">
+                                <div class="ui-icon left sketchpen-icon-basic-bg-light-32 @(icon)"></div>
+                            <div style_="padding:10px 15px 10px 5px">
+                                <strong>@(resourceScope.ResourceType):</strong>
+                                @resourceScope.Name
+                            </div>
+                            @if (!String.IsNullOrEmpty(resourceScope.DisplayName))
+                            {
+                                <div style="color:#aaa;font-size:.85em">
+                                    @resourceScope.DisplayName
+                                </div>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+            </div>
+            }
+        </div>
+</div>
