@@ -31,13 +31,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Clients
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.CaptchaRenderers", "src\IdentityServer.Nova.CaptchaRenderers\IdentityServer.Nova.CaptchaRenderers.csproj", "{313E4C0C-291A-440B-9524-0580A8FDC963}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "is-nova-libs", "is-nova-libs", "{5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "is4-libs", "is4-libs", "{5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4", "is-nova-libs\IdentityServer4\src\IdentityServer4.csproj", "{E55904B9-F8CC-48B6-89C2-051CEFEDA7F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4", "is4-libs\IdentityServer4\src\IdentityServer4.csproj", "{E55904B9-F8CC-48B6-89C2-051CEFEDA7F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.Storage", "is-nova-libs\Storage\src\IdentityServer4.Storage.csproj", "{151E620E-392C-495C-9D67-1EEAF8FFB07B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.Storage", "is4-libs\Storage\src\IdentityServer4.Storage.csproj", "{151E620E-392C-495C-9D67-1EEAF8FFB07B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.AspNetIdentity", "is-nova-libs\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj", "{07F59521-DCCD-4273-9513-8CC7DAA7DF94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.AspNetIdentity", "is4-libs\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj", "{07F59521-DCCD-4273-9513-8CC7DAA7DF94}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.LiteDb", "src\IdentityServer.Nova.LiteDb\IdentityServer.Nova.LiteDb.csproj", "{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF}"
 EndProject
@@ -53,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Abstrac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Models", "src\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj", "{9BE087FF-8991-4ACD-B3E3-894C3CD691A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Nova.Extensions.DependencyInjection", "src\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj", "{72926132-A7DA-4628-91D9-80E57A915945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Extensions.DependencyInjection", "src\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj", "{72926132-A7DA-4628-91D9-80E57A915945}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

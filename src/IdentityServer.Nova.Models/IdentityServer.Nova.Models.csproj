@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\is-nova-libs\Storage\src\IdentityServer4.Storage.csproj" />
+    <ProjectReference Include="..\..\is4-libs\Storage\src\IdentityServer4.Storage.csproj" />
   </ItemGroup>
 
 </Project>
