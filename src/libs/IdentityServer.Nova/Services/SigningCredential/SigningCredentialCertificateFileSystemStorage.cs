@@ -1,5 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.SigningCredential;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,22 +9,28 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Nova.Services.SigningCredential;
 
-public class SigningCredentialCertificateStorage : ISigningCredentialCertificateStorage
+public class SigningCredentialCertificateStorageOptions
 {
-    private readonly string _validationKeyStoragePath;
+    public string Storage { get; set; }
+    public string CertPassword { get; set; }
+}
+
+public class SigningCredentialCertificateFileSystemStorage : ISigningCredentialCertificateStorage
+{
+    private readonly SigningCredentialCertificateStorageOptions _options;
     private readonly ICertificateFactory _certificateFactory;
     private readonly ICertificateSerializer _certificateSerializer;
 
-    public SigningCredentialCertificateStorage(
-            IConfiguration configuration,
+    public SigningCredentialCertificateFileSystemStorage(
+            IOptions<SigningCredentialCertificateStorageOptions> options,
             ICertificateFactory certificateFactory,
             ICertificateSerializer certificateSerializer = null)
     {
-        _validationKeyStoragePath = configuration["SigningCredential:Storage"];
+        _options = options.Value;
         _certificateFactory = certificateFactory;
-        _certificateSerializer = certificateSerializer ?? new SimpleCertificateSerializer(configuration);
+        _certificateSerializer = certificateSerializer ?? new SimpleCertificateSerializer(_options);
 
-        var di = new DirectoryInfo(_validationKeyStoragePath);
+        var di = new DirectoryInfo(_options.Storage);
         if (!di.Exists)
         {
             di.Create();
@@ -38,7 +44,7 @@ public class SigningCredentialCertificateStorage : ISigningCredentialCertificate
 
     async public Task<IEnumerable<X509Certificate2>> GetCertificatesAsync()
     {
-        DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
+        DirectoryInfo di = new DirectoryInfo(_options.Storage);
         List<X509Certificate2> certs = new List<X509Certificate2>();
 
         foreach (var certFile in di.GetFiles("*.pfx")
@@ -53,7 +59,7 @@ public class SigningCredentialCertificateStorage : ISigningCredentialCertificate
 
     async public Task<X509Certificate2> GetRandomCertificateAsync(int maxAgeInDays)
     {
-        DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
+        DirectoryInfo di = new DirectoryInfo(_options.Storage);
         var certFiles = di.GetFiles("*.pfx")
                           .Where(f => f.CreationTime > DateTime.Now.AddDays(-maxAgeInDays))
                           .ToArray();
@@ -76,7 +82,7 @@ public class SigningCredentialCertificateStorage : ISigningCredentialCertificate
             }
         }
 
-        FileInfo certFile = new FileInfo($"{_validationKeyStoragePath}/{filename}.pfx");
+        FileInfo certFile = new FileInfo($"{_options.Storage}/{filename}.pfx");
         if (!certFile.Exists)
         {
             return null;
@@ -89,7 +95,7 @@ public class SigningCredentialCertificateStorage : ISigningCredentialCertificate
 
     async private Task UpdateValidationKeyStorageAsync(int ifOlderThanDays)
     {
-        DirectoryInfo di = new DirectoryInfo(_validationKeyStoragePath);
+        DirectoryInfo di = new DirectoryInfo(_options.Storage);
         if (!di.Exists)
         {
             di.Create();
@@ -114,7 +120,7 @@ public class SigningCredentialCertificateStorage : ISigningCredentialCertificate
 
             var cert = _certificateFactory.CreateNewX509Certificate(name, expireDays);
 
-            await _certificateSerializer.WriteToFileAsync($@"{_validationKeyStoragePath}/{name}.pfx", cert, X509ContentType.Pfx);
+            await _certificateSerializer.WriteToFileAsync($@"{_options.Storage}/{name}.pfx", cert, X509ContentType.Pfx);
         }
     }
 

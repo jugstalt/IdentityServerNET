@@ -11,9 +11,9 @@ public class SimpleCertificateSerializer : ICertificateSerializer
 {
     private readonly string _certPassword;
 
-    public SimpleCertificateSerializer(IConfiguration configuration)
+    public SimpleCertificateSerializer(SigningCredentialCertificateStorageOptions options)
     {
-        _certPassword = configuration["SigningCredential:CertPassword"];
+        _certPassword = options.CertPassword;
     }
 
     #region ICertificateSerializer

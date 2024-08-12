@@ -26,7 +26,7 @@ public class NovaHostingStartup : IHostingStartup
 
             //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
 
-            string novaAssemblyName = context.Configuration["NovaAssemblyName"];
+            string novaAssemblyName = context.Configuration["NovaAssemblyName"] ?? "IdentityServer.Nova.ServerExtension.Default";
             if (!String.IsNullOrWhiteSpace(novaAssemblyName))
             {
                 var novaAssembly = Assembly.LoadFrom($"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}/{novaAssemblyName}.dll");

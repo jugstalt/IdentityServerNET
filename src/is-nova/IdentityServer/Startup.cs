@@ -222,29 +222,38 @@ public class Startup
 
         services.AddTransient<ICertificateFactory, CertificateFactory>();
 
+        #region Register Certificate Store
+
         if (String.IsNullOrEmpty(Configuration["SigningCredential:Storage"]))
         {
             // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+            services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateInMemoryStorage>();
         }
         else
         {
-            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateStorage>();
-
-            #region Refresh Certificate Store and add SigningCredentials
-
-            var sp = services.BuildServiceProvider();
-            var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
-            signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
-            foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
+            services.Configure<SigningCredentialCertificateStorageOptions>(storageOptions =>
             {
-                builder.AddSigningCredential(cert);
-                //builder.AddValidationKey(cert);
-                //break;
-            }
-
-            #endregion
+                storageOptions.Storage = Configuration["SigningCredential:Storage"] ?? @"C:\temp\identityserver_nova\storage\validation";
+                storageOptions.CertPassword = Configuration["SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
+            });
+            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
         }
+
+        #region Refresh Certificate Store and add SigningCredentials
+
+        var sp = services.BuildServiceProvider();
+        var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
+        signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
+        foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
+        {
+            builder.AddSigningCredential(cert);
+            //builder.AddValidationKey(cert);
+            //break;
+        }
+
+        #endregion
+
+        #endregion
 
         services.AddTransient<IEmailSender, EmailSenderProxy>();
 
