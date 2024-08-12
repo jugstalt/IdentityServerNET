@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\is4-libs\Storage\src\IdentityServer4.Storage.csproj" />
+    <ProjectReference Include="..\..\libs-is4\Storage\src\IdentityServer4.Storage.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj" />
   </ItemGroup>
 

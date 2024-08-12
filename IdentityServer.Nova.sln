@@ -7,41 +7,41 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{63945976-BD2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clients", "clients", "{7644887B-8AE0-42F8-97E7-D85B43AF36CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp", "clients\ClientApp\ClientApp.csproj", "{CC55B759-A36B-4325-9678-94AAD5862659}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp", "src\clients\ClientApp\ClientApp.csproj", "{CC55B759-A36B-4325-9678-94AAD5862659}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApi", "clients\ClientApi\ClientApi.csproj", "{2F618A32-CCF2-4C49-AED8-92C4C1845039}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApi", "src\clients\ClientApi\ClientApi.csproj", "{2F618A32-CCF2-4C49-AED8-92C4C1845039}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientWeb", "clients\ClientWeb\ClientWeb.csproj", "{F303409E-CC0C-4981-A7E9-B7B964CA175A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientWeb", "src\clients\ClientWeb\ClientWeb.csproj", "{F303409E-CC0C-4981-A7E9-B7B964CA175A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "is-nova", "is-nova", "{43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "is-nova\IdentityServer\IdentityServer.csproj", "{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "src\is-nova\IdentityServer\IdentityServer.csproj", "{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova", "src\IdentityServer.Nova\IdentityServer.Nova.csproj", "{846E4ABE-5CBA-43B3-9593-C9692DEB9647}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova", "src\libs\IdentityServer.Nova\IdentityServer.Nova.csproj", "{846E4ABE-5CBA-43B3-9593-C9692DEB9647}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.MongoDb", "src\IdentityServer.Nova.MongoDb\IdentityServer.Nova.MongoDb.csproj", "{02AEB557-11B0-430C-98A7-3FB934D35B68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.MongoDb", "src\libs\IdentityServer.Nova.MongoDb\IdentityServer.Nova.MongoDb.csproj", "{02AEB557-11B0-430C-98A7-3FB934D35B68}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Azure", "src\IdentityServer.Nova.Azure\IdentityServer.Nova.Azure.csproj", "{1A265B1B-C54C-4E63-898B-69CFA7A22091}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Azure", "src\libs\IdentityServer.Nova.Azure\IdentityServer.Nova.Azure.csproj", "{1A265B1B-C54C-4E63-898B-69CFA7A22091}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Extensions", "src\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj", "{E2C14877-B80A-4C51-9273-E3A66FEFD823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Extensions", "src\libs\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj", "{E2C14877-B80A-4C51-9273-E3A66FEFD823}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Tools.CreateCert", "src\IdentityServer.Nova.Tools.CreateCert\IdentityServer.Nova.Tools.CreateCert.csproj", "{92A9AEF7-B91F-488B-8EDC-B14F257D0692}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Tools.CreateCert", "src\tools\IdentityServer.Nova.Tools.CreateCert\IdentityServer.Nova.Tools.CreateCert.csproj", "{92A9AEF7-B91F-488B-8EDC-B14F257D0692}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Clients", "src\IdentityServer.Nova.Clients\IdentityServer.Nova.Clients.csproj", "{4B738C15-EA7B-4976-AF5F-0FC19193DBF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Clients", "src\libs\IdentityServer.Nova.Clients\IdentityServer.Nova.Clients.csproj", "{4B738C15-EA7B-4976-AF5F-0FC19193DBF6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.CaptchaRenderers", "src\IdentityServer.Nova.CaptchaRenderers\IdentityServer.Nova.CaptchaRenderers.csproj", "{313E4C0C-291A-440B-9524-0580A8FDC963}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.CaptchaRenderers", "src\libs\IdentityServer.Nova.CaptchaRenderers\IdentityServer.Nova.CaptchaRenderers.csproj", "{313E4C0C-291A-440B-9524-0580A8FDC963}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "is4-libs", "is4-libs", "{5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs-is4", "libs-is4", "{5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4", "is4-libs\IdentityServer4\src\IdentityServer4.csproj", "{E55904B9-F8CC-48B6-89C2-051CEFEDA7F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4", "src\libs-is4\IdentityServer4\src\IdentityServer4.csproj", "{E55904B9-F8CC-48B6-89C2-051CEFEDA7F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.Storage", "is4-libs\Storage\src\IdentityServer4.Storage.csproj", "{151E620E-392C-495C-9D67-1EEAF8FFB07B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.Storage", "src\libs-is4\Storage\src\IdentityServer4.Storage.csproj", "{151E620E-392C-495C-9D67-1EEAF8FFB07B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.AspNetIdentity", "is4-libs\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj", "{07F59521-DCCD-4273-9513-8CC7DAA7DF94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.AspNetIdentity", "src\libs-is4\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj", "{07F59521-DCCD-4273-9513-8CC7DAA7DF94}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.LiteDb", "src\IdentityServer.Nova.LiteDb\IdentityServer.Nova.LiteDb.csproj", "{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.LiteDb", "src\libs\IdentityServer.Nova.LiteDb\IdentityServer.Nova.LiteDb.csproj", "{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.ServerExtension.Default", "src\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj", "{9837099B-A5FB-4CAC-AD6C-5C419D7A4319}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.ServerExtension.Default", "src\libs\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj", "{9837099B-A5FB-4CAC-AD6C-5C419D7A4319}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{1FF5F57D-A87B-4F01-846A-03CA77767B71}"
 	ProjectSection(SolutionItems) = preProject
@@ -49,11 +49,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{1FF5F57D-A
 		http\signing-request.http = http\signing-request.http
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Abstractions", "src\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj", "{A1EF539D-EBBE-476B-89C8-4E89078FAE1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Abstractions", "src\libs\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj", "{A1EF539D-EBBE-476B-89C8-4E89078FAE1B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Models", "src\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj", "{9BE087FF-8991-4ACD-B3E3-894C3CD691A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Models", "src\libs\IdentityServer.Nova.Models\IdentityServer.Nova.Models.csproj", "{9BE087FF-8991-4ACD-B3E3-894C3CD691A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Extensions.DependencyInjection", "src\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj", "{72926132-A7DA-4628-91D9-80E57A915945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Extensions.DependencyInjection", "src\libs\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj", "{72926132-A7DA-4628-91D9-80E57A915945}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{1A05E6FA-21A8-4D15-A795-E06D7DBB8F39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,25 +302,30 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{7644887B-8AE0-42F8-97E7-D85B43AF36CE} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{CC55B759-A36B-4325-9678-94AAD5862659} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
 		{2F618A32-CCF2-4C49-AED8-92C4C1845039} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
 		{F303409E-CC0C-4981-A7E9-B7B964CA175A} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
+		{43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA} = {43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1}
-		{846E4ABE-5CBA-43B3-9593-C9692DEB9647} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{02AEB557-11B0-430C-98A7-3FB934D35B68} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{1A265B1B-C54C-4E63-898B-69CFA7A22091} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{E2C14877-B80A-4C51-9273-E3A66FEFD823} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{92A9AEF7-B91F-488B-8EDC-B14F257D0692} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{4B738C15-EA7B-4976-AF5F-0FC19193DBF6} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{313E4C0C-291A-440B-9524-0580A8FDC963} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
+		{846E4ABE-5CBA-43B3-9593-C9692DEB9647} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{02AEB557-11B0-430C-98A7-3FB934D35B68} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{1A265B1B-C54C-4E63-898B-69CFA7A22091} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{E2C14877-B80A-4C51-9273-E3A66FEFD823} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{92A9AEF7-B91F-488B-8EDC-B14F257D0692} = {1A05E6FA-21A8-4D15-A795-E06D7DBB8F39}
+		{4B738C15-EA7B-4976-AF5F-0FC19193DBF6} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{313E4C0C-291A-440B-9524-0580A8FDC963} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{E55904B9-F8CC-48B6-89C2-051CEFEDA7F5} = {5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}
 		{151E620E-392C-495C-9D67-1EEAF8FFB07B} = {5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}
 		{07F59521-DCCD-4273-9513-8CC7DAA7DF94} = {5B804D2B-A7F3-463E-9B02-5B71DAE7A4FE}
-		{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{9837099B-A5FB-4CAC-AD6C-5C419D7A4319} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{A1EF539D-EBBE-476B-89C8-4E89078FAE1B} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{9BE087FF-8991-4ACD-B3E3-894C3CD691A5} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{72926132-A7DA-4628-91D9-80E57A915945} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
+		{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{9837099B-A5FB-4CAC-AD6C-5C419D7A4319} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{A1EF539D-EBBE-476B-89C8-4E89078FAE1B} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{9BE087FF-8991-4ACD-B3E3-894C3CD691A5} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{72926132-A7DA-4628-91D9-80E57A915945} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
+		{1A05E6FA-21A8-4D15-A795-E06D7DBB8F39} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6F7C9AB4-22C4-485D-BF3E-67CF94045749}

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova\IdentityServer.Nova.csproj" />
   </ItemGroup>
 
