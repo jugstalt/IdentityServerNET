@@ -1,4 +1,4 @@
-# IdentityServer.Legacy
+# IdentityServer.Nova
 
 Easily integrate IdentityServer4 (OpenId Connect) into existing (legacy) applications.
 
