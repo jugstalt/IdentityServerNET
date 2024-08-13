@@ -1,5 +1,6 @@
 ﻿using IdentityServer.Nova;
 using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ public class SetupService
 
     public SetupService(
             IConfiguration config,
+            ISigningCredentialCertificateStorage signingCredentialCertificateStorage,
             IUserDbContext userDb,
             IPasswordHasher<ApplicationUser> passwordHasher,
             IRoleDbContext roleDb = null,
@@ -24,6 +26,7 @@ public class SetupService
     {
         Console.WriteLine("################# Setup ##################");
 
+        LogInstance(signingCredentialCertificateStorage);
         LogInstance(userDb);
         LogInstance(roleDb);
         LogInstance(clientDb);

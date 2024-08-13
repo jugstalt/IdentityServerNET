@@ -347,3 +347,5 @@ _config/identityserver.legacy.json
 
 _config/
 *.jwk
+
+build/

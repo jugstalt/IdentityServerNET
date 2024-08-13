@@ -153,7 +153,7 @@ public class EnableAuthenticatorModel : ManageAccountPageModel
     {
         return string.Format(
             AuthenticatorUriFormat,
-            _urlEncoder.Encode(_userInterface?.ApplicationTitle ?? "IdentityServer"),
+            _urlEncoder.Encode(_userInterface?.ApplicationTitle ?? "IdentityServer.Nova"),
             _urlEncoder.Encode(email),
             unformattedKey);
     }

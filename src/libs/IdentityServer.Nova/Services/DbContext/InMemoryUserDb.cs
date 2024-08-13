@@ -69,9 +69,14 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
     public Task<ApplicationUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
+        if (String.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            return null;
+        }
+
         var user = _users.Values
             .ToArray()
-            .Where(u => u.Email.ToUpper() == normalizedEmail)
+            .Where(u => normalizedEmail.Equals(u.Email , StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
 
         return Task.FromResult(user);
@@ -89,9 +94,14 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
     public Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
+        if (String.IsNullOrWhiteSpace(normalizedUserName))
+        {
+            return null;
+        }
+
         var user = _users.Values
             .ToArray()
-            .Where(u => u.UserName.ToUpper() == normalizedUserName)
+            .Where(u => normalizedUserName.Equals(u.UserName, StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
 
         return Task.FromResult(user);
