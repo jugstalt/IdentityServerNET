@@ -11,6 +11,7 @@ Welcome to identityserver.nova's documentation!
    :caption: Contents:
 
    getting-started/index
+   clients/index
 
 
 
