@@ -4,24 +4,28 @@ Web Anwendung
 Client erstellen/bearbeiten
 ---------------------------
 
-Um einen neuen *Client* zu erstellen, muss eine eindeutige *Client Id* vergeben werden. Optional kann auch ein sprechender Name vergeben werden.
+Um einen neuen *Client* zu erstellen, muss eine eindeutige *Client Id* vergeben werden. 
+Optional kann auch ein sprechender Name vergeben werden.
 
-Damit nicht alles manuelle eingegeben werden muss, sollte als Template ``WebApplication`` eingetragen werden. Außerdem sollte für diesem Template 
-die Url zur Web Anwendung eingetragen werden. Die Eingabe der **Scopes** ist optional. Diese können auch im nächsten Schritt noch bearbeitet werden.
+Damit nicht alles manuelle eingegeben werden muss, sollte als Template ``WebApplication`` eingetragen 
+werden. Außerdem sollte für diesem Template 
+die Url zur Web Anwendung eingetragen werden. Die Eingabe der **Scopes** ist optional. Diese können 
+auch im nächsten Schritt noch bearbeitet werden.
 
 Mit ``Create new client...`` wird der neue Client erzeugt:
 
 .. image:: img/webapp1.png
 
-Wurde der Client erfolgreich erzeugt, kommt man zur Seite ``Modify Client: ...``. Hier sind die unterschiedlichen Eigenschaften für den Client in 
-Menüpunkten gegliedert:
+Wurde der Client erfolgreich erzeugt, kommt man zur Seite ``Modify Client: ...``. Hier sind die 
+unterschiedlichen Eigenschaften für den Client in Menüpunkten gegliedert:
 
 ``Name``:
 +++++++++
 
 .. image:: img/webapp2.png
 
-Hier kann der sprechende Name für den Client verändert werden. Außerdem kann eine Beschreibung für den Client eingetragen werden.
+Hier kann der sprechende Name für den Client verändert werden. Außerdem kann eine Beschreibung 
+für den Client eingetragen werden.
 
 ``Client Secrets``:
 +++++++++++++++++++

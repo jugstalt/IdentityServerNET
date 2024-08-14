@@ -2,6 +2,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace IdentityServer.Nova.Models.IdentityServerWrappers;
 
@@ -18,10 +21,13 @@ public class ScopeModel
     public string Name { get; set; }
 
     [JsonProperty("DisplayName")]
+    [DisplayName("Display Name")]
     public string DisplayName { get; set; }
 
     [JsonProperty("Description")]
-    public string Description { get; set; }
+    [DisplayName("Description")]
+    [Required(AllowEmptyStrings = true)]
+    public string Description { get; set; } = "";
 
     [JsonProperty("Required")]
     public bool Required { get; set; }
