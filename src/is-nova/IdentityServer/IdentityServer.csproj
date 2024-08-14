@@ -26,9 +26,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\libs-is4\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj" />
     <ProjectReference Include="..\..\libs-is4\IdentityServer4\src\IdentityServer4.csproj" />
-    <ProjectReference Include="..\..\libs\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova\IdentityServer.Nova.csproj" />
+    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
   </ItemGroup>
   
   <ItemGroup>

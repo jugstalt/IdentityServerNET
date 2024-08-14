@@ -105,14 +105,18 @@ public class ClientsModel : AdminPageModel
 
                         if (!String.IsNullOrWhiteSpace(Input.ClientUrl))
                         {
-                            client.RedirectUris = new[]
+                            try
                             {
-                                Input.ClientUrl+"/signin-oidc"
-                            };
-                            client.PostLogoutRedirectUris = new[]
-                            {
-                                Input.ClientUrl+"/signout-callback-oidc"
-                            };
+                                client.RedirectUris = new[]
+                                {
+                                    Input.ClientUrl = new Uri(new Uri(Input.ClientUrl), "signin-oidc").ToString()
+                                };
+                                client.PostLogoutRedirectUris = new[]
+                                {
+                                    Input.ClientUrl = new Uri(new Uri(Input.ClientUrl), "signout-callback-oidc").ToString()
+                                };
+                            }
+                            catch { }
                         }
 
 

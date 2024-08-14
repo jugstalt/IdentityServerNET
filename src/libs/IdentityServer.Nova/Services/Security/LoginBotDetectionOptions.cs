@@ -6,7 +6,7 @@ public class LoginBotDetectionOptions
     {
         MaxFailCount = 3;
         RembemberSuspiciousUserTotalMinutes = 60;
-        CaptchaCodeLength = 4;
+        CaptchaCodeLength = 6;
         BlockSuspiciousUserSeconds = 5;
         CaptchaCodeLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }

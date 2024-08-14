@@ -4,7 +4,7 @@ public class CaptchaCodeRendererOptions
 {
     public CaptchaCodeRendererOptions()
     {
-        Width = 200;
+        Width = 320;
         Height = 60;
 
         BackgroundType =

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.Security;
+using IdentityServer.Nova.Exceptions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -105,7 +106,7 @@ public class LoginBotDetection : ILoginBotDetection
     {
         if (_suspiciousUserBlocks.ContainsKey(username) && (DateTime.UtcNow - _suspiciousUserBlocks[username]).TotalSeconds < _options.BlockSuspiciousUserSeconds)
         {
-            throw new Exception("Suspicous bot request detected");
+            throw new StatusMessageException("Suspicous bot request detected");
         }
 
         _suspiciousUserBlocks.TryAdd(username, DateTime.UtcNow);

@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\IdentityServer.Nova.Clients\IdentityServer.Nova.Clients.csproj" />
-    <ProjectReference Include="..\..\libs\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
+    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Clients\IdentityServer.Nova.Clients.csproj" />
+    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,9 +3,10 @@
 
 
 using IdentityModel;
-using IdentityServer.Nova;
-using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Abstractions.Security;
+using IdentityServer.Nova.Exceptions;
+using IdentityServer.Nova.Extensions;
+using IdentityServer.Nova.Models;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
@@ -17,11 +18,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using IdentityServer.Nova.Extensions;
 
 namespace IdentityServer;
 
@@ -34,6 +35,7 @@ namespace IdentityServer;
 [AllowAnonymous]
 public class AccountController : Controller
 {
+    private readonly ILogger<AccountController> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IIdentityServerInteractionService _interaction;
@@ -45,6 +47,7 @@ public class AccountController : Controller
     private readonly IConfiguration _configuration;
 
     public AccountController(
+        ILogger<AccountController> logger,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IIdentityServerInteractionService interaction,
@@ -55,6 +58,8 @@ public class AccountController : Controller
         ILoginBotDetection loginBotDetetion = null,
         ICaptchCodeRenderer captchaCodeRenderer = null)
     {
+        _logger = logger;
+
         _userManager = userManager;
         _signInManager = signInManager;
 
@@ -129,118 +134,131 @@ public class AccountController : Controller
 
         if (ModelState.IsValid)
         {
-            bool suspicous = false;
-            if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
+            try
             {
-                await _loginBotDetection.BlockSuspicousUser(model.Username);
-
-                if (_captchaCodeRenderer != null)
+                bool suspicous = false;
+                if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                 {
-                    if (!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
+                    await _loginBotDetection.BlockSuspicousUser(model.Username);
+
+                    if (_captchaCodeRenderer != null)
                     {
-                        suspicous = true;
+                        if (!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
+                        {
+                            suspicous = true;
+                        }
                     }
                 }
-            }
 
-            var result = suspicous == true ?
-                Microsoft.AspNetCore.Identity.SignInResult.Failed :
-                await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var result = suspicous == true ?
+                    Microsoft.AspNetCore.Identity.SignInResult.Failed :
+                    await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
 
-            if (result.Succeeded)
-            {
-                var user = await _userManager.FindByNameAsync(model.Username);
-                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+                if (result.Succeeded)
+                {
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
-                // only set explicit expiration here if user chooses "remember me". 
-                // otherwise we rely upon expiration configured in cookie middleware.
-                //AuthenticationProperties props = null;
-                //if (AccountOptions.AllowRememberLogin && model.RememberLogin)
-                //{
-                //    props = new AuthenticationProperties
-                //    {
-                //        IsPersistent = true,
-                //        ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
-                //    };
-                //};
+                    // only set explicit expiration here if user chooses "remember me". 
+                    // otherwise we rely upon expiration configured in cookie middleware.
+                    //AuthenticationProperties props = null;
+                    //if (AccountOptions.AllowRememberLogin && model.RememberLogin)
+                    //{
+                    //    props = new AuthenticationProperties
+                    //    {
+                    //        IsPersistent = true,
+                    //        ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
+                    //    };
+                    //};
 
-                // issue authentication cookie with subject ID and username
-                //var isuser = new IdentityServerUser(user.SubjectId)
-                //{
-                //    DisplayName = user.Username
-                //};
+                    // issue authentication cookie with subject ID and username
+                    //var isuser = new IdentityServerUser(user.SubjectId)
+                    //{
+                    //    DisplayName = user.Username
+                    //};
 
-                //await HttpContext.SignInAsync(isuser, props);
+                    //await HttpContext.SignInAsync(isuser, props);
+
+                    if (_loginBotDetection != null)
+                    {
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                    }
+
+                    if (context != null)
+                    {
+                        if (context.IsNativeClient())
+                        {
+                            // if the client is PKCE then we assume it's native, so this change in how to
+                            // return the response is for better UX for the end user.
+                            return this.LoadingPage("Redirect", model.ReturnUrl);
+                        }
+
+                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                        return Redirect(model.ReturnUrl);
+                    }
+
+                    // request for a local page
+                    if (Url.IsLocalUrl(model.ReturnUrl))
+                    {
+                        return Redirect(model.ReturnUrl);
+                    }
+                    else if (string.IsNullOrEmpty(model.ReturnUrl))
+                    {
+                        return Redirect("~/");
+                    }
+                    else
+                    {
+                        // user might have clicked on a malicious link - should be logged
+                        throw new Exception("invalid return URL");
+                    }
+                }
+                else if (result.RequiresTwoFactor)
+                {
+                    if (_loginBotDetection != null)
+                    {
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                    }
+
+                    string twoFactorUrl = "~/Identity/Account/LoginWith2fa?ReturnUrl={0}";
+                    if (context != null || Url.IsLocalUrl(model.ReturnUrl))
+                    {
+                        return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode(model.ReturnUrl)));
+                    }
+                    else
+                    {
+                        return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode("~/")));
+                    }
+                }
 
                 if (_loginBotDetection != null)
                 {
-                    await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
-                }
-
-                if (context != null)
-                {
-                    if (context.IsNativeClient())
+                    string captcaCode = await _loginBotDetection.AddSuspicousUserAndGenerateCaptchaCodeAsync(model.Username);
+                    if (await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                     {
-                        // if the client is PKCE then we assume it's native, so this change in how to
-                        // return the response is for better UX for the end user.
-                        return this.LoadingPage("Redirect", model.ReturnUrl);
-                    }
+                        if (!String.IsNullOrEmpty(captcaCode) && _captchaCodeRenderer != null)
+                        {
+                            byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
+                            model.CaptchaImage = captchaImageBytes;
 
-                    // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                    return Redirect(model.ReturnUrl);
-                }
-
-                // request for a local page
-                if (Url.IsLocalUrl(model.ReturnUrl))
-                {
-                    return Redirect(model.ReturnUrl);
-                }
-                else if (string.IsNullOrEmpty(model.ReturnUrl))
-                {
-                    return Redirect("~/");
-                }
-                else
-                {
-                    // user might have clicked on a malicious link - should be logged
-                    throw new Exception("invalid return URL");
-                }
-            }
-            else if (result.RequiresTwoFactor)
-            {
-                if (_loginBotDetection != null)
-                {
-                    await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
-                }
-
-                string twoFactorUrl = "~/Identity/Account/LoginWith2fa?ReturnUrl={0}";
-                if (context != null || Url.IsLocalUrl(model.ReturnUrl))
-                {
-                    return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode(model.ReturnUrl)));
-                }
-                else
-                {
-                    return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode("~/")));
-                }
-            }
-
-            if (_loginBotDetection != null)
-            {
-                string captcaCode = await _loginBotDetection.AddSuspicousUserAndGenerateCaptchaCodeAsync(model.Username);
-                if (await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
-                {
-                    if (!String.IsNullOrEmpty(captcaCode) && _captchaCodeRenderer != null)
-                    {
-                        byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
-                        model.CaptchaImage = captchaImageBytes;
-
-                        this.Response.Headers.Append("Content-Security-Policy",
-                                         "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+                            this.Response.Headers.Append("Content-Security-Policy",
+                                             "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+                        }
                     }
                 }
-            }
 
-            await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
-            ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
+                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+            }
+            catch (StatusMessageException sme)
+            {
+                ModelState.AddModelError(string.Empty, sme.Message);
+                _logger.LogError("Warning on login: {message}", sme.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Sorry, something went wrong...");
+                _logger.LogError("Error on login: {message}", ex.Message);
+            }
         }
 
         // something went wrong, show form with error
