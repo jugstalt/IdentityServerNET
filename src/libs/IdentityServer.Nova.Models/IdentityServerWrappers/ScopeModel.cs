@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 
 namespace IdentityServer.Nova.Models.IdentityServerWrappers;
 
@@ -18,6 +17,7 @@ public class ScopeModel
     }
 
     [JsonProperty("Name")]
+    [Required]
     public string Name { get; set; }
 
     [JsonProperty("DisplayName")]
@@ -26,7 +26,6 @@ public class ScopeModel
 
     [JsonProperty("Description")]
     [DisplayName("Description")]
-    [Required(AllowEmptyStrings = true)]
     public string Description { get; set; } = "";
 
     [JsonProperty("Required")]

@@ -2,8 +2,11 @@ using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Exceptions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,7 +29,10 @@ public class ScopesModel : EditApiResourcePageModel
             ApiName = CurrentApiResource.Name,
             Scope = String.IsNullOrWhiteSpace(scopeName) ?
                         null :
-                        CurrentApiResource.Scopes.Where(s => s.Name == scopeName).FirstOrDefault()
+                        CurrentApiResource
+                            .Scopes
+                            .Where(s => s.Name == scopeName)
+                            .FirstOrDefault()
         };
 
         return Page();
@@ -59,32 +65,23 @@ public class ScopesModel : EditApiResourcePageModel
         {
             await LoadCurrentApiResourceAsync(Input.ApiName);
 
-            bool checkNameConvention = true;
-            if (Input.Scope.Name != null && Input.Scope.Name.StartsWith("@@"))
-            {
-                Input.Scope.Name = Input.Scope.Name.Substring(2);
-                checkNameConvention = false;
-            }
+            string resoucePrefix = $"{this.CurrentApiResource.Name}.";
 
-            if (String.IsNullOrWhiteSpace(Input.Scope?.Name) ||
-               Input.Scope.Name.Trim().Length < 3)
+            Input.Scope.Name = Input.Scope.Name switch
             {
-                throw new StatusMessageException("Invalid scope name: min. 3 letters, mumbers, . - _");
-            }
+                string str when str.StartsWith("@@") => str.Substring(2),
+                string str when str.StartsWith(resoucePrefix) => str,
+                string str when str.Equals(this.CurrentApiResource?.Name) => this.CurrentApiResource?.Name,
+                _ => $"{resoucePrefix}{Input.Scope.Name}"
+            };
 
             var regEx = new Regex(@"^[a-z0-9_\-\.]+$");
-            if (!regEx.IsMatch(Input.Scope.Name))
-            {
-                throw new StatusMessageException("Invalid scope name: Only lowercase letters, numbers,-,_,.");
-            }
 
-            if (checkNameConvention)
+            if (String.IsNullOrWhiteSpace(Input.Scope?.Name) ||
+               Input.Scope.Name.Trim().Length < 3 ||
+               !regEx.IsMatch(Input.Scope.Name))
             {
-                if (Input.Scope.Name != this.CurrentApiResource.Name &&
-                   !Input.Scope.Name.StartsWith(this.CurrentApiResource.Name + "."))
-                {
-                    throw new StatusMessageException($"Bad name convention: Scope names for this API resource shold start with '{CurrentApiResource.Name}.'. If you want to overrule this convonention, type @@ befor your scope name...");
-                }
+                throw new StatusMessageException("Invalid scope name: min. 3 letters, mumbers, . - _");
             }
 
             string scopeName = Input.Scope?.Name?.Trim().ToLower();
