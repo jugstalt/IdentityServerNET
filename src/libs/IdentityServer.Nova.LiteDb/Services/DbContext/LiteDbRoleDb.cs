@@ -24,13 +24,8 @@ public class LiteDbRoleDb : IRoleDbContext, IAdminRoleDbContext
 
     public LiteDbRoleDb(IOptions<UserDbContextConfiguration> options)
     {
-        if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
-        {
-            throw new ArgumentException("LiteDbUserDb: no connection string defined");
-        }
-
         _config = options.Value;
-        _connectionString = _config.ConnectionString;
+        _connectionString = _config.ConnectionString.EnsureLiteDbParentDirectoryCreated();
         _cryptoService = _config.CryptoService ?? new Base64CryptoService();
         _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
     }

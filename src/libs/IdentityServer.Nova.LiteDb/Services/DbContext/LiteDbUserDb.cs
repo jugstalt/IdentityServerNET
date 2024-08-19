@@ -26,13 +26,8 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     public LiteDbUserDb(IOptions<UserDbContextConfiguration> options)
     {
-        if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
-        {
-            throw new ArgumentException("LiteDbUserDb: no connection string defined");
-        }
-
         _config = options.Value;
-        _connectionString = _config.ConnectionString;
+        _connectionString = _config.ConnectionString.EnsureLiteDbParentDirectoryCreated();
         _cryptoService = _config.CryptoService ?? new Base64CryptoService();
         _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
     }
@@ -152,23 +147,26 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     public Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
     {
-        using (var db = new LiteDatabase(_connectionString))
+        try
         {
-            var collection = db.GetBlobDocumentCollection(UsersCollectionName);
-
-            ObjectId userObjectId = new ObjectId(userId);
-            var blob = collection.FindById(userObjectId);
-
-            if (blob != null)
+            using (var db = new LiteDatabase(_connectionString))
             {
-                return Task.FromResult<ApplicationUser?>(
-                        _blobSerializer.DeserializeObject<ApplicationUser>(
-                        _cryptoService.DecryptText(blob.BlobData))
-                    );
-            }
+                var collection = db.GetBlobDocumentCollection(UsersCollectionName);
 
-            return Task.FromResult<ApplicationUser?>(null);
-        }
+                ObjectId userObjectId = new ObjectId(userId);
+                var blob = collection.FindById(userObjectId);
+
+                if (blob != null)
+                {
+                    return Task.FromResult<ApplicationUser?>(
+                            _blobSerializer.DeserializeObject<ApplicationUser>(
+                            _cryptoService.DecryptText(blob.BlobData))
+                        );
+                }
+            }
+        } catch {   }
+
+        return Task.FromResult<ApplicationUser?>(null);
     }
 
     public Task<ApplicationUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)

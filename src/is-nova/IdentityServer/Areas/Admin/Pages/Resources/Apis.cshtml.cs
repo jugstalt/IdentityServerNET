@@ -40,7 +40,14 @@ public class ApisModel : AdminPageModel
         {
             if (_resourceDb != null)
             {
-                var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName);
+                var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName)
+                {
+                    Scopes = [
+                             new ScopeModel() { Name = apiName },
+                             new ScopeModel() { Name = $"{apiName}.query" },
+                             new ScopeModel() { Name = $"{apiName}.command" }
+                             ]
+                };
 
                 await _resourceDb.AddApiResourceAsync(apiResource);
             }

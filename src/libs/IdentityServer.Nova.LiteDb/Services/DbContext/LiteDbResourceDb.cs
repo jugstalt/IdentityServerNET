@@ -23,12 +23,7 @@ public class LiteDbResourceDb : IResourceDbContextModify
 
     public LiteDbResourceDb(IOptions<ResourceDbContextConfiguration> options)
     {
-        if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
-        {
-            throw new ArgumentException("FileBlobResourceDb: no connection string defined");
-        }
-
-        _connectionString = options.Value.ConnectionString;
+        _connectionString = options.Value.ConnectionString.EnsureLiteDbParentDirectoryCreated();
         _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
         _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
     }
