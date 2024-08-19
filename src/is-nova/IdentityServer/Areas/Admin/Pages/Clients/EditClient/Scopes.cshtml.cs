@@ -27,15 +27,21 @@ public class ScopesModel : EditClientPageModel
         List<ResourceScope> resourceScopes = new List<ResourceScope>();
         if (_resourceDb != null)
         {
-            var identityResources = await _resourceDb.GetAllIdentityResources();
-            var apiResources = await _resourceDb.GetAllApiResources();
+            var identityResources = this.CurrentClient.AllowedGrantTypes.Contains("authorization_code")
+                ? await _resourceDb.GetAllIdentityResources()
+                : null;
 
-            IdentityResourceScopes = identityResources?.Select(s => s.Name).ToArray() ?? new string[0];
+            var apiResources = this.CurrentClient.AllowedGrantTypes.Contains("client_credentials")
+                ? await _resourceDb.GetAllApiResources()
+                : null;
+
+            IdentityResourceScopes = identityResources?
+                .Select(s => s.Name)
+                .ToArray() ?? new string[0];
             ApiResouceScopes = apiResources?
                 .Where(m => m.Scopes != null)
                 .SelectMany(m => m.Scopes.Select(s => s.Name))
-                .ToArray() ??
-                new string[0];
+                .ToArray() ?? new string[0];
 
             if (identityResources != null)
             {

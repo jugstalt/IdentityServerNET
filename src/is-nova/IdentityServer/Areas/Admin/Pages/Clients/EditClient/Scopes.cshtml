@@ -58,11 +58,11 @@
             <ul class="nav nav-pills nav-stacked">
                 @foreach (var resourceScope in Model.PossibleResourceScopes)
                 {
-                    var icon = "edit-text";
-                    if (resourceScope.ResourceType == "API")
+                    var icon = resourceScope.ResourceType switch
                     {
-                        icon = "share";
-                    }
+                        "API" => "share",
+                        _ => "edit-text"
+                    };
 
                     <li class="ui-list-item">
                         <a asp-page-handler="Add"
