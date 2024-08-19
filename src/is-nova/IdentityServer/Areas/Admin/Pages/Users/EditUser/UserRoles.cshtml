@@ -4,6 +4,7 @@
     ViewData["Title"] = "User Roles";
     ViewData["ActivePage"] = EditUserNavPages.UserRoles;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
 <div class="row">
@@ -13,7 +14,7 @@
             @foreach (var roleName in Model.CurrentApplicationUser.Roles ?? [])
             {
                 <li class="ui-list-item" style="position:relative">
-                    <div class="ui-icon left sketchpen-icon-basic-bg-light-32 group"></div>
+                    <div class="@ColorScheme.LeftIcon("group")"></div>
                     <div style="display:inline-block;padding:10px 15px 10px 5px">@(roleName)</div>
                     @if (Model.IsRoleAdministrator)
                     {
@@ -38,7 +39,7 @@
                 @foreach (var role in Model.AddableRoles)
                 {
                 <li class="ui-list-item" style="position:relative;height:50px">
-                    <div class="ui-icon left sketchpen-icon-basic-bg-light-32 group"></div>
+                    <div class="@ColorScheme.LeftIcon("group")"></div>
                     <div style="">@(role.Name)</div>
                     <div style="color:#aaa">@(role.Description)</div>
                     @if (Model.IsRoleAdministrator)

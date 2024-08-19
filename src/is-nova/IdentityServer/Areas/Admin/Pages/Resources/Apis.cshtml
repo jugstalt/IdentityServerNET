@@ -4,6 +4,7 @@
     ViewData["Title"] = "API Resources";
     ViewData["ActivePage"] = ResourcesNavPages.Apis;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -19,7 +20,7 @@
                         <a style="padding-left:4px"
                            asp-page="./EditApi/Index"
                            asp-route-id="@apiResource.Name">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 share"></div>
+                            <div class="@ColorScheme.LeftIcon("share")"></div>
                             <div><strong>@apiResource.Name</strong></div>
                             <div>@apiResource.DisplayName</div>
                         </a>

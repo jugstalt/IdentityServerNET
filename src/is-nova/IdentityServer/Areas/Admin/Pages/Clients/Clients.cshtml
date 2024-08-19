@@ -4,6 +4,7 @@
     ViewData["Title"] = "Clients";
     ViewData["ActivePage"] = ClientsNavPages.Clients;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -19,7 +20,7 @@
                         <a style="padding-left:4px"
                            asp-page="./EditClient/Index"
                            asp-route-id="@client.ClientId">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 all-devices"></div>
+                            <div class="@ColorScheme.LeftIcon("all-devices")"></div>
                             <div><strong>@client.ClientId</strong></div>
                             <div>@client.ClientName</div>
                             @if (!String.IsNullOrWhiteSpace(client.Description))

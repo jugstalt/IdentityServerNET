@@ -2,6 +2,7 @@
 @model IdentityServer.Areas.Admin.Pages.SecretsVault.IndexModel
 @{
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 
     <div class="row">
@@ -14,7 +15,7 @@
                         <li class="ui-list-item">
                             <a asp-page="EditLocker/Index"
                                asp-route-id="@locker.Name">
-                                <div class="ui-icon left sketchpen-icon-basic-bg-light-32 lock-closed"></div>
+                                <div class="@ColorScheme.LeftIcon("lock-closed")"></div>
                                 <strong>@locker.Name</strong>
                                 <div>
                                     @locker.Description

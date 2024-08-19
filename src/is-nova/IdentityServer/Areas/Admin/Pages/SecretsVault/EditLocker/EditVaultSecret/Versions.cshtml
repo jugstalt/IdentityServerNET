@@ -4,6 +4,7 @@
     ViewData["Title"] = "Versions";
     ViewData["ActivePage"] = EditVaultSecretNavPages.Versions;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
     
     <div class="row">
@@ -17,7 +18,7 @@
                    @foreach (var secretVersion in Model.VaultSecretVersions.OrderByDescending(s => s.VersionTimeStamp))
                    {
                     <li class="ui-list-item" style="min-height:50px;position:relative">
-                        <div class="ui-icon left sketchpen-icon-basic-bg-light-32 code-c"></div>
+                        <div class="@ColorScheme.LeftIcon("code-c")"></div>
                         <div style="display:inline-block;padding:10px 15px 10px 5px">
                             @($"{ new DateTime(secretVersion.VersionTimeStamp, DateTimeKind.Utc).ToLocalTime().ToShortDateString() } { new DateTime(secretVersion.VersionTimeStamp, DateTimeKind.Utc).ToLocalTime().ToLongTimeString() }")
                         </div>

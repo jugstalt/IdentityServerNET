@@ -5,6 +5,7 @@
 @{
     var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <h2>IdentityServer.Nova</h2>
 <h4>OpenId Connect as a Service</h4>
@@ -24,7 +25,7 @@
                 {
                     <li class="ui-tile">
                         <a href="~/account/login">
-                            <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 account-login">
+                            <div class="@ColorScheme.TileIcon("account-login")">
 
                             </div>
                             <div class="ui-tile-text ">
@@ -39,7 +40,7 @@
 
                     <li class="ui-tile">
                         <a href="~/grants">
-                            <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 bookmark">
+                            <div class="@ColorScheme.TileIcon("bookmark")">
 
                             </div>
                             <div class="ui-tile-text ">
@@ -52,7 +53,7 @@
                     {
                         <li class="ui-tile">
                             <a href="~/identity/account/manage">
-                                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 account">
+                                <div class="@ColorScheme.TileIcon("account")">
 
                                 </div>
                                 <div class="ui-tile-text ">
@@ -64,7 +65,7 @@
 
                     <li class="ui-tile">
                         <a href="~/account/logout">
-                            <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 account-logout">
+                            <div class="@ColorScheme.TileIcon("account-logout")">
 
                             </div>
                             <div class="ui-tile-text ">
@@ -77,7 +78,7 @@
                     {
                         <li class="ui-tile">
                             <a href="~/admin">
-                                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 admin">
+                                <div class="@ColorScheme.TileIcon("admin")">
 
                                 </div>
                                 <div class="ui-tile-text ">

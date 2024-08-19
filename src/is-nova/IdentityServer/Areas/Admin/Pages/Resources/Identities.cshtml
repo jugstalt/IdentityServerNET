@@ -4,6 +4,7 @@
     ViewData["Title"] = "API Resources";
     ViewData["ActivePage"] = ResourcesNavPages.Identities;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -19,7 +20,7 @@
                         <a style="padding-left:4px"
                            asp-page="./EditIdentity/Index"
                            asp-route-id="@identityResource.Name">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 edit-text"></div>
+                            <div class="@ColorScheme.LeftIcon("edit-text")"></div>
                             <div><strong>@identityResource.Name</strong></div>
                             <div>@identityResource.DisplayName</div>
                         </a>

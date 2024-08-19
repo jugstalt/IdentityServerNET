@@ -255,11 +255,11 @@ public class Startup
 
         #endregion
 
-        services.AddTransient<IEmailSender, EmailSenderProxy>();
-
-        services.AddScoped<CustomTokenService>();
-
-        services.AddTransient<SetupService>();
+        services
+            .AddTransient<IEmailSender, EmailSenderProxy>()
+            .AddScoped<CustomTokenService>()
+            .AddTransient<SetupService>()
+            .AddColorSchemeService();
     }
 
     public void Configure(

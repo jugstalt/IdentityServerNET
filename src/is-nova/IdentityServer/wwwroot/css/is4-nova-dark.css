@@ -1,0 +1,24 @@
+﻿body.colorscheme-dark {
+    background-color:#222;
+    color:#eee;
+}
+
+.colorscheme-dark  .navbar-inverse {
+    border-color: #0094ff;
+    background-color: #000;
+}
+
+.colorscheme-dark .navbar-fixed-top {
+    border-width: 0px;
+}
+
+.colorscheme-dark ul.ui-tiles a:hover,
+.colorscheme-dark a:focus {
+    color: #23527c;
+    background-color: #3f3f3f;
+}
+
+.colorscheme-dark ul.ui-tiles li.ui-tile {
+    border: 1px solid #3c3c3c;
+    background-color: #333;
+}

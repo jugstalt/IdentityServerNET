@@ -5,6 +5,8 @@
     ViewData["ActivePage"] = EditClientNavPages.Scopes;
 }
 
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
+
     
     <div class="row">
         <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -26,7 +28,7 @@
                             icon = "share";
                         }
                         <li class="ui-list-item">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 @icon"></div>
+                            <div class="@ColorScheme.LeftIcon(icon)"></div>
                             <div style="display:inline-block;padding:10px 15px 10px 5px">@(scope)</div>
                             <a style="display:inline-block;float:right"
                                asp-page-handler="Remove"
@@ -68,7 +70,7 @@
                         <a asp-page-handler="Add"
                            asp-route-id="@Model.CurrentClient.ClientId"
                            asp-route-scopeName="@resourceScope.Name">
-                                <div class="ui-icon left sketchpen-icon-basic-bg-light-32 @(icon)"></div>
+                                <div class="@ColorScheme.LeftIcon(icon)"></div>
                             <div style_="padding:10px 15px 10px 5px">
                                 <strong>@(resourceScope.ResourceType):</strong>
                                 @resourceScope.Name

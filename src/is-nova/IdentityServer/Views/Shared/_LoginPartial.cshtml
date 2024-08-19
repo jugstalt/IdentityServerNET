@@ -6,13 +6,14 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 @if (SignInManager.IsSignedIn(User))
 {
         <ul class="nav navbar-nav navbar-right">
             <li>
                 <a href="~/Home/Index" title="Manage">
-                    <div class="nav-icon sketchpen-icon-basic-bg-light-16 home"></div>
+                    <div class="@ColorScheme.NavIcon("home")"></div>
                     Home
                 </a>
             </li>
@@ -20,21 +21,21 @@
                 @if (Configuration.DenyManageAccount())
                 {
                     <a href="~/Home/Index" title="Manage">
-                        <div class="nav-icon sketchpen-icon-basic-bg-light-16 account"></div>
+                        <div class="@ColorScheme.NavIcon("account")"></div>
                         Hello @UserManager.GetUserName(User)!
                     </a>
                 }
                 else
                 {
                     <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                        <div class="nav-icon sketchpen-icon-basic-bg-light-16 account"></div>
+                        <div class="@ColorScheme.NavIcon("account")"></div>
                         Account: @UserManager.GetUserName(User)
                     </a>
                 }
             </li>
             <li>
                 <a href="~/Account/Logout" title="Logout">
-                    <div class="nav-icon sketchpen-icon-basic-bg-light-16 account-logout"></div>
+                    <div class="@ColorScheme.NavIcon("account-logout")"></div>
                     Logout
                 </a>
             </li>

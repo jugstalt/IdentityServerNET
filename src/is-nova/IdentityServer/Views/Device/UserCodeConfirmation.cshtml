@@ -1,4 +1,5 @@
 @model  IdentityServer.Device.DeviceAuthorizationViewModel
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <div class="page-device-confirmation">
     <div class="lead">
@@ -32,7 +33,7 @@
                     <div class="form-group">
                         <div class="card">
                             <div class="card-header">
-                                <span class="sketchpen-icon-basic-bg-light-32 account"></span>
+                                <span class="@ColorScheme.Icon("account")"></span>
                                 Personal Information
                             </div>
                             <ul class="list-group list-group-flush">

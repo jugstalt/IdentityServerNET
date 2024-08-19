@@ -2,6 +2,7 @@
 @model IdentityServer.Areas.Admin.Pages.Users.IndexModel
 @{
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 <div class="row">
     @if (Model.ApplicationUsers != null)
@@ -14,7 +15,7 @@
                     <li class="ui-list-item">
                         <a asp-page="EditUser/Index"
                            asp-route-id="@user.Id">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 account"></div>
+                            <div class="@ColorScheme.LeftIcon("account")"></div>
                             <strong>@user.UserName</strong>
                             <div>
                                 @user.Claims.Where(c => c.Type == "given_name").FirstOrDefault()?.Value

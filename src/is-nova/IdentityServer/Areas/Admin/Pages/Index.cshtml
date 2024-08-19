@@ -3,6 +3,7 @@
 @using IdentityServer.Nova.Extensions
 @using Microsoft.Extensions.Configuration  
 @inject IConfiguration configuration
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 @model IdentityServer.Areas.Admin.IndexModel
 @{
     Layout = "_Layout.cshtml";
@@ -13,7 +14,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./Users/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 account">
+                <div class="@ColorScheme.TileIcon("account")">
 
                 </div>
                 <div class="ui-tile-text ">
@@ -26,7 +27,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./Roles/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 group">
+                <div class="@ColorScheme.TileIcon("group")">
 
                 </div>
                 <div class="ui-tile-text ">
@@ -39,7 +40,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./Resources/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 package">
+                <div class="@ColorScheme.TileIcon("package")">
 
                 </div>
                 <div class="ui-tile-text">
@@ -52,7 +53,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./Clients/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 all-devices">
+                <div class="@ColorScheme.TileIcon("all-devices")">
 
                 </div>
                 <div class="ui-tile-text">
@@ -65,7 +66,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./SecretsVault/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 lock-closed">
+                <div class="@ColorScheme.TileIcon("lock-closed")">
 
                 </div>
                 <div class="ui-tile-text">
@@ -78,7 +79,7 @@
     {
         <li class="ui-tile">
             <a asp-page="./Signing/Index">
-                <div class="ui-tile-icon sketchpen-icon-basic-bg-light-48 code-c">
+                <div class="@ColorScheme.TileIcon("code-c")">
 
                 </div>
                 <div class="ui-tile-text">

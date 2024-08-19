@@ -7,6 +7,7 @@
 
 @inject IConfiguration Configuration
 @inject IUserInterfaceService userInterface;
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 @{
     string name = null;
     if (!true.Equals(ViewData["signed-out"]))
@@ -24,11 +25,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is4-nova.css" rel="stylesheet" />
+    <link href="~/css/is4-nova-dark.css" rel="stylesheet" />
     <link href="~/css/is4-overrides.css" rel="stylesheet" />
     <link href="~/css/basic/content/css/sketchpen-basic-bg-light.css" rel="stylesheet" />
     <link href="~/css/basic/content/css/sketchpen-basic-bg-dark.css" rel="stylesheet" />
 </head>
-<body>
+<body class="colorscheme-@ColorScheme.CurrentColorScheme.ToString().ToLowerInvariant()">
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">

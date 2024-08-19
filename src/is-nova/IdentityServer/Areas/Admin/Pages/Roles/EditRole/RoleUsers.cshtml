@@ -4,6 +4,7 @@
     ViewData["Title"] = "Role Users";
     ViewData["ActivePage"] = EditRoleNavPages.RoleUsers;
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
     <div class="row">
         <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -14,7 +15,7 @@
                 @foreach (var user in Model.RoleUsers.OrderBy(u=>u.UserName))
                 {
                     <li class="ui-list-item">
-                        <div class="ui-icon left sketchpen-icon-basic-bg-light-32 account"></div>
+                        <div class="@ColorScheme.LeftIcon("account")"></div>
                         <div style="display:inline-block;padding:10px 15px 10px 5px">@(user.UserName)</div>
                         <a style="display:inline-block;float:right"
                            asp-page-handler="Remove"

@@ -2,6 +2,7 @@
 @model IdentityServer.Areas.Admin.Pages.Roles.IndexModel
 @{
 }
+@inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
 @if (Model.ApplicationRoles != null)
 {
@@ -13,7 +14,7 @@
                     <li class="ui-list-item">
                         <a asp-page="EditRole/Index"
                            asp-route-id="@role.Id">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 group"></div>
+                            <div class="@ColorScheme.LeftIcon("group")"></div>
                             <strong>@role.Name</strong>
                             <div>
                                 @role.Description
@@ -49,7 +50,7 @@
                     <li class="ui-list-item">
                         <a asp-page-handler="AddKnownRole"
                            asp-route-name="@knownRole.Name">
-                            <div class="ui-icon left sketchpen-icon-basic-bg-light-32 group"></div>
+                            <div class="@ColorScheme.LeftIcon("group")"></div>
                             <strong>@knownRole.Name</strong>
                             <div>
                                 @knownRole.Description
