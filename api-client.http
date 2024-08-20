@@ -4,3 +4,12 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=client_credentials&client_id=my-api-commands&client_secret=secret&scope=my-api my-api.command
 
 ###
+
+POST https://localhost:44300/connect/token
+Authorization: Basic bXktYXBpLWNvbW1hbmRzOnNlY3JldA==
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&
+scopes=my-api2
+
+###
