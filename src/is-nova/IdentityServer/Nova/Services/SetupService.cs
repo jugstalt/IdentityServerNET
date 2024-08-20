@@ -6,6 +6,7 @@ using IdentityServer.Nova.Services.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,12 +39,12 @@ public class SetupService
         {
             if (roleDb is not null)
             {
-                TryCreateRole(roleDb, KnownRoles.UserAdministrator).GetAwaiter().GetResult();
-                TryCreateRole(roleDb, KnownRoles.RoleAdministrator).GetAwaiter().GetResult();
-                TryCreateRole(roleDb, KnownRoles.ResourceAdministrator).GetAwaiter().GetResult();
-                TryCreateRole(roleDb, KnownRoles.ClientAdministrator).GetAwaiter().GetResult();
-                TryCreateRole(roleDb, KnownRoles.SigningAdministrator).GetAwaiter().GetResult();
-                TryCreateRole(roleDb, KnownRoles.SecretsVaultAdministrator).GetAwaiter().GetResult();
+                foreach(var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                {
+                    var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
+
+                    TryCreateRole(roleDb, knownRole).GetAwaiter().GetResult();
+                }
             }
 
             adminUser = new ApplicationUser()
@@ -74,14 +75,15 @@ public class SetupService
         Console.WriteLine("#########################################");
     }
 
-    async private Task<bool> TryCreateRole(IRoleDbContext roleDb, string role)
+    async private Task<bool> TryCreateRole(IRoleDbContext roleDb, ApplicationRole role)
     {
         try
         {
             var result = await roleDb.CreateAsync(
                     new ApplicationRole()
                     {
-                        Name = role
+                        Name = role.Name,
+                        Description = role.Description,
                     },
                     CancellationToken.None
                 );

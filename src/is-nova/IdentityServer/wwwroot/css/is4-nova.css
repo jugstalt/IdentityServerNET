@@ -192,13 +192,6 @@ ul.ui-tiles {
         .collapsable-tool h4:hover {
             text-decoration: underline;
         }
-    /*.collapsable-tool h4:before {
-        content: "˅  "
-    }
-
-    .collapsable-tool.expanded h4:before {
-        content: "˄  "
-    }*/
 
         .collapsable-tool h4:before {
             content: "+  "

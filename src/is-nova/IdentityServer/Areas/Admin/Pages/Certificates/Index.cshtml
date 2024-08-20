@@ -1,0 +1,34 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Certificates.IndexModel
+@{
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form id="cert-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CertName"></label>
+                <input asp-for="CertName" class="form-control" />
+                <span asp-validation-for="CertName" class="text-danger"></span>
+
+                <label asp-for="CN"></label>
+                <input asp-for="CN" class="form-control" />
+                <span asp-validation-for="CN" class="text-danger"></span>
+
+                <label asp-for="Password"></label>
+                <input type="password" asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+                <label asp-for="ExpireDays"></label>
+                <input asp-for="ExpireDays" class="form-control" />
+                <span asp-validation-for="ExpireDays" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-default">Download Certificate</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

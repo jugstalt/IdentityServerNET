@@ -5,6 +5,7 @@
 using IdentityServer.Nova;
 using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Services;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -26,18 +27,21 @@ public class HomeController : Controller
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ColorSchemeService _colorScheme;
     private readonly IConfiguration _config;
 
     public HomeController(IIdentityServerInteractionService interaction,
                           IWebHostEnvironment environment,
                           ILogger<HomeController> logger,
                           UserManager<ApplicationUser> userManager,
+                          ColorSchemeService colorScheme,
                           IConfiguration config)
     {
         _interaction = interaction;
         _environment = environment;
         _logger = logger;
         _userManager = userManager;
+        _colorScheme = colorScheme;
         _config = config;
     }
 
@@ -74,6 +78,25 @@ public class HomeController : Controller
 
         //_logger.LogInformation("Homepage is disabled in production. Returning 404.");
         //return NotFound();
+    }
+
+    async public Task<IActionResult> ToggleColorScheme()
+    {
+        var applicationUser = await _userManager.GetUserAsync(User);
+
+        switch(_colorScheme.CurrentColorScheme)
+        {
+            case ColorSchemes.Light:
+                _colorScheme.SetColorScheme(ColorSchemes.Dark);
+                break;
+            default:
+                _colorScheme.SetColorScheme(ColorSchemes.Light);
+                break;
+        }
+        
+
+
+        return View("index", applicationUser);
     }
 
     /// <summary>

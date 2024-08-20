@@ -5,7 +5,7 @@ using System.Linq;
 namespace ClientApi.Controllers;
 
 [Route("identity")]
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer", Policy = "command")]
 [ApiController]
 public class IdentityController : ControllerBase
 {

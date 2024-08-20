@@ -47,6 +47,8 @@
                 {
                     var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
 
+                    if (Model.ApplicationRoles.Any(r => r.Name == knownRole.Name)) continue;
+
                     <li class="ui-list-item">
                         <a asp-page-handler="AddKnownRole"
                            asp-route-name="@knownRole.Name">

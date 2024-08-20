@@ -3,14 +3,16 @@ using System;
 
 namespace IdentityServer.Nova.Services;
 
-internal class ColorSchemeService
+public class ColorSchemeService
 {
     private const string CookieName = "identityserver.nova.colorscheme";
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ColorSchemeService(IHttpContextAccessor httpContextAccessor)
     {
-        var request = httpContextAccessor.HttpContext?.Request;
-        var colorSchemeString = request.Cookies[CookieName];
+        _httpContextAccessor = httpContextAccessor;
+        var request = _httpContextAccessor.HttpContext?.Request;
+        var colorSchemeString = request?.Cookies[CookieName];
 
         this.CurrentColorScheme =
             Enum.TryParse<ColorSchemes>(colorSchemeString, out var colorScheme)
@@ -20,12 +22,27 @@ internal class ColorSchemeService
 
     public ColorSchemes CurrentColorScheme { get; private set; }
 
-    private string Scheme =>
-        CurrentColorScheme switch
+    public void SetColorScheme(ColorSchemes colorScheme)
+    {
+        this.CurrentColorScheme = colorScheme;
+
+        var response = _httpContextAccessor.HttpContext?.Response;
+
+        if (response != null)
         {
-            ColorSchemes.Dark => "dark",
-            _ => "light"
-        };
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // only https
+                SameSite = SameSiteMode.Lax, 
+                Expires = DateTimeOffset.UtcNow.AddYears(1)
+            };
+
+            response.Cookies.Append(CookieName, colorScheme.ToString(), cookieOptions);
+        }
+    }
+    
+    #region Icons
 
     public string TileIcon(string icon, int size = 48)
         => $"ui-tile-icon sketchpen-icon-basic-bg-{Scheme}-{size} {icon}";
@@ -40,5 +57,17 @@ internal class ColorSchemeService
 
     public string Icon(string icon, int size=32)
         => $"sketchpen-icon-basic-bg-{Scheme}-{size} {icon}";
-    
+
+    #endregion
+
+    #region Helper
+
+    private string Scheme =>
+       CurrentColorScheme switch
+       {
+           ColorSchemes.Dark => "dark",
+           _ => "light"
+       };
+
+    #endregion
 }

@@ -96,6 +96,9 @@ Hier kann beispielsweise die lebensdauer für einen *AccessToken* definiert werd
 Abholen eines AccessTokens
 --------------------------
 
+HTTP Request
+++++++++++++
+
 Eine Client Anwendung kann über einen **HTTP Post** Request, mit den notwendigen Parametern im Body, einen AccessToken von *IdentityServer.Nova* abholen.
 Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen übergeben:
 
@@ -114,3 +117,89 @@ Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen
         "token_type": "Bearer",
         "scope": "my-api my-api.command"
     }
+
+
+IdentityServer.Nova.Clients
++++++++++++++++++++++++++++
+
+.. code:: bash
+
+    nuget install-package IdentityServer.Nova.Clients
+
+.. code:: csharp
+
+    var tokenClient = new IdentityServer.Nova.Clients.TokenClient("my-api-commands", "secret");
+    await tokenClient.GetAccessToken("https://localhost:44300", []);
+
+    var accessToken = tokenClient.AccessToken;
+
+
+Api Authorization
+-----------------
+
+``Program.cs``
+++++++++++++++
+
+.. code:: csharp
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // ...
+
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://localhost:44300";
+            options.RequireHttpsMetadata = false;
+
+            options.Audience = "my-api";
+        });
+
+    builder.Services
+        .AddAuthorization(options => 
+        {
+            options.AddPolicy("query",
+                policy =>
+                policy.RequireClaim("scope", "my-api.query"));
+            options.AddPolicy("command",
+                policy =>
+                policy.RequireClaim("scope", "my-api.command"));
+        });
+
+    // ...
+
+    var app = builder.Build();
+
+    // ...
+
+    app.UseAuthentication(); 
+    app.UseAuthorization();  
+
+    // ...
+
+    app.Run();
+
+``Controller``
+++++++++++++++
+
+.. code:: csharp
+
+    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "query")]
+    [ApiController]
+    public class MyApiQueryController : ControllerBase
+    {
+        // ...
+    }
+
+
+    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "Bearer", Policy = "command")]
+    [ApiController]
+    public class MyApiCommandController : ControllerBase
+    {
+        // ...
+    }
+
+
+
