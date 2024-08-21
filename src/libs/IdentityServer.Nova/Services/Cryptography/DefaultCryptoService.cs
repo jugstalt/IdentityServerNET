@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,13 +12,9 @@ namespace IdentityServer.Nova.Services.Cryptography;
 
 public class DefaultCryptoService : ICryptoService
 {
-    public DefaultCryptoService(string cryptoPassword)
-        : this(Encoding.UTF8.GetBytes(cryptoPassword))
-    {
+    private readonly byte[] _defaultPasswordBytes;
 
-    }
-
-    public DefaultCryptoService(byte[] passwordBytes)
+    private DefaultCryptoService(byte[] passwordBytes)
     {
         _defaultPasswordBytes = passwordBytes;
         if (_defaultPasswordBytes.Length < 24)
@@ -27,11 +24,12 @@ public class DefaultCryptoService : ICryptoService
         DefaultEncoding = Encoding.UTF8;
     }
 
+    public DefaultCryptoService(IOptions<DefaultCryptoServiceOptions> options)
+        : this(Encoding.UTF8.GetBytes(options.Value.Password)) { }
+
     public Encoding DefaultEncoding { get; set; }
 
     #region ICryptoService
-
-    public byte[] _defaultPasswordBytes;
 
     public string EncryptText(string text, Encoding encoding = null)
     {
@@ -461,6 +459,16 @@ public class DefaultCryptoService : ICryptoService
         AES192 = 2,
         AES256 = 3
     }
+
+    #endregion
+
+    #region Static Members
+
+    public static DefaultCryptoService Create(string cryptoPassword)
+        => DefaultCryptoService.Create(Encoding.UTF8.GetBytes(cryptoPassword));
+
+    public static DefaultCryptoService Create(byte[] passwordBytes)
+        => new DefaultCryptoService(passwordBytes);
 
     #endregion
 }

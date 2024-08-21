@@ -1,6 +1,6 @@
 ﻿using IdentityModel;
-using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Models.UserInteraction;
 using Microsoft.AspNetCore.Authentication;

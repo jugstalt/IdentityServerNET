@@ -131,6 +131,10 @@ bzw.
         "scope": "my-api my-api.command"
     }
 
+.. note::
+
+    Der ``scope`` Parameter kann auch weggelassen werden. In dem Fall enthält der Token alle für den Client eingestellten Scopes.
+
 
 IdentityServer.Nova.Clients
 +++++++++++++++++++++++++++

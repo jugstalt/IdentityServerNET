@@ -1,7 +1,6 @@
 ﻿using IdentityModel.Client;
 using IdentityServer.Nova.Extensions;
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -35,7 +34,10 @@ public class TokenClient
     private HttpClient _defaultHttpClient = null;
     protected HttpClient GetHttpClient()
     {
-        if(_httpClient is not null) return _httpClient; 
+        if (_httpClient is not null)
+        {
+            return _httpClient;
+        }
 
         if (_defaultHttpClient is null)
         {

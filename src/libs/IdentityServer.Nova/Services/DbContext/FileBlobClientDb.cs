@@ -3,7 +3,6 @@ using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using Microsoft.Extensions.Options;
 using System;
@@ -20,7 +19,11 @@ public class FileBlobClientDb : IClientDbContext, IClientDbContextModify
     private ICryptoService _cryptoService = null;
     private IBlobSerializer _blobSerializer = null;
 
-    public FileBlobClientDb(IOptions<ClientDbContextConfiguration> options)
+    public FileBlobClientDb(
+            IOptions<ClientDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer blobSerializer = null
+        )
     {
         if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
         {
@@ -28,8 +31,8 @@ public class FileBlobClientDb : IClientDbContext, IClientDbContextModify
         }
 
         _rootPath = options.Value.ConnectionString;
-        _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
 
         DirectoryInfo di = new DirectoryInfo(_rootPath);
         if (!di.Exists)

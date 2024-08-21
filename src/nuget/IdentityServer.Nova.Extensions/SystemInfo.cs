@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace IdentityServer.Nova.Extensions;
@@ -34,4 +35,16 @@ public class SystemInfo
             return "Unknown";
         }
     }
+
+    static public string DefaultWorkingPath()
+        => (IsLinux, IsWindows, IsOSX) switch
+        {
+            (true, false, false) => "/etc/identityserver-nova",
+            (false, true, false) => "C:\\apps\\identityserver-nova",
+            (false, false, true) => "/etc/identityserver-nova",
+            _ => throw new System.Exception("Unknown plattform!")
+        };
+
+    static public string DefaultStoragePath()
+        => Path.Combine(DefaultWorkingPath(), "storage");
 }

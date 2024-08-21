@@ -1,6 +1,5 @@
 using IdentityServer.Nova.Models;
 using Microsoft.AspNetCore.Mvc;
-using SkiaSharp;
 using System;
 using System.ComponentModel;
 using System.IO;

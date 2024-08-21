@@ -34,14 +34,14 @@ public class ColorSchemeService
             {
                 HttpOnly = true,
                 Secure = true, // only https
-                SameSite = SameSiteMode.Lax, 
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddYears(1)
             };
 
             response.Cookies.Append(CookieName, colorScheme.ToString(), cookieOptions);
         }
     }
-    
+
     #region Icons
 
     public string TileIcon(string icon, int size = 48)
@@ -53,9 +53,9 @@ public class ColorSchemeService
 
     public string NavIcon(string icon, int size = 16)
         => $"nav-icon sketchpen-icon-basic-bg-{Scheme}-{size} {icon}";
-    
 
-    public string Icon(string icon, int size=32)
+
+    public string Icon(string icon, int size = 32)
         => $"sketchpen-icon-basic-bg-{Scheme}-{size} {icon}";
 
     #endregion

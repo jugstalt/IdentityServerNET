@@ -15,7 +15,7 @@ static public class ServicesExtensions
                                      IConfiguration configuration
                                 )
      => services.OpenIdConnectAuthentication(configuration.GetSection(ConfigurationSectionName));
-    
+
 
     static public IServiceCollection OpenIdConnectAuthentication(
                                      this IServiceCollection services,

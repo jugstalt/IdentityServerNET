@@ -4,7 +4,6 @@ using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Models.UserInteraction;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -26,7 +25,11 @@ public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCo
     private IBlobSerializer _blobSerializer;
     private UserDbContextConfiguration _config;
 
-    public FileBlobUserDb(IOptionsMonitor<UserDbContextConfiguration> options = null)
+    public FileBlobUserDb(
+                ICryptoService cryptoService,
+                IOptionsMonitor<UserDbContextConfiguration> options,
+                IBlobSerializer blobSerializer = null
+        )
     {
         if (String.IsNullOrEmpty(options?.CurrentValue?.ConnectionString))
         {
@@ -35,8 +38,8 @@ public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCo
 
         _config = options.CurrentValue;
         _rootPath = _config.ConnectionString;
-        _cryptoService = _config.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
 
         DirectoryInfo di = new DirectoryInfo(_rootPath);
         if (!di.Exists)

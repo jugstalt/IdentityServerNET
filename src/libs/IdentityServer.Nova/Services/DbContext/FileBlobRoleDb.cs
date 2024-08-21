@@ -1,9 +1,8 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.Serialize;
-using IdentityServer.Nova.Extensions.DependencyInjection;
+using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -23,7 +22,11 @@ public class FileBlobRoleDb : IRoleDbContext, IAdminRoleDbContext
     private ICryptoService _cryptoService = null;
     private IBlobSerializer _blobSerializer;
 
-    public FileBlobRoleDb(IOptions<RoleDbContextConfiguration> options = null)
+    public FileBlobRoleDb(
+            IOptions<RoleDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer blobSerializer = null
+        )
     {
         if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
         {
@@ -31,8 +34,8 @@ public class FileBlobRoleDb : IRoleDbContext, IAdminRoleDbContext
         }
 
         _rootPath = options.Value.ConnectionString;
-        _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
 
         DirectoryInfo di = new DirectoryInfo(_rootPath);
         if (!di.Exists)

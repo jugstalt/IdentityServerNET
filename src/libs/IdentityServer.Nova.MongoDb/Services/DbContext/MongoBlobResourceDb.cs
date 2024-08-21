@@ -4,7 +4,6 @@ using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.MongoDb.MongoDocuments;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -25,7 +24,11 @@ public class MongoBlobResourceDb : IResourceDbContextModify
     private string _apiCollectionName = "apiresources";
     private string _identityCollectionName = "identityresources";
 
-    public MongoBlobResourceDb(IOptions<ResourceDbContextConfiguration> options)
+    public MongoBlobResourceDb(
+            IOptions<ResourceDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer blobSerializer = null
+        )
     {
         if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
         {
@@ -33,8 +36,8 @@ public class MongoBlobResourceDb : IResourceDbContextModify
         }
 
         _connectionString = options.Value.ConnectionString;
-        _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
 
         //DirectoryInfo di = new DirectoryInfo(_connectionString);
         //if (!di.Exists)

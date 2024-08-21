@@ -1,0 +1,11 @@
+Weiter Admin Werkzeuge
+======================
+
+Aus der Administration von **Usern**, **Rollen**, **Identity/API Resources** und **Clients** bietet *IdentityServer.Nova* 
+noch weiter Werkzeuge an, die für Security Anwendungen sinnvoll sein können:
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   secretsvault

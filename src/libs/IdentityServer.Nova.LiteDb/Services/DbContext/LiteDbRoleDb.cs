@@ -5,7 +5,6 @@ using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
 using IdentityServer.Nova.Models;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
 using Microsoft.AspNetCore.Identity;
@@ -16,18 +15,22 @@ namespace IdentityServer.Nova.LiteDb.Services.DbContext;
 public class LiteDbRoleDb : IRoleDbContext, IAdminRoleDbContext
 {
     private readonly string _connectionString;
-    private readonly UserDbContextConfiguration _config;
+    private readonly RoleDbContextConfiguration _config;
     private readonly ICryptoService _cryptoService;
     private readonly IBlobSerializer _blobSerializer;
 
     private const string RolesCollectionName = "roles";
 
-    public LiteDbRoleDb(IOptions<UserDbContextConfiguration> options)
+    public LiteDbRoleDb(
+            IOptions<RoleDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer? blobSerializer = null
+        )
     {
         _config = options.Value;
         _connectionString = _config.ConnectionString.EnsureLiteDbParentDirectoryCreated();
-        _cryptoService = _config.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
     }
 
     #region IRoleDbContext

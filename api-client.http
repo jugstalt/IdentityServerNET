@@ -9,6 +9,6 @@ POST https://localhost:44300/connect/token
 Authorization: Basic bXktYXBpLWNvbW1hbmRzOnNlY3JldA==
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&scope_=my-api.command my-api
+grant_type=client_credentials&scope=my-api.command my-api
 
 ###

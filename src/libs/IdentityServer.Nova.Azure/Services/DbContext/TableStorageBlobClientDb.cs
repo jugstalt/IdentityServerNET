@@ -3,7 +3,6 @@ using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.Serialize;
 using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using Microsoft.Extensions.Options;
 using System;
@@ -23,7 +22,11 @@ public class TableStorageBlobClientDb : IClientDbContextModify
     internal static readonly string PartitionKey = "identityserver-clients";
     private AzureTableStorage<BlobTableEntity> _tableStorage;
 
-    public TableStorageBlobClientDb(IOptions<ClientDbContextConfiguration> options)
+    public TableStorageBlobClientDb(
+            IOptions<ClientDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer blobSerializer = null
+        )
     {
         if (String.IsNullOrEmpty(options?.Value?.ConnectionString))
         {
@@ -34,8 +37,8 @@ public class TableStorageBlobClientDb : IClientDbContextModify
         _tablename = !String.IsNullOrWhiteSpace(options.Value.TableName) ?
                                 options.Value.TableName :
                                 _tablename;
-        _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
 
         _tableStorage = new AzureTableStorage<BlobTableEntity>();
         _tableStorage.Init(_connectionString);

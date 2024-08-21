@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Linq;
 
 namespace ClientApi;
 
@@ -20,7 +19,7 @@ public class Startup
             {
                 options.Authority = "https://localhost:44300";
                 options.RequireHttpsMetadata = false;
-                
+
                 options.Audience = "my-api";
                 options.TokenValidationParameters = new()
                 {

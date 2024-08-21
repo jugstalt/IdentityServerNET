@@ -1,13 +1,15 @@
 ﻿using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.EventSinks;
-using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Abstractions.Security;
+using IdentityServer.Nova.Abstractions.Services;
+using IdentityServer.Nova.Abstractions.UI;
+using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.UI;
 using IdentityServer.Nova.Servivces.DbContext;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using IdentityServer.Nova.Abstractions.UI;
 
 namespace IdentityServer.Nova.Extensions.DependencyInjection;
 
@@ -209,13 +211,20 @@ public static class ServicesExtensions
         return new SecretsVaultDbContextBuilder(services);
     }
 
-    static public IServiceCollection AddSecretsVaultDbContext<T, TSecretEncryptor>(this IServiceCollection services, Action<SecretsVaultDbContextConfiguration> setupAction)
+    static public IServiceCollection AddSecretsVaultDbContext<T>(this IServiceCollection services, IConfiguration configuration, Action<SecretsVaultDbContextConfiguration> setupAction)
         where T : class, ISecretsVaultDbContext
-        where TSecretEncryptor : class, IVaultSecretCryptoService
     {
         services.Configure(setupAction);
         services.AddTransient<ISecretsVaultDbContext, T>();
-        services.AddTransient<IVaultSecretCryptoService, TSecretEncryptor>();
+
+        if (!String.IsNullOrEmpty(configuration["BlobCryptoKey"]))
+        {
+            services.AddTransient<IVaultSecretCryptoService, DefaultCryptoService>();
+        }
+        else
+        {
+            services.AddTransient<IVaultSecretCryptoService, Base64CryptoService>();
+        }
 
         return services;
     }
@@ -297,6 +306,43 @@ public static class ServicesExtensions
         services.AddTransient<IUserInterfaceService, T>();
 
         return services;
+    }
+
+    #endregion
+
+    #region CryptoService
+
+    public static IServiceCollection AddCryptoServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        Type implementationType = services.CryptoServiceType(configuration, true);
+
+        services.AddTransient(typeof(ICryptoService), implementationType);
+        services.AddTransient(typeof(IVaultSecretCryptoService), implementationType);
+
+        return services;
+    }
+
+    private static Type CryptoServiceType(this IServiceCollection services, IConfiguration configuration, bool addConfiguration = false)
+    {
+        Type implementationType = null;
+
+        if (!String.IsNullOrEmpty(configuration["BlobCryptoKey"]))
+        {
+            if (addConfiguration)
+            {
+                services.Configure<DefaultCryptoServiceOptions>(config =>
+                {
+                    config.Password = configuration["BlobCryptoKey"];
+                });
+            }
+            implementationType = typeof(DefaultCryptoService);
+        }
+        else
+        {
+            implementationType = typeof(Base64CryptoService);
+        }
+
+        return implementationType;
     }
 
     #endregion

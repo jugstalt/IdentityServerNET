@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using Cocona;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Cocona;
 
 
-CoconaApp.Run((string name = "client", string password = "", string cn = "client") => {
+CoconaApp.Run((string name = "client", string password = "", string cn = "client") =>
+{
 
     string path = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
     int expireDays = 365;

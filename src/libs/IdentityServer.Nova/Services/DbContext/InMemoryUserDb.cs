@@ -76,7 +76,7 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
         var user = _users.Values
             .ToArray()
-            .Where(u => normalizedEmail.Equals(u.Email , StringComparison.OrdinalIgnoreCase))
+            .Where(u => normalizedEmail.Equals(u.Email, StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
 
         return Task.FromResult(user);

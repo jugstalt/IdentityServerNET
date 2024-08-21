@@ -9,7 +9,6 @@ using IdentityServer.Nova.Services;
 using IdentityServer.Nova.Services.SecretsVault;
 using IdentityServer.Nova.Services.Signing;
 using IdentityServer.Nova.Services.SigningCredential;
-using IdentityServer.Nova.Services.UI;
 using IdentityServer.Nova.Services.Validators;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
@@ -220,7 +219,9 @@ public class Startup
             });
         }
 
+        services.AddCryptoServices(Configuration);
         services.AddTransient<ICertificateFactory, CertificateFactory>();
+
 
         #region Register Certificate Store
 

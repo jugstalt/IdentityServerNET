@@ -1,6 +1,6 @@
 ﻿using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.EmailSender;
-using IdentityServer.Nova.CaptchaRenderers;
+using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Extensions.DependencyInjection;
 using IdentityServer.Nova.LiteDb.Services.DbContext;
 using IdentityServer.Nova.Models;
@@ -13,7 +13,6 @@ using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.EmailSender;
 using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
-using IdentityServer.Nova.Services.Serialize;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,7 +91,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
         {
             services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
+                options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "resources");
                 options.AddDefaults(context.Configuration);
             });
         }
@@ -133,7 +132,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
         {
             services.AddClientDbContext<FileBlobClientDb>(options =>
             {
-                options.ConnectionString = @"c:\temp\identityserver_nova\storage\resources";
+                options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "clients");
                 options.AddDefaults(context.Configuration);
             });
         }
@@ -173,7 +172,6 @@ public class TestHostingStartup : IIdentityServerNovaStartup
             services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
-                options.AddDefaults(context.Configuration);
             });
         }
 
@@ -186,7 +184,6 @@ public class TestHostingStartup : IIdentityServerNovaStartup
             services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
             {
                 options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
-                options.AddDefaults(context.Configuration);
             });
         }
 
@@ -194,9 +191,9 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region App SecretsVaultDbContext (optional) 
 
-        services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb, SigningCredentialCertStoreCryptoService>(options =>
+        services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(context.Configuration, options =>
         {
-            options.ConnectionString = @"c:\temp\identityserver_nova\storage\secretsvault";
+            options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "secretsvault");
             options.CryptoService = new Base64CryptoService();
         });
 

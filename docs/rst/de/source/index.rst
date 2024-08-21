@@ -12,6 +12,7 @@ Welcome to identityserver.nova's documentation!
 
    getting-started/index
    clients/index
+   accessories/index
 
 
 

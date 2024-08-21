@@ -1,10 +1,7 @@
 ﻿using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.Models.UserInteraction;
-using IdentityServer.Nova.Services.Cryptography;
-using IdentityServer.Nova.Services.Serialize;
 using Microsoft.Extensions.Configuration;
-using System;
 
 namespace IdentityServer.Nova.ServerExtension.Default.Extensions;
 internal static class ConfigurationExtensions
@@ -12,10 +9,6 @@ internal static class ConfigurationExtensions
     public static void AddDefaults(this UserDbContextConfiguration options,
                                    IConfiguration config)
     {
-        options.CryptoService = !String.IsNullOrEmpty(config["BlobCryptoKey"])
-            ? new DefaultCryptoService(config["BlobCryptoKey"])
-            : new Base64CryptoService();
-
         options.ManageAccountEditor = new ManageAccountEditor()
         {
             AllowDelete = false,
@@ -55,10 +48,6 @@ internal static class ConfigurationExtensions
     public static void AddDefaults(this ResourceDbContextConfiguration options,
                                    IConfiguration config)
     {
-        options.CryptoService = !String.IsNullOrEmpty(config["BlobCryptoKey"])
-            ? new DefaultCryptoService(config["BlobCryptoKey"])
-            : new Base64CryptoService();
-
         options.InitialApiResources = new ApiResourceModel[]
         {
                     //new ApiResourceModel("api1","My Api1"),
@@ -73,10 +62,6 @@ internal static class ConfigurationExtensions
     public static void AddDefaults(this ClientDbContextConfiguration options,
                                    IConfiguration config)
     {
-        options.CryptoService = !String.IsNullOrEmpty(config["BlobCryptoKey"])
-            ? new DefaultCryptoService(config["BlobCryptoKey"])
-            : new Base64CryptoService();
-
         options.IntialClients = new ClientModel[]
         {
                 //new ClientModel()
@@ -116,26 +101,6 @@ internal static class ConfigurationExtensions
                 //    RedirectUris = new string[] { "https://localhost:44356/signin-oidc" },
                 //    PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
                 //}
-        };
-    }
-
-    public static void AddDefaults(this ExportClientDbContextConfiguration options,
-                                   IConfiguration config)
-    {
-        options.CryptoService = new ClearTextCryptoService();
-        options.BlobSerializer = new JsonBlobSerializer()
-        {
-            JsonFormatting = Newtonsoft.Json.Formatting.Indented
-        };
-    }
-
-    public static void AddDefauts(this ExportResourceDbContextConfiguration options,
-                                  IConfiguration config)
-    {
-        options.CryptoService = new ClearTextCryptoService();
-        options.BlobSerializer = new JsonBlobSerializer()
-        {
-            JsonFormatting = Newtonsoft.Json.Formatting.Indented
         };
     }
 }

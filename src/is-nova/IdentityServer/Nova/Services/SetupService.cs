@@ -1,5 +1,4 @@
-﻿using IdentityServer.Nova;
-using IdentityServer.Nova.Abstractions.DbContext;
+﻿using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;
@@ -39,7 +38,7 @@ public class SetupService
         {
             if (roleDb is not null)
             {
-                foreach(var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
                 {
                     var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
 

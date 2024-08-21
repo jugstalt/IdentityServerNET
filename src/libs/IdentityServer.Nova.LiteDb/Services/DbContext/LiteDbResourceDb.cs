@@ -5,7 +5,6 @@ using IdentityServer.Nova.Abstractions.Services;
 using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
 using Microsoft.Extensions.Options;
@@ -21,11 +20,15 @@ public class LiteDbResourceDb : IResourceDbContextModify
     private const string ApiCollectionName = "apiresources";
     private const string IdentityCollectionName = "identityresources";
 
-    public LiteDbResourceDb(IOptions<ResourceDbContextConfiguration> options)
+    public LiteDbResourceDb(
+            IOptions<ResourceDbContextConfiguration> options,
+            ICryptoService cryptoService,
+            IBlobSerializer? blobSerializer = null
+        )
     {
         _connectionString = options.Value.ConnectionString.EnsureLiteDbParentDirectoryCreated();
-        _cryptoService = options.Value.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = options.Value.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
     }
 
     #region IResourceDbContext

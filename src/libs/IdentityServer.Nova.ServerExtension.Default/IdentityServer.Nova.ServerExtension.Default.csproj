@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Extensions\IdentityServer.Nova.Extensions.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova.CaptchaRenderers\IdentityServer.Nova.CaptchaRenderers.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova.LiteDb\IdentityServer.Nova.LiteDb.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova\IdentityServer.Nova.csproj" />

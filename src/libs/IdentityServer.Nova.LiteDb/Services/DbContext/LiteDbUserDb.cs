@@ -6,7 +6,6 @@ using IdentityServer.Nova.LiteDb.Documents;
 using IdentityServer.Nova.LiteDb.Extensions;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Models.UserInteraction;
-using IdentityServer.Nova.Services.Cryptography;
 using IdentityServer.Nova.Services.Serialize;
 using LiteDB;
 using Microsoft.AspNetCore.Identity;
@@ -24,12 +23,16 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
     private const string UsersCollectionName = "users";
 
-    public LiteDbUserDb(IOptions<UserDbContextConfiguration> options)
+    public LiteDbUserDb(
+                IOptions<UserDbContextConfiguration> options,
+                ICryptoService cryptoService,
+                IBlobSerializer? blobSerializer = null
+          )
     {
         _config = options.Value;
         _connectionString = _config.ConnectionString.EnsureLiteDbParentDirectoryCreated();
-        _cryptoService = _config.CryptoService ?? new Base64CryptoService();
-        _blobSerializer = _config.BlobSerializer ?? new JsonBlobSerializer();
+        _cryptoService = cryptoService;
+        _blobSerializer = blobSerializer ?? new JsonBlobSerializer();
     }
 
     #region IUserDbContext
@@ -164,7 +167,8 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
                         );
                 }
             }
-        } catch {   }
+        }
+        catch { }
 
         return Task.FromResult<ApplicationUser?>(null);
     }

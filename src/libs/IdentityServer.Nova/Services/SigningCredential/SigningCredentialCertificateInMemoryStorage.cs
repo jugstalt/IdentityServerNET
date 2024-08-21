@@ -12,12 +12,12 @@ namespace IdentityServer.Nova.Services.SigningCredential;
 public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCertificateStorage
 {
     private readonly ICertificateFactory _certificateFactory;
-    private readonly ConcurrentDictionary<long, X509Certificate2> _certificates;
+    private static ConcurrentDictionary<long, X509Certificate2> _certificates = null;
 
     public SigningCredentialCertificateInMemoryStorage(ICertificateFactory certificateFactory)
     {
         _certificateFactory = certificateFactory;
-        _certificates = new ConcurrentDictionary<long, X509Certificate2>();
+        _certificates = _certificates ?? new ConcurrentDictionary<long, X509Certificate2>();
     }
 
     public Task<X509Certificate2> GetCertificateAsync(string subject)

@@ -84,7 +84,7 @@ public class HomeController : Controller
     {
         var applicationUser = await _userManager.GetUserAsync(User);
 
-        switch(_colorScheme.CurrentColorScheme)
+        switch (_colorScheme.CurrentColorScheme)
         {
             case ColorSchemes.Light:
                 _colorScheme.SetColorScheme(ColorSchemes.Dark);
@@ -93,7 +93,7 @@ public class HomeController : Controller
                 _colorScheme.SetColorScheme(ColorSchemes.Light);
                 break;
         }
-        
+
 
 
         return View("index", applicationUser);
