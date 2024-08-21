@@ -17,12 +17,11 @@ class Program
 
         //await CallSecretsVault("webgis", "secret", "webgis/sec1");
 
-        //var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
+        var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
         //var secretsVaultClient = new SecretsVaultClient("webgis", cert);
-        //await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
-        //var secret = await secretsVaultClient.GetSecret("sec1");
-
-        //Console.Write("Secret: " + secret.GetValue());
+        await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
+        var secret = await secretsVaultClient.GetSecret("sec1");
+        Console.Write("Secret: " + secret.GetValue());
 
         //Console.ReadLine();
 

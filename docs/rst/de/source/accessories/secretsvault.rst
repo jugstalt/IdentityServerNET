@@ -127,6 +127,24 @@ Wird eine **Access Token** zurück gegeben, kann dieser für den zum Abfragen de
     https://localhost:44300/api/secretsvault?v=1.0&path=my-api-locker/db-connectionstring/{version}
 
 
+Secret über IdentityServer.Nova.Clients abholen
++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. code:: bash
+
+    dotnet add package IdentityServer.Nova.Clients
+
+.. code:: csharp
+
+    var secretsVaultClient = new IdentityServer.Nova.Clients.SecretsVaultClient("my-api-secrets", "secret");
+    await secretsVaultClient.OpenLocker("https://localhost:44300", "my-api-locker");
+    var secretResponse = await secretsVaultClient.GetSecret("db-connectionstring");
+
+    Console.WriteLine(secretResponse.GetValue())
+    
+
+
+
 
 
 
