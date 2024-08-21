@@ -42,11 +42,16 @@ public class ApisModel : AdminPageModel
             {
                 var apiResource = new ApiResourceModel(apiName, Input.ApiResourceDisplayName)
                 {
-                    Scopes = [
+                    Scopes = apiName switch
+                    {
+                        "secrets-vault" => [new ScopeModel() { Name = apiName }],
+                        "signing-api" => [new ScopeModel() { Name = apiName }],
+                        _ => [
                              new ScopeModel() { Name = apiName },
                              new ScopeModel() { Name = $"{apiName}.query" },
                              new ScopeModel() { Name = $"{apiName}.command" }
                              ]
+                    }
                 };
 
                 await _resourceDb.AddApiResourceAsync(apiResource);

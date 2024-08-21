@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace IdentityServer.Api.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = "Bearer-Signing, Identity.Application")]
+[Authorize(AuthenticationSchemes = "Bearer-Signing,Identity.Application")]
 [ApiController]
 public class SigningController : ControllerBase
 {
