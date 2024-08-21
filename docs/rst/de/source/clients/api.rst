@@ -31,7 +31,10 @@ Für eine API werden nach dem erstellen automatisch folgende **Scopes** angelegt
 * ``{api-name}.query``: Lesender Zugriff auf die von der API bereitgestellten Daten
 * ``{api-name}.command``: Zusätzlich schreibender Zugriff auf die von der API bereitgestellten Daten
 
+.. note::
 
+    Der Scope ``{api-name}`` sollte später bei einem Client unbedingt als Scope hinzugefügt werden. Diese entspricht dann 
+    der ``Audience`` (``aud``) des Tokens!
 
 API Client erstellen/bearbeiten
 -------------------------------
@@ -109,6 +112,16 @@ Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen
 
     grant_type=client_credentials&client_id=my-api-commands&client_secret=secret&scope=my-api my-api.command
 
+bzw.
+
+.. code::
+
+    POST https://localhost:44300/connect/token
+    Authorization: Basic bXktYXBpLWNvbW1hbmRzOnNlY3JldA==
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=client_credentials&scope=my-api.command my-api
+
 .. code::
 
     {
@@ -122,9 +135,11 @@ Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen
 IdentityServer.Nova.Clients
 +++++++++++++++++++++++++++
 
+Zum Abholen eines Tokens kann auch das ``IdentityServer.Nova.Clients`` **nuget** Package verwendet werden:
+
 .. code:: bash
 
-    nuget install-package IdentityServer.Nova.Clients
+    dotnet add package IdentityServer.Nova.Clients
 
 .. code:: csharp
 
@@ -134,11 +149,66 @@ IdentityServer.Nova.Clients
     var accessToken = tokenClient.AccessToken;
 
 
+IdentityModel
++++++++++++++
+
+**IdentityModel** bietet ebenfalls ein Möglichkeit einen Token abzuholen:
+
+.. code:: bash
+
+    dotnet add package IdentityModel
+
+.. code:: csharp
+
+    var client = new HttpClient();
+
+    // Entdecke den Endpunkt des IdentityServers
+    var discovery = await client.GetDiscoveryDocumentAsync("https://localhost:44300");
+    if (discovery.IsError)
+    {
+        Console.WriteLine(discovery.Error);
+        return;
+    }
+
+    // Get tht Token
+    var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+    {
+        Address = discovery.TokenEndpoint,
+
+        ClientId = "my-api-commands",
+        ClientSecret = "secret",
+        Scope = "my-api my-api.command"
+    });
+
+    if (tokenResponse.IsError)
+    {
+        Console.WriteLine(tokenResponse.Error);
+        return;
+    }
+
+    Console.WriteLine(tokenResponse.AccessToken);
+
+
 Api Authorization
 -----------------
 
+Möchte man eine API über einen (Bearer) Token absichern, ist die Vorgehensweise in etwas folgendermaßen:
+
 ``Program.cs``
 ++++++++++++++
+
+In der ``Programm.cs`` Datei zu erst die notwendigen *Authentication* und *Authorization* Services registriert.
+
+Über die ``AddAuthoriation`` wird angegeben, dass die zur Authentifizierung des Clients eine ``Bearer (JWT) Token`` verwendet wird.
+Über die Optionen wird hier gesteuert, wer für die Authentifizierung verantwortlich ist (``Authority``). Ebenfalls kann die ``Audience`` vorgeben 
+werden, für die dieser der Token ausgestellt werden werden muss. Über die ``TokenValidationParameters`` wird festgelegt, welche **Claims**
+überprüft werden, um einen Token als gültig anzuerkennen. ``ClockSkew = TimeSpan.Zero`` gibt an, der der Token sofort abgelehnt wird, 
+wenn die **ExpirationTime** des Tokens überschritten wird.
+
+Mittels ``AddAuthorization`` können **Policies** angeführt werden. Über eine **Policy** wird geregelt, welche Rechte ein Client bei API Aufrufen hat.
+Hier wird ``scope`` als Claim vorausgesetzt und zwischen ``command`` und ``query`` Rechten unterschieden.
+
+Damit Authentifizierung und Autorisierung angewendet wird, muss die Application auch die entsprechende Middleware verwenden (``UseAuthentication``, ``UseAuthorization``)-
 
 .. code:: csharp
 
@@ -153,6 +223,13 @@ Api Authorization
             options.RequireHttpsMetadata = false;
 
             options.Audience = "my-api";
+            options.TokenValidationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+            };
         });
 
     builder.Services
@@ -181,6 +258,11 @@ Api Authorization
 
 ``Controller``
 ++++++++++++++
+
+Um einzelnen **Controller** oder **Methoden** abzusichern wird das ``[Authorize]`` verwendet.
+Hier wird dem Attribute noch das oben festgelegte ``AuthenticationScheme`` (**Bearer**) und die notwendige ``Policy`` 
+(**query**, **command**) übergeben. Die Methoden dieser API Controller können somit nur aufgerufen werden, wenn
+ein **Bearer Token** übergeben wird, der den **scope** ``my-api.query`` oder ``my-api.command`` enthält. 
 
 .. code:: csharp
 
