@@ -73,9 +73,14 @@ public class SigningApiClient : TokenClient
     #region Static Members
 
     async static public Task<string> GetValidatedDataFromToken(string token, string identityServerAddress)
-    {
-        return await token.GetValidatedClaimValue(identityServerAddress, "token-data");
-    }
+        => await GetValidatedClaimFromToken(token, identityServerAddress, "token-data");
+    
+
+    async static public Task<string> GetValidatedClaimFromToken(string token, string identityServerAddress, string claimName)
+        => await token.GetValidatedClaimValue(identityServerAddress, claimName);
+
+    async static public Task<IDictionary<string, string>> GetValidatedClaimsFromToken(string token, string identityServerAddress, IEnumerable<string> claimNames)
+        => await token.GetValidatedClaimsValue(identityServerAddress, claimNames?.ToArray());
 
     #endregion
 }

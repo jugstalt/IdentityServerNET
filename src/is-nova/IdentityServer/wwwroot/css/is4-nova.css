@@ -204,3 +204,12 @@ ul.ui-tiles {
 .collapsable-tool.expanded {
     max-height:unset;
 }
+
+.nav.nav-pills.nav-stacked li.list-item {
+    border-bottom: 1px solid #eee;
+}
+
+    .nav.nav-pills.nav-stacked li.list-item.selected {
+        font-weight: bold;
+        background-color: #eee;
+    }

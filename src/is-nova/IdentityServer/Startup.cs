@@ -67,6 +67,8 @@ public class Startup
                    policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
                 options.AddPolicy("admin-signing-ui-policy",
                    policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
+                options.AddPolicy("admin-createcerts-policy",
+                    policy => policy.RequireUserName(Configuration["IdentityServer:AdminUsername"]));
             }
             else
             {
@@ -87,8 +89,10 @@ public class Startup
                    policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
                 options.AddPolicy("admin-signing-ui-policy",
                    policy => policy.RequireRole(KnownRoles.SigningAdministrator));
+                options.AddPolicy("admin-createcerts-policy",
+                    policy => policy.RequireRole(KnownRoles.ClientAdministrator));
             }
-
+            
             // DoTo: find a policy that never matches!!
             options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
         });
@@ -120,7 +124,7 @@ public class Startup
                 options.Conventions.AuthorizeAreaFolder("Admin", "/clients", Configuration.DenyAdminClients() ? "_forbidden" : "admin-client-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/signing", Configuration.DenySigningUI() ? "_forbidden" : "admin-signing-ui-policy");
-
+                options.Conventions.AuthorizeAreaFolder("Admin", "/certificates", Configuration.DenyAdminCreateCerts() ? "_forbidden" : "admin-createcerts-policy");
                 if (Configuration.DenyManageAccount() == true)
                 {
                     options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage", "_forbidden");

@@ -31,7 +31,7 @@
     </div>
     <div class="col-md-6">
         <div class="row collapsable-tool">
-            <h4>New Api Resource</h4>
+            <h4>New API Resource</h4>
             <form id="-form" method="post">
 
                 <div asp-validation-summary="All" class="text-danger"></div>
@@ -46,6 +46,25 @@
                 <button id="new-client-button" type="submit" class="btn btn-default">Create...</button>
             </form>
         </div>
+        @if (Model.DefaultApiResources.Any())
+        {
+            <div class="row collapsable-tool">
+                <h4>Add default API Resource</h4>
+                <ul class="nav nav-pills nav-stacked">
+                    @foreach (var defaultApiResource in Model.DefaultApiResources)
+                    {
+                        <li>
+                            <a asp-page-handler="Add"
+                               asp-route-name="@defaultApiResource.ApiResourceName"
+                               asp-route-displayName="@defaultApiResource.ApiResourceDisplayName">
+                                <strong>Add @defaultApiResource.ApiResourceName</strong>
+                                <div>@defaultApiResource.ApiResourceDisplayName</div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
 </div>
 

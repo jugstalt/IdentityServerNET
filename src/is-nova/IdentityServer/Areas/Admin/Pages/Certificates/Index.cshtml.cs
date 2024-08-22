@@ -19,11 +19,11 @@ public class IndexModel : SecurePageModel
 
     [BindProperty]
     [DisplayName("Certificate (File) Name")]
-    public string CertName { get; set; } = "client";
+    public string CertName { get; set; } = "client-secret";
 
     [BindProperty]
-    [DisplayName("CN")]
-    public string CN { get; set; } = "client";
+    [DisplayName("Subject (CN)")]
+    public string CN { get; set; } = "client-secret";
 
     [BindProperty]
     [DisplayName("Password (optional)")]
@@ -41,7 +41,7 @@ public class IndexModel : SecurePageModel
     {
         var zipStream = new MemoryStream();
 
-        return SecureHandlerAsync(async () =>
+        return SecureHandlerAsync(() =>
         {
             var ecdsa = RSA.Create(); // generate asymmetric key pair
             var req = new CertificateRequest($"cn={CN}", ecdsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
@@ -68,6 +68,8 @@ public class IndexModel : SecurePageModel
                     entryStream.Write(crtBytes, 0, crtBytes.Length);
                 }
             }
+
+            return Task.CompletedTask;
         }
         , onFinally: () => File(zipStream.ToArray(), "application/zip", $"{CertName}.zip")
         , successMessage: ""

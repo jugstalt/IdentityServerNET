@@ -56,6 +56,9 @@ public class ScopesModel : EditApiResourcePageModel
 
     }
 
+    public IActionResult OnGetCancel(string id)
+        => RedirectToPage(new { id = id });
+
     async public Task<IActionResult> OnPostAsync()
     {
         return await SecureHandlerAsync(async () =>

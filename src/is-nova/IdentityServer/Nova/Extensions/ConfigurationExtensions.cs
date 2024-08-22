@@ -34,6 +34,10 @@ static public class ConfigurationExtensions
         return configuration["identityserver:DenySigningUI"]?.ToLower() == "true";
     }
 
+    static public bool DenyAdminCreateCerts(this IConfiguration configuration)
+        => configuration["identityserver:DenyAdminCreateCerts"]?.ToLower() == "true";
+
+
     static public bool DenyManageAccount(this IConfiguration configuration)
     {
         return configuration["identityserver:DenyManageAccount"]?.ToLower() == "true";

@@ -114,7 +114,7 @@ Zuerst muss ein gültiger **Bearer Token** abgeholt werden:
     client_secret=secret&
     scope=secrets-vault secrets-vault.my-api-locker
 
-Wird eine **Access Token** zurück gegeben, kann dieser für den zum Abfragen des **Secrets** verwendet werden:
+Wird ein **Access Token** zurück gegeben, kann dieser für den zum Abfragen des **Secrets** verwendet werden:
 
 .. code::
 
@@ -129,6 +129,9 @@ Wird eine **Access Token** zurück gegeben, kann dieser für den zum Abfragen de
 
 Secret über IdentityServer.Nova.Clients abholen
 +++++++++++++++++++++++++++++++++++++++++++++++
+
+Das **nuget** Packet ``IdentityServer.Nova.Clients`` bietet folgende Methoden,
+um auf die **Secrets API** zuzugreifen:
 
 .. code:: bash
 

@@ -3,6 +3,7 @@ using IdentityServer.Nova.Clients;
 using IdentityServer.Nova.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Specialized;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -13,15 +14,15 @@ class Program
 {
     async static Task Main(string[] args)
     {
-        var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
+        //var cert = new X509Certificate2(@"C:\temp\identityserver_legacy\cert.pfx", "");
 
         //await CallSecretsVault("webgis", "secret", "webgis/sec1");
 
-        var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
-        //var secretsVaultClient = new SecretsVaultClient("webgis", cert);
-        await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
-        var secret = await secretsVaultClient.GetSecret("sec1");
-        Console.Write("Secret: " + secret.GetValue());
+        //var secretsVaultClient = new SecretsVaultClient("webgis", "secret12113");
+        ////var secretsVaultClient = new SecretsVaultClient("webgis", cert);
+        //await secretsVaultClient.OpenLocker("https://localhost:44300", "webgis");
+        //var secret = await secretsVaultClient.GetSecret("sec1");
+        //Console.Write("Secret: " + secret.GetValue());
 
         //Console.ReadLine();
 
@@ -31,8 +32,8 @@ class Program
 
         await SigningApiTest("https://localhost:44300");
 
-        string issuer = "https://localhost:44300";
-        var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);
+        //string issuer = "https://localhost:44300";
+        //var tokenResponse = /*await GetToken()*/ /*await GetUserToken()*/ await GetToken(cert);
 
         //if(tokenResponse == null)
         //{
@@ -46,19 +47,19 @@ class Program
             //var token = new OpenIdServer.Client.Token("https://localhost:44324");
             //await token.RequestClientCredentialsTokenAsync("client", "secret1", "api1 api2");
 
-            Console.WriteLine(tokenResponse.Json);
+            //Console.WriteLine(tokenResponse.Json);
 
-            if (await tokenResponse.AccessToken.ToValidatedJwtSecurityToken(issuer) == null)
-            {
-                Console.WriteLine("Token not valid");
-                return;
-            }
+            //if (await tokenResponse.AccessToken.ToValidatedJwtSecurityToken(issuer) == null)
+            //{
+            //    Console.WriteLine("Token not valid");
+            //    return;
+            //}
 
-            Console.WriteLine("Token successfully verified!");
+            //Console.WriteLine("Token successfully verified!");
 
             //await GetUserInfo(tokenResponse);
             //await VerifyToken(tokenResponse);
-            await CallApi(tokenResponse.AccessToken);
+            //await CallApi(tokenResponse.AccessToken);
         }
         catch (Exception ex)
         {
@@ -266,10 +267,16 @@ class Program
 
     async static Task SigningApiTest(string issuerAddress)
     {
-        string clientId = "client", clientSecret = "secret1";
+        string clientId = "signing-client", clientSecret = "secret";
 
         var singingApiClient = new SigningApiClient(clientId, clientSecret);
-        var signingResponse = await singingApiClient.SignData(issuerAddress, "data-i-want-to-sign");
+        //var signingResponse = await singingApiClient.SignData(issuerAddress, "data-i-want-to-sign");
+
+        var signingResponse = await singingApiClient.SignData(issuerAddress, new NameValueCollection()
+        {
+            { "name", "doc1" },
+            { "hash", "1234567890" }
+        });
 
         if (signingResponse.Succeded == false)
         {

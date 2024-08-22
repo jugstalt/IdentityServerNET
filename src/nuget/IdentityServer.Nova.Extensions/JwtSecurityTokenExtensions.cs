@@ -61,6 +61,28 @@ static public class JwtSecurityTokenExtensions
                     .Value;
     }
 
+    async static public Task<IDictionary<string, string>> GetValidatedClaimsValue(this string jwtEncodedString, string issuerUrl, string[] claimTypes, string audience = null)
+    {
+        var result = new Dictionary<string, string>();
+
+        if (claimTypes is null || claimTypes.Length == 0)
+            return result;
+
+        var jwtToken = await jwtEncodedString.ToValidatedJwtSecurityToken(issuerUrl);
+
+
+        foreach (var claimType in claimTypes)
+        {
+            result[claimType] = jwtToken?
+                    .Claims?
+                    .Where(c => claimType.Equals(c.Type))
+                    .FirstOrDefault()?
+                    .Value;
+        }
+
+        return result;
+    }
+
     static public JwtSecurityToken ToAssertionToken(this X509Certificate2 cert, string clientId, string issuer)
     {
         var now = DateTime.UtcNow;

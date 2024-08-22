@@ -16,7 +16,7 @@
                 @foreach (var scope in Model.CurrentApiResource.Scopes)
                 {
 
-                    <li style="border-bottom:1px solid #eee;@(scope.Name == Model.Input.Scope?.Name ? ";font-weight:bold;background-color:#eee":"")">
+                    <li class="list-item@(scope.Name == Model.Input.Scope?.Name ? " selected" : "")">
                         <div style="display:inline-block;padding:10px 15px 10px 5px">
                             @(scope.Name)
                         </div>
@@ -31,6 +31,12 @@
                                asp-page="./Scopes"
                                asp-route-id="@Model.CurrentApiResource.Name"
                                asp-route-scopeName="@scope.Name">Edit</a>
+                        } 
+                        else
+                        {
+                            <a style="display:inline-block;float:right"
+                               asp-page-handler="Cancel"
+                               asp-route-id="@Model.CurrentApiResource.Name">Cancel</a>
                         }
                     </li>
 
