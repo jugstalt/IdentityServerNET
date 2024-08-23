@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'identityserver.nova'
+project = 'Identityserver.Nova'
 copyright = '2024, Jürgen Gstaltmaier'
 author = 'Jürgen Gstaltmaier'
 release = '5.0.0'
