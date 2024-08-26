@@ -1,4 +1,5 @@
-﻿using IdentityServer.Nova.Models;
+﻿using IdentityServer.Nova.Abstractions.Security;
+using IdentityServer.Nova.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,15 @@ namespace IdentityServer.Areas.Identity.Pages.Account;
 public class ResetPasswordModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ILoginBotDetection _loginBotDetection;
 
-    public ResetPasswordModel(UserManager<ApplicationUser> userManager)
+    public ResetPasswordModel(
+            UserManager<ApplicationUser> userManager,
+            ILoginBotDetection loginBotDetection = null
+        )
     {
         _userManager = userManager;
+        _loginBotDetection = loginBotDetection;
     }
 
     [BindProperty]
@@ -75,6 +81,8 @@ public class ResetPasswordModel : PageModel
         var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
         if (result.Succeeded)
         {
+            _loginBotDetection?.RemoveSuspiciousUserAsync(user.UserName);
+
             return RedirectToPage("./ResetPasswordConfirmation");
         }
 
