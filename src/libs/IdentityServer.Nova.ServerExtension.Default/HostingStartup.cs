@@ -215,7 +215,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region EmailSender (required)
 
-        services.AddTransient<ICustomEmailSender, MailJetEmailSender>();
+        services.AddTransient<ICustomEmailSender, SmtpEmailSender>();
 
         #endregion
 

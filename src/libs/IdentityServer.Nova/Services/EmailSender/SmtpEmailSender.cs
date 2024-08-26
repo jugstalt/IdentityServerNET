@@ -38,16 +38,17 @@ public class SmtpEmailSender : ICustomEmailSender
                 _configuration.GetSection("Smtp").GetValue<string>("FromName"));
             msg.To.Add(new MailAddress(email));
 
+            var smtpServer = _configuration.GetSection("Smtp").GetValue<string>("SmtpServer");
+            var smtpPort = int.Parse(_configuration.GetSection("Smtp").GetValue<string>("SmtpPort"));
+
             msg.Subject = subject;
             msg.Body = htmlMessage;
             msg.IsBodyHtml = true;
 
-            SmtpClient client = new SmtpClient(
-                _configuration.GetSection("Smtp").GetValue<string>("SmtpServer"),
-                int.Parse(_configuration.GetSection("Smtp").GetValue<string>("SmtpPort")));
+            SmtpClient client = new SmtpClient(smtpServer, smtpPort);
 
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.EnableSsl = true;
+            client.EnableSsl = smtpServer != "localhost";
 
             string username = _configuration.GetSection("Smtp").GetValue<string>("Username");
             string password = _configuration.GetSection("Smtp").GetValue<string>("Password");

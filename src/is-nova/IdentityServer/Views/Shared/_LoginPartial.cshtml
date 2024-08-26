@@ -8,6 +8,10 @@
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @inject IdentityServer.Nova.Services.ColorSchemeService ColorScheme
 
+@{
+    var applicationUser = await UserManager.GetUserAsync(User);
+}
+
 @if (SignInManager.IsSignedIn(User))
 {
         <ul class="nav navbar-nav navbar-right">
@@ -17,6 +21,15 @@
                     Home
                 </a>
             </li>
+            @if(applicationUser.HasAdministratorRole())
+            {
+                <li>
+                    <a href="~/admin" title="Admin">
+                        <div class="@ColorScheme.NavIcon("admin")"></div>
+                        Admin
+                    </a>
+                </li>
+            }
             <li>
                 @if (Configuration.DenyManageAccount())
                 {
