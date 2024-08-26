@@ -6,5 +6,6 @@ Erste Schritte
    :caption: Contents:
 
    installation
+   configuration
    login-as-admin
    admin-server
