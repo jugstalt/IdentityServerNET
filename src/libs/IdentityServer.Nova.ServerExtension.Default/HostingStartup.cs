@@ -15,6 +15,7 @@ using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 {
     public void ConfigureServices(WebHostBuilderContext context, IServiceCollection services)
     {
+        var configSection = context.Configuration.GetSection("IdentityServer");
+
         #region Add a PasswordHasher (optional)
 
         services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>();
@@ -37,26 +40,26 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>();
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:FilesDb"]))
         {
             services.AddUserDbContext<FileBlobUserDb>(options =>
             {
-                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:FilesDb"], "users");
-                options.AddDefaults(context.Configuration);
+                options.ConnectionString = Path.Combine(configSection["ConnectionStrings:FilesDb"], "users");
+                options.AddDefaults(configSection);
             });
         }
-        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:LiteDb"]))
         {
             services.AddUserDbContext<LiteDbUserDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
-                options.AddDefaults(context.Configuration);
+                options.ConnectionString = configSection["ConnectionStrings:LiteDb"];
+                options.AddDefaults(configSection);
             });
         }
         else
         {
             services.AddUserDbContext<InMemoryUserDb>(options =>
-                    options.AddDefaults(context.Configuration)
+                    options.AddDefaults(configSection)
                 );
         }
 
@@ -64,18 +67,18 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add RoleDbContext (optional) 
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:FilesDb"]))
         {
             services.AddRoleDbContext<FileBlobRoleDb>(options =>
             {
-                options.ConnectionString = Path.Combine(context.Configuration["ConnectionStrings:FilesDb"], "roles");
+                options.ConnectionString = Path.Combine(configSection["ConnectionStrings:FilesDb"], "roles");
             });
         }
-        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:LiteDb"]))
         {
             services.AddRoleDbContext<LiteDbRoleDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
+                options.ConnectionString = configSection["ConnectionStrings:LiteDb"];
             });
         }
         else
@@ -87,26 +90,26 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add a ResourceDbContext (required) 
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:FilesDb"]))
         {
             services.AddResourceDbContext<FileBlobResourceDb>(options =>
             {
                 options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "resources");
-                options.AddDefaults(context.Configuration);
+                options.AddDefaults(configSection);
             });
         }
-        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:LiteDb"]))
         {
             services.AddResourceDbContext<LiteDbResourceDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
-                options.AddDefaults(context.Configuration);
+                options.ConnectionString = configSection["ConnectionStrings:LiteDb"];
+                options.AddDefaults(configSection);
             });
         }
         else
         {
             services.AddResourceDbContext<InMemoryResourceDb>(options =>
-                    options.AddDefaults(context.Configuration)
+                    options.AddDefaults(configSection)
                 );
         }
 
@@ -114,13 +117,13 @@ public class TestHostingStartup : IIdentityServerNovaStartup
         /*
         services.AddResourceDbContext<MongoBlobResourceDb>(options =>
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
+            options.ConnectionString = configSection["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
         });
         */
         /*
         services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
+            options.ConnectionString = configSection["ConnectionStrings:AzureStorage"];
         });
         */
 
@@ -128,50 +131,50 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add a ClientDbContext (required)
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:FilesDb"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:FilesDb"]))
         {
             services.AddClientDbContext<FileBlobClientDb>(options =>
             {
                 options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "clients");
-                options.AddDefaults(context.Configuration);
+                options.AddDefaults(configSection);
             });
         }
-        else if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:LiteDb"]))
+        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:LiteDb"]))
         {
             services.AddClientDbContext<LiteDbClientDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:LiteDb"];
-                options.AddDefaults(context.Configuration);
+                options.ConnectionString = configSection["ConnectionStrings:LiteDb"];
+                options.AddDefaults(configSection);
             });
         }
         else
         {
             services.AddClientDbContext<InMemoryClientDb>(options =>
-                    options.AddDefaults(context.Configuration)
+                    options.AddDefaults(configSection)
                 );
         }
 
         /*
         services.AddClientDbContext<MongoBlobClientDb>(options =>
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
+            options.ConnectionString = configSection["ConnectionStrings:MongoDb"]; //"mongodb://localhost:27017";
         });
         */
         /*
         services.AddClientDbContext<TableStorageBlobClientDb>(options =>
         {
-            options.ConnectionString = context.Configuration["ConnectionStrings:AzureStorage"];
+            options.ConnectionString = configSection["ConnectionStrings:AzureStorage"];
         });
         */
         #endregion
 
         #region Add ExportClientDbContext (optional)
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:ExportPath"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:ExportPath"]))
         {
             services.AddExportClientDbContext<FileBlobClientExportDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
+                options.ConnectionString = configSection["ConnectionStrings:ExportPath"];
             });
         }
 
@@ -179,11 +182,11 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region Add ExportResourceDbContext (optional)
 
-        if (!String.IsNullOrEmpty(context.Configuration["ConnectionStrings:ExportPath"]))
+        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:ExportPath"]))
         {
             services.AddExportResourceDbContext<FileBlobResourceExportDb>(options =>
             {
-                options.ConnectionString = context.Configuration["ConnectionStrings:ExportPath"];
+                options.ConnectionString = configSection["ConnectionStrings:ExportPath"];
             });
         }
 
@@ -191,7 +194,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region App SecretsVaultDbContext (optional) 
 
-        services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(context.Configuration, options =>
+        services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(configSection, options =>
         {
             options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "secretsvault");
             options.CryptoService = new Base64CryptoService();
@@ -203,7 +206,7 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         services.AddUserInterfaceService<DefaultUserInterfaceService>(options =>
         {
-            options.ApplicationTitle = context.Configuration["ApplicationTitle"];  // required
+            options.ApplicationTitle = configSection["ApplicationTitle"] ?? "IdentityServer.Nova";
             options.OverrideCssContent = Properties.Resources.is4_overrides + Properties.Resources.openid_logo;
             options.MediaContent = new Dictionary<string, byte[]>()
             {
@@ -215,7 +218,22 @@ public class TestHostingStartup : IIdentityServerNovaStartup
 
         #region EmailSender (required)
 
-        services.AddTransient<ICustomEmailSender, SmtpEmailSender>();
+        if (configSection.GetSection("Mail:Smtp").Exists())
+        {
+            services.AddTransient<ICustomEmailSender, SmtpEmailSender>();
+        }
+        else if (configSection.GetSection("Mail:MailJet").Exists())
+        {
+            services.AddTransient<ICustomEmailSender, MailJetEmailSender>();
+        }
+        else if (configSection.GetSection("Mail:SendGrid").Exists())
+        {
+            services.AddTransient<ICustomEmailSender, SendGridEmailSender>();
+        }
+        else
+        {
+            services.AddTransient<ICustomEmailSender, NullEmailSender>();
+        }
 
         #endregion
 

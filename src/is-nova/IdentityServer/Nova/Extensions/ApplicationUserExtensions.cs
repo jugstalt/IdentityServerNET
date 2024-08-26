@@ -34,7 +34,7 @@ static public class ApplicationUserExtensions
     {
         if (environment.IsDevelopment() && !String.IsNullOrWhiteSpace(configuration["IdentityServer:AdminUsername"]))
         {
-            AdminUserName = configuration["IdentityServer:AdminUsername"];
+            AdminUserName = configuration["IdentityServer:Admin:AdminUsername"];
         }
         else
         {

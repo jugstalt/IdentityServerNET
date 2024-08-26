@@ -229,7 +229,7 @@ public class Startup
 
         #region Register Certificate Store
 
-        if (String.IsNullOrEmpty(Configuration["SigningCredential:Storage"]))
+        if (String.IsNullOrEmpty(Configuration["IdentityServer:SigningCredential:Storage"]))
         {
             // not recommended for production - you need to store your key material somewhere secure
             services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateInMemoryStorage>();
@@ -238,8 +238,8 @@ public class Startup
         {
             services.Configure<SigningCredentialCertificateStorageOptions>(storageOptions =>
             {
-                storageOptions.Storage = Configuration["SigningCredential:Storage"] ?? @"C:\temp\identityserver_nova\storage\validation";
-                storageOptions.CertPassword = Configuration["SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
+                storageOptions.Storage = Configuration["IdentityServer:SigningCredential:Storage"];
+                storageOptions.CertPassword = Configuration["IdentityServer:SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
             });
             services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
         }

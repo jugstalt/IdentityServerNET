@@ -14,12 +14,17 @@ Aufbau der Config Datei:
 .. code:: javascript
 
     {
-        "ApplicationTitle": "IdentityServer.Nova",
-        "IdentityServer": {
+        "NovaAssemblyName": "...",  // default: IdentityServer.Nova.ServerExtension.Default
+        "ApplicationTitle": "IdentityServer.Nova", // default "",
+        "IdentityServer": {  // default: null
             "PublicOrigin": "https://localhost:44300"
-        },
-        "ConnectionStrings": {
             // ...
         },
-
+        "ConnectionStrings": {  // default: null => all DBs in Memory
+            // ...
+        },
+        "SigningCredential": {  // default: null => certs only in memory
+            "Storage": "C:\\apps\\identityserver-nova\\storage\\validation",
+            "CertPassword": "Secu4epas3wO3d"
+        },
     }

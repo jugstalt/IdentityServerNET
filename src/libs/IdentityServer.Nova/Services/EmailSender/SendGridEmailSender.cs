@@ -14,24 +14,24 @@ public class SendGridEmailSender : ICustomEmailSender
     //	"FromName": "Identity Server"
     //}
 
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configSection;
 
     public SendGridEmailSender(IConfiguration configuration)
     {
-        _configuration = configuration;
+        _configSection = configuration.GetSection("IdentityServer:Mail:SendGrid");
     }
 
     public Task SendEmailAsync(string email, string subject, string message)
     {
-        string key = _configuration.GetSection("SendGrid").GetValue<string>("ApiKey");
+        string key = _configSection.GetValue<string>("ApiKey");
         return Execute(key, subject, message, email);
     }
 
     public Task Execute(string apiKey, string subject, string message, string email)
     {
         var client = new SendGridClient(apiKey);
-        string fromEmail = _configuration.GetSection("SendGrid").GetValue<string>("FromEmail");
-        string fromName = _configuration.GetSection("SendGrid").GetValue<string>("FromName");
+        string fromEmail = _configSection.GetValue<string>("FromEmail");
+        string fromName = _configSection.GetValue<string>("FromName");
 
         var msg = new SendGridMessage()
         {

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Abstractions.EmailSender;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.Services.Cryptography;
@@ -21,7 +22,8 @@ public class SetupService
             IPasswordHasher<ApplicationUser> passwordHasher,
             IRoleDbContext roleDb = null,
             IClientDbContext clientDb = null,
-            IResourceDbContext resourceDb = null
+            IResourceDbContext resourceDb = null,
+            ICustomEmailSender mailSender = null
         )
     {
         Console.WriteLine("################# Setup ##################");
@@ -31,6 +33,7 @@ public class SetupService
         LogInstance(roleDb);
         LogInstance(clientDb);
         LogInstance(resourceDb);
+        LogInstance(mailSender);
 
         var adminUser = userDb.FindByNameAsync("admin", CancellationToken.None).GetAwaiter().GetResult();
 

@@ -18,11 +18,11 @@ public class SmtpEmailSender : ICustomEmailSender
     //	"FromName": "Identity Server"
     //}
 
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configSection;
 
     public SmtpEmailSender(IConfiguration configuration)
     {
-        _configuration = configuration;
+        _configSection = configuration.GetSection("IdentityServer:Mail:Smtp");
     }
 
     #region ICustomEmailSender
@@ -34,12 +34,12 @@ public class SmtpEmailSender : ICustomEmailSender
             MailMessage msg = new MailMessage();
 
             msg.From = new MailAddress(
-                _configuration.GetSection("Smtp").GetValue<string>("FromEmail"),
-                _configuration.GetSection("Smtp").GetValue<string>("FromName"));
+                _configSection.GetValue<string>("FromEmail"),
+                _configSection.GetValue<string>("FromName"));
             msg.To.Add(new MailAddress(email));
 
-            var smtpServer = _configuration.GetSection("Smtp").GetValue<string>("SmtpServer");
-            var smtpPort = int.Parse(_configuration.GetSection("Smtp").GetValue<string>("SmtpPort"));
+            var smtpServer = _configSection.GetValue<string>("SmtpServer");
+            var smtpPort = int.Parse(_configSection.GetValue<string>("SmtpPort"));
 
             msg.Subject = subject;
             msg.Body = htmlMessage;
@@ -50,8 +50,8 @@ public class SmtpEmailSender : ICustomEmailSender
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.EnableSsl = smtpServer != "localhost";
 
-            string username = _configuration.GetSection("Smtp").GetValue<string>("Username");
-            string password = _configuration.GetSection("Smtp").GetValue<string>("Password");
+            string username = _configSection.GetValue<string>("Username");
+            string password = _configSection.GetValue<string>("Password");
 
             if (String.IsNullOrWhiteSpace(username))
             {

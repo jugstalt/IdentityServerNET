@@ -20,11 +20,11 @@ public class MailJetEmailSender : ICustomEmailSender
     //	"FromName": "Identity Server"
     //}
 
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configSection;
 
     public MailJetEmailSender(IConfiguration configuration)
     {
-        _configuration = configuration;
+        _configSection = configuration.GetSection("IdentityServer:Mail:MailJet");
     }
 
     #region ICustomEmailSender
@@ -36,8 +36,8 @@ public class MailJetEmailSender : ICustomEmailSender
             Console.WriteLine($"Try send mail to: {to}");
 
             MailjetClient client = new MailjetClient(
-                _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
-                _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
+                _configSection.GetValue<string>("ApiKey"),
+                _configSection.GetValue<string>("ApiSecret"));
 
             MailjetRequest request = new MailjetRequest
             {
@@ -45,7 +45,7 @@ public class MailJetEmailSender : ICustomEmailSender
             };
 
             var email = new TransactionalEmailBuilder()
-                                        .WithFrom(new SendContact(_configuration.GetSection("MailJet").GetValue<string>("FromEmail")))
+                                        .WithFrom(new SendContact(_configSection.GetValue<string>("FromEmail")))
                                         .WithSubject(subject)
                                         .WithHtmlPart(htmlMessage)
                                         .WithTo(new SendContact(to))
@@ -83,8 +83,8 @@ public class MailJetEmailSender : ICustomEmailSender
             MailMessage msg = new MailMessage();
 
             msg.From = new MailAddress(
-                _configuration.GetSection("MailJet").GetValue<string>("FromEmail"),
-                _configuration.GetSection("MailJet").GetValue<string>("FromName"));
+                _configSection.GetValue<string>("FromEmail"),
+                _configSection.GetValue<string>("FromName"));
             msg.To.Add(new MailAddress(email));
 
             msg.Subject = subject;
@@ -96,8 +96,8 @@ public class MailJetEmailSender : ICustomEmailSender
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             client.Credentials = new NetworkCredential(
-                 _configuration.GetSection("MailJet").GetValue<string>("ApiKey"),
-                 _configuration.GetSection("MailJet").GetValue<string>("ApiSecret"));
+                 _configSection.GetValue<string>("ApiKey"),
+                 _configSection.GetValue<string>("ApiSecret"));
 
             await client.SendMailAsync(msg);
 
