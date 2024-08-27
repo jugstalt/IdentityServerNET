@@ -94,7 +94,7 @@ Abschnitt ``SigningCredential``
 .. code:: javascript
 
     "SigningCredential": {
-      "Storage": "c:\\apps\\identityserver-nova\\storage",  // any path
+      "Storage": "c:\\apps\\identityserver-nova\\storage\\validation",  // any path
       "CertPassword": "..."
     }
 
