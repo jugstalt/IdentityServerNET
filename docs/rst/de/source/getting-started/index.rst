@@ -5,7 +5,9 @@ Erste Schritte
    :maxdepth: 2
    :caption: Contents:
 
-   installation
+   installation-windows
+   installation-linux
+   installation-docker
    configuration
    login-as-admin
    admin-server
