@@ -5,6 +5,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using System.Linq;
 
 namespace IdentityServer;
 
@@ -57,6 +58,20 @@ public class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
+                #region Custom App config
+                
+                var customAppConfig = args.FirstOrDefault(arg => arg.StartsWith("--customAppSettings="))?.Split('=')[1];
+                if (!string.IsNullOrEmpty(customAppConfig))
+                {
+                    string customAppConfigFile = $"appsettings.{customAppConfig}.json";
+                    Console.WriteLine($"Using custom app config file: {customAppConfigFile} ({(System.IO.File.Exists(customAppConfigFile) ? "exits" : "not exist")})");
+                    config.AddJsonFile(customAppConfigFile, optional: true, reloadOnChange: false);
+                }
+
+                #endregion
+
+                #region _config/...json File
+
                 var settingsPrefix = Environment.GetEnvironmentVariable("IDENTITY_SERVER_SETTINGS_PREFIX");
 
                 if (string.IsNullOrEmpty(settingsPrefix))
@@ -69,6 +84,8 @@ public class Program
                 config.AddJsonFile(configFile,
                     optional: true,
                     reloadOnChange: false);
+
+                #endregion
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
