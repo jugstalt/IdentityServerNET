@@ -1,6 +1,6 @@
 ﻿namespace IdentityServer.Nova.Abstractions.Security;
 
-public interface ICaptchCodeRenderer
+public interface ICaptchaCodeRenderer
 {
     byte[] RenderCodeToImage(string captchaCode);
 }

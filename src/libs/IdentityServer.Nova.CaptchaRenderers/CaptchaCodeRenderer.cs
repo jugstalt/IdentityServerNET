@@ -5,7 +5,7 @@ using SkiaSharp;
 using System;
 using System.IO;
 
-public class CaptchaCodeRenderer : ICaptchCodeRenderer
+public class CaptchaCodeRenderer : ICaptchaCodeRenderer
 {
     private CaptchaCodeRendererOptions _options;
 

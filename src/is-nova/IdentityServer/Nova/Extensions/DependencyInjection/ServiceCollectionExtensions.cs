@@ -15,6 +15,7 @@ using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
 using IdentityServer.Nova.Services.UI;
 using IdentityServer.Nova.Stores;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,104 +39,6 @@ static public class ServiceCollectionExtensions
     static public IServiceCollection AddServicesFromConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         var configSection = configuration.GetSection("IdentityServer");
-
-        #region Add an UserDbContext (required)
-
-        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Users:FilesDb"]))
-        {
-            services.AddUserDbContext<FileBlobUserDb>(options =>
-            {
-                options.ConnectionString = Path.Combine(configSection["ConnectionStrings:Users:FilesDb"], "users");
-                options.AddDefaults(configSection);
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Users:LiteDb"]))
-        {
-            services.AddUserDbContext<LiteDbUserDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Users:LiteDb"];
-                options.AddDefaults(configSection);
-            });
-        }
-
-        #endregion
-
-        #region Add RoleDbContext (optional) 
-
-        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Roles:FilesDb"]))
-        {
-            services.AddRoleDbContext<FileBlobRoleDb>(options =>
-            {
-                options.ConnectionString = Path.Combine(configSection["ConnectionStrings:Roles:FilesDb"], "roles");
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Roles:LiteDb"]))
-        {
-            services.AddRoleDbContext<LiteDbRoleDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Roles:LiteDb"];
-            });
-        }
-
-        #endregion
-
-        #region Add a ResourceDbContext (required) 
-
-        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Resources:FilesDb"]))
-        {
-            services.AddResourceDbContext<FileBlobResourceDb>(options =>
-            {
-                options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "resources");
-                options.AddDefaults(configSection);
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Resources:LiteDb"]))
-        {
-            services.AddResourceDbContext<LiteDbResourceDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Resources:LiteDb"];
-                options.AddDefaults(configSection);
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Resources:AzureStorage"]))
-        {
-            services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Resources:AzureStorage"];
-                options.AddDefaults(configSection);
-            });
-        }
-
-        #endregion
-
-        #region Add a ClientDbContext (required)
-
-        if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Clients:FilesDb"]))
-        {
-            services.AddClientDbContext<FileBlobClientDb>(options =>
-            {
-                options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "clients");
-                options.AddDefaults(configSection);
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Clients:LiteDb"]))
-        {
-            services.AddClientDbContext<LiteDbClientDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Clients:LiteDb"];
-                options.AddDefaults(configSection);
-            });
-        }
-        else if (!String.IsNullOrEmpty(configSection["ConnectionStrings:Clients:AzureStorage"]))
-        {
-            services.AddClientDbContext<TableStorageBlobClientDb>(options =>
-            {
-                options.ConnectionString = configSection["ConnectionStrings:Clients:AzureStorage"];
-                options.AddDefaults(configSection);
-            });
-        }
-
-        #endregion
 
         #region Add ExportClientDbContext (optional)
 
@@ -171,23 +74,6 @@ static public class ServiceCollectionExtensions
 
         #endregion
 
-        #region EmailSender (required)
-
-        if (configSection.GetSection("Mail:Smtp").Exists())
-        {
-            services.AddTransient<ICustomEmailSender, SmtpEmailSender>();
-        }
-        else if (configSection.GetSection("Mail:MailJet").Exists())
-        {
-            services.AddTransient<ICustomEmailSender, MailJetEmailSender>();
-        }
-        else if (configSection.GetSection("Mail:SendGrid").Exists())
-        {
-            services.AddTransient<ICustomEmailSender, SendGridEmailSender>();
-        }
-
-        #endregion
-
         return services;
     }
 
@@ -195,27 +81,131 @@ static public class ServiceCollectionExtensions
     {
         var configSection = configuration.GetSection("IdentityServer");
 
+        // Default PasswordHasher
+        services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>();
+
         services
-            // Default PasswordHasher
-            .IfServiceNotRegistered<IPasswordHasher<ApplicationUser>>(() => services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>())
+            //.IfServiceNotRegistered<IPasswordHasher<ApplicationUser>>(() => services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>())
+            
+            
             // Default UserStoreFactory
             .IfServiceNotRegistered<IUserStoreFactory>(() => services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>())
+            
             // Default UserDbContext
-            .IfServiceNotRegistered<IUserDbContext>(() => services.AddUserDbContext<InMemoryUserDb>(options =>
-                    options.AddDefaults(configSection)
-                ))
+            .IfServiceNotRegistered<IUserDbContext>(() =>
+                configSection
+                    .SwitchCase("ConnectionStrings:Users:FilesDb", value =>
+                        services.AddUserDbContext<FileBlobUserDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(value, "users");
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Users:LiteDb", value =>
+                        services.AddUserDbContext<LiteDbUserDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchDefault(() =>
+                        services.AddUserDbContext<InMemoryUserDb>(options =>
+                            options.AddDefaults(configSection)
+                        )
+                    )
+            )
+
             // Default RoleDbContex
-            .IfServiceNotRegistered<IRoleDbContext>(() => services.AddRoleDbContext<InMemoryRoleDb>())
+            .IfServiceNotRegistered<IRoleDbContext>(() => 
+                configSection
+                    .SwitchCase("ConnectionStrings:Roles:FilesDb", value =>
+                        services.AddRoleDbContext<FileBlobRoleDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(value, "roles");
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Roles:LiteDb", value =>
+                        services.AddRoleDbContext<LiteDbRoleDb>(options =>
+                        {
+                            options.ConnectionString = configSection["ConnectionStrings:Roles:LiteDb"];
+                        })
+                    )
+                    .SwitchDefault(() => 
+                        services.AddRoleDbContext<InMemoryRoleDb>()
+                    )
+            )
+
             // Default ResouceDbContext
-            .IfServiceNotRegistered<IResourceDbContext>(() => services.AddResourceDbContext<InMemoryResourceDb>(options =>
-                    options.AddDefaults(configSection)
-                ))
+            .IfServiceNotRegistered<IResourceDbContext>(() => 
+                configSection
+                    .SwitchCase("ConnectionStrings:Resources:FilesDb", value =>
+                        services.AddResourceDbContext<FileBlobResourceDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(value, "resources");
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Resources:LiteDb", value =>
+                        services.AddResourceDbContext<LiteDbResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Resources:AzureStorage", value =>
+                        services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchDefault(()=>
+                        services.AddResourceDbContext<InMemoryResourceDb>(options =>
+                            options.AddDefaults(configSection)
+                        )
+                    )
+            )
+
             // Default ClientDbContext
-            .IfServiceNotRegistered<IClientDbContext>(() => services.AddClientDbContext<InMemoryClientDb>(options =>
-                    options.AddDefaults(configSection)
-                ))
+            .IfServiceNotRegistered<IClientDbContext>(() =>
+                configSection
+                    .SwitchCase("ConnectionStrings: Clients:FilesDb", value =>
+                        services.AddClientDbContext<FileBlobClientDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(value, "clients");
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Clients:LiteDb", value =>
+                        services.AddClientDbContext<LiteDbClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase("ConnectionStrings:Clients:AzureStorage", value =>
+                        services.AddClientDbContext<TableStorageBlobClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchDefault(() =>
+                        services.AddClientDbContext<InMemoryClientDb>(options =>
+                                options.AddDefaults(configSection)
+                        )
+                    )
+            )
+
             // Default EmailSender
-            .IfServiceNotRegistered<ICustomEmailSender>(() => services.AddTransient<ICustomEmailSender, NullEmailSender>())
+            .IfServiceNotRegistered<ICustomEmailSender>(() => 
+                configSection
+                    .SwitchSection("Mail:Smtp", _ => services.AddTransient<ICustomEmailSender, SmtpEmailSender>())
+                    .SwitchSection("Mail:MailJet", _ => services.AddTransient<ICustomEmailSender, MailJetEmailSender>())
+                    .SwitchSection("Mail:SendGrid", _ => services.AddTransient<ICustomEmailSender, SendGridEmailSender>())
+                    .SwitchDefault(() => services.AddTransient<ICustomEmailSender, NullEmailSender>())
+            )
+            
             // Default UserInterface
             .IfServiceNotRegistered<IUserInterfaceService>(() => services.AddUserInterfaceService<DefaultUserInterfaceService>(options =>
             {
@@ -229,7 +219,7 @@ static public class ServiceCollectionExtensions
             // BotDetection
             .IfServiceNotRegistered<ILoginBotDetection>(() => services.AddLoginBotDetection<LoginBotDetection>())
             // Captcha
-            .IfServiceNotRegistered<ICaptchCodeRenderer>(() => services.AddCaptchaRenderer<CaptchaCodeRenderer>());
+            .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<CaptchaCodeRenderer>());
 
         return services;
     }

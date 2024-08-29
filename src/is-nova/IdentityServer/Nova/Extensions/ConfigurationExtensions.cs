@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace IdentityServer.Nova.Extensions;
 
@@ -61,5 +62,53 @@ static public class ConfigurationExtensions
     static public bool RememberLoginDefaultValue(this IConfiguration configuration)
     {
         return configuration["identityserver:Login:RememberLoginDefaultValue"]?.ToLower() == "true";
+    }
+
+    static public IConfiguration SwitchCase(
+            this IConfiguration configuration,
+            string name,
+            Action<string> then)
+    {
+        if(configuration is null) return null;
+
+        string value = configuration[name];
+
+        if(!String.IsNullOrEmpty(value))
+        {
+            then(value);
+
+            return null;  // no more switchCases
+        }
+
+        return configuration;
+    }
+
+    static public IConfiguration SwitchSection(
+            this IConfiguration configuration,
+            string name,
+            Action<IConfigurationSection> then)
+    {
+        if (configuration is null) return null;
+
+        var section = configuration.GetSection(name);
+
+        if (section.Exists())
+        {
+            then(section);
+
+            return null;  // no more switchCases
+        }
+
+        return configuration;
+    }
+
+    static public void SwitchDefault(
+            this IConfiguration configuration,
+            Action then
+        )
+    {
+        if(configuration is null) return;
+
+        then();
     }
 }

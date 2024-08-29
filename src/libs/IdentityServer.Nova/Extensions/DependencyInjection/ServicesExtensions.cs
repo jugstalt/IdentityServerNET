@@ -165,15 +165,15 @@ public static class ServicesExtensions
     }
 
     public static IServiceCollection AddCaptchaRenderer<TCaptchaRendererType>(this IServiceCollection services)
-       where TCaptchaRendererType : class, ICaptchCodeRenderer
+       where TCaptchaRendererType : class, ICaptchaCodeRenderer
     {
-        services.AddTransient<ICaptchCodeRenderer, TCaptchaRendererType>();
+        services.AddTransient<ICaptchaCodeRenderer, TCaptchaRendererType>();
 
         return services;
     }
 
     public static IServiceCollection AddCaptchaRenderer<TCaptchaRendererType, TCaptchaRendererOptionsType>(this IServiceCollection services, Action<TCaptchaRendererOptionsType> captchaOptionsSetup)
-        where TCaptchaRendererType : class, ICaptchCodeRenderer
+        where TCaptchaRendererType : class, ICaptchaCodeRenderer
         where TCaptchaRendererOptionsType : class
     {
         services.Configure<TCaptchaRendererOptionsType>(captchaOptionsSetup);

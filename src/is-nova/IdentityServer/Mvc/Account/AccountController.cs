@@ -43,7 +43,7 @@ public class AccountController : Controller
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IEventService _events;
     private readonly ILoginBotDetection _loginBotDetection;
-    private readonly ICaptchCodeRenderer _captchaCodeRenderer;
+    private readonly ICaptchaCodeRenderer _captchaCodeRenderer;
     private readonly IConfiguration _configuration;
 
     public AccountController(
@@ -56,7 +56,7 @@ public class AccountController : Controller
         IEventService events,
         IConfiguration configuration,
         ILoginBotDetection loginBotDetetion = null,
-        ICaptchCodeRenderer captchaCodeRenderer = null)
+        ICaptchaCodeRenderer captchaCodeRenderer = null)
     {
         _logger = logger;
 
