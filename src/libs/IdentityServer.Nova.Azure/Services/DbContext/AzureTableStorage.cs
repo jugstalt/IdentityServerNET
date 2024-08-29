@@ -1,13 +1,13 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure;
+using Azure.Data.Tables;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Nova.Azure.Services.DbContext;
 
-public class AzureTableStorage<T> where T : ITableEntity, new()
+public class AzureTableStorage<T> where T : class, ITableEntity, new()
 {
-    static private object thisLocker = new object();
     private string _connectionString;
 
     public bool Init(string initalParameter)
@@ -18,55 +18,82 @@ public class AzureTableStorage<T> where T : ITableEntity, new()
 
     async public Task<bool> CreateTableAsync(string tableName)
     {
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+        try
+        {
+            TableClient tableClient = tableServiceClient.GetTableClient(tableName);
+            await tableClient.CreateIfNotExistsAsync();
 
-        // Create the table if it doesn't exist.
-        CloudTable table = tableClient.GetTableReference(tableName);
-        await table.CreateIfNotExistsAsync();
-
-        return true;
+            return true;
+        }
+        catch (RequestFailedException ex)
+        {
+            Console.WriteLine($"Error on Create Table: {ex.Message}");
+            return false;
+        }
     }
 
     async public Task<bool> InsertEntityAsync(string tableName, T entity)
     {
         try
         {
-            return await InsertEntity(tableName, entity);
+            // Create a TableServiceClient using the connection string
+            TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
+
+            // Get a reference to the table
+            TableClient tableClient = tableServiceClient.GetTableClient(tableName);
+
+            // Insert the entity into the table
+            await tableClient.AddEntityAsync(entity);
+
+            return true;
         }
-        catch (StorageException ex)
+        catch (RequestFailedException ex)
         {
-            if (ex.Message.Contains("(409)"))
+            // Check if the entity already exists (conflict error)
+            if (ex.Status == 409) // 409 is the HTTP status code for Conflict
             {
                 throw new TableStorageEntityAlreadyExitsException(tableName, entity, ex);
             }
 
-            throw ex;
+            // Rethrow the original exception for other error cases
+            throw;
         }
     }
 
     async private Task<bool> InsertEntity(string tableName, T entity, bool mergeIfExists = false)
     {
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        // Create the TableServiceClient using the connection string
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+        // Get a reference to the table
+        TableClient tableClient = tableServiceClient.GetTableClient(tableName);
 
-        // Create the CloudTable object that represents the "people" table.
-        CloudTable table = tableClient.GetTableReference(tableName);
+        try
+        {
+            // Choose the appropriate operation based on mergeIfExists parameter
+            if (mergeIfExists)
+            {
+                // If the entity exists, merge it; otherwise, insert it
+                await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Merge);
+            }
+            else
+            {
+                // Insert the entity; if the entity already exists, this will throw an exception
+                await tableClient.AddEntityAsync(entity);
+            }
 
-        // Create the TableOperation object that inserts the customer entity.
-        TableOperation inserOperation = mergeIfExists ?
-            TableOperation.InsertOrMerge(entity) :
-            TableOperation.Insert(entity);
-
-        // Execute the insert operation.
-        await table.ExecuteAsync(inserOperation);
-
-        return true;
+            return true;
+        }
+        catch (RequestFailedException ex)
+        {
+            // Handle the error if the entity already exists or other errors occur
+            Console.WriteLine($"An error occurred while inserting the entity: {ex.Message}");
+            return false;
+        }
     }
+
 
     async public Task<bool> TryInsertEntityAsync(string tableName, T entity)
     {
@@ -80,97 +107,100 @@ public class AzureTableStorage<T> where T : ITableEntity, new()
         }
     }
 
-    async public Task<bool> MergeEntity(string tableName, T entity)
+    async public Task<bool> MergeEntityAsync(string tableName, T entity)
     {
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        // Create the TableServiceClient using the connection string
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+        // Get a reference to the table
+        TableClient tableClient = tableServiceClient.GetTableClient(tableName);
 
-        // Create the CloudTable object that represents the "people" table.
-        CloudTable table = tableClient.GetTableReference(tableName);
+        try
+        {
+            // Set the ETag to "*" to indicate a merge operation
+            entity.ETag = ETag.All;
 
-        // Create the TableOperation object that inserts the customer entity.
-        entity.ETag = "*";  // Always merge
-        TableOperation mergeOperation = TableOperation.Merge(entity);
+            // Perform the merge operation using UpsertEntityAsync with Merge mode
+            await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Merge);
 
-        // Execute the insert operation.
-        await table.ExecuteAsync(mergeOperation);
-
-        return true;
+            return true;
+        }
+        catch (RequestFailedException ex)
+        {
+            // Handle any errors that occur during the merge operation
+            Console.WriteLine($"An error occurred while merging the entity: {ex.Message}");
+            return false;
+        }
     }
+
 
     async public Task<IEnumerable<T>> AllEntitiesAsync(string tableName)
     {
-        return await AllTableEntities(tableName, String.Empty);
+        return await AllTableEntitiesAsync(tableName, String.Empty);
     }
 
     async public Task<IEnumerable<T>> AllEntitiesAsync(string tableName, string partitionKey)
     {
-        return await AllTableEntities(tableName, partitionKey);
+        return await AllTableEntitiesAsync(tableName, partitionKey);
     }
 
-    async private Task<IEnumerable<T>> AllTableEntities(string tableName, string partitionKey)
+    async private Task<IEnumerable<T>> AllTableEntitiesAsync(string tableName, string partitionKey)
     {
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        // Create the TableServiceClient using the connection string
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-        // Create the CloudTable object that represents the "people" table.
-        CloudTable table = tableClient.GetTableReference(tableName);
-
-        TableQuery<T> query = String.IsNullOrWhiteSpace(partitionKey) ?
-                 new TableQuery<T>() :
-                 new TableQuery<T>()
-                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+        // Get a reference to the table
+        TableClient tableClient = tableServiceClient.GetTableClient(tableName);
 
         List<T> entities = new List<T>();
 
         try
         {
-            foreach (var entity in await ExecuteQueryAsync(table, query))
+            // Define the query filter for partition key if provided
+            string filter = string.IsNullOrWhiteSpace(partitionKey)
+                ? null
+                : TableClient.CreateQueryFilter($"PartitionKey eq {partitionKey}");
+
+            // Execute the query and iterate through the result pages
+            await foreach (Page<T> page in tableClient.QueryAsync<T>(filter: filter).AsPages())
             {
-                entities.Add(entity);
+                entities.AddRange(page.Values);
             }
         }
-        catch { }
+        catch (RequestFailedException ex)
+        {
+            // Handle any errors that occur during the query operation
+            Console.WriteLine($"An error occurred while querying the entities: {ex.Message}");
+        }
 
-        return entities.ToArray();
+        return entities;
     }
 
-    async private Task<List<T>> ExecuteQueryAsync(CloudTable table, TableQuery<T> query)
+    async private Task<List<T>> ExecuteQueryAsync(TableClient tableClient, string filter = null, int? takeCount = null)
     {
         List<T> results = new List<T>();
-        TableQuerySegment<T> currentSegment = null;
 
-        if (query.TakeCount > 0)
+        try
         {
-            // Damit Top Query funktioniert
-            while (results.Count < query.TakeCount && (currentSegment == null || currentSegment.ContinuationToken != null))
+            // Query the entities using the TableClient with specified filter and take count
+            await foreach (var page in tableClient.QueryAsync<T>(filter: filter, maxPerPage: takeCount).AsPages())
             {
-                currentSegment = await table.ExecuteQuerySegmentedAsync(query, currentSegment != null ? currentSegment.ContinuationToken : null);
-                results.AddRange(currentSegment.Results);
+                results.AddRange(page.Values);
             }
         }
-        else
+        catch (RequestFailedException ex)
         {
-            TableContinuationToken continuationToken = null;
-            do
-            {
-                currentSegment = await table.ExecuteQuerySegmentedAsync(query, continuationToken);
-                continuationToken = currentSegment.ContinuationToken;
-                results.AddRange(currentSegment.Results);
-            }
-            while (continuationToken != null);
+            // Handle any errors that occur during the query operation
+            Console.WriteLine($"An error occurred while executing the query: {ex.Message}");
         }
 
         return results;
     }
 
+
     async public Task<T> EntityAsync(string tableName, string partitionKey, string rowKey)
     {
-        T tableEntity = await Entity(tableName, partitionKey, rowKey);
+        T tableEntity = await EntityAsync(tableName, partitionKey, rowKey);
         if (tableEntity != null)
         {
             return tableEntity;
@@ -186,60 +216,75 @@ public class AzureTableStorage<T> where T : ITableEntity, new()
 
     async public Task<bool> DeleteEntityAsync(string tableName, string partitionKey, string rowKey)
     {
-        var tableEntity = await Entity(tableName, partitionKey, rowKey);
+        // Fetch the entity to be deleted
+        var tableEntity = await EntityAsync(tableName, partitionKey, rowKey);
         if (tableEntity == null)
         {
             return false;
         }
 
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        // Create the TableServiceClient using the connection string
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+        // Get a reference to the table
+        TableClient tableClient = tableServiceClient.GetTableClient(tableName);
 
-        // Create the CloudTable object that represents the "people" table.
-        CloudTable table = tableClient.GetTableReference(tableName);
+        try
+        {
+            // Perform the delete operation
+            await tableClient.DeleteEntityAsync(partitionKey, rowKey, tableEntity.ETag);
 
-        TableOperation deleteOperation = TableOperation.Delete(tableEntity);
-
-        // Execute the operation.
-        await table.ExecuteAsync(deleteOperation);
-
-        return true;
+            return true;
+        }
+        catch (RequestFailedException ex)
+        {
+            // Handle any errors that occur during the delete operation
+            Console.WriteLine($"An error occurred while deleting the entity: {ex.Message}");
+            return false;
+        }
     }
+
 
     #region Helper
 
-    private CloudTableClient CreateTableClient()
+    private TableServiceClient CreateTableServiceClient()
     {
-        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+        // Create the TableServiceClient using the connection string
+        TableServiceClient tableServiceClient = new TableServiceClient(_connectionString);
 
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-        return tableClient;
+        return tableServiceClient;
     }
 
-    async private Task<T> Entity(string tableName, string partitionKey, string rowKey, CloudTableClient tableClient = null)
+    async private Task<T> EntityAsync(string tableName, string partitionKey, string rowKey, TableServiceClient tableServiceClient = null)
     {
-        if (tableClient == null)
+        if (tableServiceClient == null)
         {
-            tableClient = CreateTableClient();
+            tableServiceClient = CreateTableServiceClient();
         }
 
-        // Create the CloudTable object that represents the "people" table.
-        CloudTable table = tableClient.GetTableReference(tableName);
+        // Get a reference to the table client
+        TableClient tableClient = tableServiceClient.GetTableClient(tableName);
 
-        TableOperation retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
-
-        TableResult retrievedResult = await table.ExecuteAsync(retrieveOperation);
-
-        if (retrievedResult.Result is T)
+        try
         {
-            return (T)retrievedResult.Result;
+            // Retrieve the entity
+            var response = await tableClient.GetEntityAsync<T>(partitionKey, rowKey);
+
+            // Check if the response contains an entity
+            if (response.HasValue)
+            {
+                return response.Value;
+            }
         }
+        catch (RequestFailedException ex)
+        {
+            // Handle the exception (e.g., entity not found or other errors)
+            Console.WriteLine($"An error occurred while retrieving the entity: {ex.Message}");
+        }
+
         return default(T);
     }
+
 
     #endregion
 }

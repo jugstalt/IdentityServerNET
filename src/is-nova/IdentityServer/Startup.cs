@@ -226,7 +226,6 @@ public class Startup
         services.AddCryptoServices(Configuration);
         services.AddTransient<ICertificateFactory, CertificateFactory>();
 
-
         #region Register Certificate Store
 
         if (String.IsNullOrEmpty(Configuration["IdentityServer:SigningCredential:Storage"]))
@@ -265,6 +264,11 @@ public class Startup
             .AddScoped<CustomTokenService>()
             .AddTransient<SetupService>()
             .AddColorSchemeService();
+
+        services
+            .AddUserStore()
+            .AddRoleStore()
+            .ConfigureCustomNovaStartup(Configuration);
     }
 
     public void Configure(

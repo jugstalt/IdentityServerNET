@@ -90,8 +90,7 @@ public class Program
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder
-                    .UseSetting(WebHostDefaults.ApplicationKey, typeof(Program).Assembly.GetName().Name)
-                    .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, string.Join(";", StartupAssemblies));
+                    .UseSetting(WebHostDefaults.ApplicationKey, typeof(Program).Assembly.GetName().Name);
 
                 webBuilder.UseStartup<Startup>();
             })

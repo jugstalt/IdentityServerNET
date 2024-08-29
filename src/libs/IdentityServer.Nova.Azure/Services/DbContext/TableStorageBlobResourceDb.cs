@@ -70,7 +70,7 @@ public class TableStorageBlobResourceDb : IResourceDbContextModify
             return;
         }
 
-        await _tableStorage.MergeEntity(_tablename,
+        await _tableStorage.MergeEntityAsync(_tablename,
             new BlobTableEntity(TableStorageBlobResourceDb.ApiResourcePartitionKey,
                                 apiResource.RowKey(),
                                 apiResource,
@@ -116,7 +116,7 @@ public class TableStorageBlobResourceDb : IResourceDbContextModify
             return;
         }
 
-        await _tableStorage.MergeEntity(_tablename,
+        await _tableStorage.MergeEntityAsync(_tablename,
             new BlobTableEntity(TableStorageBlobResourceDb.IdentityResourcePartitionKey,
                                 identityResource.RowKey(),
                                 identityResource,

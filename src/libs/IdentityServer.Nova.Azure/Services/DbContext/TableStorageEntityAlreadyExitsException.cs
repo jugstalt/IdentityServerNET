@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure.Data.Tables;
 using System;
 
 namespace IdentityServer.Nova.Azure.Services.DbContext;

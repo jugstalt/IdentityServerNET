@@ -13,7 +13,6 @@ using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.EmailSender;
 using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +25,9 @@ namespace IdentityServer.Nova.ServerExtension.Default;
 [IdentityServerNovaStartup]
 public class TestHostingStartup : IIdentityServerNovaStartup
 {
-    public void ConfigureServices(WebHostBuilderContext context, IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        var configSection = context.Configuration.GetSection("IdentityServer");
+        var configSection = configuration.GetSection("IdentityServer");
 
         #region Add a PasswordHasher (optional)
 

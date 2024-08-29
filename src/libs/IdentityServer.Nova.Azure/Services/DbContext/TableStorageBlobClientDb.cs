@@ -85,7 +85,7 @@ public class TableStorageBlobClientDb : IClientDbContextModify
             return;
         }
 
-        await _tableStorage.MergeEntity(_tablename,
+        await _tableStorage.MergeEntityAsync(_tablename,
             new BlobTableEntity(TableStorageBlobClientDb.PartitionKey,
                                 client.RowKey(),
                                 client,

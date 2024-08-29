@@ -1,42 +1,38 @@
-﻿using IdentityServer.Nova.Abstractions.Cryptography;
+﻿using Azure;
+using Azure.Data.Tables;
+using IdentityServer.Nova.Abstractions.Cryptography;
 using IdentityServer.Nova.Abstractions.Serialize;
-using Microsoft.Azure.Cosmos.Table;
+using System;
 
 namespace IdentityServer.Nova.Azure.Services.DbContext;
 
-public class BlobTableEntity : TableEntity
+public class BlobTableEntity : ITableEntity
 {
+    // Implement the required properties from ITableEntity
+    public string PartitionKey { get; set; }
+    public string RowKey { get; set; }
+    public DateTimeOffset? Timestamp { get; set; }
+    public ETag ETag { get; set; }
+
+    // Custom property for the blob data
+    public string Blob { get; set; }
+
+    // Parameterless constructor (required for deserialization)
     public BlobTableEntity()
-        : base()
     {
     }
 
+    // Custom constructor for initializing with data
     public BlobTableEntity(string partitionKey, string rowKey, object dataObject, ICryptoService cryptoService, IBlobSerializer blobSerializer)
     {
         this.PartitionKey = partitionKey;
         this.RowKey = rowKey;
 
+        // Encrypt and serialize the object data
         this.Blob = cryptoService.EncryptText(blobSerializer.SerializeObject(dataObject));
     }
-
-    public string Blob { get; set; }
-
-    #region Overrides
-
-    //private IDictionary<string, EntityProperty> _properties = new Dictionary<string, EntityProperty>();
-
-    //public override void ReadEntity(IDictionary<string, EntityProperty> properties, OperationContext operationContext)
-    //{
-    //    _properties = properties;
-    //}
-
-    //public override IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
-    //{
-    //    return _properties ?? new Dictionary<string, EntityProperty>();
-    //}
-
-    #endregion
 }
+
 
 static public class BlobTableEntityExtensions
 {
