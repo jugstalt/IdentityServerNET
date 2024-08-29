@@ -200,7 +200,7 @@ public class AzureTableStorage<T> where T : class, ITableEntity, new()
 
     async public Task<T> EntityAsync(string tableName, string partitionKey, string rowKey)
     {
-        T tableEntity = await EntityAsync(tableName, partitionKey, rowKey);
+        T tableEntity = await GetEntityAsync(tableName, partitionKey, rowKey);
         if (tableEntity != null)
         {
             return tableEntity;
@@ -255,7 +255,7 @@ public class AzureTableStorage<T> where T : class, ITableEntity, new()
         return tableServiceClient;
     }
 
-    async private Task<T> EntityAsync(string tableName, string partitionKey, string rowKey, TableServiceClient tableServiceClient = null)
+    async private Task<T> GetEntityAsync(string tableName, string partitionKey, string rowKey, TableServiceClient tableServiceClient = null)
     {
         if (tableServiceClient == null)
         {

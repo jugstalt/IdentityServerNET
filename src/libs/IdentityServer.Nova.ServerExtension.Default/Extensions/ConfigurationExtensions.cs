@@ -4,7 +4,7 @@ using IdentityServer.Nova.Models.UserInteraction;
 using Microsoft.Extensions.Configuration;
 
 namespace IdentityServer.Nova.ServerExtension.Default.Extensions;
-internal static class ConfigurationExtensions
+public static class ConfigurationExtensions
 {
     public static void AddDefaults(this UserDbContextConfiguration options,
                                    IConfiguration config)

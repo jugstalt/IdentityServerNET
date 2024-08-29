@@ -74,7 +74,7 @@ public class SigningApiClient : TokenClient
 
     async static public Task<string> GetValidatedDataFromToken(string token, string identityServerAddress)
         => await GetValidatedClaimFromToken(token, identityServerAddress, "token-data");
-    
+
 
     async static public Task<string> GetValidatedClaimFromToken(string token, string identityServerAddress, string claimName)
         => await token.GetValidatedClaimValue(identityServerAddress, claimName);

@@ -92,7 +92,7 @@ public class Startup
                 options.AddPolicy("admin-createcerts-policy",
                     policy => policy.RequireRole(KnownRoles.ClientAdministrator));
             }
-            
+
             // DoTo: find a policy that never matches!!
             options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
         });
@@ -268,7 +268,9 @@ public class Startup
         services
             .AddUserStore()
             .AddRoleStore()
-            .ConfigureCustomNovaStartup(Configuration);
+            .AddServicesFromConfiguration(Configuration)
+            .ConfigureCustomNovaStartup(Configuration)
+            .AddFallbackServices(Configuration);
     }
 
     public void Configure(

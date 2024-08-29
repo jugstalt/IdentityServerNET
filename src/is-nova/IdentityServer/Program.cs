@@ -59,7 +59,7 @@ public class Program
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 #region Custom App config
-                
+
                 var customAppConfig = args.FirstOrDefault(arg => arg.StartsWith("--customAppSettings="))?.Split('=')[1];
                 if (!string.IsNullOrEmpty(customAppConfig))
                 {

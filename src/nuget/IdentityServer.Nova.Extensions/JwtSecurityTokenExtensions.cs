@@ -66,7 +66,9 @@ static public class JwtSecurityTokenExtensions
         var result = new Dictionary<string, string>();
 
         if (claimTypes is null || claimTypes.Length == 0)
+        {
             return result;
+        }
 
         var jwtToken = await jwtEncodedString.ToValidatedJwtSecurityToken(issuerUrl);
 
