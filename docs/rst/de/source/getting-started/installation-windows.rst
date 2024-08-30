@@ -1,6 +1,17 @@
 Installation unter Windows
 ==========================
 
+.. note::
+
+    Voraussetzung ist die Installation von ASPNET.Core 8.0. Gibt man in einer *Eingabeaufforderung*
+    ``dotnet --info`` ein muss folgendes Framework in der Ausgabe vorhanden sein:
+
+    .. code::
+
+        .NET runtimes installed:
+        Microsoft.AspNetCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.AspNetCore.App]
+        Microsoft.NETCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.NETCore.App]
+
 Für Windows liegen unter `Releases <https://github.com/jugstalt/identityserver.nova/releases>`_
 ZIP Dateien mit dem Namen ``identityserver.nova-win-x64-{version}.zip``.
 
