@@ -88,6 +88,30 @@ Hier kann ein *ConnectionString* für eine *Datenbank* angegeben werden, in die 
 Standardmäßig können die Daten ein einer ``LiteDb`` oder im FileSystem abgelegt werden. Wird kein *ConnectionString* angegeben, werden 
 die Daten **InMemory** gespeichert (Bei einem Neustart der Applikation sind alle Daten weg, sollte nur zur Test oder zum Entwickeln verwendet werden!)
 
+Als Alternative können die einzelnen Datenbanken auch in unterschiedliche Ziele abgelegt werden. Dazu 
+muss für jede *Klasse* eine Datenbank Verbindung angegeben werden:
+
+.. code:: javascript
+
+    "ConnectionStrings": {
+        "Users": { "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db" },
+        "Roles": { "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db" },
+        "Clients": { "AzureStorage": "UseDevelopmentStorage=true" },
+        "Resources": { "MongoDb": "mongodb://localhost:27017" },
+
+        // Fallback (here not necessary) 
+        "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db",
+    }
+
+Die einzelnen *Klassen* heißen ``Users``, ``Roles``, ``Clients`` und ``Resources``.
+Für jede *Klasse* kann ein ConnectionString definiert werden. Werden nicht alle *Klassen*
+extra angeführt, kann ein Fallback angeben werden.
+
+.. note::
+
+    Für die beiden Klassen ``Clients`` und ``Resources`` können auch in **Azure Tables**
+    oder eine **Mongo DB** gespeichert werden.
+
 Abschnitt ``SigningCredential``
 -------------------------------
 

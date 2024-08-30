@@ -7,6 +7,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "IIS": {
+      "commandName": "IIS",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "SelfHost": {
       "commandName": "Project",
       "launchBrowser": true,
@@ -20,6 +27,9 @@
   "iisSettings": {
     "windowsAuthentication": true,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "https://localhost/identityserver"
+    },
     "iisExpress": {
       "applicationUrl": "https://localhost:44300/",
       "sslPort": 44300

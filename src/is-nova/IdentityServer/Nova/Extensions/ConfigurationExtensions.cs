@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace IdentityServer.Nova.Extensions;
 
@@ -66,23 +69,36 @@ static public class ConfigurationExtensions
 
     static public IConfiguration SwitchCase(
             this IConfiguration configuration,
-            string name,
-            Action<string> then)
+            IEnumerable<string> names,
+            Action<string> then
+        )
     {
+        if (names?.Any() != true) return configuration;
+
         if(configuration is null) return null;
 
-        string value = configuration[name];
-
-        if(!String.IsNullOrEmpty(value))
+        foreach (var name in names)
         {
-            then(value);
+            string value = configuration[name];
 
-            return null;  // no more switchCases
+            if (!String.IsNullOrEmpty(value))
+            {
+                then(value);
+
+                return null;  // no more switchCases
+            }
         }
 
         return configuration;
     }
 
+
+    static public IConfiguration SwitchCase(
+            this IConfiguration configuration,
+            string name,
+            Action<string> then)
+        => configuration.SwitchCase([name], then);
+    
     static public IConfiguration SwitchSection(
             this IConfiguration configuration,
             string name,

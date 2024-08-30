@@ -5,6 +5,7 @@ using IdentityServer.Nova.Abstractions.UI;
 using IdentityServer.Nova.Azure.Services.DbContext;
 using IdentityServer.Nova.LiteDb.Services.DbContext;
 using IdentityServer.Nova.Models;
+using IdentityServer.Nova.MongoDb.Services.DbContext;
 using IdentityServer.Nova.Reflection;
 using IdentityServer.Nova.ServerExtension.Default.Extensions;
 using IdentityServer.Nova.Services;
@@ -39,6 +40,10 @@ static public class ServiceCollectionExtensions
     static public IServiceCollection AddServicesFromConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         var configSection = configuration.GetSection("IdentityServer");
+
+        // Default PasswordHasher (override aspnet core defaults)
+        // for custom Hashers override this with ConfigureCustomNovaStartup
+        services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>();
 
         #region Add ExportClientDbContext (optional)
 
@@ -81,27 +86,21 @@ static public class ServiceCollectionExtensions
     {
         var configSection = configuration.GetSection("IdentityServer");
 
-        // Default PasswordHasher
-        services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>();
-
         services
-            //.IfServiceNotRegistered<IPasswordHasher<ApplicationUser>>(() => services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>())
-            
-            
             // Default UserStoreFactory
             .IfServiceNotRegistered<IUserStoreFactory>(() => services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>())
             
             // Default UserDbContext
             .IfServiceNotRegistered<IUserDbContext>(() =>
                 configSection
-                    .SwitchCase("ConnectionStrings:Users:FilesDb", value =>
+                    .SwitchCase(["ConnectionStrings:Users:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddUserDbContext<FileBlobUserDb>(options =>
                         {
                             options.ConnectionString = Path.Combine(value, "users");
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Users:LiteDb", value =>
+                    .SwitchCase(["ConnectionStrings:Users:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddUserDbContext<LiteDbUserDb>(options =>
                         {
                             options.ConnectionString = value;
@@ -118,16 +117,16 @@ static public class ServiceCollectionExtensions
             // Default RoleDbContex
             .IfServiceNotRegistered<IRoleDbContext>(() => 
                 configSection
-                    .SwitchCase("ConnectionStrings:Roles:FilesDb", value =>
+                    .SwitchCase(["ConnectionStrings:Roles:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddRoleDbContext<FileBlobRoleDb>(options =>
                         {
                             options.ConnectionString = Path.Combine(value, "roles");
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Roles:LiteDb", value =>
+                    .SwitchCase(["ConnectionStrings:Roles:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddRoleDbContext<LiteDbRoleDb>(options =>
                         {
-                            options.ConnectionString = configSection["ConnectionStrings:Roles:LiteDb"];
+                            options.ConnectionString = value;
                         })
                     )
                     .SwitchDefault(() => 
@@ -138,22 +137,29 @@ static public class ServiceCollectionExtensions
             // Default ResouceDbContext
             .IfServiceNotRegistered<IResourceDbContext>(() => 
                 configSection
-                    .SwitchCase("ConnectionStrings:Resources:FilesDb", value =>
+                    .SwitchCase(["ConnectionStrings:Resources:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddResourceDbContext<FileBlobResourceDb>(options =>
                         {
                             options.ConnectionString = Path.Combine(value, "resources");
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Resources:LiteDb", value =>
+                    .SwitchCase(["ConnectionStrings:Resources:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddResourceDbContext<LiteDbResourceDb>(options =>
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Resources:AzureStorage", value =>
+                    .SwitchCase(["ConnectionStrings:Resources:AzureStorage", "ConnectionStrings:AzureStorage"], value =>
                         services.AddResourceDbContext<TableStorageBlobResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Resources:MongoDb", "ConnectionStrings:MongoDb"], value =>
+                        services.AddResourceDbContext<MongoBlobResourceDb>(options =>
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
@@ -169,22 +175,29 @@ static public class ServiceCollectionExtensions
             // Default ClientDbContext
             .IfServiceNotRegistered<IClientDbContext>(() =>
                 configSection
-                    .SwitchCase("ConnectionStrings: Clients:FilesDb", value =>
+                    .SwitchCase(["ConnectionStrings:Clients:FilesDb","ConnectionStrings:FilesDb"], value =>
                         services.AddClientDbContext<FileBlobClientDb>(options =>
                         {
                             options.ConnectionString = Path.Combine(value, "clients");
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Clients:LiteDb", value =>
+                    .SwitchCase(["ConnectionStrings:Clients:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddClientDbContext<LiteDbClientDb>(options =>
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchCase("ConnectionStrings:Clients:AzureStorage", value =>
+                    .SwitchCase(["ConnectionStrings:Clients:AzureStorage", "ConnectionStrings:AzureStorage"], value =>
                         services.AddClientDbContext<TableStorageBlobClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Clients:MongoDb", "ConnectionStrings:MongoDb"], value =>
+                        services.AddClientDbContext<MongoBlobClientDb>(options =>
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
