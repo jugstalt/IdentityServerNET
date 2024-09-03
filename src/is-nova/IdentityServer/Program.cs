@@ -49,11 +49,6 @@ public class Program
         }
     }
 
-    private static string[] StartupAssemblies = new[]
-    {
-        "IdentityServer.Nova"
-    };
-
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingContext, config) =>

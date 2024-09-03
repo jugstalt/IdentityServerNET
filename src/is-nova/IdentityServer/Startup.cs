@@ -197,10 +197,22 @@ public class Startup
 
         services.AddSingleton<IEventSink, EventSinkProxy>();
 
-        if (Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0)
+        if (Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0 ||
+            !String.IsNullOrWhiteSpace(Configuration["IdentityServer:PublicOrigin"]))
         {
             services.ConfigureApplicationCookie(options =>
             {
+                if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:PublicOrigin"])) 
+                {
+                    var publicOrigin = new Uri(Configuration["IdentityServer:PublicOrigin"]);
+
+                    if (publicOrigin.Scheme == "http")
+                    {
+                        Console.WriteLine($"Warning: Public Origin Scheme is HTTP ({publicOrigin}). Cookie SecurePolicy is set to 'Always'!");
+                        options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+                    }
+                }
+
                 if (!String.IsNullOrWhiteSpace(Configuration["IdentityServer:Cookie:Name"]))
                 {
                     options.Cookie.Name = Configuration["IdentityServer:Cookie:Name"];
@@ -322,25 +334,17 @@ public class Startup
 
         #endregion
 
-        app.Use(async (context, next) =>
-        {
-            var xproto = context.Request.Headers["X-Forwarded-Proto"].ToString();
-            if (xproto != null && xproto.StartsWith("https", StringComparison.OrdinalIgnoreCase))
-            {
-                context.Request.Scheme = "https";
-            }
-            await next();
-        });
-
         #region Optional Middleware
 
         if (Configuration["IdentityServer:AddXForwardedProtoMiddleware"] == "true")
         {
+            Console.WriteLine("Information: Using XForwardedProtoMiddleware");
             app.AddXForwardedProtoMiddleware();
         }
 
         if (Configuration["IdentityServer:UseHttpsRedirection"] != "false")
         {
+            Console.WriteLine("Information: Using HttpsRedirection middleware");
             app.UseHttpsRedirection();
         }
 
@@ -356,14 +360,6 @@ public class Startup
         // uncomment, if you want to add MVC
         app.UseAuthentication();
         app.UseAuthorization();
-
-        // to allow images with base64... eg. captcha images (image-src data:)
-        //app.Use(async (ctx, next) =>
-        //{
-        //    ctx.Response.Headers.Add("Content-Security-Policy",
-        //                             "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
-        //    await next();
-        //});
 
         app.UseEndpoints(endpoints =>
         {
