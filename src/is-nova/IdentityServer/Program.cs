@@ -60,7 +60,10 @@ public class Program
             {
                 #region Custom App config
 
-                var customAppConfig = args.FirstOrDefault(arg => arg.StartsWith("--customAppSettings="))?.Split('=')[1];
+                var customAppConfig = 
+                    args.FirstOrDefault(arg => arg.StartsWith("--customAppSettings="))?.Split('=')[1]
+                    ?? Environment.GetEnvironmentVariable("IDENTITY_SERVER_CUSTOM_APPSETTINGS");
+
                 if (!string.IsNullOrEmpty(customAppConfig))
                 {
                     string customAppConfigFile = $"appsettings.{customAppConfig}.json";
