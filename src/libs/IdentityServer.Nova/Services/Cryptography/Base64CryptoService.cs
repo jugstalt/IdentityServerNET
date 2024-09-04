@@ -22,7 +22,7 @@ public class Base64CryptoService : ICryptoService
         return Convert.ToBase64String(bytes);
     }
 
-    public string EncryptTextConvergent(string text, Encoding encoding = null)
+    public string PseudoHashTextConvergent(string text, Encoding encoding = null)
     {
         return EncryptText(text, encoding);
     }
@@ -39,10 +39,10 @@ public class Base64CryptoService : ICryptoService
         return encoding.GetString(decryptedBytes);
     }
 
-    public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
-    {
-        return DecryptText(base64Text, encoding);
-    }
+    //public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
+    //{
+    //    return DecryptText(base64Text, encoding);
+    //}
 
     #endregion
 }

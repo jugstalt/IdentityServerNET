@@ -46,7 +46,7 @@ public class DefaultCryptoService : ICryptoService
         return Convert.ToBase64String(AES_Encrypt(bytes, _defaultPasswordBytes, keySize: 128, useRandomSalt: true));
     }
 
-    public string EncryptTextConvergent(string text, Encoding encoding = null)
+    public string PseudoHashTextConvergent(string text, Encoding encoding = null)
     {
         try
         {
@@ -87,32 +87,32 @@ public class DefaultCryptoService : ICryptoService
         return encoding.GetString(decryptedBytes);
     }
 
-    public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
-    {
-        try
-        {
-            var inputbuffer = Convert.FromBase64String(base64Text);
+    //public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
+    //{
+    //    try
+    //    {
+    //        var inputbuffer = Convert.FromBase64String(base64Text);
 
-            byte[] passwordBytes = _defaultPasswordBytes.Take(24).ToArray();
+    //        byte[] passwordBytes = _defaultPasswordBytes.Take(24).ToArray();
 
-            SymmetricAlgorithm algorithm = System.Security.Cryptography.TripleDES.Create();
-            ICryptoTransform transform = algorithm.CreateDecryptor(passwordBytes, _static_iv);
-            byte[] bytesDecrypted = transform.TransformFinalBlock(inputbuffer.ToArray(), 0, inputbuffer.Length);
+    //        SymmetricAlgorithm algorithm = System.Security.Cryptography.TripleDES.Create();
+    //        ICryptoTransform transform = algorithm.CreateDecryptor(passwordBytes, _static_iv);
+    //        byte[] bytesDecrypted = transform.TransformFinalBlock(inputbuffer.ToArray(), 0, inputbuffer.Length);
 
-            if (encoding == null)
-            {
-                encoding = DefaultEncoding;
-            }
+    //        if (encoding == null)
+    //        {
+    //            encoding = DefaultEncoding;
+    //        }
 
-            string result = encoding.GetString(bytesDecrypted);
+    //        string result = encoding.GetString(bytesDecrypted);
 
-            return result;
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
-    }
+    //        return result;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw ex;
+    //    }
+    //}
 
     #endregion
 

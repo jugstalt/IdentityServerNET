@@ -15,7 +15,7 @@ Nach dem ersten Start sollte die Konsolenausgabe kontrolliert werden:
     IRoleDbContext: IdentityServer.Nova.Services.DbContext.InMemoryRoleDb
     IClientDbContext: IdentityServer.Nova.Services.DbContext.InMemoryClientDb
     IResourceDbContext: IdentityServer.Nova.Services.DbContext.InMemoryResourceDb
-    User admin created
+    User admin@is.nova created
     Password: Ay!ql5@r=xc%xOvq
     #########################################
     [09:29:59 Information] IdentityServer4.Startup

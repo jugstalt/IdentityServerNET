@@ -14,6 +14,7 @@ namespace IdentityServer.Nova.Services;
 
 public class SetupService
 {
+    private const string DefaultAdminLogin = "admin@is.nova";
 
     public SetupService(
             IConfiguration config,
@@ -35,7 +36,7 @@ public class SetupService
         LogInstance(resourceDb);
         LogInstance(mailSender);
 
-        var adminUser = userDb.FindByNameAsync("admin", CancellationToken.None).GetAwaiter().GetResult();
+        var adminUser = userDb.FindByNameAsync(DefaultAdminLogin, CancellationToken.None).GetAwaiter().GetResult();
 
         if (adminUser is null)
         {
@@ -51,8 +52,8 @@ public class SetupService
 
             adminUser = new ApplicationUser()
             {
-                UserName = "admin",
-                Email = "admin@admin.com",
+                UserName = DefaultAdminLogin,
+                Email = DefaultAdminLogin,
                 EmailConfirmed = true,
                 Roles =
                     new string[] {
@@ -69,10 +70,18 @@ public class SetupService
 
             adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
 
-            userDb.CreateAsync(adminUser, CancellationToken.None).GetAwaiter().GetResult();
+            var result = userDb.CreateAsync(adminUser, CancellationToken.None).GetAwaiter().GetResult();
 
-            Console.WriteLine("User admin created");
-            Console.WriteLine($"Password: {adminPassword}");
+            if (result.Succeeded)
+            {
+                Console.WriteLine($"User {DefaultAdminLogin} created");
+                Console.WriteLine($"Password: {adminPassword}");
+            } 
+            else
+            {
+                Console.WriteLine("Can't create admin user:");
+                Console.WriteLine(result.Errors.FirstOrDefault()?.Description);
+            }
         }
         Console.WriteLine("#########################################");
     }

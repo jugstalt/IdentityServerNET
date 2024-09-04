@@ -19,7 +19,7 @@ static public class CryptoExtensions
         {
             cryptoService = new Base64CryptoService();
         }
-        var encryptedUserName = cryptoService.EncryptTextConvergent(name.Trim().ToUpper());
+        var encryptedUserName = cryptoService.PseudoHashTextConvergent(name.Trim().ToUpper());
         return ByteArrayToString(Encoding.UTF8.GetBytes(encryptedUserName.ToSha256()));
     }
 

@@ -230,25 +230,24 @@ public static class ServicesExtensions
 
     private static Type CryptoServiceType(this IServiceCollection services, IConfiguration configuration, bool addConfiguration = false)
     {
-        Type implementationType = null;
-
-        if (!String.IsNullOrEmpty(configuration["BlobCryptoKey"]))
+        Func<Type> GetCryptoService = configuration["IdentityServer:Crypto:Method"]?.ToLower() switch
         {
-            if (addConfiguration)
+            "key" => () =>
             {
-                services.Configure<DefaultCryptoServiceOptions>(config =>
+                if (addConfiguration)
                 {
-                    config.Password = configuration["BlobCryptoKey"];
-                });
-            }
-            implementationType = typeof(DefaultCryptoService);
-        }
-        else
-        {
-            implementationType = typeof(Base64CryptoService);
-        }
+                    services.Configure<DefaultCryptoServiceOptions>(config =>
+                    {
+                        config.Password = configuration["IdentityServer:Crypto:Key"];
+                    });
+                }
+                return typeof(DefaultCryptoService);
+            },
+            "data-protection" => () => typeof(DataProtectionCryptoService),
+            _ => () => typeof(Base64CryptoService)
+        };
 
-        return implementationType;
+        return GetCryptoService();
     }
 
     #endregion

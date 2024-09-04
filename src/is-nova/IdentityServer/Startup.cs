@@ -236,24 +236,10 @@ public class Startup
         }
 
         services.AddCryptoServices(Configuration);
-        services.AddTransient<ICertificateFactory, CertificateFactory>();
 
         #region Register Certificate Store
 
-        if (String.IsNullOrEmpty(Configuration["IdentityServer:SigningCredential:Storage"]))
-        {
-            // not recommended for production - you need to store your key material somewhere secure
-            services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateInMemoryStorage>();
-        }
-        else
-        {
-            services.Configure<SigningCredentialCertificateStorageOptions>(storageOptions =>
-            {
-                storageOptions.Storage = Configuration["IdentityServer:SigningCredential:Storage"];
-                storageOptions.CertPassword = Configuration["IdentityServer:SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
-            });
-            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
-        }
+        services.AddSigningCredentialCertificateStorage(Configuration);
 
         #region Refresh Certificate Store and add SigningCredentials
 

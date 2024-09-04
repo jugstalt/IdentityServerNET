@@ -28,21 +28,21 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
         return DecryptToStringAsync(encryptedObject).Result;
     }
 
-    public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
-    {
-        //
-        // Simple Base64 Converting!!
-        //
+    //public string DecryptTextConvergent(string base64Text, Encoding encoding = null)
+    //{
+    //    //
+    //    // Simple Base64 Converting!!
+    //    //
 
-        var decryptedBytes = Convert.FromBase64String(base64Text);
+    //    var decryptedBytes = Convert.FromBase64String(base64Text);
 
-        if (encoding == null)
-        {
-            return Encoding.Unicode.GetString(decryptedBytes);
-        }
+    //    if (encoding == null)
+    //    {
+    //        return Encoding.Unicode.GetString(decryptedBytes);
+    //    }
 
-        return encoding.GetString(decryptedBytes);
-    }
+    //    return encoding.GetString(decryptedBytes);
+    //}
 
     public string EncryptText(string text, Encoding encoding = null)
     {
@@ -52,7 +52,7 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(encryptedObject)));
     }
 
-    public string EncryptTextConvergent(string text, Encoding encoding = null)
+    public string PseudoHashTextConvergent(string text, Encoding encoding = null)
     {
         //
         // Simple Base64 Converting!!

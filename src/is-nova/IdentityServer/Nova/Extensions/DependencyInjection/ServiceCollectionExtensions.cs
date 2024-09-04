@@ -1,8 +1,10 @@
 ﻿using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Abstractions.EmailSender;
 using IdentityServer.Nova.Abstractions.Security;
+using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Abstractions.UI;
 using IdentityServer.Nova.Azure.Services.DbContext;
+using IdentityServer.Nova.Factories;
 using IdentityServer.Nova.LiteDb.Services.DbContext;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.MongoDb.Services.DbContext;
@@ -14,9 +16,9 @@ using IdentityServer.Nova.Services.DbContext;
 using IdentityServer.Nova.Services.EmailSender;
 using IdentityServer.Nova.Services.PasswordHasher;
 using IdentityServer.Nova.Services.Security;
+using IdentityServer.Nova.Services.SigningCredential;
 using IdentityServer.Nova.Services.UI;
 using IdentityServer.Nova.Stores;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +38,28 @@ static public class ServiceCollectionExtensions
         => services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
     static public IServiceCollection AddRoleStore(this IServiceCollection services)
         => services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
+
+    static public IServiceCollection AddSigningCredentialCertificateStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddTransient<ICertificateFactory, CertificateFactory>();
+
+        if (String.IsNullOrEmpty(configuration.ValidationCertsPath()))
+        {
+            // not recommended for production - you need to store your key material somewhere secure
+            services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateInMemoryStorage>();
+        }
+        else
+        {
+            services.Configure<SigningCredentialCertificateStorageOptions>(storageOptions =>
+            {
+                storageOptions.Storage = configuration.ValidationCertsPath();
+                storageOptions.CertPassword = configuration["IdentityServer:SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
+            });
+            services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
+        }
+
+        return services;
+    }
 
     static public IServiceCollection AddServicesFromConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
@@ -73,7 +97,7 @@ static public class ServiceCollectionExtensions
 
         services.AddSecretsVaultDbContext<FileBlobSecretsVaultDb>(configSection, options =>
         {
-            options.ConnectionString = Path.Combine(SystemInfo.DefaultStoragePath(), "secretsvault");
+            options.ConnectionString = configuration.SecretsVaultPath();
             options.CryptoService = new Base64CryptoService();
         });
 
@@ -89,21 +113,21 @@ static public class ServiceCollectionExtensions
         services
             // Default UserStoreFactory
             .IfServiceNotRegistered<IUserStoreFactory>(() => services.AddTransient<IUserStoreFactory, DefaultUserStoreFactory>())
-            
+
             // Default UserDbContext
             .IfServiceNotRegistered<IUserDbContext>(() =>
                 configSection
                     .SwitchCase(["ConnectionStrings:Users:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddUserDbContext<FileBlobUserDb>(options =>
                         {
-                            options.ConnectionString = Path.Combine(value, "users");
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "users");
                             options.AddDefaults(configSection);
                         })
                     )
                     .SwitchCase(["ConnectionStrings:Users:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddUserDbContext<LiteDbUserDb>(options =>
                         {
-                            options.ConnectionString = value;
+                            options.ConnectionString = configuration.AssetPath(value);
                             options.AddDefaults(configSection);
                         })
                     )
@@ -115,39 +139,39 @@ static public class ServiceCollectionExtensions
             )
 
             // Default RoleDbContex
-            .IfServiceNotRegistered<IRoleDbContext>(() => 
+            .IfServiceNotRegistered<IRoleDbContext>(() =>
                 configSection
                     .SwitchCase(["ConnectionStrings:Roles:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddRoleDbContext<FileBlobRoleDb>(options =>
                         {
-                            options.ConnectionString = Path.Combine(value, "roles");
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "roles");
                         })
                     )
                     .SwitchCase(["ConnectionStrings:Roles:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddRoleDbContext<LiteDbRoleDb>(options =>
                         {
-                            options.ConnectionString = value;
+                            options.ConnectionString = configuration.AssetPath(value);
                         })
                     )
-                    .SwitchDefault(() => 
+                    .SwitchDefault(() =>
                         services.AddRoleDbContext<InMemoryRoleDb>()
                     )
             )
 
             // Default ResouceDbContext
-            .IfServiceNotRegistered<IResourceDbContext>(() => 
+            .IfServiceNotRegistered<IResourceDbContext>(() =>
                 configSection
                     .SwitchCase(["ConnectionStrings:Resources:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddResourceDbContext<FileBlobResourceDb>(options =>
                         {
-                            options.ConnectionString = Path.Combine(value, "resources");
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "resources");
                             options.AddDefaults(configSection);
                         })
                     )
                     .SwitchCase(["ConnectionStrings:Resources:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddResourceDbContext<LiteDbResourceDb>(options =>
                         {
-                            options.ConnectionString = value;
+                            options.ConnectionString = configuration.AssetPath(value);
                             options.AddDefaults(configSection);
                         })
                     )
@@ -165,7 +189,7 @@ static public class ServiceCollectionExtensions
                             options.AddDefaults(configSection);
                         })
                     )
-                    .SwitchDefault(()=>
+                    .SwitchDefault(() =>
                         services.AddResourceDbContext<InMemoryResourceDb>(options =>
                             options.AddDefaults(configSection)
                         )
@@ -175,17 +199,17 @@ static public class ServiceCollectionExtensions
             // Default ClientDbContext
             .IfServiceNotRegistered<IClientDbContext>(() =>
                 configSection
-                    .SwitchCase(["ConnectionStrings:Clients:FilesDb","ConnectionStrings:FilesDb"], value =>
+                    .SwitchCase(["ConnectionStrings:Clients:FilesDb", "ConnectionStrings:FilesDb"], value =>
                         services.AddClientDbContext<FileBlobClientDb>(options =>
                         {
-                            options.ConnectionString = Path.Combine(value, "clients");
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "clients");
                             options.AddDefaults(configSection);
                         })
                     )
                     .SwitchCase(["ConnectionStrings:Clients:LiteDb", "ConnectionStrings:LiteDb"], value =>
                         services.AddClientDbContext<LiteDbClientDb>(options =>
                         {
-                            options.ConnectionString = value;
+                            options.ConnectionString = configuration.AssetPath(value);
                             options.AddDefaults(configSection);
                         })
                     )
@@ -211,14 +235,14 @@ static public class ServiceCollectionExtensions
             )
 
             // Default EmailSender
-            .IfServiceNotRegistered<ICustomEmailSender>(() => 
+            .IfServiceNotRegistered<ICustomEmailSender>(() =>
                 configSection
                     .SwitchSection("Mail:Smtp", _ => services.AddTransient<ICustomEmailSender, SmtpEmailSender>())
                     .SwitchSection("Mail:MailJet", _ => services.AddTransient<ICustomEmailSender, MailJetEmailSender>())
                     .SwitchSection("Mail:SendGrid", _ => services.AddTransient<ICustomEmailSender, SendGridEmailSender>())
                     .SwitchDefault(() => services.AddTransient<ICustomEmailSender, NullEmailSender>())
             )
-            
+
             // Default UserInterface
             .IfServiceNotRegistered<IUserInterfaceService>(() => services.AddUserInterfaceService<DefaultUserInterfaceService>(options =>
             {

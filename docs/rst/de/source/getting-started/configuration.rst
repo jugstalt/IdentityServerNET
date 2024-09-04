@@ -18,11 +18,15 @@ Aufbau der Config Datei:
             "NovaAssemblyName": "...",  // default: IdentityServer.Nova.ServerExtension.Default
             "ApplicationTitle": "...", // default "IdentityServer.Nova",
             "PublicOrigin": "https://localhost:44300",
+            "StorageRootPath": "c:\\apps\\identityserver-nova",
             "ConnectionStrings": {  // default: null => all DBs in Memory
                 // ...
             },
+            "Crypto": {
+                // ...
+            },
             "SigningCredential": {  // default: null => certs only in memory
-                // ..
+                // ...
             },
             "Login": {
                 // ...
@@ -71,6 +75,13 @@ Root-Werte
   Dieser Wert ist erforderlich, damit diverse Tools des *IdentityServer.Nova* funktionieren,
   zB. **Secrets Vault**
 
+* **StorageRootPath:** Hier kann ein Pfad angegeben werden, in dem *IdentityServer.Nova* diverse Information speichern kann, beispielsweise die 
+  die Zertifikate zum Signieren von Tokens. Unterhalb dieses Ordners werden jetzt nach Konfiguration automatisch Unterordner angelegt, zB ``storage``, ``secretsvault``, ...
+  Wird dieser Pfad nicht angeführt, wird ein **Default-Pfad** verwendet:
+
+  - Windows: ``C:\\apps\\identityserver-nova``
+  - Linux/OSX: ``/home/app/identityserver-nova``
+
 Abschnitt ``ConnectionStrings``
 -------------------------------
 
@@ -79,8 +90,12 @@ Abschnitt ``ConnectionStrings``
     "ConnectionStrings": {
         "LiteDb": "c:\\apps\\identityserver-nova\\is_nova.db"
         // or
+        "LiteDb": "is_nova.db"  // store db in StorageRootPath
+        // or
         ...
         "FilesDb": "c:\\apps\\identityserver-nova\\storage"  // any path
+        // or
+        "FilesDB": "~"  // use the StorageRootPath as location
     }
 
 Hier kann ein *ConnectionString* für eine *Datenbank* angegeben werden, in die User, Rollen, Resourcen, Clients etc gespeichert werden.
@@ -94,13 +109,13 @@ muss für jede *Klasse* eine Datenbank Verbindung angegeben werden:
 .. code:: javascript
 
     "ConnectionStrings": {
-        "Users": { "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db" },
-        "Roles": { "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db" },
+        "Users": { "LiteDb": "is_nova.db" },
+        "Roles": { "LiteDb": "is_nova.db" },
         "Clients": { "AzureStorage": "UseDevelopmentStorage=true" },
         "Resources": { "MongoDb": "mongodb://localhost:27017" },
 
         // Fallback (here not necessary) 
-        "LiteDb": "C:\\temp\\identityserver_nova\\is_nova.db",
+        "LiteDb": "is_nova.db",
     }
 
 Die einzelnen *Klassen* heißen ``Users``, ``Roles``, ``Clients`` und ``Resources``.
@@ -111,6 +126,32 @@ extra angeführt, kann ein Fallback angeben werden.
 
     Für die beiden Klassen ``Clients`` und ``Resources`` können auch in **Azure Tables**
     oder eine **Mongo DB** gespeichert werden.
+
+Abschnitt ``Crypto``
+--------------------
+
+.. code:: javascript
+
+    "Crypto": {
+        "Method": "key",  // key|data-protection|base64
+        "Key": "..."      // protection key, if method=key
+    },
+
+Element, die vom Administrator erstellt werden (``Clients``, ``Resources``, ...) sollten verschlüsselt abgelegt werden, weil darin beispielsweise auf
+**Secrets** enthalten sein können.
+
+Wie verschlüsselt wird, kann in diesem Abschnitt festgelegt werden. Folgende Methoden stehen zur Verfügung:
+
+* **key:** Die Daten werden mit einem Key (Passwort) verschlüsselt. Der Key muss unter ``Key`` angeführt werden und mindestens 24 Zeichen lang sein.
+  Diese Methode ist einfach zu verwenden, auch wenn der **IdentityServer.Nova** auf mehrere Instanzen skaliert wurde. Alle Instanzen müssen dazu in 
+  der Konfiguration den gleichen ``Key`` aufweisen.
+  
+* **data-protection:** Zum Verschlüsseln wird die **Data Protection API** von .NET verwendet. Ist **IdentityServer.Nova** auf mehrere Instanzen skaliert,
+  muss darauf geachtet werden, dass alle Instanzen, den selben Schüsselkreis verwenden (siehe .NET Core Data Protection API).
+
+* **base64:** Wird keine der oben angeführten Methoden angegeben, werden die Daten **nur Base 64** konvertiert. Diese *Verschlüsselung* ist ebenfalls einfach 
+  umzusetzen, wenn **IdentityServer.Nova** auf mehrere Instanzen skaliert wird. Allerdings handelt es sich hier streng genommen nicht um eine *Verschlüsselung* 
+  sondern um eine *Codierung*. Die Daten stehen einfach nicht mehr im Klartext in der Datenbank. 
 
 Abschnitt ``SigningCredential``
 -------------------------------
