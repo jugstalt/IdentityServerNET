@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
 	<LangVersion>12</LangVersion>
     <UserSecretsId>33ba4f5b-c252-47fe-926b-959a2c9af1b0</UserSecretsId>
-    <AssemblyVersion>2.24.701.0</AssemblyVersion>
+    <AssemblyVersion>5.24.4201.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +26,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\aspire\IdentityServer.Nova.ServiceDefaults\IdentityServer.Nova.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\libs-is4\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj" />
     <ProjectReference Include="..\..\libs-is4\IdentityServer4\src\IdentityServer4.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova.MongoDb\IdentityServer.Nova.MongoDb.csproj" />

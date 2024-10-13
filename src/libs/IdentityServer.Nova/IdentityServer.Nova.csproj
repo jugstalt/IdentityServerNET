@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
 	<LangVersion>10</LangVersion>
     <UserSecretsId>45936590-d798-4c10-bbda-57acb544051f</UserSecretsId>
-    <AssemblyVersion>2.24.701</AssemblyVersion>
+    <AssemblyVersion>5.24.4201</AssemblyVersion>
 	 
   </PropertyGroup>
 

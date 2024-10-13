@@ -1,4 +1,4 @@
-﻿using IdentityServer.Nova;
+using IdentityServer.Nova;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Abstractions.UI;
 using IdentityServer.Nova.Extensions;
@@ -39,6 +39,8 @@ Log.Logger = new LoggerConfiguration()
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 builder.Host.UseSerilog();
 
 #region Custom App config
@@ -304,6 +306,8 @@ builder.Services
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 
 var setupService = app.Services.GetService<SetupService>();
 var userInterface = app.Services.GetService<IUserInterfaceService>();
@@ -378,18 +382,28 @@ app.UseIdentityServer();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapRazorPages();
-    endpoints.MapControllerRoute(
+app.MapRazorPages();
+app.MapControllerRoute(
         name: "login",
         pattern: "Identity/Account/Login",
         defaults: new { controller = "Account", action = "Login" }
         );
-    endpoints.MapControllerRoute(
+app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Home}/{action=Index}/{id?}");;
 
-});
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapRazorPages();
+//    endpoints.MapControllerRoute(
+//        name: "login",
+//        pattern: "Identity/Account/Login",
+//        defaults: new { controller = "Account", action = "Login" }
+//        );
+//    endpoints.MapControllerRoute(
+//        name: "default",
+//        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//});
 
 app.Run();
