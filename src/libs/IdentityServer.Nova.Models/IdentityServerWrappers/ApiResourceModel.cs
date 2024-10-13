@@ -18,10 +18,10 @@ public class ApiResourceModel : ResourceModel
     }
 
     [JsonProperty("ApiSecrets")]
-    public ICollection<SecretModel> ApiSecrets { get; set; }
+    public ICollection<SecretModel>? ApiSecrets { get; set; }
 
     [JsonProperty("Scopes")]
-    public ICollection<ScopeModel> Scopes { get; set; }
+    public ICollection<ScopeModel>? Scopes { get; set; }
 
     [JsonIgnore]
     public override Resource IndentityServer4Instance

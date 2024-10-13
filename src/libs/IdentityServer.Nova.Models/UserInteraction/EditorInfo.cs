@@ -48,16 +48,16 @@ public class EditorInfo
         this.Category = category;
     }
 
-    public string Name { get; set; }
-    public string DisplayName { get; set; }
-    public Type PropertyType { get; set; }
+    public string Name { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public Type? PropertyType { get; set; }
 
-    public string Category { get; set; }
+    public string Category { get; set; } = "";
     public EditorType EditorType { get; set; }
 
-    public string ClaimName { get; set; }
+    public string ClaimName { get; set; } = "";
 
-    public string RegexPattern { get; set; }
+    public string RegexPattern { get; set; } = "";
 
     public bool IsValid(string value)
     {
@@ -89,5 +89,5 @@ public class EditorInfo
         return true;
     }
 
-    public IDictionary<string, string> ComboBoxOptions { get; set; }
+    public IDictionary<string, string>? ComboBoxOptions { get; set; }
 }

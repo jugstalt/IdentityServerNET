@@ -33,7 +33,7 @@ abstract public class ResourceModel
     public string DisplayName { get; set; }
 
     [JsonProperty("Description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = "";
 
     [JsonProperty("UserClaims")]
     public ICollection<string> UserClaims { get; set; }

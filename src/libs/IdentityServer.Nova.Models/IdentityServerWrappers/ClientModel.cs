@@ -88,13 +88,13 @@ public class ClientModel
     public string ClientClaimsPrefix { get; set; }
 
     [JsonProperty("PairWiseSubjectSalt")]
-    public string PairWiseSubjectSalt { get; set; }
+    public string PairWiseSubjectSalt { get; set; } = "";
 
     [JsonProperty("UserSsoLifetime")]
     public int? UserSsoLifetime { get; set; }
 
     [JsonProperty("UserCodeType")]
-    public string UserCodeType { get; set; }
+    public string UserCodeType { get; set; } = "";
 
     [JsonProperty("DeviceCodeLifetime")]
     public int DeviceCodeLifetime { get; set; }
@@ -115,7 +115,7 @@ public class ClientModel
     public bool Enabled { get; set; }
 
     [JsonProperty("ClientId")]
-    public string ClientId { get; set; }
+    public string ClientId { get; set; } = "";
 
     [JsonProperty("ProtocolType")]
     public string ProtocolType { get; set; }
@@ -127,16 +127,16 @@ public class ClientModel
     public bool RequireClientSecret { get; set; }
 
     [JsonProperty("ClientName")]
-    public string ClientName { get; set; }
+    public string ClientName { get; set; } = "";
 
     [JsonProperty("Description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = "";
 
     [JsonProperty("ClientUri")]
-    public string ClientUri { get; set; }
+    public string ClientUri { get; set; } = "";
 
     [JsonProperty("LogoUri")]
-    public string LogoUri { get; set; }
+    public string LogoUri { get; set; } = "";
 
     [JsonProperty("AllowedCorsOrigins")]
     public ICollection<string> AllowedCorsOrigins { get; set; }
@@ -163,13 +163,13 @@ public class ClientModel
     public ICollection<string> PostLogoutRedirectUris { get; set; }
 
     [JsonProperty("FrontChannelLogoutUri")]
-    public string FrontChannelLogoutUri { get; set; }
+    public string FrontChannelLogoutUri { get; set; } = "";
 
     [JsonProperty("FrontChannelLogoutSessionRequired")]
     public bool FrontChannelLogoutSessionRequired { get; set; }
 
     [JsonProperty("BackChannelLogoutUri")]
-    public string BackChannelLogoutUri { get; set; }
+    public string BackChannelLogoutUri { get; set; } = "";
 
     [JsonProperty("AllowRememberConsent")]
     public bool AllowRememberConsent { get; set; }

@@ -5,5 +5,5 @@ namespace IdentityServer.Nova.Abstractions.DbContext;
 
 public interface IClientDbContext
 {
-    Task<ClientModel> FindClientByIdAsync(string clientId);
+    Task<ClientModel?> FindClientByIdAsync(string clientId);
 }

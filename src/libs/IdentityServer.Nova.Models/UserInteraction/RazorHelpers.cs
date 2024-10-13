@@ -6,14 +6,14 @@ namespace IdentityServer.Nova.Models.UserInteraction;
 
 static public class RazorHelpers
 {
-    static public object GetPropertyValue(object instance, EditorInfo editorInfo)
+    static public object? GetPropertyValue(object instance, EditorInfo editorInfo)
     {
         if (instance == null)
         {
             return null;
         }
 
-        object propertyValue = null;
+        object? propertyValue = null;
         var propertyInfo = instance.GetType().GetProperty(editorInfo.Name);
         if (propertyInfo != null)
         {
@@ -23,7 +23,7 @@ static public class RazorHelpers
         {
             if (instance is ApplicationUser)
             {
-                var claim = (instance as ApplicationUser).Claims
+                var claim = (instance as ApplicationUser)?.Claims
                                 .Where(c => c.Type == editorInfo.ClaimName)
                                 .FirstOrDefault();
 
@@ -35,7 +35,7 @@ static public class RazorHelpers
             }
         }
 
-        if (editorInfo.PropertyType.IsArray && propertyValue != null)
+        if (editorInfo.PropertyType?.IsArray == true && propertyValue != null)
         {
             if (propertyValue is string)
             {
@@ -139,7 +139,7 @@ static public class RazorHelpers
 
         sb.Append($@" id=""{editorInfo.Name.Replace(".", "_")}""");
 
-        if (editorInfo.PropertyType.IsArray)
+        if (editorInfo.PropertyType?.IsArray == true)
         {
             sb.Append($" rows='5'");
         }

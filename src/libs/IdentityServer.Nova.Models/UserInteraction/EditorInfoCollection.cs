@@ -7,7 +7,7 @@ namespace IdentityServer.Nova.Models.UserInteraction;
 
 public class EditorInfoCollection
 {
-    public EditorInfo[] EditorInfos { get; set; }
+    public EditorInfo[]? EditorInfos { get; set; }
 
     public bool Validate(IEnumerable<KeyValuePair<string, StringValues>> formCollection, out string validationMessage)
     {
@@ -35,5 +35,5 @@ public class EditorInfoCollection
         return String.IsNullOrEmpty(validationMessage);
     }
 
-    public string ValidationMessage { get; set; }
+    public string ValidationMessage { get; set; } = "";
 }
