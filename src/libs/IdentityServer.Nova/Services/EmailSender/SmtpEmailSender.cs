@@ -48,7 +48,8 @@ public class SmtpEmailSender : ICustomEmailSender
             SmtpClient client = new SmtpClient(smtpServer, smtpPort);
 
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.EnableSsl = smtpServer != "localhost";
+            client.EnableSsl =
+                _configSection.GetValue<bool>("EnableSsl", smtpServer != "localhost");
 
             string username = _configSection.GetValue<string>("Username");
             string password = _configSection.GetValue<string>("Password");

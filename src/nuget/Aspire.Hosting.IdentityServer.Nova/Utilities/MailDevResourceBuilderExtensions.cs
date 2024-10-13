@@ -2,7 +2,7 @@
 
 // Put extensions in the Aspire.Hosting namespace to ease discovery as referencing
 // the .NET Aspire hosting package automatically adds this namespace.
-namespace Aspire.Hosting;
+namespace Aspire.Hosting.IdentityServerNova.Utilitities;
 
 public static class MailDevResourceBuilderExtensions
 {
