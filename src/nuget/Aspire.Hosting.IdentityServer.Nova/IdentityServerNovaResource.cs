@@ -4,7 +4,8 @@
 // an alternative namespace.
 namespace Aspire.Hosting.ApplicationModel;
 
-public class IdentityServerNovaResource(string name) : ContainerResource(name), IResourceWithConnectionString
+public class IdentityServerNovaResource(string name) 
+    : ContainerResource(name)
 {
     // Constants used to refer to well known-endpoint names, this is specific
     // for each resource type. MailDev exposes an SMTP endpoint and a HTTP

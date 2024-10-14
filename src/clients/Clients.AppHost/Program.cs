@@ -6,10 +6,9 @@ var nova = builder.AddIdentityServerNova("is-nova-dev")
        .AsResourceBuilder();
 
 builder.AddProject<Projects.ClientApi>("clientapi")
-       .WithEnvironment("Authorization__Authority", nova.Resource.HttpsEndpoint);
+       .AddReference(nova, "Authorization:Authority");
 
 builder.AddProject<Projects.ClientWeb>("clientweb")
-       .WithEnvironment("OpenIdConnectAuthentication__Authority", nova.Resource.HttpsEndpoint)
-       .WithReference(nova);
+       .AddReference(nova, "OpenIdConnectAuthentication:Authority");
 
 builder.Build().Run();

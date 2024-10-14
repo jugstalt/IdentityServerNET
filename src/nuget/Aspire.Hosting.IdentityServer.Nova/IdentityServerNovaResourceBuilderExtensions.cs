@@ -1,7 +1,6 @@
 ﻿// Put extensions in the Aspire.Hosting namespace to ease discovery as referencing
 // the .NET Aspire hosting package automatically adds this namespace.
 using Aspire.Hosting.ApplicationModel;
-using Aspire.Hosting.IdentityServer.Nova;
 using Aspire.Hosting.IdentityServerNova.Utilitities;
 using System;
 
@@ -74,7 +73,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
             {
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromEmail", "no-reply@is-nova.com");
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromName", "IdentityServer Nova");
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer", ContainerEnvironment.HostAddress);
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer", mailDev.Resource.SmtpEndpoint.ContainerHost);
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort", mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port));
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
             });
@@ -86,6 +85,23 @@ static public class IdentityServerNovaResourceBuilderExtensions
 
     public static IResourceBuilder<IdentityServerNovaResource> AsResourceBuilder(this IdentityServerNovaResourceBuilder builder)
         => builder.ResourceBuilder;
+
+    public static IResourceBuilder<T> AddReference<T>(
+            this IResourceBuilder<T> builder,
+            IResourceBuilder<IdentityServerNovaResource> nova,
+            string configName
+        ) where T : IResourceWithEnvironment
+        => builder.WithEnvironment(
+            configName.Replace(":", "__"),
+            nova.Resource.HttpsEndpoint);
+
+
+    public static IResourceBuilder<T> AddReference<T>(
+            this IResourceBuilder<T> builder,
+            IdentityServerNovaResourceBuilder nova,
+            string configName
+        ) where T : IResourceWithEnvironment
+        => builder.AddReference(nova.ResourceBuilder, configName);
 }
 
 public class IdentityServerNovaResourceBuilder(

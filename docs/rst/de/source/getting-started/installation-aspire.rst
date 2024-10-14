@@ -26,8 +26,11 @@ folgendem Befehl hinzugefügt werden:
 
     // ...
 
-    builder.AddProject<MyWebAppProject>(...)
-           .WithReference(nova);
+    builder.AddProject<Projects.ClientApi>("clientapi")
+           .AddReference(nova, "Authorization:Authority");
+
+    builder.AddProject<Projects.ClientWeb>("clientweb")
+           .AddReference(nova, "OpenIdConnectAuthentication:Authority");
 
 Mit ``AddIdentityServerNova(containerName)`` wird eine Container mit dem
 ``identityserver-nova-dev`` image gestartet (https://hub.docker.com/r/gstalt/identityserver-nova-dev)
@@ -66,6 +69,10 @@ angewendet werden:
   ``IResourceBuilder`` um, auf den alle anderen Aspire Resource Methoden angewendet 
   werden können.
 
+Referenzen
+----------
 
-
+Eine *IdentityServer.Nova* Instanz kann mit ``.AddReference(nova, configName)`` an ein
+Projekt gebunden werden. ``configName`` ist dabei der Name des Wertes aus der Konfiguration
+des Projektes, in das der die (Aspire) Url von **IdentityServer.Nova** geschrieben werden soll.
 
