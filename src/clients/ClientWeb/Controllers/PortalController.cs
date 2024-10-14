@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClientWeb.Controllers;
 
 //[Authorize(Roles = "role_read")]
+[Authorize]
 public class PortalController : Controller
 {
     public IActionResult Index()

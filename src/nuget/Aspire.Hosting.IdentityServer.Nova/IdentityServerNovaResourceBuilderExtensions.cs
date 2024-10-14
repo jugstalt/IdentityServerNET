@@ -11,12 +11,12 @@ static public class IdentityServerNovaResourceBuilderExtensions
 {
     public static IdentityServerNovaResourceBuilder AddIdentityServerNova(
         this IDistributedApplicationBuilder builder,
-        string name,
+        string containerName,
         int? httpPort = null,
         int? httpsPort = null,
         string? imageTag = null)
     {
-        var resource = new IdentityServerNovaResource(name);
+        var resource = new IdentityServerNovaResource(containerName);
 
         return new IdentityServerNovaResourceBuilder(
             builder,
@@ -34,13 +34,27 @@ static public class IdentityServerNovaResourceBuilderExtensions
                           name: IdentityServerNovaResource.HttpsEndpointName));
     }
 
-    public static IdentityServerNovaResourceBuilder WithPersistance(
+    public static IdentityServerNovaResourceBuilder WithBindMountPersistance(
         this IdentityServerNovaResourceBuilder builder,
-        string persistancePath = "{{user-profile}}/identityserver-nova")
+        string persistancePath = "{{user-profile}}/identityserver-nova-aspire")
     {
         builder.ResourceBuilder.WithBindMount(
                 persistancePath.Replace("{{user-profile}}", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
-                "/home/app/identityserver-nova"
+                "/home/app/identityserver-nova",
+                isReadOnly: false
+             );
+
+        return builder;
+    }
+
+    public static IdentityServerNovaResourceBuilder WithVolumePersistance(
+        this IdentityServerNovaResourceBuilder builder,
+        string volumneName = "identityserver-nova")
+    {
+        builder.ResourceBuilder.WithBindMount(
+                volumneName,
+                "/home/app/identityserver-nova",
+                isReadOnly: false
              );
 
         return builder;
@@ -65,8 +79,13 @@ static public class IdentityServerNovaResourceBuilderExtensions
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
             });
 
+        builder.ResourceBuilder.WithReference(mailDev);
+
         return builder;
     }
+
+    public static IResourceBuilder<IdentityServerNovaResource> AsResourceBuilder(this IdentityServerNovaResourceBuilder builder)
+        => builder.ResourceBuilder;
 }
 
 public class IdentityServerNovaResourceBuilder(

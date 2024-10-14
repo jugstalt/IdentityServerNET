@@ -1,0 +1,24 @@
+@hostname=localhost
+# @port=44300
+@port=62172
+
+POST https://{{hostname}}:{{port}}/connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=is-nova-webapi-commands&client_secret=secret&scope=is-nova-webapi is-nova-webapi.command
+
+###
+
+POST https://{{hostname}}:{{port}}/connect/token
+Authorization: Basic bXktYXBpLWNvbW1hbmRzOnNlY3JldA==
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&scope=my-api.command my-api
+
+###
+
+@api_hostname=localhost
+@api_port=60889
+
+GET https://{{api_hostname}}:{{api_port}}/identity
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjNGMkI0OEIzRDFBMTZGQTM5MzU4QjdGMzUyMUQ0RERDRTA0QUYwOTdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6IlB5dElzOUdoYjZPVFdMZnpVaDFOM09CSzhKYyJ9.eyJuYmYiOjE3Mjg5MDQ0NjMsImV4cCI6MTcyODkwODA2MywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NjIxNzIiLCJjbGllbnRfaWQiOiJpcy1ub3ZhLXdlYmFwaS1jb21tYW5kcyIsImp0aSI6IjAzNzNERjI2MjNEMDY4NkZGMzQ0NDJCQUVGRDNGQjIwIiwiaWF0IjoxNzI4OTA0NDYzLCJzY29wZSI6WyJpcy1ub3ZhLXdlYmFwaS5jb21tYW5kIl19.ZNbV0LsB09FrgDidZkuqSxtlNRyjJwlnu8B1OKLZ3ytAUDGLddYUx-xO-X_rGGbp8MliT25Q9oQcf-B0YC2J6jo_-JhzCP6D8LgDpPGgHd99ntnP_xmQrkRpMyR5zcTAGtQY-SXvsqcC6FFJDngRlhLFEzO1riI9zuFFiRl5j9lNDK_MPTmiLBpjG6Xf4nDzYdbgz3d-2ktvCqQYrCkt7QiDYrVKB5oL1bIXFWC8e0S2i7MIIHaC0iGK9VBYQq6N2VohAhsc4SAkgJS4JU1xqEtrh7ViMGU2YfDSTa27NtFP1pPSZ7JBRA56e3GEZ9svZnQsrfh40x7KyOVrnHPY7A

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Clients.ServiceDefaults\Clients.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,14 +5,6 @@ VisualStudioVersion = 17.11.34929.205
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{63945976-BD2B-4C66-B9C3-BABAD538837D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clients", "clients", "{7644887B-8AE0-42F8-97E7-D85B43AF36CE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp", "src\clients\ClientApp\ClientApp.csproj", "{CC55B759-A36B-4325-9678-94AAD5862659}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApi", "src\clients\ClientApi\ClientApi.csproj", "{2F618A32-CCF2-4C49-AED8-92C4C1845039}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientWeb", "src\clients\ClientWeb\ClientWeb.csproj", "{F303409E-CC0C-4981-A7E9-B7B964CA175A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "is-nova", "is-nova", "{43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "src\is-nova\IdentityServer\IdentityServer.csproj", "{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}"
@@ -40,13 +32,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.LiteDb", "src\libs\IdentityServer.Nova.LiteDb\IdentityServer.Nova.LiteDb.csproj", "{3AC72CBE-D144-4A3F-A6AF-444D9BAB72DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.ServerExtension.Default", "src\libs\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj", "{9837099B-A5FB-4CAC-AD6C-5C419D7A4319}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{1FF5F57D-A87B-4F01-846A-03CA77767B71}"
-	ProjectSection(SolutionItems) = preProject
-		api-client.http = api-client.http
-		http\secret-request.http = http\secret-request.http
-		http\signing-request.http = http\signing-request.http
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Nova.Abstractions", "src\libs\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj", "{A1EF539D-EBBE-476B-89C8-4E89078FAE1B}"
 EndProject
@@ -76,42 +61,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|x64.Build.0 = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Debug|x86.Build.0 = Debug|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|x64.ActiveCfg = Release|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|x64.Build.0 = Release|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|x86.ActiveCfg = Release|Any CPU
-		{CC55B759-A36B-4325-9678-94AAD5862659}.Release|x86.Build.0 = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|x64.Build.0 = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Debug|x86.Build.0 = Debug|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|x64.ActiveCfg = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|x64.Build.0 = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|x86.ActiveCfg = Release|Any CPU
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039}.Release|x86.Build.0 = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|x64.Build.0 = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Debug|x86.Build.0 = Debug|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|x64.ActiveCfg = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|x64.Build.0 = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|x86.ActiveCfg = Release|Any CPU
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A}.Release|x86.Build.0 = Release|Any CPU
 		{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -333,10 +282,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7644887B-8AE0-42F8-97E7-D85B43AF36CE} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
-		{CC55B759-A36B-4325-9678-94AAD5862659} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
-		{2F618A32-CCF2-4C49-AED8-92C4C1845039} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
-		{F303409E-CC0C-4981-A7E9-B7B964CA175A} = {7644887B-8AE0-42F8-97E7-D85B43AF36CE}
 		{43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1} = {63945976-BD2B-4C66-B9C3-BABAD538837D}
 		{1D3C7B30-A456-48E7-AA64-88DA5DBFE9AA} = {43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1}
 		{846E4ABE-5CBA-43B3-9593-C9692DEB9647} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}

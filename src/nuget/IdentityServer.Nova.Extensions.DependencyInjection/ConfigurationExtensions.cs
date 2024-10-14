@@ -2,7 +2,7 @@
 
 namespace IdentityServer.Nova.Extensions.DependencyInjection;
 
-static public class ConfigurationExtensions
+static internal class ConfigurationExtensions
 {
     private const string Authority = "Authority";
     private const string ClientId = "ClientId";

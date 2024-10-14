@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -12,6 +13,11 @@ public class IdentityController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
+        return new JsonResult(
+            new {
+                claims = (User.Claims ?? [])
+                    .Select(c => new { name = c.Type, value = c.Value })
+                    .ToArray()
+            });
     }
 }

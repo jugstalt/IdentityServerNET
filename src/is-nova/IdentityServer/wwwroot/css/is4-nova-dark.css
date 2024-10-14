@@ -45,13 +45,15 @@
     color: #eee;
 }
 
-.colorscheme-dark .btn-default {
+.colorscheme-dark .btn-default,
+.colorscheme-dark .btn {
     color: #fff;
     background-color: #777;
     border-color: #3c3c3c;
 }
 
-    .colorscheme-dark .btn-default:hover {
+    .colorscheme-dark .btn-default:hover,
+    .colorscheme-dark .btn:hover {
         color: #4cc2ff;
     }
 
@@ -67,3 +69,8 @@
         font-weight: bold;
         background-color: #3c3c3c;
     }
+
+.colorscheme-dark .list-group-item {
+    background-color: #333;
+    border: 1px solid #777;
+}

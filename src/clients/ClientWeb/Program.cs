@@ -1,19 +1,29 @@
-using Microsoft.AspNetCore.Hosting;
+using IdentityServer.Nova.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace ClientWeb;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
+builder.AddServiceDefaults();
+
+builder.Services.OpenIdConnectAuthentication(builder.Configuration);
+builder.Services.AddMvc();
+
+var app = builder.Build();
+
+app.MapDefaultEndpoints();
+
+if (builder.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().Run();
-    }
-
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
+    app.UseDeveloperExceptionPage();
 }
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapDefaultControllerRoute();
+
+app.Run();
