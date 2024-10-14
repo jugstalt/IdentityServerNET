@@ -1,4 +1,5 @@
 ﻿using Aspire.Hosting.ApplicationModel;
+using System;
 
 namespace Aspire.Hosting.IdentityServerNova.Utilitities;
 
@@ -9,6 +10,10 @@ public sealed class MailDevResource(string name) : ContainerResource(name), IRes
     // endpoint.
     internal const string SmtpEndpointName = "smtp";
     internal const string HttpEndpointName = "http";
+
+    public string ContainerName = $"{name}-{Guid.NewGuid().ToString("N")}";
+    public int ContainerHttpPort = 1080;
+    public int ContainerSmtpPort = 1025;
 
     // An EndpointReference is a core .NET Aspire type used for keeping
     // track of endpoint details in expressions. Simple literal values cannot

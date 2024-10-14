@@ -23,6 +23,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
                       .WithImage(IdentityServerNovAContainerImageTags.Image)
                       .WithImageRegistry(IdentityServerNovAContainerImageTags.Registry)
                       .WithImageTag(imageTag ?? IdentityServerNovAContainerImageTags.Tag)
+                      .WithContainerRuntimeArgs("--network", "bridge")
                       .WithHttpEndpoint(
                           targetPort: 8080,
                           port: httpPort,
@@ -61,7 +62,8 @@ static public class IdentityServerNovaResourceBuilderExtensions
 
     public static IdentityServerNovaResourceBuilder WithMailDev(
         this IdentityServerNovaResourceBuilder builder,
-        int? smtpPort = null
+        int? smtpPort = null,
+        string? containerHost = null
         )
     {
         var mailDev = builder.AppBuilder.AddMailDev(
@@ -73,8 +75,8 @@ static public class IdentityServerNovaResourceBuilderExtensions
             {
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromEmail", "no-reply@is-nova.com");
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromName", "IdentityServer Nova");
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer", mailDev.Resource.SmtpEndpoint.ContainerHost);
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort", mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port));
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer", containerHost ?? mailDev.Resource.ContainerName ?? mailDev.Resource.SmtpEndpoint.ContainerHost);
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort", mailDev.Resource.ContainerSmtpPort.ToString() /*mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port)*/);
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
             });
 
