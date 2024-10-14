@@ -2,8 +2,8 @@ string? containerHost = default;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var nova = builder.AddIdentityServerNova("is-nova-dev")
-       .WithMailDev(containerHost: containerHost)
+var nova = builder.AddIdentityServerNova("is-nova-dev", bridgeNetwork: "is-nova")
+       .WithMailDev()
        .WithBindMountPersistance()
        .AsResourceBuilder();
 

@@ -4,7 +4,7 @@
 // an alternative namespace.
 namespace Aspire.Hosting.ApplicationModel;
 
-public class IdentityServerNovaResource(string name) 
+public class IdentityServerNovaResource(string name, string? bridgeNetwork = null) 
     : ContainerResource(name)
 {
     // Constants used to refer to well known-endpoint names, this is specific
@@ -12,6 +12,8 @@ public class IdentityServerNovaResource(string name)
     // endpoint.
     internal const string HttpsEndpointName = "https";
     internal const string HttpEndpointName = "http";
+
+    internal string? BridgeNetwork { get; set; } = bridgeNetwork;
 
     // An EndpointReference is a core .NET Aspire type used for keeping
     // track of endpoint details in expressions. Simple literal values cannot
@@ -21,8 +23,8 @@ public class IdentityServerNovaResource(string name)
     public EndpointReference HttpsEndpoint =>
         _httpsReference ??= new(this, HttpsEndpointName);
 
-    public ReferenceExpression ConnectionStringExpression 
-        => ReferenceExpression.Create(
-            $"https://{HttpsEndpoint.Property(EndpointProperty.Host)}:{HttpsEndpoint.Property(EndpointProperty.Port)}"
-        );
+    //public ReferenceExpression ConnectionStringExpression 
+    //    => ReferenceExpression.Create(
+    //        $"https://{HttpsEndpoint.Property(EndpointProperty.Host)}:{HttpsEndpoint.Property(EndpointProperty.Port)}"
+    //    );
 }

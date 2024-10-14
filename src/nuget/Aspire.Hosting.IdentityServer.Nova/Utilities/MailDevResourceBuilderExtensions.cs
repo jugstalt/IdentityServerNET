@@ -34,7 +34,6 @@ public static class MailDevResourceBuilderExtensions
                       .WithImage(MailDevContainerImageTags.Image)
                       .WithImageRegistry(MailDevContainerImageTags.Registry)
                       .WithImageTag(MailDevContainerImageTags.Tag)
-                      .WithContainerRuntimeArgs("--network", "bridge")
                       .WithContainerRuntimeArgs("--name", resource.ContainerName)
                       .WithHttpEndpoint(
                           targetPort: resource.ContainerHttpPort,

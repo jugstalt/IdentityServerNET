@@ -13,17 +13,15 @@ static public class IdentityServerNovaResourceBuilderExtensions
         string containerName,
         int? httpPort = null,
         int? httpsPort = null,
-        string? imageTag = null)
+        string? imageTag = null,
+        string? bridgeNetwork = null)
     {
-        var resource = new IdentityServerNovaResource(containerName);
+        var resource = new IdentityServerNovaResource(containerName, bridgeNetwork);
 
-        return new IdentityServerNovaResourceBuilder(
-            builder,
-            builder.AddResource(resource)
-                      .WithImage(IdentityServerNovAContainerImageTags.Image)
-                      .WithImageRegistry(IdentityServerNovAContainerImageTags.Registry)
-                      .WithImageTag(imageTag ?? IdentityServerNovAContainerImageTags.Tag)
-                      .WithContainerRuntimeArgs("--network", "bridge")
+        var resourceBuilder = builder.AddResource(resource)
+                      .WithImage(IdentityServerNovaContainerImageTags.Image)
+                      .WithImageRegistry(IdentityServerNovaContainerImageTags.Registry)
+                      .WithImageTag(imageTag ?? IdentityServerNovaContainerImageTags.Tag)
                       .WithHttpEndpoint(
                           targetPort: 8080,
                           port: httpPort,
@@ -31,15 +29,24 @@ static public class IdentityServerNovaResourceBuilderExtensions
                       .WithHttpsEndpoint(
                           targetPort: 8443,
                           port: httpsPort,
-                          name: IdentityServerNovaResource.HttpsEndpointName));
+                          name: IdentityServerNovaResource.HttpsEndpointName);
+
+        if(!String.IsNullOrEmpty(bridgeNetwork))
+        {
+            resourceBuilder.WithContainerRuntimeArgs("--network", bridgeNetwork);
+        }
+
+        return new IdentityServerNovaResourceBuilder(
+            builder,
+            resourceBuilder);
     }
 
     public static IdentityServerNovaResourceBuilder WithBindMountPersistance(
         this IdentityServerNovaResourceBuilder builder,
-        string persistancePath = "{{user-profile}}/identityserver-nova-aspire")
+        string persistancePath = "{{local-app-data}}/identityserver-nova-aspire")
     {
         builder.ResourceBuilder.WithBindMount(
-                persistancePath.Replace("{{user-profile}}", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
+                persistancePath.Replace("{{local-app-data}}", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)),
                 "/home/app/identityserver-nova",
                 isReadOnly: false
              );
@@ -62,21 +69,35 @@ static public class IdentityServerNovaResourceBuilderExtensions
 
     public static IdentityServerNovaResourceBuilder WithMailDev(
         this IdentityServerNovaResourceBuilder builder,
-        int? smtpPort = null,
-        string? containerHost = null
+        int? smtpPort = null
         )
     {
         var mailDev = builder.AppBuilder.AddMailDev(
             name: $"{builder.ResourceBuilder.Resource.Name}-maildev",
             smtpPort: smtpPort);
 
+        var bridgeNetwork = builder.ResourceBuilder.Resource.BridgeNetwork;
+        if (!String.IsNullOrEmpty(bridgeNetwork))
+        {
+            mailDev.WithContainerRuntimeArgs("--network", bridgeNetwork);
+        }
+
         builder.ResourceBuilder
             .WithEnvironment(e =>
             {
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromEmail", "no-reply@is-nova.com");
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromName", "IdentityServer Nova");
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer", containerHost ?? mailDev.Resource.ContainerName ?? mailDev.Resource.SmtpEndpoint.ContainerHost);
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort", mailDev.Resource.ContainerSmtpPort.ToString() /*mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port)*/);
+                
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer",
+                    String.IsNullOrEmpty(bridgeNetwork)
+                        ? mailDev.Resource.SmtpEndpoint.ContainerHost
+                        : mailDev.Resource.ContainerName);
+
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort",
+                    String.IsNullOrEmpty(bridgeNetwork)
+                        ? mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port)
+                        : mailDev.Resource.ContainerSmtpPort.ToString());
+
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
             });
 
@@ -115,7 +136,7 @@ public class IdentityServerNovaResourceBuilder(
     internal IResourceBuilder<IdentityServerNovaResource> ResourceBuilder { get; } = resourceBuilder;
 }
 
-internal static class IdentityServerNovAContainerImageTags
+internal static class IdentityServerNovaContainerImageTags
 {
     internal const string Registry = "docker.io";
     internal const string Image = "gstalt/identityserver-nova-dev";
