@@ -95,7 +95,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
 
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort",
                     String.IsNullOrEmpty(bridgeNetwork)
-                        ? mailDev.Resource.SmtpEndpoint.Property(EndpointProperty.Port)
+                        ? mailDev.Resource.SmtpEndpoint.Port //.Property(EndpointProperty.Port)
                         : mailDev.Resource.ContainerSmtpPort.ToString());
 
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
