@@ -69,6 +69,24 @@ angewendet werden:
   ``IResourceBuilder`` um, auf den alle anderen Aspire Resource Methoden angewendet 
   werden können.
 
+.. note::
+
+    Verwendet man Aspire nicht auf Windows mit *Docker Desktop* kann die Hostadresse des 
+    Docker Host nicht automatisch bestimmt werden (in Windows steht dafür die Constante 
+    ``host.docker.internal`` zur Verfügung). Damit *IdentityServer.Nova* mit *MailDev* 
+    kommunizieren kann müssen beide Anwendungen im selbem **bridge** Network laufen.
+
+    Dazu muss zuerst ein **bridge** Network erstellt werden:
+    ``docker network create is-nova``.
+
+
+    .. code:: csharp
+
+       var nova = builder.AddIdentityServerNova(
+                            containerName: "is-nova-dev", 
+                            brigeNetwork: "is-nova"
+                        ).WithMailDev();
+
 Referenzen
 ----------
 
