@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IdentityServer.Nova.Abstractions.DbContext;
 
-public interface IAdminRoleDbContext
+public interface IAdminRoleDbContext : IRoleDbContext
 {
     Task<IEnumerable<ApplicationRole>> GetRolesAsync(int limit, int skip, CancellationToken cancellationToken);
 

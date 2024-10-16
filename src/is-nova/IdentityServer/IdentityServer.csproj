@@ -57,6 +57,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Folder Include="_config\" />
     <Folder Include="Resources\" />
   </ItemGroup>
   

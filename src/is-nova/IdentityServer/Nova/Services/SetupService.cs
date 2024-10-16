@@ -2,9 +2,7 @@
 using IdentityServer.Nova.Abstractions.EmailSender;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Models;
-using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.Services.Cryptography;
-using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -69,7 +67,7 @@ public class SetupService
                     }
             };
 
-            var adminPassword = PasswordGenerator.GenerateSecurePassword(16);
+            var adminPassword = migration.AdminPassword ?? PasswordGenerator.GenerateSecurePassword(16);
 
             adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
 
@@ -79,7 +77,7 @@ public class SetupService
             {
                 Console.WriteLine($"User {DefaultAdminLogin} created");
                 Console.WriteLine($"Password: {adminPassword}");
-            } 
+            }
             else
             {
                 Console.WriteLine("Can't create admin user:");
