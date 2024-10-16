@@ -2,7 +2,9 @@
 using IdentityServer.Nova.Abstractions.EmailSender;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Models;
+using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer.Nova.Services.Cryptography;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -24,7 +26,8 @@ public class SetupService
             IRoleDbContext roleDb = null,
             IClientDbContext clientDb = null,
             IResourceDbContext resourceDb = null,
-            ICustomEmailSender mailSender = null
+            ICustomEmailSender mailSender = null,
+            DevMigrationService migration = null
         )
     {
         Console.WriteLine("################# Setup ##################");
@@ -83,6 +86,9 @@ public class SetupService
                 Console.WriteLine(result.Errors.FirstOrDefault()?.Description);
             }
         }
+
+        migration?.MigrateAsync().GetAwaiter().GetResult();
+
         Console.WriteLine("#########################################");
     }
 

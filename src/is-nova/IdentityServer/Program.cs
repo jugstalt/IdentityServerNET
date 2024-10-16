@@ -304,6 +304,11 @@ builder.Services
     .ConfigureCustomNovaStartup(builder.Configuration)
     .AddFallbackServices(builder.Configuration);
 
+if(builder.Environment.IsDevelopment())
+{
+    builder.Services.AddTransient<DevMigrationService>();
+}
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
