@@ -1,7 +1,5 @@
 ﻿#nullable enable
 
-using System.Security.Cryptography.X509Certificates;
-
 namespace IdentityServer.Nova.Models;
 
 public class MigrationModel
@@ -10,8 +8,8 @@ public class MigrationModel
 
     public IdentityResouce[]? IdentityResouces { get; set; }
 
-    public ApiResource[]? ApiResources { get; set; } 
-    
+    public ApiResource[]? ApiResources { get; set; }
+
     public Role[]? Roles { get; set; }
 
     public User[]? Users { get; set; }
@@ -39,7 +37,7 @@ public class MigrationModel
     {
         public string Name { get; set; } = "";
         public string Password { get; set; } = "";
-        public string[]? Roles { get; set; }   
+        public string[]? Roles { get; set; }
     }
 
     public class Client()
