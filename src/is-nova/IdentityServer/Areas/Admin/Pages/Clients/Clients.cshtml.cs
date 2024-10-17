@@ -1,4 +1,5 @@
 using IdentityServer.Nova.Abstractions.DbContext;
+using IdentityServer.Nova.Extensions;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -52,76 +53,7 @@ public class ClientsModel : AdminPageModel
 
                 #region Apply Client Templates
 
-                switch (Input.ClientType)
-                {
-                    case ClientTemplateType.ApiClient:
-                        client.AllowedGrantTypes = GrantTypes.ClientCredentials;
-                        client.RequireClientSecret = true;
-                        client.RequireConsent = client.AllowRememberConsent = false;
-                        if (!String.IsNullOrWhiteSpace(Input.ApiScopes))
-                        {
-                            client.AllowedScopes = Input.ApiScopes.Split(' ');
-                        }
-                        break;
-                    case ClientTemplateType.JavascriptClient:
-                        client.AllowedGrantTypes = GrantTypes.Code;
-                        client.RequirePkce = true;
-                        client.RequireClientSecret = false;
-
-                        if (!String.IsNullOrWhiteSpace(Input.ClientUrl))
-                        {
-                            client.RedirectUris = new[] { Input.ClientUrl + "/callback.html" };
-                            client.PostLogoutRedirectUris = new[] { Input.ClientUrl + "/index.html" };
-                            client.AllowedCorsOrigins = new[] { Input.ClientUrl };
-                        };
-
-                        client.AllowedScopes = new List<string>()
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile
-                        };
-                        if (!String.IsNullOrWhiteSpace(Input.ApiScopes))
-                        {
-                            ((List<string>)client.AllowedScopes).AddRange(Input.ApiScopes.Split(' '));
-                        }
-                        break;
-                    case ClientTemplateType.WebApplication:
-                        client.AllowedGrantTypes = GrantTypes.Code;
-                        client.RequireClientSecret = true;
-                        client.RequireConsent = true;
-                        client.AllowRememberConsent = true;
-                        client.RequirePkce = true;
-                        client.AlwaysIncludeUserClaimsInIdToken = true;
-
-                        client.AllowedScopes = new List<string>
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile
-                        };
-                        if (!String.IsNullOrWhiteSpace(Input.ApiScopes))
-                        {
-                            ((List<string>)client.AllowedScopes).AddRange(Input.ApiScopes.Split(' '));
-                        }
-
-                        if (!String.IsNullOrWhiteSpace(Input.ClientUrl))
-                        {
-                            try
-                            {
-                                client.RedirectUris = new[]
-                                {
-                                    Input.ClientUrl = new Uri(new Uri(Input.ClientUrl), "signin-oidc").ToString()
-                                };
-                                client.PostLogoutRedirectUris = new[]
-                                {
-                                    Input.ClientUrl = new Uri(new Uri(Input.ClientUrl), "signout-callback-oidc").ToString()
-                                };
-                            }
-                            catch { }
-                        }
-
-
-                        break;
-                }
+                client.ApplyTemplate(Input.ClientType, Input.ClientUrl, String.IsNullOrEmpty(Input.ApiScopes) ? null : Input.ApiScopes.Split(' '));
 
                 #endregion
 
