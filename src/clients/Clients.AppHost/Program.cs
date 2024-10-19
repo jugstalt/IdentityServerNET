@@ -1,25 +1,46 @@
-string? containerHost = default;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
+var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
+var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
+
 var nova = builder.AddIdentityServerNova("is-nova-dev"/*, bridgeNetwork: "is-nova"*/)
-       //.WithMailDev()
+       .WithMailDev()
        //.WithBindMountPersistance()
 
        // Migrations
+
+       .WithAdminPassword("admin")
        .WithIdentityResources(["openid", "profile", "role"])
-       .WithApiResource("my-api", ["query", "command"])
+       .WithApiResource("is-nova-webapi", ["query", "command"])
        .WithApiResource("proc-server", ["list", "execute"])
        .WithUserRoles(["custom-role1", "custom-role2", "custom-role2"])
        .WithUser("test@is.nova", "test", ["custom-role2", "custom-role3"])
-       .WithClient(ClientType.WebApplication, "web-client", "secret", "http://localhost:8765", ["openid", "profile" ] )
+       .WithClient(ClientType.WebApplication,
+                    "is-nova-webclient", "secret",
+                    webApp.Resource,
+                    [
+                        "openid", "profile", "role"
+                    ])
+       .WithClient(ClientType.ApiClient, 
+                    "is-nova-webapi-commands", "secret", 
+                    webApi.Resource,
+                    [
+                        "is-nova-webapi",
+                        "is-nova-webapi.query",
+                        "is-nova-webapi.command"
+                   ])
 
        .AsResourceBuilder();
 
-builder.AddProject<Projects.ClientApi>("clientapi")
-       .AddReference(nova, "Authorization:Authority");
 
-builder.AddProject<Projects.ClientWeb>("clientweb")
-       .AddReference(nova, "OpenIdConnectAuthentication:Authority");
+webApi
+       //.WithHealthCheck("/health")
+       .AddReference(nova, "Authorization:Authority")
+       .WaitFor(nova);
+
+webApp
+       //.WithHealthCheck("/health")
+       .AddReference(nova, "OpenIdConnectAuthentication:Authority")
+       .WaitFor(nova);
 
 builder.Build().Run();

@@ -4,7 +4,7 @@
 // an alternative namespace.
 namespace Aspire.Hosting.ApplicationModel;
 
-public class IdentityServerNovaResource(string name, string? bridgeNetwork = null) 
+public class IdentityServerNovaResource(string name) 
     : ContainerResource(name)
 {
     // Constants used to refer to well known-endpoint names, this is specific
@@ -12,8 +12,6 @@ public class IdentityServerNovaResource(string name, string? bridgeNetwork = nul
     // endpoint.
     internal const string HttpsEndpointName = "https";
     internal const string HttpEndpointName = "http";
-
-    internal string? BridgeNetwork { get; set; } = bridgeNetwork;
 
     // An EndpointReference is a core .NET Aspire type used for keeping
     // track of endpoint details in expressions. Simple literal values cannot

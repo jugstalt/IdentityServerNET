@@ -6,7 +6,7 @@ public class MigrationModel
 {
     public string? AdminPassword { get; set; } = null;
 
-    public IdentityResouce[]? IdentityResouces { get; set; }
+    public IdentityResource[]? IdentityResources { get; set; }
 
     public ApiResource[]? ApiResources { get; set; }
 
@@ -18,7 +18,7 @@ public class MigrationModel
 
     #region
 
-    public record IdentityResouce(string Name);
+    public record IdentityResource(string Name);
 
     public class ApiResource()
     {

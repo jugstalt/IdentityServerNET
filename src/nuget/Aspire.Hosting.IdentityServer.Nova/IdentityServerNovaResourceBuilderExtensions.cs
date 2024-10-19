@@ -20,7 +20,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
         string? imageTag = null,
         string? bridgeNetwork = null)
     {
-        var resource = new IdentityServerNovaResource(containerName, bridgeNetwork);
+        var resource = new IdentityServerNovaResource(containerName);
 
         var resourceBuilder = builder.AddResource(resource)
                       .WithImage(IdentityServerNovaContainerImageTags.Image)
@@ -80,32 +80,27 @@ static public class IdentityServerNovaResourceBuilderExtensions
             name: $"{builder.ResourceBuilder.Resource.Name}-maildev",
             smtpPort: smtpPort);
 
-        var bridgeNetwork = builder.ResourceBuilder.Resource.BridgeNetwork;
-        if (!String.IsNullOrEmpty(bridgeNetwork))
-        {
-            mailDev.WithContainerRuntimeArgs("--network", bridgeNetwork);
-        }
-
         builder.ResourceBuilder
             .WithEnvironment(e =>
             {
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromEmail", "no-reply@is-nova.com");
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromName", "IdentityServer Nova");
-                
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpServer",
-                    String.IsNullOrEmpty(bridgeNetwork)
-                        ? mailDev.Resource.SmtpEndpoint.ContainerHost
-                        : mailDev.Resource.ContainerName);
 
-                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__SmtpPort",
-                    String.IsNullOrEmpty(bridgeNetwork)
-                        ? mailDev.Resource.SmtpEndpoint.Port //.Property(EndpointProperty.Port)
-                        : mailDev.Resource.ContainerSmtpPort.ToString());
+                e.EnvironmentVariables.Add(
+                    "IdentityServer__Mail__Smtp__SmtpServer",
+                    //mailDev.Resource.SmtpEndpoint.ContainerHost
+                    mailDev.Resource.ContainerName);
+
+                e.EnvironmentVariables.Add(
+                    "IdentityServer__Mail__Smtp__SmtpPort",
+                    //mailDev.Resource.SmtpEndpoint.Port //.Property(EndpointProperty.Port)
+                    mailDev.Resource.ContainerSmtpPort.ToString());
 
                 e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
             });
 
-        builder.ResourceBuilder.WithReference(mailDev);
+        builder.ResourceBuilder
+            .WaitFor(mailDev);
 
         return builder;
     }
@@ -118,10 +113,12 @@ static public class IdentityServerNovaResourceBuilderExtensions
             IResourceBuilder<IdentityServerNovaResource> nova,
             string configName
         ) where T : IResourceWithEnvironment
-        => builder.WithEnvironment(
-            configName.Replace(":", "__"),
-            nova.Resource.HttpsEndpoint);
-
+        => builder.WithEnvironment(e =>
+        {
+            e.EnvironmentVariables.Add(
+                configName.Replace(":", "__"),
+                nova.Resource.HttpsEndpoint);
+        });
 
     public static IResourceBuilder<T> AddReference<T>(
             this IResourceBuilder<T> builder,
@@ -132,6 +129,20 @@ static public class IdentityServerNovaResourceBuilderExtensions
 
     #region Migrations
 
+    private const string MigEnvPrefix = "IdentityServer__Migrations__";
+
+    public static IdentityServerNovaResourceBuilder WithAdminPassword(
+            this IdentityServerNovaResourceBuilder builder,
+            string adminPassword) 
+    {
+        builder.ResourceBuilder.WithEnvironment(e =>
+        {
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}AdminPassword", adminPassword);
+        });
+
+        return builder;
+    }
+
     #region IdentityResources
 
     public static IdentityServerNovaResourceBuilder WithIdentityResouce(
@@ -140,7 +151,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
     {
         builder.ResourceBuilder.WithEnvironment(e =>
         {
-            e.EnvironmentVariables.Add($"Migrations__IdentityResources__{builder.MigIdentityResourceIndex++}__Name", identityResouce.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}IdentityResources__{builder.MigIdentityResourceIndex++}__Name", identityResouce.ToLower());
         });
 
         return builder;
@@ -166,12 +177,12 @@ static public class IdentityServerNovaResourceBuilderExtensions
     {
         builder.ResourceBuilder.WithEnvironment(e =>
         {
-            e.EnvironmentVariables.Add($"Migrations__ApiResources__{builder.MigApiResourceIndex}__Name", name.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}ApiResources__{builder.MigApiResourceIndex}__Name", name.ToLower());
 
             int index = 0;
             foreach (var scope in scopes ?? [])
             {
-                e.EnvironmentVariables.Add($"Migrations__ApiResources__{builder.MigApiResourceIndex}__Scopes__{index++}__Name", scope.ToLower());
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}ApiResources__{builder.MigApiResourceIndex}__Scopes__{index++}__Name", scope.ToLower());
             }
 
             builder.MigApiResourceIndex++;
@@ -190,7 +201,7 @@ static public class IdentityServerNovaResourceBuilderExtensions
     {
         builder.ResourceBuilder.WithEnvironment(e =>
         {
-            e.EnvironmentVariables.Add($"Migrations__Roles__{builder.MigApiUserRoleIndex++}__Name", role.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Roles__{builder.MigApiUserRoleIndex++}__Name", role.ToLower());
         });
 
         return builder;
@@ -217,13 +228,13 @@ static public class IdentityServerNovaResourceBuilderExtensions
     {
         builder.ResourceBuilder.WithEnvironment(e =>
         {
-            e.EnvironmentVariables.Add($"Migrations__Users__{builder.MigApiUserIndex}__Name", username.ToLower());
-            e.EnvironmentVariables.Add($"Migrations__Users__{builder.MigApiUserIndex}__Password", password);
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Users__{builder.MigApiUserIndex}__Name", username.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Users__{builder.MigApiUserIndex}__Password", password);
 
             int index = 0;
             foreach (var role in roles ?? [])
             {
-                e.EnvironmentVariables.Add($"Migrations__Users__{builder.MigApiUserIndex}__Roles__{index++}", role.ToString());
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}Users__{builder.MigApiUserIndex}__Roles__{index++}", role.ToString());
             }
 
             builder.MigApiUserIndex++;
@@ -246,20 +257,51 @@ static public class IdentityServerNovaResourceBuilderExtensions
     {
         builder.ResourceBuilder.WithEnvironment(e =>
         {
-            e.EnvironmentVariables.Add($"Migrations__Clients__{builder.MigClientIndex}__ClientType", clientType.ToString());
-            e.EnvironmentVariables.Add($"Migrations__Clients__{builder.MigClientIndex}__ClientId", clientId.ToLower());
-            e.EnvironmentVariables.Add($"Migrations__Clients__{builder.MigClientIndex}__ClientSecret", clientSecret);
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientType", clientType.ToString());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientId", clientId.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientSecret", clientSecret);
 
             if(!String.IsNullOrEmpty(clientUrl))
             {
-                e.EnvironmentVariables.Add($"Migrations__Clients__{builder.MigClientIndex}__ClientUrl", clientUrl);
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientUrl", clientUrl);
             }
 
             int index = 0;
             foreach (var scope in scopes ?? [])
             {
-                e.EnvironmentVariables.Add($"Migrations__Clients__{builder.MigClientIndex}__Scopes__{index++}", scope.ToLower());
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__Scopes__{index++}", scope.ToLower());
             }
+        });
+
+        return builder;
+    }
+
+    //IResourceWithEndpoints
+    public static IdentityServerNovaResourceBuilder WithClient(
+            this IdentityServerNovaResourceBuilder builder,
+            ClientType clientType,
+            string clientId,
+            string clientSecret,
+            IResourceWithEndpoints resource,
+            IEnumerable<string>? scopes = null)
+    {
+        builder.ResourceBuilder.WithEnvironment(e =>
+        {
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientType", clientType.ToString());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientId", clientId.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientSecret", clientSecret);
+
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientUrl", 
+                resource.GetEndpoint("https")?.Url ?? "");
+            
+
+            int index = 0;
+            foreach (var scope in scopes ?? [])
+            {
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__Scopes__{index++}", scope.ToLower());
+            }
+
+            builder.MigClientIndex++;
         });
 
         return builder;
@@ -297,6 +339,6 @@ internal static class IdentityServerNovaContainerImageTags
 {
     internal const string Registry = "docker.io";
     internal const string Image = "gstalt/identityserver-nova-dev";
-    internal const string Tag = "5.24.4201";
+    internal const string Tag = "latest";
 }
 

@@ -67,7 +67,7 @@ public class SetupService
                     }
             };
 
-            var adminPassword = migration.AdminPassword ?? PasswordGenerator.GenerateSecurePassword(16);
+            var adminPassword = migration?.AdminPassword ?? PasswordGenerator.GenerateSecurePassword(16);
 
             adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
 

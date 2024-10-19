@@ -113,7 +113,7 @@ public class DevMigrationService
             return false;
         }
 
-        foreach (var identityResource in _model.IdentityResouces ?? [])
+        foreach (var identityResource in _model.IdentityResources ?? [])
         {
             if (await _resourceDb.FindIdentityResource(identityResource.Name) is null)
             {
@@ -121,7 +121,8 @@ public class DevMigrationService
 
                 await _resourceDb.AddIdentityResourceAsync(new IdentityResourceModel()
                 {
-                    Name = identityResource.Name
+                    Name = identityResource.Name,
+                    DisplayName = identityResource.Name
                 });
             }
         }
