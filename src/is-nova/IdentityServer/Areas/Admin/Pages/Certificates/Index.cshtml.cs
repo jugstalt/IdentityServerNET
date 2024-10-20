@@ -47,25 +47,26 @@ public class IndexModel : SecurePageModel
             var req = new CertificateRequest($"cn={CN}", ecdsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(ExpireDays));
 
-            var pfxBytes = cert.Export(X509ContentType.Pfx, Password);
-            var crtBytes = System.Text.Encoding.UTF8.GetBytes(
+            var keyPfxBytes = cert.Export(X509ContentType.Pfx, Password);
+            var certCrtBytes = System.Text.Encoding.UTF8.GetBytes(
                             $"""
                             -----BEGIN CERTIFICATE-----
                             {Convert.ToBase64String(cert.Export(X509ContentType.Cert), Base64FormattingOptions.InsertLineBreaks)}
                             -----END CERTIFICATE-----
                             """);
+
             using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
             {
                 var pfxEntry = archive.CreateEntry($"{CertName}.pfx");
                 using (var entryStream = pfxEntry.Open())
                 {
-                    entryStream.Write(pfxBytes, 0, pfxBytes.Length);
+                    entryStream.Write(keyPfxBytes, 0, keyPfxBytes.Length);
                 }
 
                 var crtEntry = archive.CreateEntry($"{CertName}.crt");
                 using (var entryStream = crtEntry.Open())
                 {
-                    entryStream.Write(crtBytes, 0, crtBytes.Length);
+                    entryStream.Write(certCrtBytes, 0, certCrtBytes.Length);
                 }
             }
 

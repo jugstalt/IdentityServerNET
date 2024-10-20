@@ -7,30 +7,30 @@ var nova = builder.AddIdentityServerNova("is-nova-dev"/*, bridgeNetwork: "is-nov
        .WithMailDev()
        //.WithBindMountPersistance()
 
-       // Migrations
-
-       .WithAdminPassword("admin")
-       .WithIdentityResources(["openid", "profile", "role"])
-       .WithApiResource("is-nova-webapi", ["query", "command"])
-       .WithApiResource("proc-server", ["list", "execute"])
-       .WithUserRoles(["custom-role1", "custom-role2", "custom-role2"])
-       .WithUser("test@is.nova", "test", ["custom-role2", "custom-role3"])
-       .WithClient(ClientType.WebApplication,
-                    "is-nova-webclient", "secret",
-                    webApp.Resource,
-                    [
-                        "openid", "profile", "role"
-                    ])
-       .WithClient(ClientType.ApiClient, 
-                    "is-nova-webapi-commands", "secret", 
-                    webApi.Resource,
-                    [
-                        "is-nova-webapi",
-                        "is-nova-webapi.query",
-                        "is-nova-webapi.command"
-                   ])
-
-       .AsResourceBuilder();
+       .WithMigrations(migrations =>
+            migrations
+               .AddAdminPassword("admin")
+               .AddIdentityResources(["openid", "profile", "role"])
+               .AddApiResource("is-nova-webapi", ["query", "command"])
+               .AddApiResource("proc-server", ["list", "execute"])
+               .AddUserRoles(["custom-role1", "custom-role2", "custom-role2"])
+               .WithUser("test@is.nova", "test", ["custom-role2", "custom-role3"])
+               .AddClient(ClientType.WebApplication,
+                             "is-nova-webclient", "secret",
+                            webApp.Resource,
+                            [
+                                "openid", "profile", "role"
+                            ])
+               .AddClient(ClientType.ApiClient,
+                            "is-nova-webapi-commands", "secret",
+                            webApi.Resource,
+                            [
+                                "is-nova-webapi",
+                                "is-nova-webapi.query",
+                                "is-nova-webapi.command"
+                           ])
+       )
+       .Build();
 
 
 webApi
