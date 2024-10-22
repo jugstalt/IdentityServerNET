@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\is-nova\IdentityServer.DbContext\IdentityServer.DbContext.csproj" />
     <ProjectReference Include="..\..\is-nova\IdentityServer\IdentityServer.csproj" />
     <ProjectReference Include="..\..\nuget\Aspire.Hosting.IdentityServer.Nova\Aspire.Hosting.IdentityServer.Nova.csproj" IsAspireProjectResource="false" />
   </ItemGroup>

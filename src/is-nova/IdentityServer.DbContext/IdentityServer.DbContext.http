@@ -1,0 +1,6 @@
+@IdentityServer.DbContext_HostAddress = http://localhost:5085
+
+GET {{IdentityServer.DbContext_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

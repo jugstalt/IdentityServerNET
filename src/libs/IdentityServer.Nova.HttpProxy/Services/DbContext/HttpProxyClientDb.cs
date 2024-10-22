@@ -1,5 +1,6 @@
 ﻿using IdentityServer.Nova.Abstractions.DbContext;
 using IdentityServer.Nova.Distribution.Services;
+using IdentityServer.Nova.Distribution.ValueTypes;
 using IdentityServer.Nova.Models.IdentityServerWrappers;
 using System.Reflection;
 
@@ -27,18 +28,18 @@ namespace IdentityServer.Nova.HttpProxy.Services.DbContext
         #region IClientDbContextModify
 
         public Task AddClientAsync(ClientModel client)
-            => _httpInvoker.HandlePostAsync<object, ClientModel>(
+            => _httpInvoker.HandlePostAsync<NoResult, ClientModel>(
                     GetMethod<T>(nameof(AddClientAsync)),
                     client);
 
         public Task UpdateClientAsync(ClientModel client, IEnumerable<string>? propertyNames = null)
-            => _httpInvoker.HandlePostAsync<object, ClientModel>(
+            => _httpInvoker.HandlePostAsync<NoResult, ClientModel>(
                     GetMethod<T>(nameof(RemoveClientAsync)),
-                    client, propertyNames);
+                    client, propertyNames ?? []);
 
 
         public Task RemoveClientAsync(ClientModel client)
-            => _httpInvoker.HandlePostAsync<object, ClientModel>(
+            => _httpInvoker.HandlePostAsync<NoResult, ClientModel>(
                     GetMethod<T>(nameof(RemoveClientAsync)),
                     client);
 

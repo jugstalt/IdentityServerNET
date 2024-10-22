@@ -12,7 +12,7 @@ static public class EndpointRouteBuilderExtensions
             this IEndpointRouteBuilder builder,
             string path = "/api/invoke")
     {
-        builder.MapGet("{path}/{methodName}", async (
+        builder.MapGet($"{path}/{{methodName}}", async (
             HttpRequest request,
             [FromServices] InvokerService<T> invoker,
             string methodName) =>
@@ -23,7 +23,7 @@ static public class EndpointRouteBuilderExtensions
             }
         );
 
-        builder.MapPost("{path}/{methodName}", async (
+        builder.MapPost($"{path}/{{methodName}}", async (
                     HttpRequest request,
                     [FromServices] InvokerService<T> invoker,
                     string methodName) =>

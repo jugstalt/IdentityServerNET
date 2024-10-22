@@ -35,7 +35,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs-is4\Storage\src\IdentityServer4.Storage.csproj" />
-    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Distribution\IdentityServer.Nova.Distribution.csproj" />
     <ProjectReference Include="..\IdentityServer.Nova.Abstractions\IdentityServer.Nova.Abstractions.csproj" />
   </ItemGroup>
 

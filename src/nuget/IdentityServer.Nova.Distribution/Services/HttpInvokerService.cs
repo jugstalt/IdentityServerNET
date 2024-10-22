@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using IdentityServer.Nova.Distribution.ValueTypes;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 using System.Text.Json;
 using System.Web;
@@ -39,6 +40,9 @@ public class HttpInvokerService<TInterface>
             var response = await _httpClient.GetAsync(uri);
             response.EnsureSuccessStatusCode();
 
+            if (typeof(TResult) == typeof(string))
+                return NoResult.Value<TResult>();
+
             // Deserialize the response to the expected result type
             var result = JsonSerializer.Deserialize<TResult>(
                     await response.Content.ReadAsStringAsync(),
@@ -65,7 +69,7 @@ public class HttpInvokerService<TInterface>
             // Prepare the query string if there are URL parameters
             var queryParams = string.Join("&", methodInfo.GetParameters()
                 .Where((p, i) => p.ParameterType != bodyParameter?.GetType())
-                .Select((p, i) => $"{p.Name}={HttpUtility.UrlEncode(urlParameters[i]?.ToString())}"));
+                .Select((p, i) => $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i]))}"));
 
             if (!string.IsNullOrEmpty(queryParams))
             {
@@ -79,6 +83,9 @@ public class HttpInvokerService<TInterface>
             var response = await _httpClient.PostAsync(uri, content);
             response.EnsureSuccessStatusCode();
 
+            if (typeof(TResult) == typeof(string))
+                return NoResult.Value<TResult>();
+
             // Deserialize the response to the expected result type
             var result = JsonSerializer.Deserialize<TResult>(
                     await response.Content.ReadAsStringAsync(),
@@ -90,5 +97,5 @@ public class HttpInvokerService<TInterface>
         {
             throw new InvalidOperationException($"Error invoking method '{methodInfo.Name}'", ex);
         }
-    }
+    }   
 }

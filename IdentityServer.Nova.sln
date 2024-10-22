@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Nova.Distrib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.Nova.HttpProxy", "src\libs\IdentityServer.Nova.HttpProxy\IdentityServer.Nova.HttpProxy.csproj", "{65035E20-513C-4533-8763-677F5463AAC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer.DbContext", "src\is-nova\IdentityServer.DbContext\IdentityServer.DbContext.csproj", "{452516A0-915A-45D3-8629-8AC535044492}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -305,6 +307,18 @@ Global
 		{65035E20-513C-4533-8763-677F5463AAC1}.Release|x64.Build.0 = Release|Any CPU
 		{65035E20-513C-4533-8763-677F5463AAC1}.Release|x86.ActiveCfg = Release|Any CPU
 		{65035E20-513C-4533-8763-677F5463AAC1}.Release|x86.Build.0 = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|x64.Build.0 = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Debug|x86.Build.0 = Debug|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|Any CPU.Build.0 = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|x64.ActiveCfg = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|x64.Build.0 = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|x86.ActiveCfg = Release|Any CPU
+		{452516A0-915A-45D3-8629-8AC535044492}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -335,6 +349,7 @@ Global
 		{9EA728DB-2C22-4880-B0DA-951171D0E83F} = {C98EEE0E-17AD-4B00-8F63-295212056AA7}
 		{DAB0F04D-0B0C-4DCE-8B35-E7ACF2E09D5E} = {C98EEE0E-17AD-4B00-8F63-295212056AA7}
 		{65035E20-513C-4533-8763-677F5463AAC1} = {B17CF63C-D4C7-4AE9-9BDA-44FC83BB3892}
+		{452516A0-915A-45D3-8629-8AC535044492} = {43CBBAFA-4AFB-4951-BF35-7EBFCC9187D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6F7C9AB4-22C4-485D-BF3E-67CF94045749}
