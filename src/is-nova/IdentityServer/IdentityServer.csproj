@@ -29,6 +29,7 @@
     <ProjectReference Include="..\..\aspire\IdentityServer.Nova.ServiceDefaults\IdentityServer.Nova.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\libs-is4\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj" />
     <ProjectReference Include="..\..\libs-is4\IdentityServer4\src\IdentityServer4.csproj" />
+    <ProjectReference Include="..\..\libs\IdentityServer.Nova.HttpProxy\IdentityServer.Nova.HttpProxy.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova.MongoDb\IdentityServer.Nova.MongoDb.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova.ServerExtension.Default\IdentityServer.Nova.ServerExtension.Default.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova\IdentityServer.Nova.csproj" />

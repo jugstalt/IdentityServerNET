@@ -93,9 +93,17 @@ public class InMemoryRoleDb : IRoleDbContext, IAdminRoleDbContext
         return IdentityResult.Success;
     }
 
-    public Task<T> UpdatePropertyAsync<T>(ApplicationRole role, string applicationRoleProperty, T propertyValue, CancellationToken cancellation)
+    async public Task<T> UpdatePropertyAsync<T>(ApplicationRole role, string applicationRoleProperty, T propertyValue, CancellationToken cancellationToken)
     {
-        return Task.FromResult<T>(propertyValue);
+        var storedRole = await FindByIdAsync(role.Id, cancellationToken);
+        if (storedRole is null) return default(T);
+
+        var propertyInfo = role.GetType().GetProperty(applicationRoleProperty);
+        if(propertyInfo is null) return default(T);
+
+        propertyInfo.SetValue(storedRole, propertyValue, null);
+
+        return propertyValue;
     }
 
     #endregion

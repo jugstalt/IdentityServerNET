@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\aspire\IdentityServer.Nova.ServiceDefaults\IdentityServer.Nova.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServer.Nova\IdentityServer.Nova.csproj" />
     <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Distribution\IdentityServer.Nova.Distribution.csproj" />
   </ItemGroup>

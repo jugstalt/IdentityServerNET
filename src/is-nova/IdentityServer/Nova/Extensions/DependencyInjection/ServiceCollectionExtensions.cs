@@ -4,7 +4,9 @@ using IdentityServer.Nova.Abstractions.Security;
 using IdentityServer.Nova.Abstractions.SigningCredential;
 using IdentityServer.Nova.Abstractions.UI;
 using IdentityServer.Nova.Azure.Services.DbContext;
+using IdentityServer.Nova.Distribution.Services;
 using IdentityServer.Nova.Factories;
+using IdentityServer.Nova.HttpProxy.Services.DbContext;
 using IdentityServer.Nova.LiteDb.Services.DbContext;
 using IdentityServer.Nova.Models;
 using IdentityServer.Nova.MongoDb.Services.DbContext;
@@ -26,6 +28,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using IdentityServer.Nova.Distribution.Extensions.DependencyInjection;
 
 namespace IdentityServer.Nova.Extensions.DependencyInjection;
 
@@ -153,6 +156,18 @@ static public class ServiceCollectionExtensions
                             options.ConnectionString = configuration.AssetPath(value);
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Roles:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
+                        services
+                        .AddRoleDbContext<HttpProxyRoleDb>(_ => { })
+                        .AddHttpInvoker<IAdminRoleDbContext>(invoker =>
+                        {
+                            invoker.UrlPath = "api/roles";
+                        },
+                        client =>
+                        {
+                            client.BaseAddress = new Uri(value);
+                        })
+                    )
                     .SwitchDefault(() =>
                         services.AddRoleDbContext<InMemoryRoleDb>()
                     )
@@ -187,6 +202,18 @@ static public class ServiceCollectionExtensions
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Resources:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
+                        services
+                        .AddResourceDbContext<HttpProxyResourceDb>(_ => { })
+                        .AddHttpInvoker<IResourceDbContextModify>(invoker =>
+                        {
+                            invoker.UrlPath = "api/resources";
+                        },
+                        client =>
+                        {
+                            client.BaseAddress = new Uri(value);
                         })
                     )
                     .SwitchDefault(() =>
@@ -225,6 +252,18 @@ static public class ServiceCollectionExtensions
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Clients:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
+                        services
+                        .AddClientDbContext<HttpProxyClientDb>(_ => { })
+                        .AddHttpInvoker<IClientDbContextModify>(invoker =>
+                        {
+                            invoker.UrlPath = "api/clients";
+                        }, 
+                        client =>
+                        {
+                            client.BaseAddress = new Uri(value);
                         })
                     )
                     .SwitchDefault(() =>

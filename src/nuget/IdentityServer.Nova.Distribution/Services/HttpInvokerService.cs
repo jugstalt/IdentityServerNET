@@ -9,9 +9,10 @@ namespace IdentityServer.Nova.Distribution.Services;
 public class HttpInvokerService<TInterface>
 {
     private readonly HttpClient _httpClient;
-    private readonly HttpInvokerServiceOptions _options;
+    private readonly HttpInvokerServiceOptions<TInterface> _options;
 
-    public HttpInvokerService(HttpClient httpClient, IOptions<HttpInvokerServiceOptions> options)
+    public HttpInvokerService(HttpClient httpClient, 
+        IOptions<HttpInvokerServiceOptions<TInterface>> options)
     {
         _httpClient = httpClient;
         _options = options.Value;
@@ -25,11 +26,15 @@ public class HttpInvokerService<TInterface>
         try
         {
             // Construct the request URI using the method name
-            var uri = $"{_options.BaseUrl}/{_options.UrlPath}/{methodInfo.Name}";
+            var uri = $"{_options.UrlPath}/{methodInfo.Name}";
 
             // Prepare the query string if there are parameters
             var queryParams = string.Join("&", methodInfo.GetParameters()
-                .Select((p, i) => $"{p.Name}={HttpUtility.UrlEncode(parameters[i]?.ToString())}"));
+                .Select((p, i) =>
+                    i < parameters.Length
+                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(parameters[i]))}"
+                    : "")
+                .Where(s => !string.IsNullOrEmpty(s)));
 
             if (!string.IsNullOrEmpty(queryParams))
             {
@@ -44,8 +49,9 @@ public class HttpInvokerService<TInterface>
                 return NoResult.Value<TResult>();
 
             // Deserialize the response to the expected result type
+            var resultJson = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<TResult>(
-                    await response.Content.ReadAsStringAsync(),
+                    resultJson,
                     _options.JsonOptions);
 
             return result;
@@ -64,12 +70,17 @@ public class HttpInvokerService<TInterface>
         try
         {
             // Construct the request URI using the method name
-            var uri = $"{_options.BaseUrl}/{_options.UrlPath}/{methodInfo.Name}";
+            var uri = $"{_options.UrlPath}/{methodInfo.Name}";
 
             // Prepare the query string if there are URL parameters
             var queryParams = string.Join("&", methodInfo.GetParameters()
                 .Where((p, i) => p.ParameterType != bodyParameter?.GetType())
-                .Select((p, i) => $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i]))}"));
+                .Select((p, i) => 
+                    i<urlParameters.Length 
+                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i]))}"
+                    : ""
+                    )
+                .Where(s => !string.IsNullOrEmpty(s)));
 
             if (!string.IsNullOrEmpty(queryParams))
             {
@@ -83,12 +94,13 @@ public class HttpInvokerService<TInterface>
             var response = await _httpClient.PostAsync(uri, content);
             response.EnsureSuccessStatusCode();
 
-            if (typeof(TResult) == typeof(string))
+            if (typeof(TResult) == typeof(NoResult))
                 return NoResult.Value<TResult>();
 
             // Deserialize the response to the expected result type
+            var resultJson = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<TResult>(
-                    await response.Content.ReadAsStringAsync(),
+                    resultJson,
                     _options.JsonOptions);
 
             return result;

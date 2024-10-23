@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Text.Json;
 
 namespace IdentityServer.Nova.Distribution.Extensions;
 
@@ -30,7 +31,11 @@ static public class EndpointRouteBuilderExtensions
             {
                 var invokeResult = await invoker.HandleAsync(request, methodName);
 
-                return invokeResult;
+                return invokeResult switch
+                {
+                    string => JsonSerializer.Serialize(invokeResult),
+                    _ => invokeResult
+                };
             }
         );
 
