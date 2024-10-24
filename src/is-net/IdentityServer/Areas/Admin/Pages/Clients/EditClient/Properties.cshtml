@@ -1,0 +1,41 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Clients.EditClient.PropertiesModel
+@{
+    ViewData["Title"] = "Client Properties";
+    ViewData["ActivePage"] = EditClientNavPages.Properties;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="row">
+    <partial name="_StatusMessage" model="Model.StatusMessage" />
+    <form id="-form" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input type="hidden" asp-for="Input.ClientId" />
+        <div class="col-md-6">
+            @{ var count = 0; }
+            @foreach (var field in typeof(IdentityServerNET.Models.IdentityServerWrappers.ClientModel).GetProperties())
+            {
+                if (!Model.Input.IgnoreProperties.Contains(field.Name) && field.CanWrite && field.CanRead &&
+                    (field.PropertyType == typeof(string) || field.PropertyType == typeof(int)))
+                {
+                    var name = field.Name;
+                    var hasValue = field.GetValue(Model.CurrentClient) != null;
+
+                    <div class="form-group">
+                        <label>@($"{ field.Name } ({ field.PropertyType.ToString().Split('.').Last() })") </label>
+                        <input name="Input.Client.@field.Name" value="@field.GetValue(Model.CurrentClient)" class="form-control" />
+                    </div>
+
+                    @if (++count % 4 == 0)
+                    {
+                        @Html.Raw("</div><div class='col-md-6'>");
+                    }
+                }
+            }
+
+            <button id="update-properties-button" type="submit" class="btn btn-default">Save</button>
+        </div>
+
+        
+    </form>
+</div>

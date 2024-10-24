@@ -1,0 +1,62 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Users.EditUser.UserRolesModel
+@{
+    ViewData["Title"] = "User Roles";
+    ViewData["ActivePage"] = EditUserNavPages.UserRoles;
+}
+@inject IdentityServerNET.Services.ColorSchemeService ColorScheme
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <h4>@ViewData["Title"]</h4>
+        <ul class="nav nav-pills nav-stacked">
+            @foreach (var roleName in Model.CurrentApplicationUser.Roles ?? [])
+            {
+                <li class="ui-list-item" style="position:relative">
+                    <div class="@ColorScheme.LeftIcon("group")"></div>
+                    <div style="display:inline-block;padding:10px 15px 10px 5px">@(roleName)</div>
+                    @if (Model.IsRoleAdministrator)
+                    {
+                        <a style="display:inline-block;position:absolute;right:0px;top:0px"
+                            asp-page-handler="Remove"
+                            asp-route-id="@Model.CurrentApplicationUser.Id"
+                            asp-route-roleName="@roleName">
+                            Remove
+                        </a>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+    
+        
+    @if (Model.IsRoleAdministrator && Model.AddableRoles != null && Model.AddableRoles.Count() > 0)
+    {
+        <div class="col-md-6">
+            <h4>Add user role:</h4>
+            <ul class="nav nav-pills nav-stacked">
+                @foreach (var role in Model.AddableRoles)
+                {
+                <li class="ui-list-item" style="position:relative;height:50px">
+                    <div class="@ColorScheme.LeftIcon("group")"></div>
+                    <div style="">@(role.Name)</div>
+                    <div style="color:#aaa">@(role.Description)</div>
+                    @if (Model.IsRoleAdministrator)
+                    {
+                        <a style="display:inline-block;position:absolute;right:0px;top:0px"
+                            asp-page-handler="Add"
+                            asp-route-id="@Model.CurrentApplicationUser.Id"
+                            asp-route-roleName="@role.Name">
+                            Add
+                        </a>
+                    }
+                </li>
+                }
+            </ul>
+        </div>
+    }
+    
+</div>
+
+

@@ -1,0 +1,39 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/" />
+  <Folder Name="/src/aspire/" Id="52bf7fb6-37ff-5100-efd1-124eff302675">
+    <Project Path="src/aspire/IdentityServerNET.AppHost/IdentityServerNET.AppHost.csproj" />
+    <Project Path="src/aspire/IdentityServerNET.ServiceDefaults/IdentityServerNET.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/is-net/" Id="5259ac93-9054-c673-8aff-a4b0feb717aa">
+    <Project Path="src/is-net/IdentityServer.DbContext/IdentityServer.DbContext.csproj" />
+    <Project Path="src/is-net/IdentityServer/IdentityServer.csproj" />
+  </Folder>
+  <Folder Name="/src/libs-is4/" Id="b7e77ec5-e506-7f06-5224-55401bf62312">
+    <Project Path="src/libs-is4/AspNetIdentity/src/IdentityServer4.AspNetIdentity.csproj" />
+    <Project Path="src/libs-is4/IdentityServer4/src/IdentityServer4.csproj" />
+    <Project Path="src/libs-is4/Storage/src/IdentityServer4.Storage.csproj" />
+  </Folder>
+  <Folder Name="/src/libs/" Id="e431c0ef-0a07-9d2c-3ea9-2c750d5184d2">
+    <Project Path="src/libs/IdentityServerNET.Abstractions/IdentityServerNET.Abstractions.csproj" />
+    <Project Path="src/libs/IdentityServerNET.Azure/IdentityServerNET.Azure.csproj" />
+    <Project Path="src/libs/IdentityServerNET.CaptchaRenderers/IdentityServerNET.CaptchaRenderers.csproj" />
+    <Project Path="src/libs/IdentityServerNET.HttpProxy/IdentityServerNET.HttpProxy.csproj" />
+    <Project Path="src/libs/IdentityServerNET.LiteDb/IdentityServerNET.LiteDb.csproj" />
+    <Project Path="src/libs/IdentityServerNET.Models/IdentityServerNET.Models.csproj" />
+    <Project Path="src/libs/IdentityServerNET.MongoDb/IdentityServerNET.MongoDb.csproj" />
+    <Project Path="src/libs/IdentityServerNET.ServerExtension.Default/IdentityServerNET.ServerExtension.Default.csproj" />
+    <Project Path="src/libs/IdentityServerNET/IdentityServerNET.csproj" />
+  </Folder>
+  <Folder Name="/src/nuget/" Id="79ceada1-4c55-eec1-b0e1-3ac6bcca3bf1">
+    <Project Path="src/nuget/IdentityServerNET.Aspire.Hosting/IdentityServerNET.Aspire.Hosting.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Clients/IdentityServerNET.Clients.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Distribution/IdentityServerNET.Distribution.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Extensions.DependencyInjection/IdentityServerNET.Extensions.DependencyInjection.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Extensions/IdentityServerNET.Extensions.csproj" />
+  </Folder>
+</Solution>

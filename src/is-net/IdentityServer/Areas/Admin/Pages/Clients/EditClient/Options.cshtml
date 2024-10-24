@@ -1,0 +1,42 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Clients.EditClient.OptionsModel
+@{
+    ViewData["Title"] = "Client Options";
+    ViewData["ActivePage"] = EditClientNavPages.Options;
+}
+
+    <h4>@ViewData["Title"]</h4>
+    <div class="row">
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+        <div class="col-md-6">
+
+            <ul class="nav nav-pills nav-stacked">
+                @{ var count = 0; }
+                @foreach (var field in typeof(IdentityServerNET.Models.IdentityServerWrappers.ClientModel).GetProperties())
+                {
+                    if (field.CanWrite && field.PropertyType == typeof(bool))
+                    {
+                        var name = field.Name;
+                        var hasValue = (bool)field.GetValue(Model.CurrentClient);
+
+                        <li style="border-bottom:1px solid #eee">
+                            <a asp-page-handler="Set"
+                               asp-route-id="@Model.CurrentClient.ClientId"
+                               asp-route-option="@name"
+                               asp-route-value="@(!hasValue)">
+                                <div style="width:32px;height:26px;float:left"
+                                     class="@(hasValue ? "glyphicon glyphicon-ok" : "")">
+                                </div>
+                                <div>@(name)</div>
+                            </a>
+                        </li>
+
+                        @if (++count % 7 == 0)
+                        {
+                            @Html.Raw("</ul></div><div class='col-md-6'><ul class='nav nav-pills nav-stacked'>");
+                        }
+                    }
+                }
+            </ul>
+        </div>
+    </div>

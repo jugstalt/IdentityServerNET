@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>12</LangVersion>
+		<Version>5.24.4201</Version>
+	</PropertyGroup>
+
+  <PropertyGroup>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteDB" Version="5.0.21" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityServerNET.Abstractions\IdentityServerNET.Abstractions.csproj" />
+    <ProjectReference Include="..\IdentityServerNET\IdentityServerNET.csproj" />
+  </ItemGroup>
+
+</Project>

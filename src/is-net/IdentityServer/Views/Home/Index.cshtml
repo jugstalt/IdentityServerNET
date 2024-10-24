@@ -1,0 +1,106 @@
+@model IdentityServerNET.Models.ApplicationUser;
+@using IdentityServerNET;
+@using IdentityServerNET.Extensions
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration;
+@{
+    var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
+}
+@inject IdentityServerNET.Services.ColorSchemeService ColorScheme
+
+<h2>IdentityServer NET</h2>
+<h4>OpenId Connect as a Service</h4>
+<hr/>
+    <div class="row">
+        <div class="col-md-3">
+            @if (Model!=null)
+            {
+                <h4>Hello, @Model.ApplicationUserName()</h4>
+            }
+            
+        </div>
+        <div class="col-md-9">
+
+            <ul class="ui-tiles">
+                @if (Model == null)
+                {
+                    <li class="ui-tile">
+                        <a href="~/account/login">
+                            <div class="@ColorScheme.TileIcon("account-login")">
+
+                            </div>
+                            <div class="ui-tile-text ">
+                                Login
+                            </div>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="ui-tile">
+                        <a href="~/home/ToggleColorScheme">
+                            <div class="@ColorScheme.TileIcon("darkmode")">
+                            </div>
+                            <div class="ui-tile-text ">
+                                Color Scheme
+                            </div>
+                        </a>
+                    </li>
+
+                    <li class="ui-tile">
+                        <a href="~/grants">
+                            <div class="@ColorScheme.TileIcon("bookmark")">
+
+                            </div>
+                            <div class="ui-tile-text ">
+                                Grants
+                            </div>
+                        </a>
+                    </li>
+
+                    @if (!configuration.DenyManageAccount())
+                    {
+                        <li class="ui-tile">
+                            <a href="~/identity/account/manage">
+                                <div class="@ColorScheme.TileIcon("account")">
+
+                                </div>
+                                <div class="ui-tile-text ">
+                                    Manage my account
+                                </div>
+                            </a>
+                        </li>
+                    }
+
+                    <li class="ui-tile">
+                        <a href="~/account/logout">
+                            <div class="@ColorScheme.TileIcon("account-logout")">
+
+                            </div>
+                            <div class="ui-tile-text ">
+                                Logout
+                            </div>
+                        </a>
+                    </li>
+
+                    if (Model.HasAdministratorRole())
+                    {
+                        <li class="ui-tile">
+                            <a href="~/admin">
+                                <div class="@ColorScheme.TileIcon("admin")">
+
+                                </div>
+                                <div class="ui-tile-text ">
+                                    Admin
+                                </div>
+                            </a>
+                        </li>
+                    }
+                }
+
+            </ul>
+            <p>
+                <a asp-action="About">IdentiyServer: About...</a>
+            </p>
+            
+        </div>
+    </div>
