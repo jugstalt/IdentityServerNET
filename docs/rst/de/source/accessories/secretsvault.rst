@@ -74,7 +74,7 @@ Der Zugriff für Clients mit übergabe eines **Bearer Tokens**. Damit ein gülti
 API Resources anlegen 
 +++++++++++++++++++++
 
-*IdentityServer.Nova* bietet eine API zum abfragen von Secrets (https://.../api/api/secretsvault?v=1.0&path={secret-version-path}).
+*IdentityServerNET* bietet eine API zum abfragen von Secrets (https://.../api/api/secretsvault?v=1.0&path={secret-version-path}).
 Um diese API verwenden zu können, müssen zuerst die notwendigen **API Resourcen** angelegt werden. Dazu muss über die *Admin-Seite* in den 
 Bereich **Resources (Identities & APIs)** und dort zum Menüpunkt **API Resources** gewechselt werden. Falls noch nicht vorhanden, muss
 hier zuerst die API Resource ``secrets-vault`` erstellt werden:
@@ -127,19 +127,19 @@ Wird ein **Access Token** zurück gegeben, kann dieser für den zum Abfragen des
     https://localhost:44300/api/secretsvault?v=1.0&path=my-api-locker/db-connectionstring/{version}
 
 
-Secret über IdentityServer.Nova.Clients abholen
+Secret über IdentityServerNET.Clients abholen
 +++++++++++++++++++++++++++++++++++++++++++++++
 
-Das **nuget** Packet ``IdentityServer.Nova.Clients`` bietet folgende Methoden,
+Das **nuget** Packet ``IdentityServerNET.Clients`` bietet folgende Methoden,
 um auf die **Secrets API** zuzugreifen:
 
 .. code:: bash
 
-    dotnet add package IdentityServer.Nova.Clients
+    dotnet add package IdentityServerNET.Clients
 
 .. code:: csharp
 
-    var secretsVaultClient = new IdentityServer.Nova.Clients.SecretsVaultClient("my-api-secrets", "secret");
+    var secretsVaultClient = new IdentityServerNET.Clients.SecretsVaultClient("my-api-secrets", "secret");
     await secretsVaultClient.OpenLocker("https://localhost:44300", "my-api-locker");
     var secretResponse = await secretsVaultClient.GetSecret("db-connectionstring");
 

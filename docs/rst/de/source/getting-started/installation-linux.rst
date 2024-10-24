@@ -16,8 +16,8 @@ Für Linux liegen unter `Releases <https://github.com/jugstalt/identityserver.no
 ZIP Dateien mit dem Namen ``identityserver.nova-linux-x64-{version}.zip``.
 
 Das ZIP File enthält einen Ordner, der der Versionsnummer entspricht. Dieses 
-Verzeichnis kann beispielsweise nach ``~/apps/identityserver-nova`` kopiert werden.
-Danach wechselt man in das Verzeichnis ``~/apps/identityserver-nova/{version}/app``
+Verzeichnis kann beispielsweise nach ``~/apps/identityserver-net`` kopiert werden.
+Danach wechselt man in das Verzeichnis ``~/apps/identityserver-net/{version}/app``
 und führt folgendes Kommando aus:
 
 .. code:: bash

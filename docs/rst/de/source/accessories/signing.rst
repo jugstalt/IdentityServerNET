@@ -88,19 +88,19 @@ Wird ein **Access Token** zurück gegeben, kann dieser für den zum Erstellen de
     name=doc1
     &hash=1234567890
 
-Token über IdentityServer.Nova.Clients abholen
+Token über IdentityServerNET.Clients abholen
 ++++++++++++++++++++++++++++++++++++++++++++++
 
-Das **nuget** Packet ``IdentityServer.Nova.Clients`` bietet folgende Methoden,
+Das **nuget** Packet ``IdentityServerNET.Clients`` bietet folgende Methoden,
 um auf die **Signing API** zuzugreifen:
 
 .. code:: bash
 
-    dotnet add package IdentityServer.Nova.Clients
+    dotnet add package IdentityServerNET.Clients
 
 .. code:: csharp
 
-    using IdentityServer.Nova.Clients;
+    using IdentityServerNET.Clients;
 
     // ...
 
@@ -128,7 +128,7 @@ Token validieren
 Ein Token aus der **Signing API** kann einer Application übergeben werden. Diese kann 
 die Gültigkeit des Tokens prüfen und einzelne Claims abfragen. Dafür bietet .NET Core 
 verschiedene Möglichkeiten. Einige Methoden sind ebenfalls im **nuget** Packet 
-``IdentityServer.Nova.Clients`` enthalten
+``IdentityServerNET.Clients`` enthalten
 
 .. code:: csharp
 

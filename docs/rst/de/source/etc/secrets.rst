@@ -72,7 +72,7 @@ Zu Absichern des **Clients** über ein Zertifikat sind folgende Files notwendig:
   *AccessToken* abzuholen.
 
 * **CRT Datei:** Öffentlich Schlüssel (Text Format). Dieses Zertifikat wird am 
-  *IdentityServer.Nova* als **Secret** hinterlegt.
+  *IdentityServerNET* als **Secret** hinterlegt.
 
 .. image:: img/secrets5.png
 
@@ -89,11 +89,11 @@ Ein **Client** muss zuerst das Zertifikat auslesen:
     var cert = new X509Certificate2(@"my-api-client-secret.pfx", "password");
 
 Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket 
-``IdentityServer.Nova.Clients`` anstelle es *Shared Secrets* übergeben werden.
+``IdentityServerNET.Clients`` anstelle es *Shared Secrets* übergeben werden.
 
 .. code:: csharp
 
-    var tokenClient = new IdentityServer.Nova.Clients.TokenClient("my-api-commands", cert);
+    var tokenClient = new IdentityServerNET.Clients.TokenClient("my-api-commands", cert);
     await tokenClient.GetAccessToken("https://localhost:44300", []);
 
     var accessToken = tokenClient.AccessToken;
@@ -138,11 +138,11 @@ Ein **Client** muss zuerst das Zertifikat auslesen:
     var cert = new X509Certificate2(@"my-api-client-secret.pfx", "password");
 
 Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket 
-``IdentityServer.Nova.Clients`` anstelle es *Shared Secrets* übergeben werden.
+``IdentityServerNET.Clients`` anstelle es *Shared Secrets* übergeben werden.
 
 .. code:: csharp
 
-    var secretsVaultClient = new IdentityServer.Nova.Clients.SecretsVaultClient("my-api-secrets", cert);
+    var secretsVaultClient = new IdentityServerNET.Clients.SecretsVaultClient("my-api-secrets", cert);
     await secretsVaultClient.OpenLocker("https://localhost:44300", "my-api-locker");
     var secretResponse = await secretsVaultClient.GetSecret("db-connectionstring");
 

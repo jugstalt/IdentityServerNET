@@ -60,7 +60,7 @@ Clients ``WebApplication`` als Template gewählt wurde, sollte hier schon die ri
 +++++++++++++++++++
 
 Die **Scopes** geben an, welche **Identity Resources** die Web Anwendung für einen angemeldeten User abfragen kann. Ich dürfen nur **Scopes** eingetragen werden, die für 
-den **IdentityServer.Nova** als **Identity Resources** eintragen sind (siehe Abschnitt Erste Schritte).
+den **IdentityServerNET** als **Identity Resources** eintragen sind (siehe Abschnitt Erste Schritte).
 
 Für Web Anwendungen wird hier standardmäßig ``openid`` und ``profile`` eingetragen:
 
@@ -83,7 +83,7 @@ Möchte man hier mehrere Urls angeben, muss jeder Url in einer neuen Zeile angeg
 
 .. image:: img/webapp7.png
 
-Kommt die Anmeldungsaufforderung später nicht einer der Seiten, die hier aufgelistet ist, lässt **IdentityServer.Nova** diese nicht zu.
+Kommt die Anmeldungsaufforderung später nicht einer der Seiten, die hier aufgelistet ist, lässt **IdentityServerNET** diese nicht zu.
 
 ``Advanced Properties``:
 ++++++++++++++++++++++++
@@ -100,17 +100,17 @@ Client Web Anwendung anpassen
 
 Ein Client muss **OpenId Connect** unterstützen. In ASP.NET Core Umfeld werden hier die entsprechenden Methoden angeboten.
 
-**IdentityServer.Nova** bietet dafür einen einfachen Weg über Erweiterungsmethoden des ``IServiceCollection`` Objektes an. Dazu muss folgendes ``nuget`` Paket installiert werden:
+**IdentityServerNET** bietet dafür einen einfachen Weg über Erweiterungsmethoden des ``IServiceCollection`` Objektes an. Dazu muss folgendes ``nuget`` Paket installiert werden:
 
 .. code:: powershell
 
-    dotnet add package IdentityServer.Nova.Extensions.DependencyInjection
+    dotnet add package IdentityServerNET.Extensions.DependencyInjection
 
 Über diese Paket wird ``IServiceCollection`` um folgende Methode erweitert:
 
 .. code:: csharp
     
-    using IdentityServer.Nova.Extensions.DependencyInjection;
+    using IdentityServerNET.Extensions.DependencyInjection;
 
     var builder = WebApplication.CreateBuilder(args);
 

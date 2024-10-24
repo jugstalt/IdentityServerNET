@@ -1,7 +1,7 @@
 Installation mit Aspire
 =======================
 
-Bei der Entwicklung von Anwendungen kann **IdentityServer.Nova** über 
+Bei der Entwicklung von Anwendungen kann **IdentityServerNET** über 
 den **Aspire Host** als Container gestartet werden.
 
 Voraussetzung ist das Nuget Packet:
@@ -10,7 +10,7 @@ Voraussetzung ist das Nuget Packet:
 
     dotnet add package Aspire.Hosting.IdentityServer.Hosting
 
-Im Code der *Aspire AppHost* Anwendungen kann der *IdentityServer.Nova* mit
+Im Code der *Aspire AppHost* Anwendungen kann der *IdentityServerNET* mit
 folgendem Befehl hinzugefügt werden:
 
 .. code:: csharp
@@ -33,16 +33,16 @@ folgendem Befehl hinzugefügt werden:
            .AddReference(nova, "OpenIdConnectAuthentication:Authority");
 
 Mit ``AddIdentityServerNova(containerName)`` wird eine Container mit dem
-``identityserver-nova-dev`` image gestartet (https://hub.docker.com/r/gstalt/identityserver-nova-dev)
+``identityserver-net-dev`` image gestartet (https://hub.docker.com/r/gstalt/identityserver-net-dev)
 
 Dieses Image ist speziell für die Entwicklung erstellt worden. Da für viele Workflows 
-bei der Anmeldung am *IdentityServer.Nova* eine HTTPS Verbindung notwendig ist,
+bei der Anmeldung am *IdentityServerNET* eine HTTPS Verbindung notwendig ist,
 wurde diese Image mit einem *selbst-signiertem Dev Zertifikat* für die SSL Verbindungen 
 erstellt.
 
 .. note:: 
 
-    Da die Verbindung zum *IdentityServer.Nova* über eine *selbst-signiertes Zertifikat* 
+    Da die Verbindung zum *IdentityServerNET* über eine *selbst-signiertes Zertifikat* 
     erfolgt, können im Browser Warnungen angezeigt. Das dieses Image nur für die 
     Entwicklung verwendet werden sollte, können diese Warnungen im Browser ignoriert werden.
 
@@ -57,9 +57,9 @@ angewendet werden:
   verifizieren.
 
 * ``WithBindMountPersistance()``: Damit Einstellungen in der Entwicklungsumgebung
-  des *IdentityServer.Nova* gespeichert bleiben, kann mit dieser Methode ein Pfad
+  des *IdentityServerNET* gespeichert bleiben, kann mit dieser Methode ein Pfad
   für die Speicherung angeführt werden. Wird kein Parameter übergeben, erfolgt 
-  die Speicherung der Daten im ``%USER%/identityserver-nova-aspire`` Verzeichnis.
+  die Speicherung der Daten im ``%USER%/identityserver-net-aspire`` Verzeichnis.
 
 * ``WithVolumePersistance()``: Ähnlich wie oben, nur das die Speicherung der 
   Daten in einem Docker Volume erfolgt. **Achtung:** hier kann es aufgrund 
@@ -73,7 +73,7 @@ angewendet werden:
 
     Verwendet man Aspire nicht auf Windows mit *Docker Desktop* kann die Hostadresse des 
     Docker Host nicht automatisch bestimmt werden (in Windows steht dafür die Constante 
-    ``host.docker.internal`` zur Verfügung). Damit *IdentityServer.Nova* mit *MailDev* 
+    ``host.docker.internal`` zur Verfügung). Damit *IdentityServerNET* mit *MailDev* 
     kommunizieren kann müssen beide Anwendungen im selbem **bridge** Network laufen.
 
     Dazu muss zuerst ein **bridge** Network erstellt werden:
@@ -90,7 +90,7 @@ angewendet werden:
 Referenzen
 ----------
 
-Eine *IdentityServer.Nova* Instanz kann mit ``.AddReference(nova, configName)`` an ein
+Eine *IdentityServerNET* Instanz kann mit ``.AddReference(nova, configName)`` an ein
 Projekt gebunden werden. ``configName`` ist dabei der Name des Wertes aus der Konfiguration
-des Projektes, in das der die (Aspire) Url von **IdentityServer.Nova** geschrieben werden soll.
+des Projektes, in das der die (Aspire) Url von **IdentityServerNET** geschrieben werden soll.
 

@@ -50,7 +50,7 @@ Klickt man auf die Kachel ``Roles``, kommt man zu folgender Ansicht:
 
 .. image:: img/admin-server4.png
 
-Hier können Rollen verwaltet werden, die Usern zugeordnet werden können. Standardmäßig werden hier Rollen den **IdentityServer.Nova** aufgelistet, die angeben, ob ein User
+Hier können Rollen verwaltet werden, die Usern zugeordnet werden können. Standardmäßig werden hier Rollen den **IdentityServerNET** aufgelistet, die angeben, ob ein User
 bestimmte Administrationstätigkeiten erledigen kann. Über den Block ``Create new role`` können benutzerdefinierte Rollen erstellt werden.
 
 Klickt man auf eine Rolle in der Liste können diverse Eigenschaften (Beschreibung) geändert oder die Rolle gelöscht werden.

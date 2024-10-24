@@ -2,7 +2,7 @@ API Client
 ==========
 
 Ein *API Client* ist eine Anwendung, die auf eine **Web API** zugreifen muss, die einen
-gültigen **Bearer Token** erfordert, der vom **IdentityServer.Nova** ausgestellt wurde.
+gültigen **Bearer Token** erfordert, der vom **IdentityServerNET** ausgestellt wurde.
 
 API Resource
 ------------
@@ -102,7 +102,7 @@ Abholen eines AccessTokens
 HTTP Request
 ++++++++++++
 
-Eine Client Anwendung kann über einen **HTTP Post** Request, mit den notwendigen Parametern im Body, einen AccessToken von *IdentityServer.Nova* abholen.
+Eine Client Anwendung kann über einen **HTTP Post** Request, mit den notwendigen Parametern im Body, einen AccessToken von *IdentityServerNET* abholen.
 Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen übergeben:
 
 .. code:: 
@@ -136,18 +136,18 @@ bzw.
     Der ``scope`` Parameter kann auch weggelassen werden. In dem Fall enthält der Token alle für den Client eingestellten Scopes.
 
 
-IdentityServer.Nova.Clients
+IdentityServerNET.Clients
 +++++++++++++++++++++++++++
 
-Zum Abholen eines Tokens kann auch das ``IdentityServer.Nova.Clients`` **nuget** Package verwendet werden:
+Zum Abholen eines Tokens kann auch das ``IdentityServerNET.Clients`` **nuget** Package verwendet werden:
 
 .. code:: bash
 
-    dotnet add package IdentityServer.Nova.Clients
+    dotnet add package IdentityServerNET.Clients
 
 .. code:: csharp
 
-    var tokenClient = new IdentityServer.Nova.Clients.TokenClient("my-api-commands", "secret");
+    var tokenClient = new IdentityServerNET.Clients.TokenClient("my-api-commands", "secret");
     await tokenClient.GetAccessToken("https://localhost:44300", []);
 
     var accessToken = tokenClient.AccessToken;

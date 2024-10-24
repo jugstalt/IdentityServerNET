@@ -10,17 +10,17 @@ Nach dem ersten Start sollte die Konsolenausgabe kontrolliert werden:
 
     Using config file: _config/default.identityserver.nova.json (not exist)
     ################# Setup ##################
-    ISigningCredentialCertificateStorage: IdentityServer.Nova.Services.SigningCredential.SigningCredentialCertificateInMemoryStorage
-    IUserDbContext: IdentityServer.Nova.Services.DbContext.InMemoryUserDb
-    IRoleDbContext: IdentityServer.Nova.Services.DbContext.InMemoryRoleDb
-    IClientDbContext: IdentityServer.Nova.Services.DbContext.InMemoryClientDb
-    IResourceDbContext: IdentityServer.Nova.Services.DbContext.InMemoryResourceDb
+    ISigningCredentialCertificateStorage: IdentityServerNET.Services.SigningCredential.SigningCredentialCertificateInMemoryStorage
+    IUserDbContext: IdentityServerNET.Services.DbContext.InMemoryUserDb
+    IRoleDbContext: IdentityServerNET.Services.DbContext.InMemoryRoleDb
+    IClientDbContext: IdentityServerNET.Services.DbContext.InMemoryClientDb
+    IResourceDbContext: IdentityServerNET.Services.DbContext.InMemoryResourceDb
     User admin@is.nova created
     Password: Ay!ql5@r=xc%xOvq
     #########################################
     [09:29:59 Information] IdentityServer4.Startup
 
-Hier wird angezeigt, welches Konfigurationsfile verwendet wird. Im Beispiel hier, wird der **IdentityServer.Nova** ohne existierendes 
+Hier wird angezeigt, welches Konfigurationsfile verwendet wird. Im Beispiel hier, wird der **IdentityServerNET** ohne existierendes 
 Konfigurationsfile gestartet (``... not exist``). Das ist grundsätzlich möglich, in diesem Fall werden Standardwerte für die Konfiguration verwendet.
 
 .. note::
@@ -86,7 +86,7 @@ Wird der ``Code`` akzeptiert, erscheint folgende Anzeige mit möglichen ``Recove
 
 .. image:: img/login-as-admin6.png
 
-Meldet man sich jetzt vom **IdentityServer.Nova** ab (``Logout``) und erneut an, muss neben dem neuem Passwort auch ein ``Authenticator code`` eingeben werden:
+Meldet man sich jetzt vom **IdentityServerNET** ab (``Logout``) und erneut an, muss neben dem neuem Passwort auch ein ``Authenticator code`` eingeben werden:
 
 .. image:: img/login-as-admin7.png
 

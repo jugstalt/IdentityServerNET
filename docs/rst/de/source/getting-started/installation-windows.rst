@@ -21,7 +21,7 @@ Das ZIP File enthält einen Ordner, der der Versionsnummer entspricht:
     :width: 400
 
 Dieser Ordner kann an einen beliebigen Ort kopiert werden, beispielsweise unter 
-``C:\apps\identityserver-nova``. Im Ordner befindet sich die eigentlich Anwendung
+``C:\apps\identityserver-net``. Im Ordner befindet sich die eigentlich Anwendung
 (Verzeichnis ``app``) und eine **Bat-Datei** zum Starten der Anwendung:
 
 .. image:: img/install-windows2.png

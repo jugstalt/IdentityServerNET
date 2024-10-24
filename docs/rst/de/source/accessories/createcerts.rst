@@ -1,7 +1,7 @@
 Selbst-Signierte Zertifikate erstellen
 ======================================
 
-**IdentityServer.Nova** bietet ein *Admin-Werkzeug* zum erstellen von 
+**IdentityServerNET** bietet ein *Admin-Werkzeug* zum erstellen von 
 selbst-signierten Zertifikate. Das Ergebnis ist ein *ZIP-File* mit folgendem 
 Inhalt:
 

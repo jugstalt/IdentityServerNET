@@ -3,44 +3,44 @@ Installation mit Docker
 
 Für Docker liegen auf *Docker Hub* folgende Images bereit:
 
-* ``gstalt/identityserver-nova-base:{tag}``:
+* ``gstalt/identityserver-net-base:{tag}``:
 
   Ein Basis Images, dass alle notwendigen Assemblies beinhaltet. Dieses kann verwendet werden,
   um eingen Images mit eingenen Konfigurationen oder Plugins zu erstellen
 
-* ``gstalt/identityserver-nova:{tag}``:
+* ``gstalt/identityserver-net:{tag}``:
 
   Der IdentityServer in einer *Default* Konfiguration. Die Applikation wird im Container mit 
   Port 8080 gestartet.
 
   .. code:: bash
 
-    docker run -d -p 8080:8080 --name is-nova identityserver-nova:5.24.3601
+    docker run -d -p 8080:8080 --name is-nova identityserver-net:5.24.3601
 
   Die Anwendung läuft damit unter http://localhost:8080
 
-* ``gstalt/identityserver-nova-dev:{tag}``:
+* ``gstalt/identityserver-net-dev:{tag}``:
 
   Ein Image, das als lokaler IdentityServer für die Entwicklung von Anwendung verwendet werden kann.
-  Da für die Anmeldung von Anwendungen *HTTPS* vorausgesetzt wird, wir hier der *IdentityServer.Nova* 
+  Da für die Anmeldung von Anwendungen *HTTPS* vorausgesetzt wird, wir hier der *IdentityServerNET* 
   im Container unter dem Port 8443 mit und *HTTPS* mit denen selbst signierten Developer 
   Zertifikat gestartet.
 
   .. code:: bash
 
-    docker run -d -p 8443:8443 --name is-nova-dev identityserver-nova-dev:5.24.3601
+    docker run -d -p 8443:8443 --name is-nova-dev identityserver-net-dev:5.24.3601
 
   Die Anwendung läuft damit unter https://localhost:8443
 
 Benutzerdefinierte Images bauen
 -------------------------------
 
-Mit dem Basis Image ``gstalt/identityserver-nova-base:{tag}`` können Benutzerdefinierte
+Mit dem Basis Image ``gstalt/identityserver-net-base:{tag}`` können Benutzerdefinierte
 Images gebaut werden. Ein Docker File sieht dabei in etwa wie folgt aus:
 
 .. code:: docker
 
-    FROM identityserver-nova-base:latest
+    FROM identityserver-net-base:latest
 
     WORKDIR /app
 
