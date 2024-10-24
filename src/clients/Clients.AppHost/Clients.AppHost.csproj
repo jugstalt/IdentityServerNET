@@ -13,7 +13,7 @@
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0-rc.1.24511.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\nuget\Aspire.Hosting.IdentityServer.Nova\Aspire.Hosting.IdentityServer.Nova.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\nuget\IdentityServerNET.Aspire.Hosting\IdentityServerNET.Aspire.Hosting.csproj" IsAspireProjectResource="false"/>
     <ProjectReference Include="..\ClientApi\ClientApi.csproj" />
     <ProjectReference Include="..\ClientWeb\ClientWeb.csproj" />
   </ItemGroup>

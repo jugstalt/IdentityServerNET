@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/aspire/">
+    <Project Path="src/clients/Clients.AppHost/Clients.AppHost.csproj" />
+    <Project Path="src/clients/Clients.ServiceDefaults/Clients.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/clients/">
+    <Project Path="src/clients/ClientApi/ClientApi.csproj" />
+    <Project Path="src/clients/ClientWeb/ClientWeb.csproj" />
+  </Folder>
+  <Folder Name="/http/">
+    <File Path="http/api-client.http" />
+    <File Path="http/secret-request.http" />
+    <File Path="http/signing-request.http" />
+  </Folder>
+  <Folder Name="/nuget/">
+    <Project Path="src/nuget/IdentityServerNET.Aspire.Hosting/IdentityServerNET.Aspire.Hosting.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Extensions.DependencyInjection/IdentityServerNET.Extensions.DependencyInjection.csproj" />
+  </Folder>
+</Solution>

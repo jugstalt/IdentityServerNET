@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\nuget\IdentityServer.Nova.Extensions.DependencyInjection\IdentityServer.Nova.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\nuget\IdentityServerNET.Extensions.DependencyInjection\IdentityServerNET.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Clients.ServiceDefaults\Clients.ServiceDefaults.csproj" />
   </ItemGroup>
 

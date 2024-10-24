@@ -1,4 +1,4 @@
-# IdentityServer.Nova
+# IdentityServer NET
 
 The online documentation is available here:
 

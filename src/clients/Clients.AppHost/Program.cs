@@ -3,7 +3,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 
-var nova = builder.AddIdentityServerNova("is-nova-dev"/*, bridgeNetwork: "is-nova"*/)
+var nova = builder.AddIdentityServerNET("is-nova-dev"/*, bridgeNetwork: "is-nova"*/)
        .WithMailDev()
        //.WithBindMountPersistance()
 
