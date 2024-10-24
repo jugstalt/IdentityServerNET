@@ -134,6 +134,21 @@ static public class ServiceCollectionExtensions
                             options.AddDefaults(configSection);
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Users:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
+                        services
+                        .AddUserDbContext<HttpProxyUserDb>(options => 
+                        {
+                            options.AddDefaults(configSection);
+                        })
+                        .AddHttpInvoker<IAdminUserDbContext>(invoker =>
+                        {
+                            invoker.UrlPath = "api/users";
+                        },
+                        client =>
+                        {
+                            client.BaseAddress = new Uri(value);
+                        })
+                    )
                     .SwitchDefault(() =>
                         services.AddUserDbContext<InMemoryUserDb>(options =>
                             options.AddDefaults(configSection)

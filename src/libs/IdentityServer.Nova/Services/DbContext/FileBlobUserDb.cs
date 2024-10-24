@@ -178,7 +178,7 @@ public class FileBlobUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCo
         return propertyValue;
     }
 
-    async public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+    async public Task UpdatePropertyByEditorInfoAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
     {
         var propertyInfo = user.GetType().GetProperty(dbPropertyInfo.Name);
         if (propertyInfo != null)

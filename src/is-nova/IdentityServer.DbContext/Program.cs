@@ -9,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 #endif
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer().ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.AddHttpInvokerDefaults();
+});
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IClientDbContextModify, InMemoryClientDb>();

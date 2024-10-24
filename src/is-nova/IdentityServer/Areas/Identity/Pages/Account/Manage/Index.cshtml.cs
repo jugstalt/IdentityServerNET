@@ -74,7 +74,7 @@ public partial class IndexModel : ManageAccountProfilePageModel
             }
 
             var userDbContext = await CurrentUserDbContext();
-            await userDbContext.UpdatePropertyAsync(
+            await userDbContext.UpdatePropertyByEditorInfoAsync(
                 this.ApplicationUser,
                 editorInfo,
                 this.Request.Form[formKey].ToString(),

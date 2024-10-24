@@ -32,7 +32,7 @@ public class HttpInvokerService<TInterface>
             var queryParams = string.Join("&", methodInfo.GetParameters()
                 .Select((p, i) =>
                     i < parameters.Length
-                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(parameters[i]))}"
+                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(parameters[i], _options.JsonOptions))}"
                     : "")
                 .Where(s => !string.IsNullOrEmpty(s)));
 
@@ -77,7 +77,7 @@ public class HttpInvokerService<TInterface>
                 .Where((p, i) => p.ParameterType != bodyParameter?.GetType())
                 .Select((p, i) => 
                     i<urlParameters.Length 
-                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i]))}"
+                    ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i], _options.JsonOptions))}"
                     : ""
                     )
                 .Where(s => !string.IsNullOrEmpty(s)));
@@ -88,7 +88,7 @@ public class HttpInvokerService<TInterface>
             }
 
             // Serialize the body parameter
-            var content = new StringContent(JsonSerializer.Serialize(bodyParameter), System.Text.Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(bodyParameter, _options.JsonOptions), System.Text.Encoding.UTF8, "application/json");
 
             // Send the request
             var response = await _httpClient.PostAsync(uri, content);

@@ -20,7 +20,7 @@ static public class EndpointRouteBuilderExtensions
             {
                 var invokeResult = await invoker.HandleAsync(request, methodName);
 
-                return invokeResult;
+                return invokeResult.ToResult();
             }
         );
 
@@ -31,14 +31,17 @@ static public class EndpointRouteBuilderExtensions
             {
                 var invokeResult = await invoker.HandleAsync(request, methodName);
 
-                return invokeResult switch
-                {
-                    string => JsonSerializer.Serialize(invokeResult),
-                    _ => invokeResult
-                };
+                return invokeResult.ToResult();
             }
         );
 
         return builder;
     }
+
+    private static object? ToResult(this object? result)
+        => result switch
+        {
+            string => JsonSerializer.Serialize(result),
+            _ => result
+        };
 }

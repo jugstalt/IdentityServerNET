@@ -7,11 +7,13 @@ var dbContextApi = builder.AddProject<Projects.IdentityServer_DbContext>("identi
 
 builder.AddProject<Projects.IdentityServer>("identityserver", launchProfileName: "SelfHost")
        //.WithReference(mailDev)
-       .WithEnvironment(e =>
-       {
-           e.EnvironmentVariables.Add("IdentityServer__ConnectionStrings__HttpProxy", dbContextApi.Resource.GetEndpoint("https"));
-       })
-       .WaitFor(dbContextApi)
+    
+       //.WithEnvironment(e =>
+       //{
+       //    e.EnvironmentVariables.Add("IdentityServer__ConnectionStrings__HttpProxy", dbContextApi.Resource.GetEndpoint("https"));
+       //})
+       //.WaitFor(dbContextApi)
+       
        .WaitFor(maildev);
 
 

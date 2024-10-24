@@ -1,18 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using IdentityServer.Nova.Distribution.Extensions;
+using Microsoft.AspNetCore.Http;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace IdentityServer.Nova.Distribution.Services;
 
 public class InvokerService<T>
 {
     private readonly T _service;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public InvokerService(T service)
     {
         _service = service;
+        _jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web).AddHttpInvokerDefaults();
     }
 
     public async Task<object?> HandleAsync(HttpRequest request, string methodName)
@@ -37,32 +38,55 @@ public class InvokerService<T>
 
                 if (request.Query.ContainsKey(param.Name))
                 {
-                    if(param.ParameterType.IsGenericParameter)
+                    if (param.ParameterType.IsGenericParameter)
                     {
-                        var jsonObject = JsonSerializer.Deserialize(request.Query[param.Name].ToString(), typeof(object));
+                        var jsonObject = JsonSerializer.Deserialize(
+                            request.Query[param.Name].ToString(), typeof(object),
+                            _jsonOptions
+                            );
                         arguments[i] = jsonObject switch
                         {
-                            JsonElement jsonElement => jsonElement.ValueKind switch { 
+                            JsonElement jsonElement => jsonElement.ValueKind switch
+                            {
                                 JsonValueKind.String => jsonElement.GetString(),
-                                JsonValueKind.False => false,   
+                                JsonValueKind.False => false,
                                 JsonValueKind.True => true,
                                 JsonValueKind.Null => null,
-                                JsonValueKind.Number => jsonElement.GetDouble(),
+                                JsonValueKind.Number when jsonElement.GetString()?.Contains(".") == true => jsonElement.GetDouble(),
+                                JsonValueKind.Number => jsonElement.GetInt64(),
                                 _ => throw new Exception($"Unsupportet generic paramter kind {jsonElement.ValueKind}")
                             },
                             _ => throw new Exception("Can't determine generic parameter")
                         };
                         genericMethodParameterTypes.Add(arguments[i]?.GetType() ?? typeof(object));
-                    } 
-                    else
-                    { 
-                        arguments[i] = JsonSerializer.Deserialize(request.Query[param.Name].ToString(), param.ParameterType);
                     }
-                    
+                    else
+                    {
+                        var jsonObject = JsonSerializer.Deserialize(
+                            request.Query[param.Name].ToString(), param.ParameterType,
+                            _jsonOptions);
+                        arguments[i] = jsonObject switch
+                        {
+                            // if param.ParameterType is object the result is often just 
+                            // JsonElement => convert this to its real type
+                            JsonElement jsonElement => jsonElement.ValueKind switch
+                            {
+                                JsonValueKind.String => jsonElement.GetString(),
+                                JsonValueKind.False => false,
+                                JsonValueKind.True => true,
+                                JsonValueKind.Null => null,
+                                JsonValueKind.Number when jsonElement.GetString()?.Contains(".") == true => jsonElement.GetDouble(),
+                                JsonValueKind.Number => jsonElement.GetInt64(),
+                                _ => throw new Exception($"Unsupportet paramter kind {jsonElement.ValueKind}")
+                            },
+                            _ => jsonObject
+                        };
+                    }
+
                 }
                 else if (request.Body != null && (param.ParameterType.IsClass && param.ParameterType != typeof(string)))
                 {
-                    arguments[i] = await JsonSerializer.DeserializeAsync(request.Body, param.ParameterType);
+                    arguments[i] = await JsonSerializer.DeserializeAsync(request.Body, param.ParameterType, _jsonOptions);
                 }
                 else if (param.ParameterType == typeof(CancellationToken))
                 {
@@ -70,8 +94,8 @@ public class InvokerService<T>
                 }
                 else
                 {
-                    if(param.ParameterType == typeof(CancellationToken))
-                    return new { Error = $"Missing or invalid parameter: {param.Name}" };
+                    if (param.ParameterType == typeof(CancellationToken))
+                        return new { Error = $"Missing or invalid parameter: {param.Name}" };
                 }
             }
 
@@ -79,7 +103,7 @@ public class InvokerService<T>
             {
                 method = method.MakeGenericMethod(genericMethodParameterTypes.ToArray());
             }
-            
+
             var result = method.Invoke(_service, arguments);
 
             if (result is Task taskResult)

@@ -70,7 +70,7 @@ public class IndexModel : EditUserPageModel
                     continue;
                 }
 
-                await _userDbContext.UpdatePropertyAsync(
+                await _userDbContext.UpdatePropertyByEditorInfoAsync(
                     this.CurrentApplicationUser,
                     editorInfo,
                     this.Request.Form[formKey].ToString(),

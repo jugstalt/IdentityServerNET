@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,9 +21,9 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
     private readonly UserDbContextConfiguration _config;
 
-    public InMemoryUserDb(IOptionsMonitor<UserDbContextConfiguration> optionsMonitor = null)
+    public InMemoryUserDb(IOptions<UserDbContextConfiguration> options = null)
     {
-        _config = optionsMonitor?.CurrentValue ?? new UserDbContextConfiguration();
+        _config = options?.Value ?? new UserDbContextConfiguration();
     }
 
     #region IUserDbContext
@@ -125,16 +126,38 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
         return IdentityResult.Success;
     }
 
-    public Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellation)
+    async public Task<T> UpdatePropertyAsync<T>(ApplicationUser user, string applicationUserProperty, T propertyValue, CancellationToken cancellationToken)
     {
-        return Task.FromResult<T>(propertyValue);
+        var storedUser = await FindByIdAsync(user.Id, cancellationToken);
+
+        if (storedUser is null) throw new ArgumentException("Unknown user");
+
+        var propertyInfo = storedUser.GetType().GetProperty(applicationUserProperty);
+        if (propertyInfo is null) throw new ArgumentException($"Unknown user property: {applicationUserProperty}");
+
+        propertyInfo.SetValue(storedUser, propertyValue, null);
+
+        return propertyValue;
     }
 
-    public Task UpdatePropertyAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellation)
+    async public Task UpdatePropertyByEditorInfoAsync(ApplicationUser user, EditorInfo dbPropertyInfo, object propertyValue, CancellationToken cancellationToken)
     {
         if (!String.IsNullOrWhiteSpace(dbPropertyInfo.ClaimName))
         {
-            List<Claim> claims = new List<Claim>(user.Claims
+            var storedUser = await FindByIdAsync(user.Id, cancellationToken);
+            if (storedUser is null) throw new ArgumentException("Unknown user");
+
+            var propertyInfo = storedUser.GetType().GetProperty(
+                dbPropertyInfo.ClaimName, 
+                BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+            if(propertyInfo is not null)
+            {
+                propertyInfo.SetValue(storedUser, propertyValue);
+
+                return;
+            }
+
+            List<Claim> claims = new List<Claim>(storedUser.Claims
                     .Where(c => c.Type != dbPropertyInfo.ClaimName));
 
             if (!String.IsNullOrWhiteSpace(propertyValue?.ToString()))
@@ -142,10 +165,8 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
                 claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()));
             }
 
-            user.Claims = claims;
+            storedUser.Claims = claims;
         }
-
-        return Task.CompletedTask;
     }
 
     #endregion
@@ -187,10 +208,13 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
     #region IUserRoleContext
 
-    public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    async public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
+        var storedUser = await FindByIdAsync(user.Id, cancellationToken);
+        if (storedUser is null) throw new ArgumentException("Unknown user");
+
         var roles = new List<string>();
-        if (user.Roles != null)
+        if (storedUser.Roles != null)
         {
             roles.AddRange(user.Roles);
         }
@@ -200,24 +224,23 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
             roles.Add(roleName);
         }
 
-        user.Roles = roles;
-
-        return Task.CompletedTask;
+        storedUser.Roles = roles;
     }
 
-    public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+    async public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
-        if (user.Roles != null)
+        var storedUser = await FindByIdAsync(user.Id, cancellationToken);
+        if (storedUser is null) throw new ArgumentException("Unknown user");
+
+        if (storedUser.Roles != null)
         {
-            var roles = new List<string>(user.Roles);
+            var roles = new List<string>(storedUser.Roles);
             if (roles.Contains(roleName))
             {
                 roles.Remove(roleName);
-                user.Roles = roles;
+                storedUser.Roles = roles;
             }
         }
-
-        return Task.CompletedTask;
     }
 
     public Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)

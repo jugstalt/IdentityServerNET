@@ -1,6 +1,8 @@
 ﻿using IdentityServer.Nova.Models.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
+using System.Text.Json.Serialization;
 
 namespace IdentityServer.Nova.Models.UserInteraction;
 
@@ -50,7 +52,22 @@ public class EditorInfo
 
     public string Name { get; set; } = "";
     public string DisplayName { get; set; } = "";
+
+    [JsonIgnore]
     public Type? PropertyType { get; set; }
+
+    public string? PropertyTypeString
+    {
+        get => PropertyType?.ToString();
+        set
+        {
+            PropertyType = value switch
+            {
+                null => null,
+                _ => Type.GetType(value)
+            };
+        }
+    }
 
     public string Category { get; set; } = "";
     public EditorType EditorType { get; set; }
