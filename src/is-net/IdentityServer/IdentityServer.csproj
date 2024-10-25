@@ -27,13 +27,14 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\aspire\IdentityServerNET.ServiceDefaults\IdentityServerNET.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\customize\IdentityServerNET.ServerExtension.Default\IdentityServerNET.ServerExtension.Default.csproj" />
     <ProjectReference Include="..\..\libs-is4\AspNetIdentity\src\IdentityServer4.AspNetIdentity.csproj" />
     <ProjectReference Include="..\..\libs-is4\IdentityServer4\src\IdentityServer4.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.Azure\IdentityServerNET.Azure.csproj" />
+    <ProjectReference Include="..\..\libs\IdentityServerNET.CaptchaRenderers\IdentityServerNET.CaptchaRenderers.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.HttpProxy\IdentityServerNET.HttpProxy.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.LiteDb\IdentityServerNET.LiteDb.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.MongoDb\IdentityServerNET.MongoDb.csproj" />
-    <ProjectReference Include="..\..\libs\IdentityServerNET.ServerExtension.Default\IdentityServerNET.ServerExtension.Default.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET\IdentityServerNET.csproj" />
     <ProjectReference Include="..\..\nuget\IdentityServerNET.Extensions\IdentityServerNET.Extensions.csproj" />
   </ItemGroup>

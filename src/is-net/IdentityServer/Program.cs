@@ -149,15 +149,6 @@ builder.Services.AddAuthentication("Bearer")
         options.Audience = "signing-api";
     });
 
-builder.Services.AddAuthentication()
-    .AddGoogle("Google", options =>
-    {
-        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-
-        options.ClientId = "...";
-        options.ClientSecret = "...";
-    });
-
 builder.Services.AddMvc()
             .AddRazorPagesOptions(options =>
             {

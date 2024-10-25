@@ -11,7 +11,6 @@ using IdentityServerNET.LiteDb.Services.DbContext;
 using IdentityServerNET.Models;
 using IdentityServerNET.MongoDb.Services.DbContext;
 using IdentityServerNET.Reflection;
-using IdentityServerNET.ServerExtension.Default.Extensions;
 using IdentityServerNET.Services;
 using IdentityServerNET.Services.Cryptography;
 using IdentityServerNET.Services.DbContext;
