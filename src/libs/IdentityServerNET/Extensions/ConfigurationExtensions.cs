@@ -1,9 +1,9 @@
 ﻿using IdentityServerNET.Abstractions.Services;
-using IdentityServerNET.Models.IdentityServerWrappers;
 using IdentityServerNET.Models.UserInteraction;
 using Microsoft.Extensions.Configuration;
 
-namespace IdentityServerNET.ServerExtension.Default.Extensions;
+namespace IdentityServerNET.Extensions;
+
 public static class ConfigurationExtensions
 {
     public static void AddDefaults(this UserDbContextConfiguration options,
@@ -48,59 +48,21 @@ public static class ConfigurationExtensions
     public static void AddDefaults(this ResourceDbContextConfiguration options,
                                    IConfiguration config)
     {
-        options.InitialApiResources = new ApiResourceModel[]
-        {
-                    //new ApiResourceModel("api1","My Api1"),
-                    //new ApiResourceModel("api2","My Api2")
-        };
-        options.InitialIdentityResources = new IdentityResourceModel[]
-        {
+        //options.InitialApiResources = new ApiResourceModel[]
+        //{
+        //};
+        //options.InitialIdentityResources = new IdentityResourceModel[]
+        //{
 
-        };
+        //};
     }
 
     public static void AddDefaults(this ClientDbContextConfiguration options,
                                    IConfiguration config)
     {
-        options.IntialClients = new ClientModel[]
-        {
-                //new ClientModel()
-                //{
-                //    ClientId = "client",
-                //    ClientSecrets = new SecretModel[]
-                //    {
-                //        new SecretModel()
-                //        {
-                //            Value = "secret1".ToSha256()
-                //        },
-                //        new SecretModel()
-                //        {
-                //            Value = "secret2".ToSha256()
-                //        }
-                //    },
-                //    AllowedGrantTypes = { GrantTypes.ClientCredentials, GrantTypes.Password },
-                //    AllowedScopes = { "api1", "api2", "profile", "openid" }
-                //},
-                //new ClientModel()
-                //{
-                //    ClientId = "mvc",
-                //    ClientSecrets = new SecretModel[]
-                //    {
-                //        new SecretModel() { Value ="secret".ToSha256() }
-                //    },
-                //    AllowedGrantTypes = { GrantTypes.AuthorizationCode },
-                //    AllowedScopes = { "openid", "profile", "api1", "email", "role", "address", "phone" },
+        //options.IntialClients = new ClientModel[]
+        //{
 
-                //    AlwaysSendClientClaims = true,
-                //    AlwaysIncludeUserClaimsInIdToken = true,
-
-                //    AllowOfflineAccess = true,
-                //    RequireConsent = false,
-                //    RequirePkce = true,
-
-                //    RedirectUris = new string[] { "https://localhost:44356/signin-oidc" },
-                //    PostLogoutRedirectUris = new string[] { "https://localhost:44356/signout-callback-oidc" }
-                //}
-        };
+        //};
     }
 }

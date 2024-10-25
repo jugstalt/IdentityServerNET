@@ -9,6 +9,9 @@
     <Project Path="src/aspire/IdentityServerNET.AppHost/IdentityServerNET.AppHost.csproj" />
     <Project Path="src/aspire/IdentityServerNET.ServiceDefaults/IdentityServerNET.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/src/customize/" Id="f3a74df7-d413-42a0-a26e-e5355cc27ef5">
+    <Project Path="src/customize/IdentityServerNET.ServerExtension.Default/IdentityServerNET.ServerExtension.Default.csproj" />
+  </Folder>
   <Folder Name="/src/is-net/" Id="5259ac93-9054-c673-8aff-a4b0feb717aa">
     <Project Path="src/is-net/IdentityServer.DbContext/IdentityServer.DbContext.csproj" />
     <Project Path="src/is-net/IdentityServer/IdentityServer.csproj" />
@@ -26,7 +29,6 @@
     <Project Path="src/libs/IdentityServerNET.LiteDb/IdentityServerNET.LiteDb.csproj" />
     <Project Path="src/libs/IdentityServerNET.Models/IdentityServerNET.Models.csproj" />
     <Project Path="src/libs/IdentityServerNET.MongoDb/IdentityServerNET.MongoDb.csproj" />
-    <Project Path="src/libs/IdentityServerNET.ServerExtension.Default/IdentityServerNET.ServerExtension.Default.csproj" />
     <Project Path="src/libs/IdentityServerNET/IdentityServerNET.csproj" />
   </Folder>
   <Folder Name="/src/nuget/" Id="79ceada1-4c55-eec1-b0e1-3ac6bcca3bf1">
