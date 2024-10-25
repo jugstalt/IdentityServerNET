@@ -371,7 +371,7 @@ public class AccountController : Controller
             {
                 allowLocal = client.EnableLocalLogin;
 
-                if (client.IdentityProviderRestrictions != null && client.IdentityProviderRestrictions.Any())
+                if (client.IdentityProviderRestrictions?.Any() == true)
                 {
                     providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
                 }

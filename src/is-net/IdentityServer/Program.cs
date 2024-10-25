@@ -24,6 +24,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.IO;
 using System.Linq;
+using System.Web.Services.Description;
 
 #region Serilog
 
@@ -146,6 +147,15 @@ builder.Services.AddAuthentication("Bearer")
         options.RequireHttpsMetadata = false;
 
         options.Audience = "signing-api";
+    });
+
+builder.Services.AddAuthentication()
+    .AddGoogle("Google", options =>
+    {
+        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+        options.ClientId = "...";
+        options.ClientSecret = "...";
     });
 
 builder.Services.AddMvc()
