@@ -1,11 +1,14 @@
-﻿using IdentityServer4.Configuration;
+﻿using IdentityModel;
+using IdentityServer4.Configuration;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -76,6 +79,22 @@ public class CustomTokenService : DefaultTokenService
         };
 
         return token;
+    }
+
+    public IdentityServer4.Models.Token CreateUserToken(ApplicationUser user, int lifeTime = 3600)
+    {
+        var claims = new NameValueCollection()
+        {
+            { JwtClaimTypes.Id, user.Id },
+            { JwtClaimTypes.Name, user.UserName}
+        };
+
+        foreach (var role in user.Roles ?? [])
+        {
+            claims.Add(JwtClaimTypes.Role, role);
+        }
+        
+        return CreateCustomToken(claims, lifeTime);
     }
 
     public override async Task<string> CreateSecurityTokenAsync(IdentityServer4.Models.Token token)

@@ -30,11 +30,11 @@
     <Project Path="src/libs/IdentityServerNET.Models/IdentityServerNET.Models.csproj" />
     <Project Path="src/libs/IdentityServerNET.MongoDb/IdentityServerNET.MongoDb.csproj" />
     <Project Path="src/libs/IdentityServerNET/IdentityServerNET.csproj" />
+    <Project Path="src/nuget/IdentityServerNET.Distribution/IdentityServerNET.Distribution.csproj" />
   </Folder>
   <Folder Name="/src/nuget/" Id="79ceada1-4c55-eec1-b0e1-3ac6bcca3bf1">
     <Project Path="src/nuget/IdentityServerNET.Aspire.Hosting/IdentityServerNET.Aspire.Hosting.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Clients/IdentityServerNET.Clients.csproj" />
-    <Project Path="src/nuget/IdentityServerNET.Distribution/IdentityServerNET.Distribution.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Extensions.DependencyInjection/IdentityServerNET.Extensions.DependencyInjection.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Extensions/IdentityServerNET.Extensions.csproj" />
   </Folder>
