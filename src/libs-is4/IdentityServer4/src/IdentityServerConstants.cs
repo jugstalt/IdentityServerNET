@@ -142,6 +142,7 @@ public static class IdentityServerConstants
         public const string Phone = "phone";
         /// <summary>This scope value MUST NOT be used with the OpenID Connect Implicit Client Implementer's Guide 1.0. See the OpenID Connect Basic Client Implementer's Guide 1.0 (http://openid.net/specs/openid-connect-implicit-1_0.html#OpenID.Basic) for its usage in that subset of OpenID Connect.</summary>
         public const string OfflineAccess = "offline_access";
+        public const string Role = "role";
     }
 
     public static class PersistedGrantTypes

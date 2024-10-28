@@ -2,6 +2,7 @@
 
 using Grpc.Core.Interceptors;
 using IdentityModel;
+using IdentityServer4.Stores;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
@@ -27,11 +28,13 @@ public class DevMigrationService
     private readonly IResourceDbContextModify? _resourceDb;
     private readonly IClientDbContextModify? _clientDb;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
+    private readonly IResourceStore _resourceStore;
 
     public DevMigrationService(
             IConfiguration config,
             ILogger<DevMigrationService> logger,
             IPasswordHasher<ApplicationUser> passwordHasher,
+            IResourceStore resourceStore,
             IUserDbContext? userDb = null,
             IRoleDbContext? roleDb = null,
             IResourceDbContext? resourceDb = null,
@@ -48,6 +51,7 @@ public class DevMigrationService
         _clientDb = clientDb as IClientDbContextModify;
 
         _passwordHasher = passwordHasher;
+        _resourceStore = resourceStore;
     }
 
     public string? AdminPassword
@@ -113,16 +117,22 @@ public class DevMigrationService
             return false;
         }
 
+        var allResources = _resourceStore.GetAllResourcesAsync().Result;
+
         foreach (var identityResource in _model.IdentityResources ?? [])
         {
             if (await _resourceDb.FindIdentityResource(identityResource.Name) is null)
             {
                 _logger.LogInformation("Migrate IdentityResouce {identityResource}", identityResource.Name);
 
+                var resource = allResources.IdentityResources?
+                    .Where(r => r.Name == identityResource.Name)
+                    .FirstOrDefault();
+
                 await _resourceDb.AddIdentityResourceAsync(new IdentityResourceModel()
                 {
-                    Name = identityResource.Name,
-                    DisplayName = identityResource.Name
+                    Name = resource?.Name ?? identityResource.Name,
+                    DisplayName = resource?.DisplayName ?? identityResource.Name
                 });
             }
         }

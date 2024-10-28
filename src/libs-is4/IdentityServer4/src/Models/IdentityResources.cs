@@ -3,6 +3,7 @@
 
 
 using IdentityModel;
+using Microsoft.AspNetCore.Identity;
 using System.Linq;
 
 namespace IdentityServer4.Models;
@@ -27,6 +28,16 @@ public static class IdentityResources
             DisplayName = "Your user identifier";
             Required = true;
             UserClaims.Add(JwtClaimTypes.Subject);
+        }
+    }
+
+    public class Role : IdentityResource
+    {
+        public Role()
+        {
+            Name = IdentityServerConstants.StandardScopes.Role;
+            DisplayName = "Your role(s)";
+            UserClaims.Add(JwtClaimTypes.Role);
         }
     }
 

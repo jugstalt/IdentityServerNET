@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace IdentityServerNET;
 
@@ -65,36 +66,19 @@ class ResourceStore : IResourceStore
 
         foreach (var scopeName in scopeNames)
         {
-            //switch (scopeName.ToLower())
-            //{
-            //    case "openid":
-            //        identityResources.Add(new IdentityResources.OpenId());
-            //        break;
-            //    case "profile":
-            //        identityResources.Add(new IdentityResources.Profile());
-            //        break;
-            //    case "email":
-            //        identityResources.Add(new IdentityResources.Email());
-            //        break;
-            //    case "address":
-            //        identityResources.Add(new IdentityResources.Address());
-            //        break;
-            //    case "phone":
-            //        identityResources.Add(new IdentityResources.Phone());
-            //        break;
-            //    case "role":
-            //        identityResources.Add(new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role }));
-            //        break;
-            //}
-
             var identityResource = (await _resourcedbContext.FindIdentityResource(scopeName))?.IndentityServer4Instance as IdentityResource;
-            if (identityResource != null)
+            if (identityResource is not null)
             {
-                if (identityResource.Name == "role")
+                identityResources.Add(identityResource.Name.ToLower() switch
                 {
-                    identityResource = new IdentityResource("role", "Your Role(s)", new[] { IdentityModel.JwtClaimTypes.Role });
-                }
-                identityResources.Add(identityResource);
+                    "openid" => new IdentityResources.OpenId(),
+                    "profile" => new IdentityResources.Profile(),
+                    "email" => new IdentityResources.Email(),
+                    "address" => new IdentityResources.Address(),
+                    "phone" => new IdentityResources.Phone(),
+                    "role" => new IdentityResources.Role(),
+                    _ => identityResource
+                });
             }
         }
 
@@ -114,9 +98,10 @@ class ResourceStore : IResourceStore
         {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
-            //new IdentityResources.Email(),
-            //new IdentityResources.Address(),
-            //new IdentityResources.Phone(),
+            new IdentityResources.Email(),
+            new IdentityResources.Address(),
+            new IdentityResources.Phone(),
+            new IdentityResources.Role()
         };
 
         if (_resourcedbContext is IResourceDbContextModify)
