@@ -5,5 +5,5 @@ namespace IdentityServerNET;
 
 public interface IIdentityServerStartup
 {
-    void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+    void ConfigureServices(IServiceCollection services, IConfiguration configuration, IIdentityServerBuilder identityServerBuilder);
 }

@@ -185,5 +185,35 @@ static public class IdentityServerNetMigrationBuilderExtensions
         return builder;
     }
 
+    public static IdentityServerNetMigrationBuilder AddClient(
+            this IdentityServerNetMigrationBuilder builder,
+            ClientType clientType,
+            string clientId,
+            string clientSecret,
+            string clientUrl,
+            IEnumerable<string>? scopes = null)
+    {
+        builder.ResourceBuilder.WithEnvironment(e =>
+        {
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientType", clientType.ToString());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientId", clientId.ToLower());
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientSecret", clientSecret);
+
+            e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__ClientUrl",
+                clientUrl);
+
+
+            int index = 0;
+            foreach (var scope in scopes ?? [])
+            {
+                e.EnvironmentVariables.Add($"{MigEnvPrefix}Clients__{builder.MigClientIndex}__Scopes__{index++}", scope.ToLower());
+            }
+
+            builder.MigClientIndex++;
+        });
+
+        return builder;
+    }
+
     #endregion
 }

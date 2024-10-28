@@ -164,7 +164,8 @@ public class DefaultUserSession : IUserSession
             throw new ArgumentNullException(nameof(properties));
         }
 
-        var currentSubjectId = (await GetUserAsync())?.GetSubjectId();
+        string currentSubjectId = "";
+        (await GetUserAsync())?.TryGetSubjectId(out currentSubjectId);
         var newSubjectId = principal.GetSubjectId();
 
         if (properties.GetSessionId() == null || currentSubjectId != newSubjectId)

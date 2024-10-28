@@ -313,7 +313,10 @@ static public class ServiceCollectionExtensions
         return services;
     }
 
-    static public IServiceCollection ConfigureCustomStartup(this IServiceCollection services, IConfiguration configuration)
+    static public IServiceCollection ConfigureCustomStartup(
+            this IServiceCollection services, 
+            IConfiguration configuration,
+            IIdentityServerBuilder identityServerBuilder)
     {
         //services.AddTransient<IPasswordHasher<ApplicationUser>, ClearPasswordHasher>();
 
@@ -329,7 +332,7 @@ static public class ServiceCollectionExtensions
                     if (type.GetInterfaces().Any(i => i.Equals(typeof(IIdentityServerStartup))))
                     {
                         var hostingStartup = Activator.CreateInstance(type) as IIdentityServerStartup;
-                        hostingStartup.ConfigureServices(services, configuration);
+                        hostingStartup.ConfigureServices(services, configuration, identityServerBuilder);
                     }
                 }
             }
