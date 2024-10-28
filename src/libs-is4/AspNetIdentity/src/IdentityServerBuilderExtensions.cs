@@ -67,7 +67,7 @@ public static class IdentityServerBuilderExtensions
             options.Cookie.IsEssential = true;
         });
 
-        builder.Services.AddAuthentication(options =>
+        builder.Authentication = builder.Services.AddAuthentication(options =>
         {
             if (options.DefaultAuthenticateScheme == null &&
                 options.DefaultScheme == IdentityServerConstants.DefaultCookieAuthenticationScheme)

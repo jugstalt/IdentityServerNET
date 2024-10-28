@@ -302,7 +302,7 @@ builder.Services
     .AddUserStore()
     .AddRoleStore()
     .AddServicesFromConfiguration(builder.Configuration)
-    .ConfigureCustomStartup(builder.Configuration)
+    .ConfigureCustomStartup(builder.Configuration, identityServerBuilder)
     .AddFallbackServices(builder.Configuration);
 
 if(builder.Environment.IsDevelopment())

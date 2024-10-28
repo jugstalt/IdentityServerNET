@@ -347,22 +347,25 @@ public class UserStoreProxy : IUserStore<ApplicationUser>,
 
     public Task AddLoginAsync(ApplicationUser user, UserLoginInfo login, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task RemoveLoginAsync(ApplicationUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task<IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        return Task.FromResult<IList<UserLoginInfo>>(new List<UserLoginInfo>());
     }
 
     public Task<ApplicationUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return Task.FromResult((ApplicationUser)null);
     }
 
     #endregion

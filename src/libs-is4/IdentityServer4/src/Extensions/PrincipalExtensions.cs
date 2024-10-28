@@ -6,6 +6,7 @@ using IdentityModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -66,6 +67,17 @@ public static class PrincipalExtensions
     public static string GetSubjectId(this IPrincipal principal)
     {
         return principal.Identity.GetSubjectId();
+    }
+
+    public static bool TryGetSubjectId(this IPrincipal principal, out string subjectId)
+    {
+        subjectId = "";
+        try
+        {
+            subjectId = principal.GetSubjectId();
+            return true;
+        }
+        catch { return false; }
     }
 
     /// <summary>

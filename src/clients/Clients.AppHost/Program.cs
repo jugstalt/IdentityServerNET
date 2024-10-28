@@ -4,7 +4,7 @@ var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 
 var nova = builder.AddIdentityServerNET("is-nova-dev"/*, bridgeNetwork: "is-nova"*/)
-       .WithMailDev()
+       //.WithMailDev()
        //.WithBindMountPersistance()
 
        .WithMigrations(migrations =>
@@ -14,13 +14,19 @@ var nova = builder.AddIdentityServerNET("is-nova-dev"/*, bridgeNetwork: "is-nova
                .AddApiResource("is-nova-webapi", ["query", "command"])
                .AddApiResource("proc-server", ["list", "execute"])
                .AddUserRoles(["custom-role1", "custom-role2", "custom-role2"])
-               .WithUser("test@is.nova", "test", ["custom-role2", "custom-role3"])
+               .WithUser("test@is.net", "test", ["custom-role2", "custom-role3"])
                .AddClient(ClientType.WebApplication,
                              "is-nova-webclient", "secret",
                             webApp.Resource,
                             [
                                 "openid", "profile", "role"
                             ])
+               .AddClient(ClientType.WebApplication,
+                          "local-webgis-portal", "secret",
+                          "https://localhost:44320",
+                          [
+                                "openid", "profile",
+                          ])
                .AddClient(ClientType.ApiClient,
                             "is-nova-webapi-commands", "secret",
                             webApi.Resource,

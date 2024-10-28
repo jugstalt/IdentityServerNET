@@ -2,7 +2,7 @@ using IdentityServerNET.Aspire.Hosting.Utilitities;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var maildev = builder.AddMailDev("maildev", smtpPort: 1025);
+//var maildev = builder.AddMailDev("maildev", smtpPort: 1025);
 var dbContextApi = builder.AddProject<Projects.IdentityServer_DbContext>("identityserver-dbcontext");
 
 builder.AddProject<Projects.IdentityServer>("identityserver", launchProfileName: "SelfHost")
@@ -14,7 +14,8 @@ builder.AddProject<Projects.IdentityServer>("identityserver", launchProfileName:
        //})
        //.WaitFor(dbContextApi)
        
-       .WaitFor(maildev);
+       //.WaitFor(maildev)
+       ;
 
 
 builder.Build().Run();
