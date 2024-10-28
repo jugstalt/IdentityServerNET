@@ -46,7 +46,7 @@ webApi
 
 webApp
        //.WithHealthCheck("/health")
-       .AddReference(nova, "OpenIdConnectAuthentication:Authority")
+       .AddReference(nova, "OpenIdConnectAuthentication__:Authority")
        .WaitFor(nova);
 
 builder.Build().Run();
