@@ -314,7 +314,7 @@ static public class ServiceCollectionExtensions
     }
 
     static public IServiceCollection ConfigureCustomStartup(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration,
             IIdentityServerBuilder identityServerBuilder)
     {

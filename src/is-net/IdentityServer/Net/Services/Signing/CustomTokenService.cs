@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -93,7 +92,7 @@ public class CustomTokenService : DefaultTokenService
         {
             claims.Add(JwtClaimTypes.Role, role);
         }
-        
+
         return CreateCustomToken(claims, lifeTime);
     }
 

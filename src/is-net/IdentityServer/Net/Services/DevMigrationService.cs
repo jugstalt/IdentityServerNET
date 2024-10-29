@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using Grpc.Core.Interceptors;
 using IdentityModel;
 using IdentityServer4.Stores;
 using IdentityServerNET.Abstractions.DbContext;

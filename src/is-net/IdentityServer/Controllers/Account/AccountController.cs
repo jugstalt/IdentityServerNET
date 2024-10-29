@@ -3,15 +3,15 @@
 
 
 using IdentityModel;
-using IdentityServerNET.Abstractions.Security;
-using IdentityServerNET.Exceptions;
-using IdentityServerNET.Extensions;
-using IdentityServerNET.Models;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using IdentityServerNET.Abstractions.Security;
+using IdentityServerNET.Exceptions;
+using IdentityServerNET.Extensions;
+using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

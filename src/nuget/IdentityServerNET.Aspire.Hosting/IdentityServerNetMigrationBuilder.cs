@@ -1,6 +1,4 @@
-﻿using Aspire.Hosting.ApplicationModel;
-
-namespace Aspire.Hosting.ApplicationModel;
+﻿namespace Aspire.Hosting.ApplicationModel;
 
 public class IdentityServerNetMigrationBuilder(IResourceBuilder<IdentityServerNetResource> resourceBuilder)
 {

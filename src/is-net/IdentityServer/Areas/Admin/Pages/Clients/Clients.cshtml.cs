@@ -1,8 +1,6 @@
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models.IdentityServerWrappers;
-using IdentityServer4;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

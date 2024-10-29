@@ -4,7 +4,7 @@
 // an alternative namespace.
 namespace Aspire.Hosting.ApplicationModel;
 
-public class IdentityServerNetResource(string name) 
+public class IdentityServerNetResource(string name)
     : ContainerResource(name)
 {
     // Constants used to refer to well known-endpoint names, this is specific

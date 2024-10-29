@@ -46,9 +46,9 @@ static public class ConfigurationExtensions
 
     #region Helper
 
-    static private bool IsAbsoluteOrRelativePath(this string path) 
-        => 
-        String.IsNullOrEmpty(path) 
+    static private bool IsAbsoluteOrRelativePath(this string path)
+        =>
+        String.IsNullOrEmpty(path)
         ? false
         : (SystemInfo.IsLinux, SystemInfo.IsWindows, SystemInfo.IsOSX) switch
         {

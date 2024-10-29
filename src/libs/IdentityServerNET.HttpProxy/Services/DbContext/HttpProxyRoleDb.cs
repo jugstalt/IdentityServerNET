@@ -2,7 +2,6 @@
 using IdentityServerNET.Distribution.Services;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
 
 namespace IdentityServerNET.HttpProxy.Services.DbContext;
 

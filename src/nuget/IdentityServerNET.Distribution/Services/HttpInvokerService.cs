@@ -11,7 +11,7 @@ public class HttpInvokerService<TInterface>
     private readonly HttpClient _httpClient;
     private readonly HttpInvokerServiceOptions<TInterface> _options;
 
-    public HttpInvokerService(HttpClient httpClient, 
+    public HttpInvokerService(HttpClient httpClient,
         IOptions<HttpInvokerServiceOptions<TInterface>> options)
     {
         _httpClient = httpClient;
@@ -75,8 +75,8 @@ public class HttpInvokerService<TInterface>
             // Prepare the query string if there are URL parameters
             var queryParams = string.Join("&", methodInfo.GetParameters()
                 .Where((p, i) => p.ParameterType != bodyParameter?.GetType())
-                .Select((p, i) => 
-                    i<urlParameters.Length 
+                .Select((p, i) =>
+                    i < urlParameters.Length
                     ? $"{p.Name}={HttpUtility.UrlEncode(JsonSerializer.Serialize(urlParameters[i], _options.JsonOptions))}"
                     : ""
                     )
@@ -109,5 +109,5 @@ public class HttpInvokerService<TInterface>
         {
             throw new InvalidOperationException($"Error invoking method '{methodInfo.Name}'", ex);
         }
-    }   
+    }
 }

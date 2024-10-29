@@ -1,9 +1,7 @@
 ﻿using IdentityServerNET.Abstractions.DbContext;
-using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Distribution.Services;
 using IdentityServerNET.Distribution.ValueTypes;
 using IdentityServerNET.Models.IdentityServerWrappers;
-using Microsoft.Extensions.Options;
 
 namespace IdentityServerNET.HttpProxy.Services.DbContext;
 

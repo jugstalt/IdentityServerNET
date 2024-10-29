@@ -148,9 +148,9 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
             if (storedUser is null) throw new ArgumentException("Unknown user");
 
             var propertyInfo = storedUser.GetType().GetProperty(
-                dbPropertyInfo.ClaimName, 
+                dbPropertyInfo.ClaimName,
                 BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
-            if(propertyInfo is not null)
+            if (propertyInfo is not null)
             {
                 propertyInfo.SetValue(storedUser, propertyValue);
 

@@ -99,7 +99,7 @@ public class InMemoryRoleDb : IRoleDbContext, IAdminRoleDbContext
         if (storedRole is null) return default(T);
 
         var propertyInfo = role.GetType().GetProperty(applicationRoleProperty);
-        if(propertyInfo is null) return default(T);
+        if (propertyInfo is null) return default(T);
 
         propertyInfo.SetValue(storedRole, propertyValue, null);
 

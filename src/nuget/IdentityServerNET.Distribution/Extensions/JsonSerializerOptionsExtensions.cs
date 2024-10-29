@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using IdentityServerNET.Distribution.Json.Converts;
 using System.Text.Json;
-using System.Threading.Tasks;
-using IdentityServerNET.Distribution.Json.Converts;
+using System.Text.Json.Serialization;
 
 namespace IdentityServerNET.Distribution.Extensions;
 
@@ -16,7 +10,7 @@ static public class JsonSerializerOptionsExtensions
     {
         if (options.Converters != null)
         {
-            options.Converters.Add(new ClaimConverter());;
+            options.Converters.Add(new ClaimConverter()); ;
         }
 
         options.ReferenceHandler = ReferenceHandler.IgnoreCycles;

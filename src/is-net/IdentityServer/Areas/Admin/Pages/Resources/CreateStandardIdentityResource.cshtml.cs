@@ -1,6 +1,6 @@
+using IdentityServer4.Models;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
