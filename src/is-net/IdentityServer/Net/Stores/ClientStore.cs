@@ -1,6 +1,6 @@
-﻿using IdentityServerNET.Abstractions.DbContext;
-using IdentityServer4.Models;
+﻿using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using IdentityServerNET.Abstractions.DbContext;
 using System.Threading.Tasks;
 
 namespace IdentityServerNET;

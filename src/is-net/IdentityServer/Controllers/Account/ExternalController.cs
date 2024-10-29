@@ -3,12 +3,10 @@
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Events;
-using IdentityServer4.Extensions;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -134,7 +132,7 @@ public class ExternalController : Controller
             AdditionalClaims = additionalLocalClaims
         };
 
-        
+
         //await HttpContext.SignInAsync("Identity.Application", isuser.CreatePrincipal()/*, localSignInProps*/);
         await _signInManager.SignInAsync(user, localSignInProps);
 

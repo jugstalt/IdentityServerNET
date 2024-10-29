@@ -1,6 +1,6 @@
-﻿using IdentityServerNET.Abstractions.EventSinks;
-using IdentityServer4.Events;
+﻿using IdentityServer4.Events;
 using IdentityServer4.Services;
+using IdentityServerNET.Abstractions.EventSinks;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

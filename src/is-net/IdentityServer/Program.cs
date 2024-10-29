@@ -1,3 +1,6 @@
+using IdentityServer4.Configuration;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
 using IdentityServerNET;
 using IdentityServerNET.Abstractions.SigningCredential;
 using IdentityServerNET.Abstractions.UI;
@@ -8,9 +11,6 @@ using IdentityServerNET.Services;
 using IdentityServerNET.Services.SecretsVault;
 using IdentityServerNET.Services.Signing;
 using IdentityServerNET.Services.Validators;
-using IdentityServer4.Configuration;
-using IdentityServer4.Services;
-using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +24,6 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.IO;
 using System.Linq;
-using System.Web.Services.Description;
 
 #region Serilog
 
@@ -217,7 +216,8 @@ var identityServerBuilder = builder.Services.AddIdentityServer(options =>
     .AddAspNetIdentity<ApplicationUser>()
     // Add Strores
     .AddResourceStore<ResourceStore>()
-    .AddClientStore<ClientStore>();
+    .AddClientStore<ClientStore>()
+    .AddExternalIdentityProviders(builder.Configuration);
 
 builder.Services.AddTransient<IReplayCache, DefaultReplayCache>();
 builder.Services.AddTransient<IAuthorizationContextService, AuthorizationContextService>();
@@ -305,7 +305,7 @@ builder.Services
     .ConfigureCustomStartup(builder.Configuration, identityServerBuilder)
     .AddFallbackServices(builder.Configuration);
 
-if(builder.Environment.IsDevelopment())
+if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddTransient<DevMigrationService>();
 }
@@ -396,7 +396,7 @@ app.MapControllerRoute(
         );
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");;
+        pattern: "{controller=Home}/{action=Index}/{id?}"); ;
 
 //app.UseEndpoints(endpoints =>
 //{

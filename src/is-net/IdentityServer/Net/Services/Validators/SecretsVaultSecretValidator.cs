@@ -1,6 +1,6 @@
-﻿using IdentityServerNET.Services.SecretsVault;
-using IdentityServer4.Models;
+﻿using IdentityServer4.Models;
 using IdentityServer4.Validation;
+using IdentityServerNET.Services.SecretsVault;
 using System;
 using System.Collections.Generic;
 using System.Linq;

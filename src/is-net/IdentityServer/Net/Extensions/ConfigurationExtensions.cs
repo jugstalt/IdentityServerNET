@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +74,7 @@ static public class ConfigurationExtensions
     {
         if (names?.Any() != true) return configuration;
 
-        if(configuration is null) return null;
+        if (configuration is null) return null;
 
         foreach (var name in names)
         {
@@ -98,7 +97,7 @@ static public class ConfigurationExtensions
             string name,
             Action<string> then)
         => configuration.SwitchCase([name], then);
-    
+
     static public IConfiguration SwitchSection(
             this IConfiguration configuration,
             string name,
@@ -123,7 +122,7 @@ static public class ConfigurationExtensions
             Action then
         )
     {
-        if(configuration is null) return;
+        if (configuration is null) return;
 
         then();
     }

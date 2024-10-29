@@ -1,7 +1,6 @@
 ﻿using IdentityServerNET.Models.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using System.Text.Json.Serialization;
 
 namespace IdentityServerNET.Models.UserInteraction;

@@ -1,12 +1,10 @@
 using IdentityModel;
-using IdentityServerNET;
+using IdentityServer4.Models;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models.IdentityServerWrappers;
 using IdentityServerNET.Services.SecretsVault;
-using IdentityServer4;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

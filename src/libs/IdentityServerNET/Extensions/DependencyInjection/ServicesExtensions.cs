@@ -242,7 +242,8 @@ public static class ServicesExtensions
                     });
                 }
                 return typeof(DefaultCryptoService);
-            },
+            }
+            ,
             "data-protection" => () => typeof(DataProtectionCryptoService),
             _ => () => typeof(Base64CryptoService)
         };

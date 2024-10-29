@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using IdentityServer4.Services;
 using IdentityServerNET;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
 using IdentityServerNET.Services;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;

@@ -11,7 +11,7 @@ public sealed class MailDevResource(string name) : ContainerResource(name)/*, IR
     internal const string SmtpEndpointName = "smtp";
     internal const string HttpEndpointName = "http";
 
-    public string ContainerName = $"{name}-{Guid.NewGuid().ToString("N")}";
+    public string ContainerName = $"{name}-{Guid.NewGuid():N}";
     public int ContainerHttpPort = 1080;
     public int ContainerSmtpPort = 1025;
 
