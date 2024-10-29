@@ -1,12 +1,11 @@
-﻿using IdentityServerNET.Abstractions.DbContext;
-using IdentityServerNET.Models.IdentityServerWrappers;
-using IdentityServer4.Models;
+﻿using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Models.IdentityServerWrappers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Humanizer;
 
 namespace IdentityServerNET;
 
@@ -88,11 +87,6 @@ class ResourceStore : IResourceStore
     async public Task<Resources> GetAllResourcesAsync()
     {
         var resources = new Resources();
-
-        //resources.ApiResources = new ApiResource[]
-        //{
-        //    await this.FindApiResourceAsync("api1")
-        //};
 
         resources.IdentityResources = new IdentityResource[]
         {
