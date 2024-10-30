@@ -7,7 +7,7 @@ namespace Aspire.Hosting;
 
 static public class IdentityServerNetMigrationBuilderExtensions
 {
-    private const string MigEnvPrefix = "IdentityServer__Migrations__";
+    private const string MigEnvPrefix = $"{IdentityServerNetConfigurationBuilderExtensions.ConfigPrefix}Migrations__";
 
     public static IdentityServerNetMigrationBuilder AddAdminPassword(
             this IdentityServerNetMigrationBuilder builder,

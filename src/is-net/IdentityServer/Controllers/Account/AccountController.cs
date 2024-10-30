@@ -86,7 +86,7 @@ public class AccountController : Controller
         if (vm.IsExternalLoginOnly)
         {
             // we only have one option for logging in and it's an external provider
-            return RedirectToAction("Challenge", "External", new { provider = vm.ExternalLoginScheme, returnUrl });
+            return RedirectToAction("Challenge", "External", new { scheme = vm.ExternalLoginScheme, returnUrl });
         }
 
         vm.AllowRememberLogin = !_configuration.DenyRememberLogin();
@@ -323,7 +323,9 @@ public class AccountController : Controller
         {
             return Redirect(vm.PostLogoutRedirectUri);
         }
-        return Redirect("~/Account/Login");
+
+        //return Redirect("~/Account/Login");
+        return Redirect("~/Home/Index");
     }
 
     [HttpGet]

@@ -3,10 +3,20 @@ var builder = DistributedApplication.CreateBuilder(args);
 var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 
-var nova = builder.AddIdentityServerNET("is-nova-dev"/*, bridgeNetwork: "is-nova"*/)
+var identityServer = builder.AddIdentityServerNET("is-net-dev")
        //.WithMailDev()
        //.WithBindMountPersistance()
 
+       .WithConfiguration(config =>
+       {
+           config
+                //.DenyRememberLogin()
+                .RememberLoginDefaultValue(true)
+                .DenyForgotPasswordChallange()
+                .DenyManageAccount()
+                //.DenyLocalLogin()
+                ;
+       })
        .WithMigrations(migrations =>
             migrations
                .AddAdminPassword("admin")
@@ -36,17 +46,22 @@ var nova = builder.AddIdentityServerNET("is-nova-dev"/*, bridgeNetwork: "is-nova
                                 "is-nova-webapi.command"
                            ])
        )
+       .WithExternalProviders(external =>
+       {
+           external.AddMicrosoftIdentityWeb(
+               builder.Configuration.GetSection("IdentityServer:External:MicrosoftIdentityWeb"));
+       })
        .Build();
 
 
 webApi
        //.WithHealthCheck("/health")
-       .AddReference(nova, "Authorization:Authority")
-       .WaitFor(nova);
+       .AddReference(identityServer, "Authorization:Authority")
+       .WaitFor(identityServer);
 
 webApp
        //.WithHealthCheck("/health")
-       .AddReference(nova, "OpenIdConnectAuthentication__:Authority")
-       .WaitFor(nova);
+       .AddReference(identityServer, "OpenIdConnectAuthentication:Authority")
+       .WaitFor(identityServer);
 
 builder.Build().Run();

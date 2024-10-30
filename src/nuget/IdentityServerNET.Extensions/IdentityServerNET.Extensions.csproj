@@ -3,7 +3,7 @@
   <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
 	  <LangVersion>12</LangVersion>
-	  <Version>5.24.4301</Version>
+	  <Version>5.24.4405</Version>
 	  <Copyright>2024, Jürgen Gstaltmaier</Copyright>
 	  <PackageProjectUrl>https://github.com/jugstalt/identityservernet</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/jugstalt/identityservernet</RepositoryUrl>

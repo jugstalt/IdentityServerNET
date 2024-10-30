@@ -5,12 +5,14 @@ using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServerNET.Models.Extensions;
 
 namespace IdentityServer;
 
@@ -31,6 +34,7 @@ public class ExternalController : Controller
     private readonly ILogger<ExternalController> _logger;
     private readonly IEventService _events;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IConfiguration _configuration;
 
     public ExternalController(
         IIdentityServerInteractionService interaction,
@@ -38,7 +42,8 @@ public class ExternalController : Controller
         IEventService events,
         ILogger<ExternalController> logger,
         IUserStore<ApplicationUser> users,
-        SignInManager<ApplicationUser> signInManager)
+        SignInManager<ApplicationUser> signInManager,
+        IConfiguration configuration)
     {
         _users = users;
 
@@ -47,6 +52,7 @@ public class ExternalController : Controller
         _logger = logger;
         _events = events;
         _signInManager = signInManager;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -101,14 +107,38 @@ public class ExternalController : Controller
             _logger.LogDebug("External claims: {@claims}", externalClaims);
         }
 
+        var externalUsername = result.Principal.GetUsername();
+        var externalEmail = result.Principal.GetEmail() ??
+            (
+                externalUsername.IsValidEmailAddress()
+                ? externalUsername
+                : ""
+            );
+
         // lookup our user and external provider info
         var (user, provider, providerUserId, claims) = await FindUserFromExternalProvider(result);
-        if (user == null)
+        if (user is null)
         {
             // this might be where you might initiate a custom workflow for user registration
             // in this sample we don't show how that would be done, as our sample implementation
             // simply auto-provisions new external user
             user = AutoProvisionUser(provider, providerUserId, claims);
+        }
+
+        if (user is null &&
+            !_configuration.DenyRegisterAccount() &&
+            (externalUsername.IsValidGeneralUsername() || externalUsername.IsValidEmailAddress()) &&
+            externalEmail.IsValidEmailAddress())
+        {
+            
+            var _ = await _users.CreateAsync(new ApplicationUser()
+            {
+                UserName = externalUsername.ToLower(),
+                Email = externalEmail.ToLower(),
+                EmailConfirmed = true,
+            }, CancellationToken.None);
+
+            user = await _users.FindByNameAsync(externalUsername, CancellationToken.None);
         }
 
         if (user is null)
