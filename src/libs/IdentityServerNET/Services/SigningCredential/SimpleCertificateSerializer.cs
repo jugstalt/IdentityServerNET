@@ -31,7 +31,10 @@ public class SimpleCertificateSerializer : ICertificateSerializer
 
     public X509Certificate2 LoadFromBytes(byte[] bytes, string name)
     {
-        return new X509Certificate2(bytes, _certPassword);
+        return new X509Certificate2(bytes, _certPassword,
+                               X509KeyStorageFlags.MachineKeySet
+                             | X509KeyStorageFlags.PersistKeySet
+                             | X509KeyStorageFlags.Exportable);
     }
 
     async public Task WriteToFileAsync(string fileName, X509Certificate2 cert, X509ContentType type)
