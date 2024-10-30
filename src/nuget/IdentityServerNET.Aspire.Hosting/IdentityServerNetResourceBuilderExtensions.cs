@@ -110,6 +110,24 @@ static public class IdentityServerNetResourceBuilderExtensions
         return builder;
     }
 
+    public static IdentityServerNetResourceBuilder WithExternalProviders(
+        this IdentityServerNetResourceBuilder builder,
+        Action<IdentityServerNetExternalProvidersBuilder> externalResourceBuilder)
+    {
+        externalResourceBuilder(new IdentityServerNetExternalProvidersBuilder(builder.ResourceBuilder));
+
+        return builder;
+    }
+
+    static public IdentityServerNetResourceBuilder WithConfiguration(
+        this IdentityServerNetResourceBuilder builder,
+        Action<IdentityServerNetConfigurationBuilder> externalResourceBuilder)
+    {
+        externalResourceBuilder(new IdentityServerNetConfigurationBuilder(builder.ResourceBuilder));
+
+        return builder;
+    }
+
     public static IResourceBuilder<T> AddReference<T>(
             this IResourceBuilder<T> builder,
             IResourceBuilder<IdentityServerNetResource> isNet,

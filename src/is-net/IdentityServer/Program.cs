@@ -1,3 +1,4 @@
+using IdentityServer.Net.Extensions.DependencyInjection;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -74,6 +75,8 @@ builder.Configuration.AddJsonFile(configFile,
                                   reloadOnChange: false);
 
 #endregion
+
+builder.Configuration.ApplyConstants();
 
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>

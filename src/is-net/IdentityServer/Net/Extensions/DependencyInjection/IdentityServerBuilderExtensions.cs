@@ -11,22 +11,22 @@ internal static class IdentityServerBuilderExtensions
             this IIdentityServerBuilder builder,
             IConfiguration configuration)
     {
-        if (!String.IsNullOrEmpty(configuration["IdentityServer:External:AzureAD:ClientId"]))
+        if (!String.IsNullOrEmpty(configuration["IdentityServer:External:MicrosoftIdentityWeb:ClientId"]))
         {
             builder.Authentication
                 .AddMicrosoftIdentityWebApp(options =>
                 {
                     options.Instance = "https://login.microsoftonline.com/";
-                    options.Domain = configuration["IdentityServer:External:AzureAD:Domain"];
-                    options.TenantId = configuration["IdentityServer:External:AzureAD:TenantId"];
-                    options.ClientId = configuration["IdentityServer:External:AzureAD:ClientId"];
-                    options.ClientSecret = configuration["IdentityServer:External:AzureAD:ClientSecret"];
+                    options.Domain = configuration["IdentityServer:External:MicrosoftIdentityWeb:Domain"];
+                    options.TenantId = configuration["IdentityServer:External:MicrosoftIdentityWeb:TenantId"];
+                    options.ClientId = configuration["IdentityServer:External:MicrosoftIdentityWeb:ClientId"];
+                    options.ClientSecret = configuration["IdentityServer:External:MicrosoftIdentityWeb:ClientSecret"];
                     options.CallbackPath = "/signin-oidc";
                     options.SignedOutCallbackPath = "";
                 },
                 openIdConnectScheme: $"{IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme}.azuread",
                 cookieScheme: $"{IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme}.azuread.cookie",
-                displayName: configuration["IdentityServer:External:AzureAD:Name"] ?? "AzureAD");
+                displayName: configuration["IdentityServer:External:MicrosoftIdentityWeb:Name"] ?? "Microsoft Identity");
         }
 
         return builder;

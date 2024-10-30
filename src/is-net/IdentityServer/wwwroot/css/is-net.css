@@ -213,3 +213,16 @@ ul.ui-tiles {
         font-weight: bold;
         background-color: #eee;
     }
+
+li.login-external-provider {
+    width:100%;
+}
+    li.login-external-provider a {
+        background-image: url(media/openid-logo.png);
+        background-position: 5px center;
+        background-repeat: no-repeat;
+        background-size: 42px;
+        padding: 15px 15px 15px 60px;
+        height: 50px;
+        width: 100%;
+    }

@@ -178,7 +178,8 @@ Abschnitt ``Login``
     "Login": {
         "DenyForgotPasswordChallange": true,    // default: false
         "DenyRememberLogin": true,              // default: false,
-        "RememberLoginDefaultValue": true       // default: false
+        "RememberLoginDefaultValue": true,      // default: false
+        "DenyLocalLogin": true                  // default: false  
     }
 
 Hier kann das Verhalten und die Möglichkeiten beim Login gesteuert werden:
@@ -186,6 +187,8 @@ Hier kann das Verhalten und die Möglichkeiten beim Login gesteuert werden:
 * **DenyForgotPasswordChallange:** wenn ``true`` hat ein Anwender keine Möglichkeit, sein Passwort über ``Passwort vergessen`` zu ändern.
 * **DenyRememberLogin:** wenn ``true`` wird die Option ``Remember my login`` beim Login nicht angeboten
 * **RememberLoginDefaultValue:** wenn ``true`` ist die Option ``Remember my login`` automatisch ausgewählt
+* **DenyLocalLogin:** wenn ``true`` können sich Anwender nicht mit User/Passwort anmelden. 
+  Das kann Sinn machen, wenn man sich nur über *externe Identity Provider* anmelden können sollte.
 
 Abschnitt ``Admin``
 -------------------
