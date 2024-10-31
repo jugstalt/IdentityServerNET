@@ -392,11 +392,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapControllerRoute(
-        name: "login",
-        pattern: "Identity/Account/Login",
-        defaults: new { controller = "Account", action = "Login" }
-        );
+//app.MapControllerRoute(
+//        name: "login",
+//        pattern: "Identity/Account/Login",
+//        defaults: new { controller = "Account", action = "Login" }
+//        );
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}"); ;

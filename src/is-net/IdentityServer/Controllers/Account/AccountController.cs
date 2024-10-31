@@ -78,10 +78,10 @@ public class AccountController : Controller
     /// Entry point into the login workflow
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Login(string returnUrl)
+    public async Task<IActionResult> Login(string returnUrl, bool forceLocal = false)
     {
         // build a model so we know what to show on the login page
-        var vm = await BuildLoginViewModelAsync(returnUrl);
+        var vm = await BuildLoginViewModelAsync(returnUrl, forceLocal);
 
         if (vm.IsExternalLoginOnly)
         {
@@ -136,6 +136,9 @@ public class AccountController : Controller
         {
             try
             {
+                if (String.IsNullOrWhiteSpace(model.Password))
+                    throw new Exception("Password is empty");
+
                 bool suspicous = false;
                 if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                 {
@@ -338,7 +341,7 @@ public class AccountController : Controller
     /*****************************************/
     /* helper APIs for the AccountController */
     /*****************************************/
-    private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl)
+    private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl, bool forceLocal = false)
     {
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
         if (context?.IdP != null)
@@ -366,6 +369,7 @@ public class AccountController : Controller
             }).ToList();
 
         var allowLocal = true;
+
         if (context?.Client.ClientId != null)
         {
             var client = await _clientStore.FindEnabledClientByIdAsync(context.Client.ClientId);
@@ -383,7 +387,7 @@ public class AccountController : Controller
         return new LoginViewModel
         {
             AllowRememberLogin = AccountOptions.AllowRememberLogin,
-            EnableLocalLogin = allowLocal && AccountOptions.AllowLocalLogin,
+            EnableLocalLogin = (allowLocal && AccountOptions.AllowLocalLogin) || forceLocal,
             ReturnUrl = returnUrl,
             Username = context?.LoginHint,
             ExternalProviders = providers.ToArray()

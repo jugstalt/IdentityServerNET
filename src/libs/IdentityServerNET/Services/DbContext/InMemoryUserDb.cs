@@ -28,6 +28,8 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
 
     #region IUserDbContext
 
+    public string DefaultAdminLogin => Const.DefaultAdminLogin;
+
     public UserDbContextConfiguration ContextConfiguration => _config;
 
     async public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)

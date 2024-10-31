@@ -9,13 +9,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServerNET.Models.Extensions;
 
 namespace IdentityServerNET.Services;
 
 public class SetupService
 {
-    private const string DefaultAdminLogin = "admin@is.net";
-
     public SetupService(
             IConfiguration config,
             ISigningCredentialCertificateStorage signingCredentialCertificateStorage,
@@ -37,54 +36,65 @@ public class SetupService
         LogInstance(resourceDb);
         LogInstance(mailSender);
 
-        var adminUser = userDb.FindByNameAsync(DefaultAdminLogin, CancellationToken.None).GetAwaiter().GetResult();
-
-        if (adminUser is null)
+        // Databases without DefaultAdminLogin does not 
+        // support a default admin 
+        // => only autocreate user/roles if supported
+        if (!String.IsNullOrEmpty(userDb.DefaultAdminLogin))  
         {
-            if (roleDb is not null)
+            var adminUser = userDb.FindByNameAsync(userDb.DefaultAdminLogin, CancellationToken.None).GetAwaiter().GetResult();
+
+            if (adminUser is null)
             {
-                foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                if (roleDb is not null)
                 {
-                    var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
+                    foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                    {
+                        var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
 
-                    TryCreateRole(roleDb, knownRole).GetAwaiter().GetResult();
+                        TryCreateRole(roleDb, knownRole).GetAwaiter().GetResult();
+                    }
                 }
-            }
 
-            adminUser = new ApplicationUser()
-            {
-                UserName = DefaultAdminLogin,
-                Email = DefaultAdminLogin,
-                EmailConfirmed = true,
-                Roles =
-                    new string[] {
+                adminUser = new ApplicationUser()
+                {
+                    UserName = userDb.DefaultAdminLogin,
+                    Email = userDb.DefaultAdminLogin.IsValidEmailAddress()
+                        ? userDb.DefaultAdminLogin
+                        : $"{userDb.DefaultAdminLogin}@identityserver.net",
+                    EmailConfirmed = true,
+                    Roles =
+                        new string[] {
                         KnownRoles.UserAdministrator,
                         KnownRoles.RoleAdministrator,
                         KnownRoles.ResourceAdministrator,
                         KnownRoles.ClientAdministrator,
                         KnownRoles.SigningAdministrator,
                         KnownRoles.SecretsVaultAdministrator
-                    }
-            };
+                        }
+                };
 
-            var adminPassword = migration?.AdminPassword ?? PasswordGenerator.GenerateSecurePassword(16);
+                var adminPassword = 
+                    migration?.AdminPassword 
+                    ?? config["IdentityServer:Migragions:AdminPassword"]
+                    ?? PasswordGenerator.GenerateSecurePassword(16);
 
-            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
+                adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);
 
-            var result = userDb.CreateAsync(adminUser, CancellationToken.None).GetAwaiter().GetResult();
+                var result = userDb.CreateAsync(adminUser, CancellationToken.None).GetAwaiter().GetResult();
 
-            if (result.Succeeded)
-            {
-                Console.WriteLine($"User {DefaultAdminLogin} created");
-                Console.WriteLine($"Password: {adminPassword}");
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"User {userDb.DefaultAdminLogin} created");
+                    Console.WriteLine($"Password: {adminPassword}");
+                }
+                else
+                {
+                    Console.WriteLine("Can't create admin user:");
+                    Console.WriteLine(result.Errors.FirstOrDefault()?.Description);
+                }
             }
-            else
-            {
-                Console.WriteLine("Can't create admin user:");
-                Console.WriteLine(result.Errors.FirstOrDefault()?.Description);
-            }
+
         }
-
         migration?.MigrateAsync().GetAwaiter().GetResult();
 
         Console.WriteLine("#########################################");
