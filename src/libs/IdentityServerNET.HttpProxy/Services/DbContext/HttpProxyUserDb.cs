@@ -25,6 +25,8 @@ public class HttpProxyUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserD
 
     #region IUserDbContext
 
+    public string DefaultAdminLogin => "";  // ToDo  sollte man aus IAdminUserDbContext holen...?
+
     public UserDbContextConfiguration ContextConfiguration => _options;
 
     public Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)

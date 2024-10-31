@@ -9,6 +9,8 @@ namespace IdentityServerNET.Abstractions.DbContext;
 
 public interface IUserDbContext
 {
+    string DefaultAdminLogin { get; }
+
     Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken);
     Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken);
     Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken);
