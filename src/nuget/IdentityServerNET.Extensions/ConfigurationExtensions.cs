@@ -26,6 +26,9 @@ static public class ConfigurationExtensions
     static public string ValidationCertsPath(this IConfiguration configuration)
         => Path.Combine(configuration.StoragePath(), "validation");
 
+    static public string DataProtectionKeysPath(this IConfiguration configuration)
+        => Path.Combine(configuration.StoragePath(), "dataprotection", "key");
+
     static public string AssetPath(this IConfiguration configuration, string path)
     {
         path = path.RemoveTildePath();

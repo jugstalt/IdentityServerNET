@@ -13,6 +13,7 @@ using IdentityServerNET.Services.SecretsVault;
 using IdentityServerNET.Services.Signing;
 using IdentityServerNET.Services.Validators;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -77,6 +78,17 @@ builder.Configuration.AddJsonFile(configFile,
 #endregion
 
 builder.Configuration.ApplyConstants();
+
+#region Data Protection
+
+builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(builder.Configuration.DataProtectionKeysPath()))
+                .SetApplicationName("IdentityServer")
+                .SetDefaultKeyLifetime(TimeSpan.FromDays(30));
+                //.ProtectKeysWithCertificate("thumbprint")  // todo
+                ;
+
+#endregion
 
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
