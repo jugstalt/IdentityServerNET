@@ -12,8 +12,8 @@ Installation unter Windows
         Microsoft.AspNetCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.AspNetCore.App]
         Microsoft.NETCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.NETCore.App]
 
-Für Windows liegen unter `Releases <https://github.com/jugstalt/identityserver.nova/releases>`_
-ZIP Dateien mit dem Namen ``identityserver.nova-win-x64-{version}.zip``.
+Für Windows liegen unter `Releases <https://github.com/jugstalt/IdentityServerNET/releases>`_
+ZIP Dateien mit dem Namen ``identityservernet-win-x64-{version}.zip``.
 
 Das ZIP File enthält einen Ordner, der der Versionsnummer entspricht:
 

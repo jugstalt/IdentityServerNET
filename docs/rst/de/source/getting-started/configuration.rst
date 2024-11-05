@@ -15,7 +15,7 @@ Aufbau der Config Datei:
 
     {
         "IdentityServer": {  
-            "NovaAssemblyName": "...",  // default: IdentityServerNET.ServerExtension.Default
+            "AssemblyName": "...",  // default: IdentityServerNET.ServerExtension.Default
             "ApplicationTitle": "...", // default "IdentityServerNET",
             "PublicOrigin": "https://localhost:44300",
             "StorageRootPath": "c:\\apps\\identityserver-net",
@@ -55,9 +55,9 @@ weiter *Sections* auf die in der Folge eingegangen wird.
 Root-Werte
 ----------
 
-* **NovaAssemblyName:** Die Konfiguration der Services erfolgt ein einer Assembly im Programmverzeichnis.
-  In diese Assembly muss eine Klasse mit dem Attribut ``[IdentityServerNovaStartup]`` das vom 
-  Interface ``IIdentityServerNovaStartup`` abgeleitet wurde. Methoden dieser Klasse werden beim 
+* **AssemblyName:** Die Konfiguration der Services erfolgt ein einer Assembly im Programmverzeichnis.
+  In diese Assembly muss eine Klasse mit dem Attribut ``[IdentityServerStartup]`` das vom 
+  Interface ``IIdentityServerStartup`` abgeleitet wurde. Methoden dieser Klasse werden beim 
   Start der Applikation aufgerufen, um *Services* zu registrieren.
 
   Damit kann der *IdentityServerNET* einfach den eigenen Bedürfnissen angepasst werden, ohne 
@@ -88,9 +88,9 @@ Abschnitt ``ConnectionStrings``
 .. code:: javascript
 
     "ConnectionStrings": {
-        "LiteDb": "c:\\apps\\identityserver-net\\is_nova.db"
+        "LiteDb": "c:\\apps\\identityserver-net\\is_net.db"
         // or
-        "LiteDb": "is_nova.db"  // store db in StorageRootPath
+        "LiteDb": "is_net.db"  // store db in StorageRootPath
         // or
         ...
         "FilesDb": "c:\\apps\\identityserver-net\\storage"  // any path
@@ -109,13 +109,13 @@ muss für jede *Klasse* eine Datenbank Verbindung angegeben werden:
 .. code:: javascript
 
     "ConnectionStrings": {
-        "Users": { "LiteDb": "is_nova.db" },
-        "Roles": { "LiteDb": "is_nova.db" },
+        "Users": { "LiteDb": "is_net.db" },
+        "Roles": { "LiteDb": "is_net.db" },
         "Clients": { "AzureStorage": "UseDevelopmentStorage=true" },
         "Resources": { "MongoDb": "mongodb://localhost:27017" },
 
         // Fallback (here not necessary) 
-        "LiteDb": "is_nova.db",
+        "LiteDb": "is_net.db",
     }
 
 Die einzelnen *Klassen* heißen ``Users``, ``Roles``, ``Clients`` und ``Resources``.

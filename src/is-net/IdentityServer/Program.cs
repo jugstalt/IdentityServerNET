@@ -184,16 +184,6 @@ builder.Services.AddMvc()
                 options.Conventions.AuthorizeAreaPage("/Account/Login", "/Account/Login");
             });
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    if (!String.IsNullOrWhiteSpace(builder.Configuration["Cookie:Name"]))
-    {
-        options.Cookie = new Microsoft.AspNetCore.Http.CookieBuilder() { Name = builder.Configuration["Cookie:Name"] };
-    }
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-});
-
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 builder.Services.AddRazorPages()
     .AddRazorPagesOptions(options =>
@@ -240,18 +230,23 @@ builder.Services.AddTransient<IAuthorizationContextService, AuthorizationContext
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders =
-        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+        ForwardedHeaders.XForwardedFor | 
+        ForwardedHeaders.XForwardedProto | 
+        ForwardedHeaders.XForwardedHost;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
 builder.Services.AddSingleton<IEventSink, EventSinkProxy>();
 
-if (builder.Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0 ||
-    !String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:PublicOrigin"]))
+if (builder.Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0 
+    || !String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:PublicOrigin"]))
 {
     builder.Services.ConfigureApplicationCookie(options =>
     {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+
         if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:PublicOrigin"]))
         {
             var publicOrigin = new Uri(builder.Configuration["IdentityServer:PublicOrigin"]);

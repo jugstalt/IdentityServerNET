@@ -8,14 +8,14 @@ Nach dem ersten Start sollte die Konsolenausgabe kontrolliert werden:
     [09:29:58 Information]
     Starting host...
 
-    Using config file: _config/default.identityserver.nova.json (not exist)
+    Using config file: _config/default.identityserver.net.json (not exist)
     ################# Setup ##################
     ISigningCredentialCertificateStorage: IdentityServerNET.Services.SigningCredential.SigningCredentialCertificateInMemoryStorage
     IUserDbContext: IdentityServerNET.Services.DbContext.InMemoryUserDb
     IRoleDbContext: IdentityServerNET.Services.DbContext.InMemoryRoleDb
     IClientDbContext: IdentityServerNET.Services.DbContext.InMemoryClientDb
     IResourceDbContext: IdentityServerNET.Services.DbContext.InMemoryResourceDb
-    User admin@is.nova created
+    User admin@is.net created
     Password: Ay!ql5@r=xc%xOvq
     #########################################
     [09:29:59 Information] IdentityServer4.Startup
