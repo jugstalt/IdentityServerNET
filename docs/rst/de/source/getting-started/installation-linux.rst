@@ -12,8 +12,8 @@ Installation unter Linux
         Microsoft.AspNetCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.AspNetCore.App]
         Microsoft.NETCore.App 8.0.x [/usr/lib/dotnet/shared/Microsoft.NETCore.App]
 
-Für Linux liegen unter `Releases <https://github.com/jugstalt/identityserver.nova/releases>`_
-ZIP Dateien mit dem Namen ``identityserver.nova-linux-x64-{version}.zip``.
+Für Linux liegen unter `Releases <https://github.com/jugstalt/IdentityServerNET/releases>`_
+ZIP Dateien mit dem Namen ``identityserver.net-linux-x64-{version}.zip``.
 
 Das ZIP File enthält einen Ordner, der der Versionsnummer entspricht. Dieses 
 Verzeichnis kann beispielsweise nach ``~/apps/identityserver-net`` kopiert werden.

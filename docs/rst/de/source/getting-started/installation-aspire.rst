@@ -17,22 +17,69 @@ folgendem Befehl hinzugefügt werden:
 
     var builder = DistributedApplication.CreateBuilder(args);
 
-    // ...
+    var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
+    var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 
-    var nova = builder.AddIdentityServerNova(containerName: "is-nova-dev")
-       .WithMailDev()              // optional
-       .WithBindMountPersistance() // optional
-       .AsResourceBuilder();       // optional
+    var identityServer = builder.AddIdentityServerNET("is-net-dev")
+       //.WithMailDev()
+       //.WithBindMountPersistance()  // we dont need persitance, everything is setup on start with migrations
 
-    // ...
+       .WithConfiguration(config =>
+       {
+           config
+                //.DenyRememberLogin()
+                .RememberLoginDefaultValue(true)
+                .DenyForgotPasswordChallange()
+                .DenyManageAccount()
+                //.DenyLocalLogin()
+                ;
+       })
+       .WithMigrations(migrations =>
+            migrations
+               .AddAdminPassword("admin")
+               .AddIdentityResources(["openid", "profile", "role"])
+               .AddApiResource("is-nova-webapi", ["query", "command"])
+               .AddApiResource("proc-server", ["list", "execute"])
+               .AddUserRoles(["custom-role1", "custom-role2", "custom-role2"])
+               .WithUser("test@is.net", "test", ["custom-role2", "custom-role3"])
+               .AddClient(ClientType.WebApplication,
+                          "is-net-webclient", "secret",
+                          webApp.Resource,
+                          [
+                              "openid", "profile", "role"
+                          ])
+               .AddClient(ClientType.WebApplication,
+                          "local-webgis-portal", "secret",
+                          "https://localhost:44320",
+                          [
+                                "openid", "profile",
+                          ])
+               .AddClient(ClientType.ApiClient,
+                            "is-net-webapi-commands", "secret",
+                            webApi.Resource,
+                            [
+                                "is-net-webapi",
+                                "is-net-webapi.query",
+                                "is-net-webapi.command"
+                           ])
+       )
+       .WithExternalProviders(external =>
+       {
+           external.AddMicrosoftIdentityWeb(
+               builder.Configuration.GetSection("IdentityServer:External:MicrosoftIdentityWeb"));
+       })
+       .Build();
 
-    builder.AddProject<Projects.ClientApi>("clientapi")
-           .AddReference(nova, "Authorization:Authority");
 
-    builder.AddProject<Projects.ClientWeb>("clientweb")
-           .AddReference(nova, "OpenIdConnectAuthentication:Authority");
+    webApi.AddReference(identityServer, "Authorization:Authority")
+          .WaitFor(identityServer);
 
-Mit ``AddIdentityServerNova(containerName)`` wird eine Container mit dem
+    webApp.AddReference(identityServer, "OpenIdConnectAuthentication:Authority")
+          .WaitFor(identityServer);
+
+    builder.Build().Run();
+
+Mit ``AddIdentityServerNET(containerName)`` wird eine Container mit dem
 ``identityserver-net-dev`` image gestartet (https://hub.docker.com/r/gstalt/identityserver-net-dev)
 
 Dieses Image ist speziell für die Entwicklung erstellt worden. Da für viele Workflows 
@@ -49,7 +96,7 @@ erstellt.
 Optional Methoden
 -----------------
 
-Auf den ``IdentityServerNovaResourceBuilder`` können optional noch weiter Methoden
+Auf den ``IdentityServerNETResourceBuilder`` können optional noch weiter Methoden
 angewendet werden:
 
 * ``WithMailDev()``: Started zusätzlich einen MailDev Server der zum Testen des 
@@ -65,32 +112,39 @@ angewendet werden:
   Daten in einem Docker Volume erfolgt. **Achtung:** hier kann es aufgrund 
   der Rechte des Container Users zu Zugriffsproblemen kommen.
 
-* ``AsResourceBuilder()``: Wandelt den ``IdentityServerNovaResourceBuilder`` in einen 
+* ``WithConfiguration(config => {})`` Hier kann die Konfiguration des IdentityServerNET angepasst werden.
+
+* ``WithMigrations(migrations => {})`` Über Migrations könne beim Start des IdentityServerNET
+  Objekte wie ``Client``, ``Resources``, ``User``, ``Rollen`` angelegt werden. 
+  Hier kann ebenfalls ein Administrator Passwort festgelegt werden.
+
+* ``WithExternalProviders(external => {})`` Hier können externe IdentityProvider angeben werden.
+  Derzeit ist *MicrosoftIdentityWeb* implementiert. Die Konfiguration für ``AddMicrosoftIdentityWeb``
+  wird in einer Config Section definiert:
+
+  .. code:: json
+
+    "IdentityServer": {
+      // ...
+      "External": {
+        "MicrosoftIdentityWeb": {
+          "Name": "Microsoft Identity",
+          "Domain": "mydomain.onmicrosoft.com",
+          "TenantId": "...",
+          "ClientId": "...",
+          "ClientSecret": ""
+        }
+      }
+    }
+
+* ``Builder()``: Wandelt den ``IdentityServerNETResourceBuilder`` in einen 
   ``IResourceBuilder`` um, auf den alle anderen Aspire Resource Methoden angewendet 
   werden können.
-
-.. note::
-
-    Verwendet man Aspire nicht auf Windows mit *Docker Desktop* kann die Hostadresse des 
-    Docker Host nicht automatisch bestimmt werden (in Windows steht dafür die Constante 
-    ``host.docker.internal`` zur Verfügung). Damit *IdentityServerNET* mit *MailDev* 
-    kommunizieren kann müssen beide Anwendungen im selbem **bridge** Network laufen.
-
-    Dazu muss zuerst ein **bridge** Network erstellt werden:
-    ``docker network create is-nova``.
-
-
-    .. code:: csharp
-
-       var nova = builder.AddIdentityServerNova(
-                            containerName: "is-nova-dev", 
-                            brigeNetwork: "is-nova"
-                        ).WithMailDev();
 
 Referenzen
 ----------
 
-Eine *IdentityServerNET* Instanz kann mit ``.AddReference(nova, configName)`` an ein
+Eine *IdentityServerNET* Instanz kann mit ``.AddReference(identityServer, configName)`` an ein
 Projekt gebunden werden. ``configName`` ist dabei der Name des Wertes aus der Konfiguration
 des Projektes, in das der die (Aspire) Url von **IdentityServerNET** geschrieben werden soll.
 

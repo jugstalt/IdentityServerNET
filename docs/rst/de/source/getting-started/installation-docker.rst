@@ -15,7 +15,7 @@ Für Docker liegen auf *Docker Hub* folgende Images bereit:
 
   .. code:: bash
 
-    docker run -d -p 8080:8080 --name is-nova identityserver-net:5.24.3601
+    docker run -d -p 8080:8080 --name is-net identityserver-net:5.24.3601
 
   Die Anwendung läuft damit unter http://localhost:8080
 
@@ -28,7 +28,7 @@ Für Docker liegen auf *Docker Hub* folgende Images bereit:
 
   .. code:: bash
 
-    docker run -d -p 8443:8443 --name is-nova-dev identityserver-net-dev:5.24.3601
+    docker run -d -p 8443:8443 --name is-net-dev identityserver-net-dev:5.24.3601
 
   Die Anwendung läuft damit unter https://localhost:8443
 
