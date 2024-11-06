@@ -1,7 +1,7 @@
 Als Administrator anmelden
 ==========================
 
-Nach dem ersten Start sollte die Konsolenausgabe kontrolliert werden:
+Nach dem ersten Start sollte die Konsolenausgabe überprüft werden:
 
 .. code-block:: bash
 
@@ -20,76 +20,76 @@ Nach dem ersten Start sollte die Konsolenausgabe kontrolliert werden:
     #########################################
     [09:29:59 Information] IdentityServer4.Startup
 
-Hier wird angezeigt, welches Konfigurationsfile verwendet wird. Im Beispiel hier, wird der **IdentityServerNET** ohne existierendes 
-Konfigurationsfile gestartet (``... not exist``). Das ist grundsätzlich möglich, in diesem Fall werden Standardwerte für die Konfiguration verwendet.
+Hier wird angezeigt, welches Konfigurationsfile verwendet wird. Im folgenden Beispiel wird der **IdentityServerNET** ohne ein vorhandenes 
+Konfigurationsfile gestartet (``... not exist``). Das ist grundsätzlich möglich, und in diesem Fall werden Standardwerte für die Konfiguration verwendet.
 
 .. note::
 
-    Das Start ohne Konfiguration ist nur für Testzwecke empfohlen. Hier werden alle Zertifikate, Benutzer, Rollen, Clients usw. nur im Speicher 
-    abgelegt (InMemory Datenbanken). Wird die Anwendungen neu gestartet, sind alle Einstellungen die vorgenommen wurden, weg.
+    Der Start ohne Konfiguration ist nur für Testzwecke empfohlen. Hier werden alle Zertifikate, Benutzer, Rollen, Clients usw. nur im Speicher 
+    abgelegt (InMemory-Datenbanken). Wird die Anwendung neu gestartet, sind alle vorgenommenen Einstellungen verloren.
 
-Im *Setup* Block wird angezeigt, welche Datenbank Instanzen verwendet werden. Folgende Datenbank werden hier aufgelistet:
+Im *Setup*-Block wird angezeigt, welche Datenbank-Instanzen verwendet werden. Folgende Datenbanken werden hier aufgelistet:
 
-* **ISigningCredentialCertificateStorage:** Hier werden die Zertifikate abgelegt. Über diese Zertifikate wird eine Anmeldung erst möglich gemacht,
-  bzw. kann über diese Zertifikate (öffentlicher Schlüssel) die Gültigkeit eines (JWT-) Tokens überprüft werden. Die notwendigen Schlüssel dafür werden 
-  vom IdentityServer auch über diese Url angeführt: https://my-identity-server-url/.well-known/openid-configuration/jwks
+* **ISigningCredentialCertificateStorage:** Hier werden die Zertifikate abgelegt. Über diese Zertifikate wird eine Anmeldung möglich gemacht,
+  und über die öffentlichen Schlüssel kann die Gültigkeit eines (JWT-)Tokens überprüft werden. Die notwendigen Schlüssel dafür werden 
+  vom IdentityServer auch über diese URL bereitgestellt: https://my-identity-server-url/.well-known/openid-configuration/jwks
 
-* **IUserDbContext:** Hier werden die User gespeichert
-* **IRoleDbContext:** Hier werden die (User) Rollen gespeichert
-* **IClientDbContext:** Hier werden Client gespeichert. Client sind (Web) Anwendungen, bei denen man sich über den **IdentityServer** anmelden kann.
-* **IResourceDbContext:** Hier werden Resourcen gespeichert. Diese repräsentieren die `scopes`, die Anwendungen bei der Anmeldung übergeben können.
+* **IUserDbContext:** Hier werden die Benutzer gespeichert.
+* **IRoleDbContext:** Hier werden die (Benutzer-)Rollen gespeichert.
+* **IClientDbContext:** Hier werden Clients gespeichert. Clients sind (Web-)Anwendungen, bei denen man sich über den **IdentityServer** anmelden kann.
+* **IResourceDbContext:** Hier werden Ressourcen gespeichert. Diese repräsentieren die `scopes`, die Anwendungen bei der Anmeldung übergeben können.
   
-Falls in der *User Datenbank* noch kein Administrator angelegt wurde, wird ein solcher User beim Start angelegt. (``User admin created``).
-Das Passwort wird hier zufällig gewählt und in der Konsolenausgabe angezeigt.
+Falls in der *User-Datenbank* noch kein Administrator angelegt wurde, wird ein solcher Benutzer beim Start automatisch erstellt (``User admin created``).
+Das Passwort wird zufällig gewählt und in der Konsolenausgabe angezeigt.
 
 .. note::
 
-    Dieses Passwort sollte in produktiven Umgebungen nach dem ersten Start geändert werden. Siehe weiter Vorgehensweise
+    Dieses Passwort sollte in produktiven Umgebungen nach dem ersten Start geändert werden. Weitere Schritte siehe unten.
 
-Im Browser wird beim Ersten Start, folgendes angezeigt:
+Im Browser wird beim ersten Start Folgendes angezeigt:
 
 .. image:: img/login-as-admin1.png
 
-Klickt man auf ``Login``, kann man sich mit den ``admin`` User mit dem in der Konsolenausgabe angezeigtem Passwort anmelden:
+Klickt man auf ``Login``, kann man sich mit dem Benutzer ``admin`` und dem in der Konsolenausgabe angezeigten Passwort anmelden:
 
 .. image:: img/login-as-admin2.png
 
-Nach erfolgreicher Anmeldung sieht die Anzeige in etwas wie folgt aus:
+Nach erfolgreicher Anmeldung sieht die Anzeige in etwa wie folgt aus:
 
 .. image:: img/login-as-admin3.png
 
-Administrator Passwort ändern
+Administrator-Passwort ändern
 -----------------------------
 
-Das automatisch erstelle Administrator Passwort sollte in produktiven Umgebungen geändert werden. Dazu klickt man ``Manage my account``.
+Das automatisch erstellte Administratorpasswort sollte in produktiven Umgebungen geändert werden. Dazu klickt man auf ``Manage my account``.
 
-Hier können diverse Einstellungen zum Konto gemacht werden. Zum Ändern des Passwortes klickt man auf den Menüpunkt ``Passwort``. Hier 
-muss noch einmal das aktuelle Passwort angegeben werden (`Current password`). Das neue Passwort muss zweimal angegeben werden (`New password`, `Confirm new password`).
+Hier können verschiedene Kontoeinstellungen vorgenommen werden. Zum Ändern des Passworts klickt man auf den Menüpunkt ``Passwort``. Hier 
+muss noch einmal das aktuelle Passwort angegeben werden (`Current password`). Das neue Passwort muss zweimal eingegeben werden (`New password`, `Confirm new password`).
 
 .. image:: img/login-as-admin4.png
 
-Mit ``Update password`` wird das neue Passwort für zukünftige Anmeldungen neu gesetzt.
+Mit ``Update password`` wird das neue Passwort für zukünftige Anmeldungen festgelegt.
 
-Zwei Faktor Authentifizierung
+Zwei-Faktor-Authentifizierung
 -----------------------------
 
-Zur bessern Absicherung des Kontos ist eine Authentifizierung mit zweitem Faktor notwendig (über eine **Authenticator App**). Für den Administrator wird das empfohlen. 
-Dazu klickt man im auf ``Two-factor authentication`` und dort auf ``Setup authenticator app``:
+Zur besseren Absicherung des Kontos ist eine Authentifizierung mit einem zweiten Faktor erforderlich (über eine **Authenticator App**). Für den Administrator wird dies empfohlen. 
+Dazu klickt man auf ``Two-factor authentication`` und dort auf ``Setup authenticator app``:
 
 .. image:: img/login-as-admin5.png
 
-Im einer **Authenticator App** kann der hier angezeigt QR Code gescannt werden. Danach ist der erzeugt Code im Feld ``Verification Code`` einzutragen und mir ``Verify``
+In einer **Authenticator App** kann der hier angezeigte QR-Code gescannt werden. Danach ist der erzeugte Code im Feld ``Verification Code`` einzugeben und mit ``Verify``
 zu bestätigen.
 
-Wird der ``Code`` akzeptiert, erscheint folgende Anzeige mit möglichen ``Recovery codes``. Diese können anstelle der ``Authenticator App`` verwendet werden. Jeder dieser 
-``Recovery Codes`` kann nur einmal für die Anmeldung verwenden:
+Wird der ``Code`` akzeptiert, erscheint eine Anzeige mit möglichen ``Recovery codes``. Diese können anstelle der **Authenticator App** verwendet werden. Jeder dieser 
+``Recovery Codes`` kann nur einmal für die Anmeldung verwendet werden:
 
 .. image:: img/login-as-admin6.png
 
-Meldet man sich jetzt vom **IdentityServerNET** ab (``Logout``) und erneut an, muss neben dem neuem Passwort auch ein ``Authenticator code`` eingeben werden:
+Meldet man sich jetzt vom **IdentityServerNET** ab (``Logout``) und erneut an, muss neben dem neuen Passwort auch ein ``Authenticator code`` eingegeben werden:
 
 .. image:: img/login-as-admin7.png
 
-Hat man die **Authenticator App** nicht zur Verfügung besteht noch die Möglichkeit sich mit einem der ``Recovery Codes`` anzumelden. Dazu klickt man auf den Link `log in with recovery code`:
+Hat man die **Authenticator App** nicht zur Verfügung, besteht noch die Möglichkeit, sich mit einem der ``Recovery Codes`` anzumelden. Dazu klickt man auf den Link ``log in with recovery code``:
 
 .. image:: img/login-as-admin8.png

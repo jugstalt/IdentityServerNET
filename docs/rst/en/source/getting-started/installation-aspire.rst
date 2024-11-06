@@ -1,17 +1,17 @@
-Installation mit Aspire
-=======================
+Installation with Aspire
+========================
 
-Bei der Entwicklung von Anwendungen kann **IdentityServerNET** über 
-den **Aspire Host** als Container gestartet werden.
+During application development, **IdentityServerNET** can be started as a container 
+via the **Aspire Host**.
 
-Voraussetzung ist das NuGet-Paket:
+The required NuGet package is:
 
 .. code:: 
 
     dotnet add package Aspire.Hosting.IdentityServer.Hosting
 
-Im Code der *Aspire AppHost*-Anwendung kann der *IdentityServerNET* mit
-folgendem Befehl hinzugefügt werden:
+In the code of the *Aspire AppHost* application, *IdentityServerNET* can be added with the 
+following command:
 
 .. code:: csharp
 
@@ -79,47 +79,42 @@ folgendem Befehl hinzugefügt werden:
 
     builder.Build().Run();
 
-Mit ``AddIdentityServerNET(containerName)`` wird ein Container mit dem
-``identityserver-net-dev``-Image gestartet (https://hub.docker.com/r/gstalt/identityserver-net-dev).
+Using ``AddIdentityServerNET(containerName)`` starts a container with the 
+``identityserver-net-dev`` image (https://hub.docker.com/r/gstalt/identityserver-net-dev).
 
-Dieses Image wurde speziell für die Entwicklung erstellt. Da für viele Workflows 
-bei der Anmeldung am *IdentityServerNET* eine HTTPS-Verbindung erforderlich ist,
-wurde dieses Image mit einem *selbstsignierten Dev-Zertifikat* für die SSL-Verbindungen 
-erstellt.
+This image was specifically created for development. Since many workflows 
+for *IdentityServerNET* login require an HTTPS connection, this image was built 
+with a *self-signed development certificate* for SSL connections.
 
 .. note:: 
 
-    Da die Verbindung zum *IdentityServerNET* über ein *selbstsigniertes Zertifikat* 
-    erfolgt, können im Browser Warnungen angezeigt werden. Da dieses Image nur für die 
-    Entwicklung verwendet werden sollte, können diese Warnungen im Browser ignoriert werden.
+    Since the connection to *IdentityServerNET* uses a *self-signed certificate*, 
+    warnings may appear in the browser. As this image is intended solely for 
+    development, these warnings can be ignored in the browser.
 
-Optionale Methoden
-------------------
+Optional Methods
+----------------
 
-Auf den ``IdentityServerNETResourceBuilder`` können optional noch weitere Methoden 
-angewendet werden:
+The ``IdentityServerNETResourceBuilder`` allows additional optional methods to be applied:
 
-* ``WithMailDev()``: Startet zusätzlich einen MailDev-Server, der zum Testen des 
-  Mailversands verwendet werden kann, z. B. für die E-Mail-Bestätigung eines neu registrierten Users.
+* ``WithMailDev()``: Also starts a MailDev server, which can be used to test 
+  email functions, such as for a newly registered user who needs to verify their email.
 
-* ``WithBindMountPersistance()``: Damit Einstellungen in der Entwicklungsumgebung
-  des *IdentityServerNET* gespeichert bleiben, kann mit dieser Methode ein Pfad
-  für die Speicherung angegeben werden. Wird kein Parameter übergeben, erfolgt 
-  die Speicherung der Daten im Verzeichnis ``%USER%/identityserver-net-aspire``.
+* ``WithBindMountPersistance()``: To save settings within the development environment
+  of *IdentityServerNET*, a path for data storage can be specified using this method. 
+  If no parameter is provided, data is stored in the ``%USER%/identityserver-net-aspire`` directory.
 
-* ``WithVolumePersistance()``: Ähnlich wie oben, nur dass die Speicherung der 
-  Daten in einem Docker-Volume erfolgt. **Achtung:** Hier kann es aufgrund 
-  der Rechte des Container-Users zu Zugriffsproblemen kommen.
+* ``WithVolumePersistance()``: Similar to the above, but stores data in a Docker volume. **Note:** This may cause 
+  access issues due to container user permissions.
 
-* ``WithConfiguration(config => {})``: Hier kann die Konfiguration des *IdentityServerNET* angepasst werden.
+* ``WithConfiguration(config => {})``: Here, the *IdentityServerNET* configuration can be customized.
 
-* ``WithMigrations(migrations => {})``: Über Migrations können beim Start des *IdentityServerNET*
-  Objekte wie ``Client``, ``Resources``, ``User``, ``Roles`` angelegt werden. 
-  Hier kann ebenfalls ein Administratorpasswort festgelegt werden.
+* ``WithMigrations(migrations => {})``: Migrations allow objects such as ``Client``, ``Resources``, ``User``, and ``Roles`` to be created 
+  when *IdentityServerNET* starts. An administrator password can also be set here.
 
-* ``WithExternalProviders(external => {})``: Hier können externe Identity-Provider angegeben werden.
-  Derzeit ist *MicrosoftIdentityWeb* implementiert. Die Konfiguration für ``AddMicrosoftIdentityWeb``
-  wird in einer Konfigurationssektion definiert:
+* ``WithExternalProviders(external => {})``: External identity providers can be specified here.
+  Currently, *MicrosoftIdentityWeb* is implemented. Configuration for ``AddMicrosoftIdentityWeb`` 
+  is defined in a configuration section:
 
   .. code:: json
 
@@ -136,14 +131,14 @@ angewendet werden:
       }
     }
 
-* ``Builder()``: Wandelt den ``IdentityServerNETResourceBuilder`` in einen 
-  ``IResourceBuilder`` um, auf den alle anderen Aspire-Resource-Methoden angewendet 
-  werden können.
+* ``Builder()``: Converts the ``IdentityServerNETResourceBuilder`` into an 
+  ``IResourceBuilder``, allowing all other Aspire resource methods to be applied.
 
-Referenzen
+References
 ----------
 
-Eine *IdentityServerNET*-Instanz kann mit ``.AddReference(identityServer, configName)`` an ein
-Projekt gebunden werden. ``configName`` ist dabei der Name des Wertes aus der Konfiguration
-des Projekts, in den die (Aspire-)URL von **IdentityServerNET** geschrieben werden soll.
+An *IdentityServerNET* instance can be linked to a project with ``.AddReference(identityServer, configName)``. 
+``configName`` is the name of the key in the project’s configuration where the (Aspire) URL of **IdentityServerNET** 
+should be written.
+
 
