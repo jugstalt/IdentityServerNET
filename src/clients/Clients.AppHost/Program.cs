@@ -3,9 +3,9 @@ var builder = DistributedApplication.CreateBuilder(args);
 var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 
-var identityServer = builder.AddIdentityServerNET("is-net-dev", httpsPort:44300)
-       //.WithMailDev()
-       //.WithBindMountPersistance()
+var identityServer = builder.AddIdentityServerNET("is-net-dev")
+       .WithMailDev()
+       .WithBindMountPersistance()
 
        .WithConfiguration(config =>
        {
