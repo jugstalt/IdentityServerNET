@@ -1,8 +1,8 @@
-Weitere Admin Werkzeuge
+Weitere Admin-Werkzeuge
 =======================
 
-Aus der Administration von **Usern**, **Rollen**, **Identity/API Resources** und **Clients** bietet *IdentityServerNET* 
-noch weiter Werkzeuge an, die für Security Anwendungen sinnvoll sein können:
+Neben der Verwaltung von **Usern**, **Rollen**, **Identity/API Resources** und **Clients** bietet *IdentityServerNET* 
+weitere Werkzeuge an, die für Sicherheitsanwendungen nützlich sein können:
 
 .. toctree::
    :maxdepth: 2

@@ -1,112 +1,110 @@
-Web Anwendung
-=============
+Web Application
+===============
 
-Client erstellen/bearbeiten
----------------------------
+Creating/Editing a Client
+-------------------------
 
-Um einen neuen *Client* zu erstellen, muss eine eindeutige *Client Id* vergeben werden. 
-Optional kann auch ein sprechender Name vergeben werden.
+To create a new *client*, a unique *Client Id* must be assigned. 
+An optional display name can also be provided.
 
-Damit nicht alles manuelle eingegeben werden muss, sollte als Template ``WebApplication`` eingetragen 
-werden. Außerdem sollte für diesem Template 
-die Url zur Web Anwendung eingetragen werden. Die Eingabe der **Scopes** ist optional. Diese können 
-auch im nächsten Schritt noch bearbeitet werden.
+To simplify input, the ``WebApplication`` template should be selected. 
+Additionally, the URL to the web application should be entered for this template. Specifying **scopes** is optional and 
+can also be done in the next step.
 
-Mit ``Create new client...`` wird der neue Client erzeugt:
+Use ``Create new client...`` to create the new client:
 
 .. image:: img/webapp1.png
 
-Wurde der Client erfolgreich erzeugt, kommt man zur Seite ``Modify Client: ...``. Hier sind die 
-unterschiedlichen Eigenschaften für den Client in Menüpunkten gegliedert:
+After successfully creating the client, you will be taken to the ``Modify Client: ...`` page. 
+The various client properties are organized into menu items:
 
 ``Name``:
 +++++++++
 
 .. image:: img/webapp2.png
 
-Hier kann der sprechende Name für den Client verändert werden. Außerdem kann eine Beschreibung 
-für den Client eingetragen werden.
+Here, you can change the client’s display name and add a description.
 
 ``Client Secrets``:
 +++++++++++++++++++
 
-Ein Client sollte auch ein **Secret** besitzen. Ein Client Anwendung, muss diesen **Secret** bei der Anmeldung mitschicken. Ein **Secret** kann sowohl ein 
-Text (**Shared Secret**) als auch ein Zertifikat sein (**X509 Certificate *.crt**) sein. Ein **Shared Secret** kann ebenfalls in den **Secrets Vault** gespeichert werden (siehe später).
+A client should also have a **secret**. The client application must send this **secret** when logging in. A **secret** can be either 
+a text-based **Shared Secret** or a **certificate** (**X509 Certificate *.crt**). A **shared secret** can also be stored in the **Secrets Vault** (see later).
 
-Das **Shared Secret** kann ein beliebiger Text sein, eine Art Passwort. Möchte man ein sicheres **Secret** erzeugen, kann man den ``Random Secret Generator`` auf dieser Seite verwenden.
+The **shared secret** can be any text, like a password. If you want a secure **secret**, you can use the ``Random Secret Generator`` on this page.
 
 .. note:: 
 
-    Einem **Secret** kann ebenfalls ein Ablaufdatum (``Optional Expiration Date``) und eine Beschreibung haben.
+    A **secret** can also have an expiration date (``Optional Expiration Date``) and a description.
 
-Das **Secret** sollte sicher sein. Für dieses Beispiel soll der einfach halber das **Secret** den Wert ``secret`` haben und niemals ablaufen:
+The **secret** should be secure. For simplicity in this example, we will use the value ``secret`` without an expiration date:
 
 .. image:: img/webapp3.png
 
 .. note::
 
-    Es können mehre **Secrets** angelegt werden. Ein Client muss dann genau ein *gültiges* **Secret** übergeben. Das kann praktisch sein, wenn ein **Secret** getauscht werden muss.
-    Dabei kann dass neue **Secret** neben dem alten **Secret** bestehen, bis alle Clients auf das neue **Secret** umgestellt sind. Erst dann kann der alte **Secret** gelöscht werden.
+    Multiple **secrets** can be created. The client must then pass exactly one *valid* **secret**. This is useful if a **secret** needs to be rotated.
+    The new **secret** can coexist with the old **secret** until all clients switch to the new **secret**. Only then should the old **secret** be deleted.
 
 ``Allowed Grants``:
 +++++++++++++++++++
 
-Hier können die **Grants** eingestellt werden, die für die Anmeldung erlaubt sind. Jede Anmeldungsmethode funktioniert mit unterschiedlichen **Grants**. Da beim Erstellen des 
-Clients ``WebApplication`` als Template gewählt wurde, sollte hier schon die richten **Grants** eingestellt sein:
+This section allows you to set the **grants** permitted for login. Each login method uses different **grants**. Since the ``WebApplication`` 
+template was selected when creating the client, the appropriate **grants** should already be set here:
 
 .. image:: img/webapp4.png
 
 ``Allowed Scopes``:
 +++++++++++++++++++
 
-Die **Scopes** geben an, welche **Identity Resources** die Web Anwendung für einen angemeldeten User abfragen kann. Ich dürfen nur **Scopes** eingetragen werden, die für 
-den **IdentityServerNET** als **Identity Resources** eintragen sind (siehe Abschnitt Erste Schritte).
+**Scopes** specify which **identity resources** the web application can request for a logged-in user. Only **scopes** configured 
+as **identity resources** in **IdentityServerNET** should be listed here (see section Getting Started).
 
-Für Web Anwendungen wird hier standardmäßig ``openid`` und ``profile`` eingetragen:
+For web applications, ``openid`` and ``profile`` are entered by default:
 
 .. image:: img/webapp5.png
 
 ``Advanced Settings``:
 ++++++++++++++++++++++
 
-Hier können weitere Optionen angeführt werden, die für die Anmeldung herangezogen werden. Beispielsweise kann angegeben werden, oder ein **Secret** von Client zwingend übergeben werden muss
+Here, you can specify additional options for authentication. For example, you can specify whether a **secret** must always be provided by the client
 (``RequireClientSecret``).
-Über die Option ``RequireConsent`` kann gesteuert werden, ob ein User nach der Anmeldung noch zustimmen muss, ob die Web Anwendung zugriff auf die bestellen **Scopes** (Claims) haben darf:
+The ``RequireConsent`` option controls whether a user must consent after logging in to allow the web application access to the requested **scopes** (claims):
 
 .. image:: img/webapp6.png
 
 ``Advanced Collections``:
 +++++++++++++++++++++++++
 
-Hier können Auflistungen angeführt werden, die für die Anmeldung notwendig sind. Wichtig ist bei Web Anwendung immer, die Url der Seite, auf die eine erfolgreiche Anmeldung zurück geleitet wird (``RedirectUri``).
-Möchte man hier mehrere Urls angeben, muss jeder Url in einer neuen Zeile angegeben werden:
+Here, collections necessary for login can be specified. For web applications, it is essential to specify the URL to which a user is redirected after a successful login (``RedirectUri``).
+To specify multiple URLs, enter each URL on a new line:
 
 .. image:: img/webapp7.png
 
-Kommt die Anmeldungsaufforderung später nicht einer der Seiten, die hier aufgelistet ist, lässt **IdentityServerNET** diese nicht zu.
+If a login request later comes from a page not listed here, **IdentityServerNET** will reject it.
 
 ``Advanced Properties``:
 ++++++++++++++++++++++++
 
-Erweiterte Einstellungen für den Client, wie ``IdentityTokenLifetime``, ``AccessTokenLifetime`` usw. Diese Werte brauchen in der Regeln nicht geändert werden.
+Advanced settings for the client, such as ``IdentityTokenLifetime`` and ``AccessTokenLifetime``. These values generally do not need to be changed.
 
 ``Delete``:
 +++++++++++
 
-Hier kann ein Client auch wieder gelöscht werden.
+Here, you can delete a client.
 
-Client Web Anwendung anpassen
------------------------------
+Adjusting a Client Web Application
+----------------------------------
 
-Ein Client muss **OpenId Connect** unterstützen. In ASP.NET Core Umfeld werden hier die entsprechenden Methoden angeboten.
+A client must support **OpenId Connect**. In the ASP.NET Core environment, the necessary methods are available.
 
-**IdentityServerNET** bietet dafür einen einfachen Weg über Erweiterungsmethoden des ``IServiceCollection`` Objektes an. Dazu muss folgendes ``nuget`` Paket installiert werden:
+**IdentityServerNET** provides a straightforward approach via extension methods for the ``IServiceCollection`` object. The following **NuGet** package must be installed:
 
 .. code:: powershell
 
     dotnet add package IdentityServerNET.Extensions.DependencyInjection
 
-Über diese Paket wird ``IServiceCollection`` um folgende Methode erweitert:
+This package adds the following method to ``IServiceCollection``:
 
 .. code:: csharp
     
@@ -118,12 +116,12 @@ Ein Client muss **OpenId Connect** unterstützen. In ASP.NET Core Umfeld werden 
 
     builder.Services.OpenIdConnectAuthentication(builder.Configuration);
 
-Die Methode entnimmt die Parameter aus der App-Configuration (zB. ``appsettings.json``). In der Configuration muss es einen Abschnitt ``OpenIdConnectAuthentication`` geben, in dem die notwendigen
-Parameter enthalten sind.
+The method retrieves parameters from the app configuration (e.g., ``appsettings.json``). The configuration must contain a
+section ``OpenIdConnectAuthentication`` with the required parameters.
 
 .. note::
 
-    Der Abschnittsname kann auch geändert werden. Dann mus der ``OpenIdConnectAuthentication`` der entsprechende Abschnitt übergeben werden.
+    The section name can also be changed. In that case, the appropriate section should be passed instead of ``OpenIdConnectAuthentication``.
 
 .. code:: json
 

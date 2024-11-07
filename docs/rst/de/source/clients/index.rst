@@ -1,14 +1,14 @@
 Clients verwalten
 =================
 
-Clients sind Anwendungen, die sich über den IdentityServer anmelden können. Dabei können folgende Anwendung Typen unterschieden werden:
+Clients sind Anwendungen, die sich über den IdentityServer anmelden können. Folgende Anwendungstypen können dabei unterschieden werden:
 
-* **Web Anwendung:** Eine Web Anwendung, bei der sich Anwender mit User/Passwort anmelden müssen. 
-* **Api Clients:** Anwendungen, die auf eine (Web) API zugreifen müssen, die wiederum einen gültigen *Bearer Token* verlangt, der vom IdentityServer 
+* **Web-Anwendung:** Eine Web-Anwendung, bei der sich Anwender mit Benutzername und Passwort anmelden müssen.
+* **API Clients:** Anwendungen, die auf eine (Web-)API zugreifen müssen, die einen gültigen *Bearer Token* verlangt, der vom IdentityServer 
   ausgestellt wurde.
-* **JavaScript Client:** Eine *Single Page Web Seite* oder *statische Web Seite*, bei der eine Anmeldung über User und Passwort notwendig ist. 
+* **JavaScript Client:** Eine *Single Page Application* oder *statische Webseite*, bei der eine Anmeldung über Benutzername und Passwort erforderlich ist. 
 
-Zum Verwalten und Erstellen von Clients, muss man als Administrator angemeldet sein. Im *Admin Bereich* gibt es die Kacken ``Clients``, die zur
+Um Clients zu verwalten und zu erstellen, muss man als Administrator angemeldet sein. Im *Admin-Bereich* gibt es die Kachel ``Clients``, die zur
 Ansicht ``Add or modify clients`` führt:
 
 .. image:: img/index1.png
