@@ -1,109 +1,107 @@
 API Client
 ==========
 
-Ein *API Client* ist eine Anwendung, die auf eine **Web API** zugreifen muss, die einen
-gültigen **Bearer Token** erfordert, der vom **IdentityServerNET** ausgestellt wurde.
+An *API Client* is an application that needs to access a **Web API** requiring a
+valid **Bearer Token** issued by **IdentityServerNET**.
 
 API Resource
 ------------
 
-Um einen **Bearer Token** für eine API auszustellen, muss diese API im ersten Schritt als
-**API Resource** angelegt werden. Dazu navigiert man über die ``Admin`` Seite zu 
-``Resources (Identity & APIs)``/``API Resources``.
-Dort kann eine neue **API Resource** angelegt werden:
+To issue a **Bearer Token** for an API, this API must first be created as an
+**API Resource**. Navigate to ``Resources (Identity & APIs)``/``API Resources`` 
+via the ``Admin`` page to add a new **API Resource**:
 
 .. image:: img/api1.png
 
-Im nächsten Schritt müssen für die **API Resource** mögliche **Scopes** angelegt werden:
+In the next step, **Scopes** must be created for the **API Resource**:
 
 .. image:: img/api2.png
 
 .. note::
 
-    Die Namenskonvention für API Resource Scopes ist: ``api-resource-name.scope-name``. 
-    Gibt man einen Scope ein, wird dieser automatisch in diese Konvention umgewandelt. Eine Ausnahme ist ein Scope, 
-    der den gleichen Namen hat, wie die ``api-resource``. Möchte man einen Scope anlegen, der nicht diese 
-    Konvention entspricht, muss dieser mit vorangestelltem ``@@`` angegeben werden, zB ``@@scope-name``
+    The naming convention for API Resource scopes is: ``api-resource-name.scope-name``. 
+    When a scope is entered, it is automatically converted to this format. An exception is a scope 
+    that has the same name as the ``api-resource``. To create a scope that does not follow this 
+    convention, prefix it with ``@@``, e.g., ``@@scope-name``.
 
-Für eine API werden nach dem erstellen automatisch folgende **Scopes** angelegt:
+For an API, the following **scopes** are created automatically:
 
-* ``{api-name}``: Allgemeiner Zugriff auf die API
-* ``{api-name}.query``: Lesender Zugriff auf die von der API bereitgestellten Daten
-* ``{api-name}.command``: Zusätzlich schreibender Zugriff auf die von der API bereitgestellten Daten
+* ``{api-name}``: General access to the API
+* ``{api-name}.query``: Read-only access to data provided by the API
+* ``{api-name}.command``: Additionally, write access to data provided by the API
 
 .. note::
 
-    Der Scope ``{api-name}`` sollte später bei einem Client unbedingt als Scope hinzugefügt werden. Diese entspricht dann 
-    der ``Audience`` (``aud``) des Tokens!
+    The ``{api-name}`` scope should later be added to a client as a scope. This scope 
+    will then correspond to the ``Audience`` (``aud``) of the token!
 
-API Client erstellen/bearbeiten
--------------------------------
+Creating/Editing an API Client
+------------------------------
 
-Um einen neuen *Client* zu erstellen, muss eine eindeutige *Client Id* vergeben werden. 
-Optional kann auch ein sprechender Name vergeben werden.
+To create a new *Client*, a unique *Client Id* must be assigned. 
+An optional display name can also be provided.
 
-Damit nicht alles manuelle eingegeben werden muss, sollte als Template ``API`` eingetragen 
-werden. Außerdem sollte für diesem Template 
-die Url zur Web Anwendung eingetragen werden. Die Eingabe der **Scopes** ist optional. Diese können 
-auch im nächsten Schritt noch bearbeitet werden:
+To simplify input, select the ``API`` template. Additionally, in this template, 
+enter the URL of the web application. Entering **Scopes** is optional and can 
+also be edited in the next step:
 
 .. image:: img/api3.png
 
-Wurde der Client erfolgreich erzeugt, kommt man zur Seite ``Modify Client: ...``. Hier sind die 
-unterschiedlichen Eigenschaften für den Client in Menüpunkten gegliedert:
+After successfully creating the client, you will be redirected to the ``Modify Client: ...`` page. 
+The various client properties are organized into menu items:
 
 ``Name``:
 +++++++++
 
 .. image:: img/api4.png
 
-Hier kann der sprechende Name für den Client verändert werden. Außerdem kann eine Beschreibung 
-für den Client eingetragen werden.
+Here, you can change the client's display name and add a description.
 
 ``Client Secrets``
 ++++++++++++++++++
 
-Hier muss ein Secret angegeben werden, mit dem sich der Client am Identity Server Anmelden muss. Über den
-**Random Secret Generator** kann ein sicheres Secret erzeugt werden. Der Einfachheit halber verwenden wir hier 
-allerdings als Secret einfach ``secret``:
+Here, a secret must be provided that the client uses to authenticate with the Identity Server. 
+A secure secret can be generated via the **Random Secret Generator**. For simplicity, we will use 
+the secret ``secret``:
 
 .. image:: img/api5.png
 
 ``Allowed Grants``
 ++++++++++++++++++
 
-Da beim Erstellen des Clients der Typ ``ApiClient`` gewählt wurde, sollte hier ``ClientCredentials`` ausgewählt sein:
+Since the client type ``ApiClient`` was selected when creating the client, ``ClientCredentials`` should be selected here:
 
 .. image:: img/api6.png
 
 ``Allowed Scopes``
 ++++++++++++++++++
 
-Hier müssen die Scopes hinzugefügt werden, für die ``API Resource`` angelegt worden sind. Die **Scopes** bestimmen in der 
-API später spezielle Rechte für den Zugriff auf die API. Beim ``my-api-command`` Client, macht es hier Sinn, den ``my-api`` und 
-den ``my-api.command`` Scope aus ``Add existing resource scope`` Bereich zu übernehmen:
+Here, the scopes created for the ``API Resource`` must be added. The **Scopes** specify specific 
+access rights to the API. For the ``my-api-command`` client, it makes sense to select the ``my-api`` 
+and ``my-api.command`` scopes from the ``Add existing resource scope`` section:
 
 .. image:: img/api7.png
 
 ``Advanced Properties``
 +++++++++++++++++++++++
 
-Hier kann beispielsweise die lebensdauer für einen *AccessToken* definiert werden:
+Here, the lifetime of an *AccessToken* can be defined, for example:
 
 .. image:: img/api8.png
 
 .. note::
 
-    Alle weiteren Menüpunkte sind für *API Clients* weniger relevant und werden nicht im Detail aufgelistete.
+    All other menu items are less relevant for *API Clients* and are not listed in detail here.
 
-Abholen eines AccessTokens
---------------------------
+Retrieving an AccessToken
+-------------------------
 
 HTTP Request
 ++++++++++++
 
-Eine Client Anwendung kann über einen **HTTP Post** Request, mit den notwendigen Parametern im Body, einen AccessToken von *IdentityServerNET* abholen.
-Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen übergeben:
+A client application can retrieve an AccessToken from *IdentityServerNET* using an **HTTP POST** request 
+with the necessary parameters in the body. The scopes are passed via the ``scope`` parameter, using spaces as separators:
+
 
 .. code:: 
     
@@ -112,7 +110,7 @@ Die Scopes werden über den Parameter ``scope`` mit leerzeichen als Trennzeichen
 
     grant_type=client_credentials&client_id=my-api-commands&client_secret=secret&scope=my-api my-api.command
 
-bzw.
+or
 
 .. code::
 
@@ -133,13 +131,13 @@ bzw.
 
 .. note::
 
-    Der ``scope`` Parameter kann auch weggelassen werden. In dem Fall enthält der Token alle für den Client eingestellten Scopes.
+    The ``scope`` parameter can also be omitted. In this case, the token will include all scopes configured for the client.
 
 
 IdentityServerNET.Clients
-+++++++++++++++++++++++++++
+++++++++++++++++++++++++++
 
-Zum Abholen eines Tokens kann auch das ``IdentityServerNET.Clients`` **nuget** Package verwendet werden:
+To retrieve a token, the **NuGet** package ``IdentityServerNET.Clients`` can also be used:
 
 .. code:: bash
 
@@ -156,7 +154,7 @@ Zum Abholen eines Tokens kann auch das ``IdentityServerNET.Clients`` **nuget** P
 IdentityModel
 +++++++++++++
 
-**IdentityModel** bietet ebenfalls ein Möglichkeit einen Token abzuholen:
+**IdentityModel** also provides a way to retrieve a token:
 
 .. code:: bash
 
@@ -193,26 +191,27 @@ IdentityModel
     Console.WriteLine(tokenResponse.AccessToken);
 
 
-Api Authorization
+API Authorization
 -----------------
 
-Möchte man eine API über einen (Bearer) Token absichern, ist die Vorgehensweise in etwas folgendermaßen:
+To secure an API using a (Bearer) token, the process is generally as follows:
 
 ``Program.cs``
 ++++++++++++++
 
-In der ``Programm.cs`` Datei zu erst die notwendigen *Authentication* und *Authorization* Services registriert.
+In the ``Program.cs`` file, register the necessary *authentication* and *authorization* services.
 
-Über die ``AddAuthoriation`` wird angegeben, dass die zur Authentifizierung des Clients eine ``Bearer (JWT) Token`` verwendet wird.
-Über die Optionen wird hier gesteuert, wer für die Authentifizierung verantwortlich ist (``Authority``). Ebenfalls kann die ``Audience`` vorgeben 
-werden, für die dieser der Token ausgestellt werden werden muss. Über die ``TokenValidationParameters`` wird festgelegt, welche **Claims**
-überprüft werden, um einen Token als gültig anzuerkennen. ``ClockSkew = TimeSpan.Zero`` gibt an, der der Token sofort abgelehnt wird, 
-wenn die **ExpirationTime** des Tokens überschritten wird.
+With ``AddAuthentication``, specify that a ``Bearer (JWT) Token`` is used for client authentication.
+The options define who is responsible for authentication (``Authority``). Additionally, the ``Audience`` 
+that the token must be issued for can be specified. ``TokenValidationParameters`` determines which **claims** 
+are checked to validate the token. Setting ``ClockSkew = TimeSpan.Zero`` ensures that the token is immediately rejected 
+if its **ExpirationTime** is exceeded.
 
-Mittels ``AddAuthorization`` können **Policies** angeführt werden. Über eine **Policy** wird geregelt, welche Rechte ein Client bei API Aufrufen hat.
-Hier wird ``scope`` als Claim vorausgesetzt und zwischen ``command`` und ``query`` Rechten unterschieden.
+Using ``AddAuthorization``, **policies** can be defined. A **policy** governs the rights a client has for API calls.
+In this example, the ``scope`` claim is required, with distinctions made between ``command`` and ``query`` rights.
 
-Damit Authentifizierung und Autorisierung angewendet wird, muss die Application auch die entsprechende Middleware verwenden (``UseAuthentication``, ``UseAuthorization``)-
+To apply authentication and authorization, the application must also use the corresponding middleware 
+(``UseAuthentication``, ``UseAuthorization``).
 
 .. code:: csharp
 
@@ -263,10 +262,10 @@ Damit Authentifizierung und Autorisierung angewendet wird, muss die Application 
 ``Controller``
 ++++++++++++++
 
-Um einzelnen **Controller** oder **Methoden** abzusichern wird das ``[Authorize]`` verwendet.
-Hier wird dem Attribute noch das oben festgelegte ``AuthenticationScheme`` (**Bearer**) und die notwendige ``Policy`` 
-(**query**, **command**) übergeben. Die Methoden dieser API Controller können somit nur aufgerufen werden, wenn
-ein **Bearer Token** übergeben wird, der den **scope** ``my-api.query`` oder ``my-api.command`` enthält. 
+To secure individual **controllers** or **methods**, use the ``[Authorize]`` attribute.
+Specify the previously configured ``AuthenticationScheme`` (**Bearer**) and the required ``Policy`` 
+(**query**, **command**). This ensures that the methods in these API controllers can only be accessed 
+if a **Bearer Token** with the **scope** ``my-api.query`` or ``my-api.command`` is provided.
 
 .. code:: csharp
 

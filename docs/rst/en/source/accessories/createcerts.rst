@@ -1,17 +1,14 @@
-Selbst-Signierte Zertifikate erstellen
-======================================
+Creating Self-Signed Certificates
+=================================
 
-**IdentityServerNET** bietet ein *Admin-Werkzeug* zum erstellen von 
-selbst-signierten Zertifikate. Das Ergebnis ist ein *ZIP-File* mit folgendem 
-Inhalt:
+**IdentityServerNET** provides an *admin tool* to create self-signed certificates. The result is a *ZIP file* with the following content:
 
-* **{cert-name}.pfx:** Das Zertifikate als PFX Datei
-* **{cert-name}.crt:** Der öffentliche Schlüssel des Zertifikate als CRT Datei
+* **{cert-name}.pfx:** The certificate as a PFX file
+* **{cert-name}.crt:** The public key of the certificate as a CRT file
 
 .. note::
 
-    CRT Dateien können in einem Text Editor geöffnet werden und haben folgendes 
-    Format:
+    CRT files can be opened in a text editor and have the following format:
 
     .. code::
 
@@ -21,25 +18,23 @@ Inhalt:
         ...
         -----END CERTIFICATE-----
 
-Ein Grund, warum ein selbst-signiertes Zertifikat erzeugt wird, ist, dass diese als 
-als **Secret** für **Clients** verwendet werden.
+One common use of a self-signed certificate is as a **secret** for **clients**.
 
-Um ein Zertifikat zu erzeugen, wechselt man auf der *Admin-Seite* in den Bereich ``Create Certs``:
+To create a certificate, go to the ``Create Certs`` section on the *Admin page*:
 
 .. image:: img/certs1.png
     :width: 320
 
-* **Certificate (File) Name:** ein Name für das Zertifikat. Dieser entspricht dem Filenamen
-  des ZIP-Files und der einzelnen Files.
+* **Certificate (File) Name:** A name for the certificate. This corresponds to the ZIP file 
+  name and the names of the individual files.
 
-* **Subject (CN):** Das Subject für das Zertifikat (CN=...). Dieser Name steht im Zertifikat.
+* **Subject (CN):** The subject of the certificate (CN=...). This name appears in the certificate.
 
-* **Password:** Ein optionales Passwort für das Zertifikat. Das PFX lässt sich später nur 
-  mit diesem Passwort öffnen.
+* **Password:** An optional password for the certificate. The PFX file can only be opened 
+  with this password.
 
-* **Expire Days:** Die Anzahl der Tage, nach dem dieses Zertifikat abläuft.
+* **Expire Days:** The number of days after which the certificate expires.
 
-Klickt man auf ``Download Certificate`` wird eine ZIP Datei mit folgendem Inhalt 
-herunter geladen:
+Clicking on ``Download Certificate`` downloads a ZIP file with the following content:
 
 .. image:: img/certs2.png

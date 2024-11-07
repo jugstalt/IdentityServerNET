@@ -1,62 +1,62 @@
 Payload Signing
 ===============
 
-Mit **Payload Signing** kann ein beliebiger Payload (Dictionary) in einen JWT Token verpacken.
-Das erstellen eines Token kann sowohl über die *Admin-Seite* oder durch eine API Aufruf eines 
+Mit **Payload Signing** kann ein beliebiger Payload (Dictionary) in einen JWT-Token verpackt werden.
+Das Erstellen eines Tokens kann entweder über die *Admin-Seite* oder durch einen API-Aufruf eines 
 berechtigten Clients erfolgen.
 
-JWT Token über Admin-Seite
---------------------------
+JWT-Token über die Admin-Seite
+------------------------------
 
-Um als Administrator einen **JWT Token** zu erzeugen, wechselt man über die *Admin-Seite*
+Um als Administrator einen **JWT-Token** zu erzeugen, navigiert man auf der *Admin-Seite*
 zum Bereich ``Sign Payload UI``.
 
-Dort kann ein **Payload** (Dictionary) als JSON angeben werden und daraus ein 
-ein Token erzeugt werden:
+Hier kann ein **Payload** (Dictionary) im JSON-Format angegeben werden, aus dem 
+ein Token erzeugt wird:
 
 .. image:: img/signing1.png
     :width: 300
 
-Der erzeugte Token enthält dann folgende Informationen:
+Der erzeugte Token enthält dann die folgenden Informationen:
 
 .. image:: img/signing2.png
     :width: 300
 
-JWT Token über Signing API
---------------------------
+JWT-Token über die Signing API
+------------------------------
 
-Über die **Signing API** kann ein berechtigter Client, JWT Tokens mit benutzerdefiniertem
-Payload erstellen. Folgende Voraussetzungen sind dazu notwendig:
+Über die **Signing API** kann ein berechtigter Client JWT-Tokens mit benutzerdefiniertem
+Payload erstellen. Folgende Voraussetzungen müssen dafür erfüllt sein:
 
 API Resource einrichten
 +++++++++++++++++++++++
 
-Im ersten Schritt muss die **API Resource** eingerichtet werden (falls noch nicht eingerichtet).
-Dazu wechselt man von der *Admin-Seite* in den Bereich ``Resources (Identity & APIs)`` und dort 
-zum Menüpunkt ``API Resources``. Dort muss eine **API Resource** mit dem Namen ``signing-api``
-angelegt werden. Ist diese Resource noch nicht vorhanden, kann sie der einfach halber auch 
-über den Bereich ``Add default API Resource``:
+Zunächst muss die **API Resource** eingerichtet werden (falls noch nicht vorhanden).
+Wechseln Sie dazu auf der *Admin-Seite* in den Bereich ``Resources (Identity & APIs)`` und dort 
+zum Menüpunkt ``API Resources``. Hier muss eine **API Resource** mit dem Namen ``signing-api``
+angelegt werden. Falls diese Resource noch nicht vorhanden ist, kann sie einfach 
+über den Bereich ``Add default API Resource`` hinzugefügt werden:
 
 .. image:: img/signing3.png
 
 .. note::
 
-    Unter ``Scopes`` muss für diese **API Resource** ein **Scope** ``signing-api`` existieren.
-    Das sollte automatisch beim Hinzufügen passiert sein. Falls nicht muss der Scope manuell 
+    Unter ``Scopes`` muss für diese **API Resource** ein **Scope** ``signing-api`` vorhanden sein.
+    Dieser Scope sollte beim Hinzufügen automatisch erstellt worden sein. Falls nicht, muss er manuell 
     hinzugefügt werden.
 
 API Client erstellen
 ++++++++++++++++++++
 
-Als nächstes muss ein *Client* erstellt werden, der auf die **Signing API** zugreifen darf.
-Dazu muss von der *Admin-Seite* in den Bereich ``Clients`` wechseln. Dort muss ein **API Client**
-angelegt werden:
+Als Nächstes muss ein *Client* erstellt werden, der Zugriff auf die **Signing API** erhält.
+Dazu wechseln Sie auf der *Admin-Seite* in den Bereich ``Clients`` und legen dort einen **API Client**
+an:
 
 .. image:: img/signing4.png
 
-Für den Client muss unter ``Client Secrets`` ein **Secret** vergeben werden, dass der Client später übergeben muss, 
-um einen Token abzuholen.
-Unter dem Menüpunkt ``Scopes`` muss für diesen Client noch der **API Scope** ``signing-api`` hinzugefügt
+Für den Client muss unter ``Client Secrets`` ein **Secret** festgelegt werden, das der Client später übermitteln muss, 
+um ein Token abzurufen.
+Unter dem Menüpunkt ``Scopes`` muss für diesen Client der **API Scope** ``signing-api`` hinzugefügt
 werden:
 
 .. image:: img/signing5.png
@@ -64,7 +64,7 @@ werden:
 Token über HTTP Request erstellen
 +++++++++++++++++++++++++++++++++
 
-Zuerst muss ein gültiger **Bearer Token** abgeholt werden:
+Zuerst muss ein gültiger **Bearer Token** abgerufen werden:
 
 .. code::
 
@@ -76,8 +76,8 @@ Zuerst muss ein gültiger **Bearer Token** abgeholt werden:
     &client_secret=secret1
     &scope=signing-api
      
-Wird ein **Access Token** zurück gegeben, kann dieser für den zum Erstellen des 
-**Tokens** verwendet werden:
+Wenn ein **Access Token** zurückgegeben wird, kann dieses Token verwendet werden, um 
+den **Token** zu erstellen:
 
 .. code::
 
@@ -88,10 +88,10 @@ Wird ein **Access Token** zurück gegeben, kann dieser für den zum Erstellen de
     name=doc1
     &hash=1234567890
 
-Token über IdentityServerNET.Clients abholen
-++++++++++++++++++++++++++++++++++++++++++++++
+Token über IdentityServerNET.Clients abrufen
++++++++++++++++++++++++++++++++++++++++++++++
 
-Das **nuget** Packet ``IdentityServerNET.Clients`` bietet folgende Methoden,
+Das **NuGet**-Paket ``IdentityServerNET.Clients`` bietet folgende Methoden,
 um auf die **Signing API** zuzugreifen:
 
 .. code:: bash
@@ -122,13 +122,13 @@ um auf die **Signing API** zuzugreifen:
 
     var token = signingResponse.SecurityToken
 
-Token validieren 
+Token validieren
 ++++++++++++++++
 
-Ein Token aus der **Signing API** kann einer Application übergeben werden. Diese kann 
-die Gültigkeit des Tokens prüfen und einzelne Claims abfragen. Dafür bietet .NET Core 
-verschiedene Möglichkeiten. Einige Methoden sind ebenfalls im **nuget** Packet 
-``IdentityServerNET.Clients`` enthalten
+Ein Token aus der **Signing API** kann an eine Anwendung übergeben werden. Diese Anwendung kann 
+die Gültigkeit des Tokens prüfen und einzelne Claims abfragen. .NET Core bietet dafür 
+verschiedene Möglichkeiten. Einige Methoden sind ebenfalls im **NuGet**-Paket 
+``IdentityServerNET.Clients`` enthalten.
 
 .. code:: csharp
 

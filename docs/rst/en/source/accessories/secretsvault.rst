@@ -1,108 +1,104 @@
 Secrets Vault
 =============
 
-Das **Secrets Vault** dient zum zentralen Speichern von **Secrets** wie beispielsweise:
+The **Secrets Vault** is used for centralized storage of **secrets** such as:
 
-* ConnectionString
-* Passwörter
-* Client Secrets
+* Connection strings
+* Passwords
+* Client secrets
 
-Die **Secrets** werden sogenannten **Lockers** zugeordnet. Eine Anwendung bekommt beispielsweise Zugriff auf einen **Locker** und kann die 
-darin enthaltenen **Secrets** abgreifen. Für jedes Secret können unterschiedliche **Versionen** angelegt werden. Ändert sich beispielsweise ein 
-*ConnectionString* kann eine neue Version für ein **Secret** angelegt werden. Sind alle **Clients** auf die neue Version des *ConnectionStrings*
-umgestellt, kann die alte **Version** gelöscht werden.
-
-.. note::
-
-    Idealerweise wird ein **Locker** pro *Client* angelegt. Im **Locker** gibt es nur die für den *Client* relevanten **Secrets**.
+**Secrets** are assigned to **lockers**. An application, for example, is granted access to a **locker** and can retrieve the 
+**secrets** it contains. Multiple **versions** can be created for each secret. If a 
+*connection string* changes, for instance, a new version can be created for a **secret**. Once all **clients** have switched to the new version of the *connection string*, 
+the old **version** can be deleted.
 
 .. note::
 
-    Beim Abholen eine **Secrets** kann auch auf die Angabe der **Version** verzichtet werden. Dann muss allerdings berücksichtigt werden,
-    dass der Client immer auf die zuletzt erstellte Version zugreift. Führt man eine neue **Version** an, holt sich ein *Client* beim 
-    nächsten Zugriff die neu **Version** ab!
+    Ideally, one **locker** should be created per *client*. A **locker** should contain only the **secrets** relevant for the *client*.
 
-Zum Verwalten des **Secrets Vault** klickt man auf der *Admin Seite* auf die entsprechende Kachel.
+.. note::
 
-Locker anlegen
---------------
+    When retrieving a **secret**, the **version** can also be omitted. However, in this case, it is important to remember that 
+    the client will always access the most recently created version. When a new **version** is created, 
+    the *client* will retrieve the new **version** upon the next request!
 
-Ein neuer Locker wird über das ``Create new locker`` Formular angelegt:
+To manage the **Secrets Vault**, click on the appropriate tile on the *Admin page*.
+
+Creating a Locker
+-----------------
+
+A new locker is created using the ``Create new locker`` form:
 
 .. image:: img/secretsvault1.png
 
-Secret anlegen
---------------
+Creating a Secret
+-----------------
 
-Um eine **Secret** innerhalb eines **Lockers** anzulegen, öffnet man im entsprechenden Locker den Menüpunkt ``Secrets`` und erstellt über 
-das Formular ``Create new secret`` ein neues **Secret**. Hier muss einmal nur der Name und optional die Beschreibung des **Secrets** angeführt 
-werden:
+To create a **secret** within a **locker**, open the ``Secrets`` menu in the corresponding locker and use 
+the ``Create new secret`` form to add a new **secret**. Only the name and an optional description of the **secret** are required:
 
 .. image:: img/secretsvault2.png
 
-Secret Versionen anlegen
+Creating Secret Versions
 ------------------------
 
-Um schließlich dem **Secret** einen Wert zu geben, müssen **Versionen** angelegt werden. Dazu wählt man zuerst das **Secret** aus der Liste aus
-und wechselt zum Menüpunkt ``Versions``:
+To assign a value to a **secret**, **versions** must be created. To do this, select the **secret** from the list 
+and go to the ``Versions`` menu:
 
 .. image:: img/secretsvault3.png
 
-In der Liste erscheint die neue erstellte Version des **Secrets**. Erstellt man weiter Versionen, wird das neueste Version immer ganz oben angezeigt.
-Mehrere Versionen machen Sinn, wenn sich ein ConnectionString ändern kann, zB neuer Datenbankserver. Hier kann eine neue Version angelegt werden,
-und sukzessive alle Clients auf die neue Datenbank umgestellt werden. Danach können alte Versionen wieder gelöscht werden.
+The newly created version of the **secret** appears in the list. If further versions are created, the most recent version is always shown at the top.
+Multiple versions are useful if, for example, a connection string changes due to a new database server. A new version can be created here, and clients can be gradually updated to use the new database. Old versions can then be deleted.
 
-Klickt man auf den Link, der bei der **Version** angezeigt wird, öffnet sich ein *JSON* im Browser:
+Clicking on the link displayed for the **version** opens a *JSON* in the browser:
 
 .. image:: img/secretsvault4.png
 
 .. note::
 
-    Der letzte Teil der Url ist der ``versionTimeStamp``. Dieser kann auch beim Abholen der **Secret-Version** weggelassen werden. 
-    Damit wird immer die zuletzt erstellte Version zurück gegeben. 
+    The last part of the URL is the ``versionTimeStamp``. This can be omitted when retrieving a **secret version**. 
+    This will return the most recently created version. 
 
     .. image:: img/secretsvault5.png
 
-Secret abfragen
----------------
+Retrieving a Secret
+-------------------
 
-**Secrets** können mit der oben gezeigten Methode (Klick auf Link) abgeholt werden. Dieser Link ist allerdings nur für Administrator mit Browser
-möglich. Möchte man diesen Link im Browser öffnen und ist nicht als Administrator angemeldet, wird man zum *Login* weiter geleitet.
+**Secrets** can be retrieved using the method shown above (clicking the link). However, this link is only accessible to administrators with browser access.
+If a non-administrator attempts to open this link in the browser, they will be redirected to the *login* page.
 
-Der Zugriff für Clients mit übergabe eines **Bearer Tokens**. Damit ein gültiger *Token* abgeholt werden sind folgende Schritte notwendig:
+Clients can access secrets by passing a **Bearer Token**. The following steps are necessary to obtain a valid token:
 
-API Resources anlegen 
-+++++++++++++++++++++
+Creating API Resources
+++++++++++++++++++++++
 
-*IdentityServerNET* bietet eine API zum abfragen von Secrets (https://.../api/api/secretsvault?v=1.0&path={secret-version-path}).
-Um diese API verwenden zu können, müssen zuerst die notwendigen **API Resourcen** angelegt werden. Dazu muss über die *Admin-Seite* in den 
-Bereich **Resources (Identities & APIs)** und dort zum Menüpunkt **API Resources** gewechselt werden. Falls noch nicht vorhanden, muss
-hier zuerst die API Resource ``secrets-vault`` erstellt werden:
+*IdentityServerNET* provides an API for retrieving secrets (https://.../api/api/secretsvault?v=1.0&path={secret-version-path}).
+To use this API, the necessary **API resources** must first be created. To do this, go to the **Resources (Identities & APIs)** 
+section on the *Admin page*, then select **API Resources**. If not yet created, the ``secrets-vault`` API resource must be created here:
 
 .. image:: img/secretsvault6.png
 
-Für die Resource muss dann unter ``Scopes`` noch ein **Scope** mit dem Namen es **Lockers** eingereicht werden:
+Under ``Scopes``, add a **scope** with the name of the **locker** to the resource:
 
 .. image:: img/secretsvault7.png
 
-Client anlegen
-++++++++++++++
+Creating a Client
++++++++++++++++++
 
-Damit ein Client auf den **Locker** zugreifen kann, muss von der *Admin Seite* in den Bereich **Clients** gewechselt werden und 
-dort ein **API Client** erstellt werden:
+To allow a client to access the **locker**, go to the **Clients** section on the *Admin page* 
+and create an **API client** there:
 
 .. image:: img/secretsvault8.png
 
-Für den Client muss unter ``Client Secrets`` ein **Secret** vergeben werden, dass der Client später übergeben muss, um einen Token abzuholen.
-Unter ``Scopes`` sind die beiden **Scopes** ``secrets-vault`` und ``secrets-vault.{locker-name}`` aus dem Bereich ``Add existing resource scope``
-hinzuzufügen:
+Under ``Client Secrets``, assign a **secret** that the client will later use to obtain a token.
+Under ``Scopes``, add the **scopes** ``secrets-vault`` and ``secrets-vault.{locker-name}`` from the ``Add existing resource scope`` section:
 
 .. image:: img/secretsvault9.png
 
-Secret über HTTP Request abholen
-++++++++++++++++++++++++++++++++
+Retrieving a Secret via HTTP Request
+++++++++++++++++++++++++++++++++++++
 
-Zuerst muss ein gültiger **Bearer Token** abgeholt werden:
+First, obtain a valid **Bearer Token**:
 
 .. code::
 
@@ -114,7 +110,7 @@ Zuerst muss ein gültiger **Bearer Token** abgeholt werden:
     client_secret=secret&
     scope=secrets-vault secrets-vault.my-api-locker
 
-Wird ein **Access Token** zurück gegeben, kann dieser für den zum Abfragen des **Secrets** verwendet werden:
+If an **Access Token** is returned, it can be used to retrieve the **secret**:
 
 .. code::
 
@@ -123,15 +119,15 @@ Wird ein **Access Token** zurück gegeben, kann dieser für den zum Abfragen des
 
 .. note:: 
 
-    Hier wurde im Pfad keine Version mitgegeben. Möchte man eine bestimmte Version Abfragen muss diese im Pfad mitgegeben werden, zB
+    In this example, no version was specified in the path. To retrieve a specific version, add it to the path, e.g., 
     https://localhost:44300/api/secretsvault?v=1.0&path=my-api-locker/db-connectionstring/{version}
 
 
-Secret über IdentityServerNET.Clients abholen
-+++++++++++++++++++++++++++++++++++++++++++++++
+Retrieving a Secret via IdentityServerNET.Clients
++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Das **nuget** Packet ``IdentityServerNET.Clients`` bietet folgende Methoden,
-um auf die **Secrets API** zuzugreifen:
+The **NuGet** package ``IdentityServerNET.Clients`` provides the following methods 
+to access the **Secrets API**:
 
 .. code:: bash
 

@@ -1,17 +1,17 @@
 Secrets
 =======
 
-Um *Access Tokens* zu erhalten, muss/soll ein **Client** eine **Client Id** und ein 
-**Client Secret** übergeben (**Client Id** und **Client Secret** entspricht in etwa
-*User* und *Passwort*).
+Um *Access Tokens* zu erhalten, muss oder sollte ein **Client** eine **Client Id** und ein 
+**Client Secret** übergeben (**Client Id** und **Client Secret** entsprechen in etwa
+*Benutzername* und *Passwort*).
 
 Hier werden die unterschiedlichen Arten von **Secrets** aufgezeigt.
 
 Kein Secret verwenden
 ---------------------
 
-Es können **Clients** eingerichtet werden, die kein **Secret** voraussetzen. Bei **Clients**
-gibt es unter dem Menüpunkt ``Advanced Options`` folgende Option:
+Es können **Clients** eingerichtet werden, die kein **Secret** voraussetzen. Unter dem Menüpunkt ``Advanced Options`` eines **Clients** 
+gibt es die folgende Option:
 
 .. image:: img/secrets1.png
 
@@ -19,23 +19,23 @@ Ist die Option ``RequireClientSecret`` nicht gesetzt, muss ein **Client** kein S
 
 .. note::
 
-    Diese Option nicht zu setzten, sollte nur bei ``Web Anwendungen`` erfolgen. Hier werden 
+    Diese Option nicht zu setzen, sollte nur bei ``Web Anwendungen`` erfolgen. Hier können 
     unter dem Menüpunkt ``Advanced Collections`` noch ``Redirect Urls`` angegeben werden:
 
     .. image:: img/secrets2.png
 
-    Da der Anmelde-Prozess bei *OpenId Connect* nur möglich ist, wenn auf eine dieser Urls
-    weitergeleitet werden kann, ist eine **Web Application Client** damit eigentlich schon 
+    Da der Anmeldeprozess bei *OpenId Connect* nur möglich ist, wenn auf eine dieser URLs
+    weitergeleitet werden kann, ist ein **Web Application Client** dadurch grundsätzlich 
     abgesichert. 
 
 .. note::
 
-    **API Clients** sollten niemals ohne **Secret** eine AccessToken abholen können!
+    **API Clients** sollten niemals ohne **Secret** ein AccessToken abrufen können!
 
 Shared Secrets
 --------------
 
-Die einfachste Art von Secrets sind ``Shared Secrets``. Dabei handelt es sich im 
+Die einfachste Art von Secrets sind ``Shared Secrets``. Dabei handelt es sich um 
 Passwörter (Text):
 
 .. image:: img/secrets3.png
@@ -47,36 +47,36 @@ Passwörter (Text):
 
 .. note::
 
-    **Secrets** können ein Ablaufdatum haben (``optional: Expire Date``). Das kann hilfreich sein
-    wenn man einem Client nur für eine beschränkte Zeit Zugriff auf eine API haben sollte.
+    **Secrets** können ein Ablaufdatum haben (``optional: Expire Date``). Das kann hilfreich sein,
+    wenn ein Client nur für eine beschränkte Zeit Zugriff auf eine API haben soll.
 
- Zu erstellen von sicheren **Secrets** kann der ``Random Secret Generator`` verwendet werden,
- der auf der Seite angeboten wird:
+Zum Erstellen von sicheren **Secrets** kann der ``Random Secret Generator`` verwendet werden,
+der auf der Seite angeboten wird:
 
 .. image:: img/secrets4.png
     :width: 320
 
-Ein so erzeugtes Passwort, kann aus dem Textfeld kopiert und in der Eingabemaske für ein 
+Ein so erzeugtes Passwort kann aus dem Textfeld kopiert und in der Eingabemaske für ein 
 ``Shared Secret`` eingefügt werden.
 
 X509 Certificate
 ----------------
 
-**Clients** können auch über Zertifikate abgesichert werden. Dazu können die vorherigen Abschnitt
-beschriebenen selbst-signierten Zertifikate verwendet werden.
+**Clients** können auch über Zertifikate abgesichert werden. Dazu können die im vorherigen Abschnitt
+beschriebenen selbstsignierten Zertifikate verwendet werden.
 
-Zu Absichern des **Clients** über ein Zertifikat sind folgende Files notwendig:
+Zum Absichern des **Clients** über ein Zertifikat sind folgende Dateien notwendig:
 
-* **PFX Datei:** Beinhalte öffentlich und privaten Schlüssel und kann optional mit einem 
-  Passwort geschützt sein. Dieses Zertifikat verwendet der **Client** um einen 
-  *AccessToken* abzuholen.
+* **PFX-Datei:** Enthält den öffentlichen und privaten Schlüssel und kann optional mit einem 
+  Passwort geschützt sein. Dieses Zertifikat verwendet der **Client**, um ein 
+  *AccessToken* abzurufen.
 
-* **CRT Datei:** Öffentlich Schlüssel (Text Format). Dieses Zertifikat wird am 
+* **CRT-Datei:** Öffentlicher Schlüssel (Textformat). Dieses Zertifikat wird am 
   *IdentityServerNET* als **Secret** hinterlegt.
 
 .. image:: img/secrets5.png
 
-Das *CRT-File* muss mit einem Text Editor geöffnet werden und der Inhalt in die Eingabemaske
+Die *CRT-Datei* muss mit einem Texteditor geöffnet werden und der Inhalt in die Eingabemaske
 kopiert werden. Als Typ für das **Secret** muss ``X509 Certificate (.crt)`` eingestellt werden.
 
 Zugriff vom Client
@@ -88,8 +88,8 @@ Ein **Client** muss zuerst das Zertifikat auslesen:
 
     var cert = new X509Certificate2(@"my-api-client-secret.pfx", "password");
 
-Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket 
-``IdentityServerNET.Clients`` anstelle es *Shared Secrets* übergeben werden.
+Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **NuGet**-Paket 
+``IdentityServerNET.Clients`` anstelle eines *Shared Secrets* übergeben werden.
 
 .. code:: csharp
 
@@ -101,35 +101,35 @@ Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket
 Secrets Vault
 -------------
 
-Im **Secrets Vault** (siehe vorheriger Abschnitt), können **Secrets** zentral gespeichert werden.
-Die **Secrets** kann ein berechtigter **Client** über die **Secret Value API** abholen.
+Im **Secrets Vault** (siehe vorheriger Abschnitt) können **Secrets** zentral gespeichert werden.
+Berechtigte **Clients** können **Secrets** über die **Secret Value API** abrufen.
 
-Damit die **Secrets** nicht an mehreren Stellen gepflegt werden müssen, können **Secrets** für
-**Clients** auf direkt auf das **Secrets Vault** verweisen. Ändert man ein **Secret** im 
-**Secrets Vault** muss es noch einmal im bei den **Secrets** für den **Client** verändert werden.
+Damit **Secrets** nicht an mehreren Stellen gepflegt werden müssen, können **Secrets** für
+**Clients** direkt auf das **Secrets Vault** verweisen. Ändert man ein **Secret** im 
+**Secrets Vault**, muss es nicht erneut bei den **Secrets** für den **Client** angepasst werden.
 
-Anstelle des eigentlich **Secrets** wird der *Pfad* des **Secrets** im **Secrets Vault** eingetragen:
+Anstelle des eigentlichen **Secrets** wird der *Pfad* des **Secrets** im **Secrets Vault** eingetragen:
 
 .. image:: img/secrets6.png
 
 Um den Pfad für ein Secret herauszufinden, wechselt man als Administrator ins
 **Secrets Vault** und klickt auf die entsprechende Version eines **Secrets**. Im Browser
-wird ein JSON angezeigt, in dem auch der korrekte Pfad für das **Secret** aufgezeigt wird:
+wird ein JSON angezeigt, in dem auch der korrekte Pfad für das **Secret** zu sehen ist:
 
 .. image:: img/secrets7.png
 
 .. note::
 
-    Als Pfad kann eine bestimmte Version, oder die letzte erstelle Version des Secrets herangezogen
-    werden. Dafür muss im Pfad einfach die Version weggelassen werden, zb: 
-    ``my-api-locker/db-donnectionstring``
+    Als Pfad kann eine bestimmte Version oder die letzte erstellte Version des Secrets verwendet
+    werden. Dafür muss im Pfad die Versionsnummer einfach weggelassen werden, z. B.: 
+    ``my-api-locker/db-connectionstring``
 
-Zugriff von Client
+Zugriff vom Client
 ++++++++++++++++++
 
 Der Zugriff auf das **Secrets Vault** wurde schon im Kapitel *Secrets Vault* beschrieben. 
-Hier noch einmal das Beispiel mit der Annahme, dass der **API Client** für die
-**Secrets Vault API** mit eine Zertifikat abgesichert wurde.
+Hier noch einmal das Beispiel, mit der Annahme, dass der **API Client** für die
+**Secrets Vault API** mit einem Zertifikat abgesichert wurde.
 
 Ein **Client** muss zuerst das Zertifikat auslesen:
 
@@ -137,8 +137,8 @@ Ein **Client** muss zuerst das Zertifikat auslesen:
 
     var cert = new X509Certificate2(@"my-api-client-secret.pfx", "password");
 
-Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket 
-``IdentityServerNET.Clients`` anstelle es *Shared Secrets* übergeben werden.
+Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **NuGet**-Paket 
+``IdentityServerNET.Clients`` anstelle eines *Shared Secrets* übergeben werden.
 
 .. code:: csharp
 
@@ -146,20 +146,20 @@ Dieses Zertifikat kann dann an unterschiedliche Methoden aus dem **nuget** Paket
     await secretsVaultClient.OpenLocker("https://localhost:44300", "my-api-locker");
     var secretResponse = await secretsVaultClient.GetSecret("db-connectionstring");
 
-    Console.WriteLine(secretResponse.GetValue())
+    Console.WriteLine(secretResponse.GetValue());
 
-Auf diese Weise kann eine **Client Anwendung** geschrieben werden, bei der in der Konfiguration
-keine Sensiblen Daten gespeichert werden müssen. Alle **Secrets** werden im **Secrets Vault**
-gespeichert. Das einzige Geheimnis das für den Client noch notwendig ist, ist das optionale
-Passwort für das Zertifikat (Kann theoretisch *hard coded* implementiert werden). 
+Auf diese Weise kann eine **Client-Anwendung** entwickelt werden, in deren Konfiguration
+keine sensiblen Daten gespeichert werden müssen. Alle **Secrets** werden im **Secrets Vault**
+gespeichert. Das einzige Geheimnis, das für den Client noch notwendig ist, ist das optionale
+Passwort für das Zertifikat (dies kann theoretisch hart codiert werden).
 
-Das Zertifikat kann regelmäßig ausgetauscht werden, dazu sind dann mehrere Schritte notwendig:
+Das Zertifikat kann regelmäßig ausgetauscht werden. Dafür sind folgende Schritte notwendig:
 
 * Neues Zertifikat erstellen (eventuell mit dem gleichen Passwort)
 
-* Für **Secrets Vault Client** den Inhalt des neuen CRT-File eintragen
+* Für **Secrets Vault Client** den Inhalt der neuen CRT-Datei eintragen
 
-* Für die **Client Anwendung** das neue PFX-File aktualisieren
+* Für die **Client-Anwendung** das neue PFX-File aktualisieren
 
 
 
