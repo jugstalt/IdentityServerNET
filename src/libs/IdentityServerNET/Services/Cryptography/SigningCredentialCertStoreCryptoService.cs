@@ -117,7 +117,9 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
     private PasswordBytes PasswordFromCert(X509Certificate2 cert)
     {
         // Generate some Password for eg Token Encryption now to improve performace
-        var hash = new SHA1Managed().ComputeHash(cert.GetPublicKey());
+        //var hash = new SHA1Managed().ComputeHash(cert.GetPublicKey());
+        using var sha1 = SHA1.Create();
+        var hash = sha1.ComputeHash(cert.GetPublicKey());
         hash = cert.GetRSAPrivateKey().SignHash(hash, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
 
         var password = new byte[128];
@@ -145,8 +147,10 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
 
     static private byte[] GetRandomBytes(int size)
     {
-        byte[] ba = new byte[size];
-        RNGCryptoServiceProvider.Create().GetBytes(ba);
+        //byte[] ba = new byte[size];
+        //RNGCryptoServiceProvider.Create().GetBytes(ba);
+
+        byte[] ba = RandomNumberGenerator.GetBytes(size);
         return ba;
     }
 
@@ -166,7 +170,7 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
         Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
 
         byte[] saltBytes = salt;
-        var key = new Rfc2898DeriveBytes(hash, g1, 10); // 10 is enough for this...
+        var key = new Rfc2898DeriveBytes(hash, g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
         ret = key.GetBytes(size);
 
         return ret;
@@ -180,7 +184,7 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
 
         using (MemoryStream ms = new MemoryStream())
         {
-            using (RijndaelManaged AES = new RijndaelManaged())
+            using (var AES = Aes.Create())
             {
                 AES.KeySize = keySize;
                 AES.BlockSize = 128;
@@ -212,7 +216,7 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
 
         using (MemoryStream ms = new MemoryStream())
         {
-            using (RijndaelManaged AES = new RijndaelManaged())
+            using (var AES = Aes.Create())
             {
                 AES.KeySize = keySize;
                 AES.BlockSize = 128;

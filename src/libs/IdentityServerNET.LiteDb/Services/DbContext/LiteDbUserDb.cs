@@ -86,7 +86,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
                 var id = collection.Insert(blob);
 
-                user.Id = id.RawValue.ToString();
+                user.Id = id.RawValue.ToString()!;
                 blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(user));
 
                 collection.Update(blob);
@@ -247,7 +247,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
         var propertyInfo = user.GetType().GetProperty(dbPropertyInfo.Name);
         if (propertyInfo != null)
         {
-            propertyInfo.SetValue(user, Convert.ChangeType(propertyValue, dbPropertyInfo.PropertyType));
+            propertyInfo.SetValue(user, Convert.ChangeType(propertyValue, dbPropertyInfo.PropertyType!));
 
             await UpdateAsync(user, cancellation);
         }
@@ -260,7 +260,7 @@ public class LiteDbUserDb : IUserDbContext, IAdminUserDbContext, IUserRoleDbCont
 
                 if (!String.IsNullOrWhiteSpace(propertyValue?.ToString()))
                 {
-                    claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()));
+                    claims.Add(new Claim(dbPropertyInfo.ClaimName, propertyValue?.ToString()!));
                 }
 
                 user.Claims = claims;

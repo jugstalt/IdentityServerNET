@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using static IdentityModel.ClaimComparer;
 
 namespace IdentityServerNET.Services.Cryptography;
 
@@ -57,20 +58,20 @@ public class DefaultCryptoService : ICryptoService
                 encoding = DefaultEncoding;
             }
 
-            var inputbuffer = Encoding.UTF8.GetBytes(text);
+            var inputBuffer = Encoding.UTF8.GetBytes(text);
 
             SymmetricAlgorithm algorithm = System.Security.Cryptography.TripleDES.Create();
             ICryptoTransform transform = algorithm.CreateEncryptor(passwordBytes, _static_iv);
 
-            var outputBuffer = transform.TransformFinalBlock(inputbuffer.ToArray(), 0, inputbuffer.Length);
+            var outputBuffer = transform.TransformFinalBlock(inputBuffer.ToArray(), 0, inputBuffer.Length);
 
             string result = String.Empty;
 
             return Convert.ToBase64String(outputBuffer);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            throw ex;
+            throw;
         }
     }
 
@@ -205,16 +206,16 @@ public class DefaultCryptoService : ICryptoService
             // Add Random Salt in front -> two ident objects will produce differnt results
             // Remove the Bytes after decryption
             byte[] randomSalt = GetRandomBytes();
-            byte[] bytesToEncrpytWidhSalt = new byte[randomSalt.Length + bytesToBeEncrypted.Length];
-            Buffer.BlockCopy(randomSalt, 0, bytesToEncrpytWidhSalt, 0, randomSalt.Length);
-            Buffer.BlockCopy(bytesToBeEncrypted, 0, bytesToEncrpytWidhSalt, randomSalt.Length, bytesToBeEncrypted.Length);
+            byte[] bytesToEncrpytWithSalt = new byte[randomSalt.Length + bytesToBeEncrypted.Length];
+            Buffer.BlockCopy(randomSalt, 0, bytesToEncrpytWithSalt, 0, randomSalt.Length);
+            Buffer.BlockCopy(bytesToBeEncrypted, 0, bytesToEncrpytWithSalt, randomSalt.Length, bytesToBeEncrypted.Length);
 
-            bytesToBeEncrypted = bytesToEncrpytWidhSalt;
+            bytesToBeEncrypted = bytesToEncrpytWithSalt;
         }
 
         using (MemoryStream ms = new MemoryStream())
         {
-            using (RijndaelManaged AES = new RijndaelManaged())
+            using (var AES = Aes.Create())
             {
                 AES.KeySize = keySize;
                 AES.BlockSize = 128;
@@ -246,7 +247,7 @@ public class DefaultCryptoService : ICryptoService
 
         using (MemoryStream ms = new MemoryStream())
         {
-            using (RijndaelManaged AES = new RijndaelManaged())
+            using (var AES = Aes.Create())
             {
                 AES.KeySize = keySize;
                 AES.BlockSize = 128;
@@ -281,8 +282,10 @@ public class DefaultCryptoService : ICryptoService
 
     static private byte[] GetRandomBytes()
     {
-        byte[] ba = new byte[_saltSize];
-        RNGCryptoServiceProvider.Create().GetBytes(ba);
+        //byte[] ba = new byte[_saltSize];
+        //RNGCryptoServiceProvider.Create().GetBytes(ba);
+
+        byte[] ba = RandomNumberGenerator.GetBytes(_saltSize);
         return ba;
     }
 
@@ -297,13 +300,14 @@ public class DefaultCryptoService : ICryptoService
     private static byte[] _g1 = new Guid("956F94BF45B44609B243A0B744DFFBE3").ToByteArray();
     static private byte[] GetHashedBytes(byte[] initialBytes, int size, byte[] salt, byte[] g1)
     {
-        var hash = SHA256.Create().ComputeHash(initialBytes);
+        using var sha256 = SHA256.Create();
+        var hash = sha256.ComputeHash(initialBytes);
 
         var ret = new byte[size];
         Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
 
         byte[] saltBytes = salt ?? new byte[] { 167, 123, 23, 12, 64, 198, 177, 114 };
-        var key = new Rfc2898DeriveBytes(hash, g1 ?? _g1, 10); // 10 is enough for this...
+        var key = new Rfc2898DeriveBytes(hash, g1 ?? _g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
         ret = key.GetBytes(size);
 
         return ret;

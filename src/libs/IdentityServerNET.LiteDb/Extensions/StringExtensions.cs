@@ -9,7 +9,7 @@ internal static class StringExtensions
         }
 
         FileInfo fileInfo = new FileInfo(dbPath);
-        if (!fileInfo.Directory.Exists)
+        if (fileInfo.Directory?.Exists == false)
         {
             fileInfo.Directory.Create();
         }
