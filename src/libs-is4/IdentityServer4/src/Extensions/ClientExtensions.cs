@@ -55,7 +55,8 @@ public static class ClientExtensions
     {
         return secrets
             .Where(s => s.Type == IdentityServerConstants.SecretTypes.X509CertificateBase64)
-            .Select(s => new X509Certificate2(Convert.FromBase64String(s.Value)))
+            //.Select(s => new X509Certificate2(Convert.FromBase64String(s.Value)))
+            .Select(s => X509CertificateLoader.LoadCertificate(Convert.FromBase64String(s.Value)))
             .Where(c => c != null)
             .ToList();
     }

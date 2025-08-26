@@ -66,7 +66,7 @@ public class LiteDbRoleDb : IRoleDbContext, IAdminRoleDbContext
 
             var id = collection.Insert(blob);
 
-            role.Id = id.RawValue.ToString();
+            role.Id = id.RawValue.ToString()!;
             blob.BlobData = _cryptoService.EncryptText(_blobSerializer.SerializeObject(role));
 
             collection.Update(blob);

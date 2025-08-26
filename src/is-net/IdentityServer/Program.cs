@@ -389,6 +389,7 @@ if (builder.Configuration["IdentityServer:UseHttpsRedirection"] != "false")
 
 app.UseForwardedHeaders();
 
+app.UseIdentityServerAppBasePath();
 app.UseStaticFiles();
 app.UseRouting();
 
