@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
 	  <LangVersion>12</LangVersion>
-	  <Version>5.25.3401</Version>
+	  <Version>6.25.4701</Version>
   </PropertyGroup>
 
   <ItemGroup>

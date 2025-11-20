@@ -2,7 +2,6 @@
 
 using IdentityServer4.Models;
 using IdentityServerNET.Models.IdentityServerWrappers;
-using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,9 +45,12 @@ internal static class ClientModelExtensions
                     IdentityServer4.IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServer4.IdentityServerConstants.StandardScopes.Profile
                 };
-                if (apiScopes is not null)
+                if (apiScopes?.Any() == true)
                 {
-                    client.AllowedScopes.AddRange(apiScopes);
+                    foreach(var apiScope in apiScopes)
+                    {
+                       client.AllowedScopes.Add(apiScope);
+                    }
                 }
                 break;
             case ClientTemplateType.WebApplication:
@@ -64,9 +66,12 @@ internal static class ClientModelExtensions
                     IdentityServer4.IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServer4.IdentityServerConstants.StandardScopes.Profile
                 };
-                if (apiScopes is not null)
+                if (apiScopes?.Any() == true)
                 {
-                    client.AllowedScopes.AddRange(apiScopes);
+                    foreach(var apiScope in apiScopes)
+                    {
+                       client.AllowedScopes.Add(apiScope);
+                    }
                 }
 
                 if (!String.IsNullOrWhiteSpace(clientUrl))

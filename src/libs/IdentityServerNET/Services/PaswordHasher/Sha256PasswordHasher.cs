@@ -1,4 +1,4 @@
-﻿using IdentityModel;
+﻿using Duende.IdentityModel;
 using IdentityServerNET.Models;
 
 namespace IdentityServerNET.Services.PasswordHasher;

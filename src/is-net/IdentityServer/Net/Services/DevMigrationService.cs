@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-using IdentityModel;
+using Duende.IdentityModel;
 using IdentityServer4.Stores;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Extensions;

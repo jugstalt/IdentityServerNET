@@ -1,4 +1,4 @@
-﻿using IdentityModel.Client;
+﻿using Duende.IdentityModel.Client;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;

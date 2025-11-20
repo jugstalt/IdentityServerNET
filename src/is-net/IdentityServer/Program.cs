@@ -1,4 +1,4 @@
-using IdentityServer.Net.Extensions.DependencyInjection;
+﻿using IdentityServer.Net.Extensions.DependencyInjection;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -233,7 +233,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
         ForwardedHeaders.XForwardedFor | 
         ForwardedHeaders.XForwardedProto | 
         ForwardedHeaders.XForwardedHost;
-    options.KnownNetworks.Clear();
+    // obsolote: https://aka.ms/aspnet/deprecate/005
+    //options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
