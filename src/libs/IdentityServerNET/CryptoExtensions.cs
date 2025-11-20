@@ -1,4 +1,4 @@
-﻿using IdentityModel;
+﻿using Duende.IdentityModel;
 using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Services.Cryptography;
 using System;

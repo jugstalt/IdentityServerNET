@@ -166,12 +166,19 @@ public class SigningCredentialCertStoreCryptoService : ICryptoService
     {
         var hash = SHA256.Create().ComputeHash(initialBytes);
 
-        var ret = new byte[size];
-        Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
+        //var ret = new byte[size];
+        //Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
 
-        byte[] saltBytes = salt;
-        var key = new Rfc2898DeriveBytes(hash, g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
-        ret = key.GetBytes(size);
+        //byte[] saltBytes = salt;
+        //var key = new Rfc2898DeriveBytes(hash, g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
+        //ret = key.GetBytes(size);
+
+        var ret = Rfc2898DeriveBytes.Pbkdf2(
+            hash,
+            g1, 10,
+            hashAlgorithm: HashAlgorithmName.SHA1,
+            outputLength: size
+            );
 
         return ret;
     }

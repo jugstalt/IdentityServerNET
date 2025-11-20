@@ -1,4 +1,4 @@
-using IdentityModel;
+﻿using Duende.IdentityModel;
 using IdentityServer4.Models;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Exceptions;

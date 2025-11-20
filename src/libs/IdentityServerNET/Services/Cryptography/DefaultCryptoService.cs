@@ -7,7 +7,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using static IdentityModel.ClaimComparer;
 
 namespace IdentityServerNET.Services.Cryptography;
 
@@ -303,12 +302,19 @@ public class DefaultCryptoService : ICryptoService
         using var sha256 = SHA256.Create();
         var hash = sha256.ComputeHash(initialBytes);
 
-        var ret = new byte[size];
-        Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
+        //var ret = new byte[size];
+        //Buffer.BlockCopy(hash, 0, ret, 0, Math.Min(hash.Length, ret.Length));
 
-        byte[] saltBytes = salt ?? new byte[] { 167, 123, 23, 12, 64, 198, 177, 114 };
-        var key = new Rfc2898DeriveBytes(hash, g1 ?? _g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
-        ret = key.GetBytes(size);
+        //byte[] saltBytes = salt ?? new byte[] { 167, 123, 23, 12, 64, 198, 177, 114 };
+        //var key = new Rfc2898DeriveBytes(hash, g1 ?? _g1, 10, hashAlgorithm: HashAlgorithmName.SHA1); // 10 is enough for this...
+        //ret = key.GetBytes(size);
+
+        var ret = Rfc2898DeriveBytes.Pbkdf2(
+            hash,
+            g1 ?? _g1,
+            10, // 10 is enough for this...
+            hashAlgorithm: HashAlgorithmName.SHA1,
+            outputLength: size);
 
         return ret;
     }

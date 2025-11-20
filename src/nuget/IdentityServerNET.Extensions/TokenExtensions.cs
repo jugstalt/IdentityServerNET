@@ -1,4 +1,4 @@
-﻿//using IdentityModel;
+﻿//using Duende.IdentityModel;
 //using IdentityModel.Client;
 //using IdentityServerNET.Token.ErrorHandling;
 //using Newtonsoft.Json;
