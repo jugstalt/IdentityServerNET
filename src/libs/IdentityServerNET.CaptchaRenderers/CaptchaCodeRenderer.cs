@@ -76,10 +76,11 @@ public class CaptchaCodeRenderer : ICaptchaCodeRenderer
         int fontSize = GetFontSize(width, captchaCode.Length);
 
         using (SKPaint paint = new SKPaint())
+        using (SKFont font = new SKFont())
         {
             paint.IsAntialias = true;
-            paint.TextSize = fontSize;
-            paint.Typeface = SKTypeface.FromFamilyName("Serif", SKFontStyle.Bold);
+            font.Size = fontSize;
+            font.Typeface = SKTypeface.FromFamilyName("Serif", SKFontStyle.Bold);
 
             for (int i = 0; i < captchaCode.Length; i++)
             {
@@ -90,7 +91,7 @@ public class CaptchaCodeRenderer : ICaptchaCodeRenderer
                 int maxY = height - fontSize;
                 float y = rand.Next(0, maxY > 0 ? maxY : 0);
 
-                canvas.DrawText(captchaCode[i].ToString(), x, y + fontSize - fontSize / 8, paint);
+                canvas.DrawText(captchaCode[i].ToString(), x, y + fontSize - fontSize / 8, font, paint);
             }
         }
     }
