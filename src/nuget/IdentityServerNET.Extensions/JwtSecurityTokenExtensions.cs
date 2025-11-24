@@ -99,7 +99,7 @@ static public class JwtSecurityTokenExtensions
                 new Claim(JwtClaimTypes.Subject, clientId),
                 new Claim(
                     JwtClaimTypes.IssuedAt,
-                    now.ToEpochTime().ToString(),  // obsolete
+                    //now.ToEpochTime().ToString(),  // obsolete
                     DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                     ClaimValueTypes.Integer64)
             },
