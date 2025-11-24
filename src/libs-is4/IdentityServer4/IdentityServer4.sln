@@ -17,12 +17,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.IntegrationT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer4.Storage", "..\Storage\src\IdentityServer4.Storage.csproj", "{EF3859D7-8419-4CB0-BEDE-FEE05569386D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\..\..\build\_build.csproj", "{8D89A199-986D-4537-8651-664AF5D8DD3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D89A199-986D-4537-8651-664AF5D8DD3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D89A199-986D-4537-8651-664AF5D8DD3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{407C030E-60E6-41F7-AF43-0AC48EDCC17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{407C030E-60E6-41F7-AF43-0AC48EDCC17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{407C030E-60E6-41F7-AF43-0AC48EDCC17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
