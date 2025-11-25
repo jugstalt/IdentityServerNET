@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IdentityServerNET.Abstractions\IdentityServerNET.Abstractions.csproj" />
     <ProjectReference Include="..\IdentityServerNET\IdentityServerNET.csproj" />
   </ItemGroup>
 
