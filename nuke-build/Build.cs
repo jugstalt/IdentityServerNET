@@ -64,7 +64,6 @@ class Build : NukeBuild
                 .SetProjectFile(RootDirectory / "src" / "is-net" / "IdentityServer" / "IdentityServer.csproj")
                 .SetConfiguration(Configuration)
                 .SetProperty("DeployOnBuild", "true")
-                //.SetOutputDirectory(RootDirectory / "publish" / Platform / "cms" / "artifacts")
                 .SetPublishProfile(Platform)
                 .SetRuntime(Platform)
                 //.EnableNoRestore()
