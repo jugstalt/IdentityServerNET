@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\libs\IdentityServerNET.Models\IdentityServerNET.Models.csproj" />
     <ProjectReference Include="..\src\nuget\IdentityServerNET.Extensions\IdentityServerNET.Extensions.csproj" />
   </ItemGroup>
 
