@@ -5,6 +5,7 @@
 using Duende.IdentityModel;
 using IdentityServer4.Extensions;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -145,6 +146,6 @@ public static class ValidatedAuthorizeRequestExtensions
             hash = sha.ComputeHash(bytes);
         }
 
-        return Base64Url.Encode(hash) + "." + salt;
+        return Base64Url.EncodeToString(hash) + "." + salt;
     }
 }

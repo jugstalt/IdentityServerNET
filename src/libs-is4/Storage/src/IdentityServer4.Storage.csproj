@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-		<PackageReference Include="Duende.IdentityModel" Version="7.1.0" />
+		<PackageReference Include="Duende.IdentityModel" Version="8.0.0" />
 		<!--<PackageReference Include="IdentityModel" Version="7.0.0" /> -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="10.0.200" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
