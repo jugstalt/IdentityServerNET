@@ -68,7 +68,7 @@ static public class ServiceCollectionExtensions
 
         // Default PasswordHasher (override aspnet core defaults)
         // for custom Hashers override this with ConfigureCustomStartup
-        services.AddTransient<IPasswordHasher<ApplicationUser>, Sha512PasswordHasher>();
+        services.AddTransient<IPasswordHasher<ApplicationUser>, SecurePasswordHasher>();
 
         #region Add ExportClientDbContext (optional)
 
