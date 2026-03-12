@@ -13,6 +13,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -788,7 +789,7 @@ internal class TokenRequestValidator : ITokenRequestValidator
 
         var codeVerifierBytes = Encoding.ASCII.GetBytes(codeVerifier);
         var hashedBytes = codeVerifierBytes.Sha256();
-        var transformedCodeVerifier = Base64Url.Encode(hashedBytes);
+        var transformedCodeVerifier = Base64Url.EncodeToString(hashedBytes);
 
         return TimeConstantComparer.IsEqual(transformedCodeVerifier.Sha256(), codeChallenge);
     }

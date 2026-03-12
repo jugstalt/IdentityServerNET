@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Buffers.Text;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
@@ -101,7 +102,7 @@ public class DefaultTokenCreationService : ITokenCreationService
                 Logger.LogWarning("Certificate {subjectName} has expired on {expiration}", cert.Subject, cert.NotAfter.ToString(CultureInfo.InvariantCulture));
             }
 
-            header["x5t"] = Base64Url.Encode(cert.GetCertHash());
+            header["x5t"] = Base64Url.EncodeToString(cert.GetCertHash());
         }
 
         if (token.Type == TokenTypes.AccessToken)

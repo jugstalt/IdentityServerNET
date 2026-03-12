@@ -4,7 +4,7 @@
       <TargetFramework>net10.0</TargetFramework>
       <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
-	  <Version>6.25.4801</Version>
+	  <Version>6.26.1101</Version>
 	  <Copyright>2025, Jürgen Gstaltmaier</Copyright>
 	  <PackageProjectUrl>https://github.com/jugstalt/identityservernet</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/jugstalt/identityservernet</RepositoryUrl>

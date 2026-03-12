@@ -4,6 +4,7 @@
 
 using Duende.IdentityModel;
 using IdentityServer4.Extensions;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -93,7 +94,7 @@ public class ConsentRequest
                 var bytes = Encoding.UTF8.GetBytes(value);
                 var hash = sha.ComputeHash(bytes);
 
-                return Base64Url.Encode(hash);
+                return Base64Url.EncodeToString(hash);
             }
         }
     }

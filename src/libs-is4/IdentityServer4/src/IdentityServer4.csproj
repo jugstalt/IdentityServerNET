@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Duende.IdentityModel" Version="7.1.0" />
+    <PackageReference Include="Duende.IdentityModel" Version="8.0.0" />
     <!--<PackageReference Include="IdentityModel" Version="7.0.0" /> -->
 		
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.16.0" />
