@@ -17,12 +17,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="xunit" Version="2.8.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\libs\IdentityServerNET\IdentityServerNET.csproj" />
-    <ProjectReference Include="..\..\src\libs-is4\IdentityServer4\src\IdentityServer4.csproj" />
+    <ProjectReference Include="..\..\src\is-net\IdentityServer\IdentityServer.csproj" />
   </ItemGroup>
 
 </Project>

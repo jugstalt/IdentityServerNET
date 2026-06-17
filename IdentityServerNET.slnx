@@ -40,6 +40,7 @@
   </Folder>
   <Folder Name="/src/tests/" />
   <Folder Name="/test/">
+    <Project Path="test/IdentityServerNET.Host.Tests/IdentityServerNET.Host.Tests.csproj" />
     <Project Path="test/IdentityServerNET.Models.Tests/IdentityServerNET.Models.Tests.csproj" />
     <Project Path="test/IdentityServerNET.Tests/IdentityServerNET.Tests.csproj" />
   </Folder>

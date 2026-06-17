@@ -426,3 +426,8 @@ app.MapControllerRoute(
 //});
 
 app.Run();
+
+// Exposes the implicitly-generated Program class so the integration-test project
+// (IdentityServerNET.Host.Tests) can boot the real host in-memory via
+// WebApplicationFactory<Program>. This declaration carries no behavior.
+public partial class Program { }
