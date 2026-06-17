@@ -9,6 +9,7 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -48,8 +49,37 @@ class Build : NukeBuild
 
     Target Test => _ => _
         .Before(Compile)
+        .DependsOn(Restore)
         .Executes(() =>
         {
+            Log.Information($"Running tests for IdentityServer.Net {Version}");
+
+            var testProjects = new List<AbsolutePath>
+            {
+                RootDirectory / "test" / "IdentityServerNET.Tests" / "IdentityServerNET.Tests.csproj",
+                RootDirectory / "test" / "IdentityServerNET.Models.Tests" / "IdentityServerNET.Models.Tests.csproj",
+            };
+
+            // The host integration tests boot the real host, which depends on
+            // Microsoft.Windows.Compatibility and is therefore Windows-only. Skip them when
+            // deploying from a non-Windows agent (e.g. the linux-x64 docker build).
+            if (SystemInfo.IsWindows)
+            {
+                testProjects.Add(RootDirectory / "test" / "IdentityServerNET.Host.Tests" / "IdentityServerNET.Host.Tests.csproj");
+            }
+            else
+            {
+                Log.Information("Skipping IdentityServerNET.Host.Tests on non-Windows platform.");
+            }
+
+            foreach (var testProject in testProjects)
+            {
+                Log.Information($"Testing {testProject}");
+
+                DotNetTasks.DotNetTest(s => s
+                    .SetProjectFile(testProject)
+                    .SetConfiguration(Configuration));
+            }
         });
 
     Target Compile => _ => _
