@@ -218,6 +218,12 @@ public class JwtRequestValidator
                     case JArray jarr:
                         payload.Add(key, jarr.ToString(Formatting.None));
                         break;
+                    // System.IdentityModel.Tokens.Jwt 8.x exposes complex JSON claims as
+                    // System.Text.Json.JsonElement instead of Newtonsoft JObject/JArray.
+                    case System.Text.Json.JsonElement je when je.ValueKind == System.Text.Json.JsonValueKind.Object
+                                                           || je.ValueKind == System.Text.Json.JsonValueKind.Array:
+                        payload.Add(key, je.GetRawText());
+                        break;
                 }
             }
         }

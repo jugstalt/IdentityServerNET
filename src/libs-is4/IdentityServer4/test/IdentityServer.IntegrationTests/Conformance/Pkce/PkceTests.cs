@@ -2,18 +2,31 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using System.Buffers.Text;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Buffers.Text;
 using System.Security.Claims;
+using System.Buffers.Text;
 using System.Text;
+using System.Buffers.Text;
 using System.Threading.Tasks;
+using System.Buffers.Text;
 using FluentAssertions;
-using IdentityModel;
-using IdentityModel.Client;
+using System.Buffers.Text;
+using Duende.IdentityModel;
+using System.Buffers.Text;
+using Duende.IdentityModel.Client;
+using System.Buffers.Text;
 using IdentityServer.IntegrationTests.Common;
+using System.Buffers.Text;
 using IdentityServer4;
+using System.Buffers.Text;
 using IdentityServer4.Models;
+using System.Buffers.Text;
 using IdentityServer4.Test;
+using System.Buffers.Text;
 using Xunit;
 
 namespace IdentityServer.IntegrationTests.Conformance.Pkce
@@ -534,7 +547,7 @@ namespace IdentityServer.IntegrationTests.Conformance.Pkce
         {
             var codeVerifierBytes = Encoding.ASCII.GetBytes(codeVerifier);
             var hashedBytes = codeVerifierBytes.Sha256();
-            var transformedCodeVerifier = Base64Url.Encode(hashedBytes);
+            var transformedCodeVerifier = Base64Url.EncodeToString(hashedBytes);
 
             return transformedCodeVerifier;
         }

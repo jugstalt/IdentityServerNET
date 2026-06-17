@@ -58,6 +58,8 @@ class Build : NukeBuild
             {
                 RootDirectory / "test" / "IdentityServerNET.Tests" / "IdentityServerNET.Tests.csproj",
                 RootDirectory / "test" / "IdentityServerNET.Models.Tests" / "IdentityServerNET.Models.Tests.csproj",
+                // Vendored IdentityServer4 integration/conformance suite (OpenID/OAuth2 standards safety net).
+                RootDirectory / "src" / "libs-is4" / "IdentityServer4" / "test" / "IdentityServer.IntegrationTests" / "IdentityServer.IntegrationTests.csproj",
             };
 
             // The host integration tests boot the real host, which depends on

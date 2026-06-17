@@ -82,7 +82,7 @@ namespace IdentityServer.IntegrationTests.Conformance.Basic
             var response = await _mockPipeline.BrowserClient.GetAsync(url);
             response.StatusCode.Should().Be(HttpStatusCode.Found);
 
-            var authorization = new IdentityModel.Client.AuthorizeResponse(response.Headers.Location.ToString());
+            var authorization = new Duende.IdentityModel.Client.AuthorizeResponse(response.Headers.Location.ToString());
             authorization.IsError.Should().BeFalse();
             authorization.Code.Should().NotBeNull();
             authorization.State.Should().Be(state);
@@ -100,13 +100,15 @@ namespace IdentityServer.IntegrationTests.Conformance.Basic
             var state = Guid.NewGuid().ToString();
             var nonce = Guid.NewGuid().ToString();
 
-            var url = _mockPipeline.CreateAuthorizeUrl(
-                clientId: "code_client",
-                responseType: null, // missing
-                scope: "openid",
-                redirectUri: "https://code_client/callback",
-                state: state,
-                nonce: nonce);
+            // response_type is deliberately omitted to verify SERVER-side rejection.
+            // Duende.IdentityModel's RequestUrl.CreateAuthorizeUrl now validates response_type
+            // client-side and would throw, so the URL is built manually here.
+            var url = IdentityServerPipeline.AuthorizeEndpoint +
+                "?client_id=code_client" +
+                "&scope=openid" +
+                "&redirect_uri=" + Uri.EscapeDataString("https://code_client/callback") +
+                "&state=" + Uri.EscapeDataString(state) +
+                "&nonce=" + Uri.EscapeDataString(nonce);
 
             _mockPipeline.BrowserClient.AllowAutoRedirect = true;
             var response = await _mockPipeline.BrowserClient.GetAsync(url);

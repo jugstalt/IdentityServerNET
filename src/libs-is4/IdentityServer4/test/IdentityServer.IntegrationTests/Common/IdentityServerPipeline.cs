@@ -1,4 +1,4 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.Extensions;
@@ -332,8 +332,29 @@ namespace IdentityServer.IntegrationTests.Common
                 responseMode: responseMode,
                 codeChallenge: codeChallenge,
                 codeChallengeMethod: codeChallengeMethod,
-                extra: extra);
+                extra: ToParameters(extra));
             return url;
+        }
+
+        private static Parameters ToParameters(object extra)
+        {
+            if (extra == null)
+            {
+                return null;
+            }
+
+            if (extra is Parameters parameters)
+            {
+                return parameters;
+            }
+
+            var result = new Parameters();
+            foreach (var prop in extra.GetType().GetProperties())
+            {
+                result.Add(prop.Name, prop.GetValue(extra)?.ToString());
+            }
+
+            return result;
         }
 
         public AuthorizeResponse ParseAuthorizationResponseUrl(string url)

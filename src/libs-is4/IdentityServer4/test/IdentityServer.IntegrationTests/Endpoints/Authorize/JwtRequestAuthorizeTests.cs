@@ -1,4 +1,4 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using FluentAssertions;
-using IdentityModel;
+using Duende.IdentityModel;
 using IdentityServer.IntegrationTests.Common;
 using IdentityServer4;
 using IdentityServer4.Configuration;
@@ -31,7 +31,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
         private readonly IdentityServerPipeline _mockPipeline = new IdentityServerPipeline();
         private readonly Client _client;
 
-        private readonly string _symmetricJwk = @"{ 'kty': 'oct', 'use': 'sig', 'kid': '1', 'k': 'nYA-IFt8xTsdBHe9hunvizcp3Dt7f6qGqudq18kZHNtvqEGjJ9Ud-9x3kbQ-LYfLHS3xM2MpFQFg1JzT_0U_F8DI40oby4TvBDGszP664UgA8_5GjB7Flnrlsap1NlitvNpgQX3lpyTvC2zVuQ-UVsXbBDAaSBUSlnw7SE4LM8Ye2WYZrdCCXL8yAX9vIR7vf77yvNTEcBCI6y4JlvZaqMB4YKVSfygs8XqGGCHjLpE5bvI-A4ESbAUX26cVFvCeDg9pR6HK7BmwPMlO96krgtKZcXEJtUELYPys6-rbwAIdmxJxKxpgRpt0FRv_9fm6YPwG7QivYBX-vRwaodL1TA', 'alg': 'HS256'}";
+        private readonly string _symmetricJwk = @"{ ""kty"": ""oct"", ""use"": ""sig"", ""kid"": ""1"", ""k"": ""nYA-IFt8xTsdBHe9hunvizcp3Dt7f6qGqudq18kZHNtvqEGjJ9Ud-9x3kbQ-LYfLHS3xM2MpFQFg1JzT_0U_F8DI40oby4TvBDGszP664UgA8_5GjB7Flnrlsap1NlitvNpgQX3lpyTvC2zVuQ-UVsXbBDAaSBUSlnw7SE4LM8Ye2WYZrdCCXL8yAX9vIR7vf77yvNTEcBCI6y4JlvZaqMB4YKVSfygs8XqGGCHjLpE5bvI-A4ESbAUX26cVFvCeDg9pR6HK7BmwPMlO96krgtKZcXEJtUELYPys6-rbwAIdmxJxKxpgRpt0FRv_9fm6YPwG7QivYBX-vRwaodL1TA"", ""alg"": ""HS256""}";
         private readonly RsaSecurityKey _rsaKey;
 
         public JwtRequestAuthorizeTests()
@@ -69,13 +69,13 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
                         {
                             // RSA key as JWK
                             Type = IdentityServerConstants.SecretTypes.JsonWebKey,
-                            Value = JsonConvert.SerializeObject(JsonWebKeyConverter.ConvertFromRSASecurityKey(_rsaKey))
+                            Value = System.Text.Json.JsonSerializer.Serialize(JsonWebKeyConverter.ConvertFromRSASecurityKey(_rsaKey))
                         },
                         new Secret
                         {
                             // x509 cert as JWK
                             Type = IdentityServerConstants.SecretTypes.JsonWebKey,
-                            Value = JsonConvert.SerializeObject(JsonWebKeyConverter.ConvertFromX509SecurityKey(new X509SecurityKey(TestCert.Load())))
+                            Value = System.Text.Json.JsonSerializer.Serialize(JsonWebKeyConverter.ConvertFromX509SecurityKey(new X509SecurityKey(TestCert.Load())))
                         }
                     },
 
@@ -113,13 +113,13 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
                         {
                             // RSA key as JWK
                             Type = IdentityServerConstants.SecretTypes.JsonWebKey,
-                            Value = JsonConvert.SerializeObject(JsonWebKeyConverter.ConvertFromRSASecurityKey(_rsaKey))
+                            Value = System.Text.Json.JsonSerializer.Serialize(JsonWebKeyConverter.ConvertFromRSASecurityKey(_rsaKey))
                         },
                         new Secret
                         {
                             // x509 cert as JWK
                             Type = IdentityServerConstants.SecretTypes.JsonWebKey,
-                            Value = JsonConvert.SerializeObject(JsonWebKeyConverter.ConvertFromX509SecurityKey(new X509SecurityKey(TestCert.Load())))
+                            Value = System.Text.Json.JsonSerializer.Serialize(JsonWebKeyConverter.ConvertFromX509SecurityKey(new X509SecurityKey(TestCert.Load())))
                         }
                     },
 
@@ -351,13 +351,13 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
             _mockPipeline.LoginRequest.RequestObjectValues.Should().ContainKey("foo");
             _mockPipeline.LoginRequest.RequestObjectValues["foo"].Should().Be("123foo");
         }
-        
+
         [Fact]
         [Trait("Category", Category)]
         public async Task correct_jwt_typ_should_pass_strict_validation()
         {
             _mockPipeline.Options.StrictJarValidation = true;
-            
+
             var requestJwt = CreateRequestJwt(
                 issuer: _client.ClientId,
                 audience: IdentityServerPipeline.BaseUrl,

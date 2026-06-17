@@ -1,25 +1,44 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using System.Buffers.Text;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Buffers.Text;
 using System.Linq;
+using System.Buffers.Text;
 using System.Net.Http;
+using System.Buffers.Text;
 using System.Security.Claims;
+using System.Buffers.Text;
 using System.Text;
+using System.Buffers.Text;
 using System.Threading.Tasks;
+using System.Buffers.Text;
 using FluentAssertions;
-using IdentityModel;
-using IdentityModel.Client;
+using System.Buffers.Text;
+using Duende.IdentityModel;
+using System.Buffers.Text;
+using Duende.IdentityModel.Client;
+using System.Buffers.Text;
 using IdentityServer.IntegrationTests.Clients.Setup;
+using System.Buffers.Text;
 using IdentityServer.IntegrationTests.Common;
+using System.Buffers.Text;
 using Microsoft.AspNetCore.Hosting;
+using System.Buffers.Text;
 using Microsoft.AspNetCore.TestHost;
+using System.Buffers.Text;
 using Microsoft.IdentityModel.Tokens;
+using System.Buffers.Text;
 using Newtonsoft.Json;
+using System.Buffers.Text;
 using Newtonsoft.Json.Linq;
+using System.Buffers.Text;
 using Xunit;
 
 namespace IdentityServer.IntegrationTests.Clients
@@ -66,6 +85,7 @@ namespace IdentityServer.IntegrationTests.Clients
             var response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
 
                 ClientId = ClientId,
                 ClientAssertion =
@@ -88,6 +108,7 @@ namespace IdentityServer.IntegrationTests.Clients
             var response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
                 ClientId = "client",
 
                 ClientAssertion =
@@ -110,6 +131,7 @@ namespace IdentityServer.IntegrationTests.Clients
             var response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
 
                 ClientId = ClientId,
                 ClientAssertion =
@@ -122,11 +144,12 @@ namespace IdentityServer.IntegrationTests.Clients
             });
 
             AssertValidToken(response);
-            
+
             // replay
             response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
 
                 ClientId = ClientId,
                 ClientAssertion =
@@ -148,6 +171,7 @@ namespace IdentityServer.IntegrationTests.Clients
             var response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
 
                 ClientId = ClientId,
                 ClientAssertion =
@@ -173,6 +197,7 @@ namespace IdentityServer.IntegrationTests.Clients
             var response = await _client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = TokenEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
 
                 ClientId = clientId,
                 ClientAssertion =
@@ -220,7 +245,7 @@ namespace IdentityServer.IntegrationTests.Clients
         {
             var token = response.AccessToken.Split('.').Skip(1).Take(1).First();
             var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(
-                Encoding.UTF8.GetString(Base64Url.Decode(token)));
+                Encoding.UTF8.GetString(Base64Url.DecodeFromChars(token)));
 
             return dictionary;
         }
