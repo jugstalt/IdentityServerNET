@@ -23,6 +23,13 @@ public class AuthorizationCodePkceFlowTests
 {
     private const string ClientId = "code-client";
     private const string ClientSecret = "code-secret";
+    // A second confidential code client sharing the same redirect_uri. Used to prove that an
+    // authorization code issued to one client cannot be redeemed by a different client.
+    private const string OtherClientId = "code-client-2";
+    private const string OtherClientSecret = "code-secret-2";
+    // A code client that requires consent. Used to exercise the consent-denied path.
+    private const string ConsentClientId = "code-client-consent";
+    private const string ConsentClientSecret = "code-consent-secret";
     private const string RedirectUri = "https://client/callback";
     private const string SubjectId = "alice";
 
@@ -37,6 +44,30 @@ public class AuthorizationCodePkceFlowTests
             AllowedGrantTypes = GrantTypes.Code,
             RequirePkce = true,
             RequireConsent = false,
+            RedirectUris = { RedirectUri },
+            AllowedScopes = { "openid", "profile", "api" },
+            AllowOfflineAccess = true
+        });
+
+        _pipeline.Clients.Add(new Client
+        {
+            ClientId = OtherClientId,
+            ClientSecrets = { new Secret(OtherClientSecret.Sha256()) },
+            AllowedGrantTypes = GrantTypes.Code,
+            RequirePkce = true,
+            RequireConsent = false,
+            RedirectUris = { RedirectUri },
+            AllowedScopes = { "openid", "profile", "api" },
+            AllowOfflineAccess = true
+        });
+
+        _pipeline.Clients.Add(new Client
+        {
+            ClientId = ConsentClientId,
+            ClientSecrets = { new Secret(ConsentClientSecret.Sha256()) },
+            AllowedGrantTypes = GrantTypes.Code,
+            RequirePkce = true,
+            RequireConsent = true,
             RedirectUris = { RedirectUri },
             AllowedScopes = { "openid", "profile", "api" },
             AllowOfflineAccess = true
@@ -88,6 +119,75 @@ public class AuthorizationCodePkceFlowTests
         }
 
         return url;
+    }
+
+    /// <summary>
+    /// Flexible authorize-URL builder used by the security tests. Allows overriding the client,
+    /// the PKCE challenge method and adding a <c>prompt</c> value.
+    /// </summary>
+    private static string BuildAuthorizeUrl(
+        string clientId,
+        string scope,
+        string redirectUri,
+        string state,
+        string nonce,
+        string? codeChallenge,
+        string codeChallengeMethod = "S256",
+        string? prompt = null)
+    {
+        var url = $"{OidcTestPipeline.AuthorizeEndpoint}" +
+                  $"?client_id={clientId}" +
+                  $"&response_type=code" +
+                  $"&scope={Uri.EscapeDataString(scope)}" +
+                  $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
+                  $"&state={state}" +
+                  $"&nonce={nonce}";
+
+        if (codeChallenge != null)
+        {
+            url += $"&code_challenge={codeChallenge}&code_challenge_method={codeChallengeMethod}";
+        }
+
+        if (prompt != null)
+        {
+            url += $"&prompt={prompt}";
+        }
+
+        return url;
+    }
+
+    /// <summary>
+    /// Drives login + authorize for the given client and returns the issued authorization code.
+    /// </summary>
+    private async Task<string> GetAuthorizationCodeAsync(string clientId, string challenge, string scope = "openid api")
+    {
+        _pipeline.BrowserClient.AllowAutoRedirect = false;
+        var authorizeResponse = await _pipeline.BrowserClient.GetAsync(
+            BuildAuthorizeUrl(clientId, scope, RedirectUri, "state123", "nonce123", challenge));
+
+        return QueryHelpers.ParseQuery(authorizeResponse.Headers.Location!.Query)["code"].ToString();
+    }
+
+    /// <summary>POSTs an authorization_code token request and returns the raw response.</summary>
+    private Task<HttpResponseMessage> ExchangeCodeAsync(
+        string code,
+        string verifier,
+        string clientId = ClientId,
+        string clientSecret = ClientSecret,
+        string redirectUri = RedirectUri)
+    {
+        var form = new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["client_id"] = clientId,
+            ["client_secret"] = clientSecret,
+            ["code"] = code,
+            ["redirect_uri"] = redirectUri,
+            ["code_verifier"] = verifier
+        };
+
+        return _pipeline.BackChannelClient.PostAsync(
+            OidcTestPipeline.TokenEndpoint, new FormUrlEncodedContent(form));
     }
 
     [Fact]
@@ -197,5 +297,162 @@ public class AuthorizationCodePkceFlowTests
         Assert.True(_pipeline.ErrorWasCalled, "Missing code_challenge should surface on the error page.");
         Assert.NotNull(_pipeline.ErrorMessage);
         Assert.Equal("invalid_request", _pipeline.ErrorMessage!.Error);
+    }
+
+    [Fact]
+    public async Task AuthorizationCode_CanOnlyBeRedeemedOnce()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        var verifier = CreateCodeVerifier();
+        var code = await GetAuthorizationCodeAsync(ClientId, CreateCodeChallenge(verifier));
+
+        // First exchange succeeds.
+        var first = await ExchangeCodeAsync(code, verifier);
+        Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+
+        // Replaying the same code must be rejected (RFC 6749 §4.1.2: a code is single-use).
+        var second = await ExchangeCodeAsync(code, verifier);
+        Assert.Equal(HttpStatusCode.BadRequest, second.StatusCode);
+
+        using var doc = JsonDocument.Parse(await second.Content.ReadAsStringAsync());
+        Assert.Equal("invalid_grant", doc.RootElement.GetProperty("error").GetString());
+    }
+
+    [Fact]
+    public async Task AuthorizationCode_IssuedToOneClient_CannotBeRedeemedByAnother()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        var verifier = CreateCodeVerifier();
+        // Code is issued to "code-client"...
+        var code = await GetAuthorizationCodeAsync(ClientId, CreateCodeChallenge(verifier));
+
+        // ...but redeemed with the (valid) credentials of "code-client-2". The code is bound to the
+        // requesting client, so this must fail and prevents code injection across clients.
+        var response = await ExchangeCodeAsync(code, verifier, OtherClientId, OtherClientSecret);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("invalid_grant", doc.RootElement.GetProperty("error").GetString());
+    }
+
+    [Fact]
+    public async Task CodeExchange_WithMismatchedRedirectUri_IsRejected()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        var verifier = CreateCodeVerifier();
+        var code = await GetAuthorizationCodeAsync(ClientId, CreateCodeChallenge(verifier));
+
+        // The redirect_uri at the token endpoint must exactly match the one used at /authorize.
+        var response = await ExchangeCodeAsync(code, verifier, redirectUri: "https://client/other-callback");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("invalid_grant", doc.RootElement.GetProperty("error").GetString());
+    }
+
+    [Fact]
+    public async Task CodeExchange_WithoutClientSecret_IsRejected()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        var verifier = CreateCodeVerifier();
+        var code = await GetAuthorizationCodeAsync(ClientId, CreateCodeChallenge(verifier));
+
+        // A confidential client must authenticate at the token endpoint; PKCE does not replace
+        // client authentication. Omitting the secret must fail with invalid_client.
+        var response = await _pipeline.BackChannelClient.PostAsync(
+            OidcTestPipeline.TokenEndpoint,
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "authorization_code",
+                ["client_id"] = ClientId,
+                ["code"] = code,
+                ["redirect_uri"] = RedirectUri,
+                ["code_verifier"] = verifier
+            }));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("invalid_client", doc.RootElement.GetProperty("error").GetString());
+    }
+
+    [Fact]
+    public async Task Authorize_WithPlainPkceMethod_IsRejected()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        // The client does not allow plain-text PKCE, so the weaker "plain" method must be rejected
+        // (downgrade protection): only S256 is acceptable.
+        _pipeline.BrowserClient.AllowAutoRedirect = true;
+        await _pipeline.BrowserClient.GetAsync(
+            BuildAuthorizeUrl(ClientId, "openid", RedirectUri, "state123", "nonce123",
+                CreateCodeVerifier(), codeChallengeMethod: "plain"));
+
+        Assert.True(_pipeline.ErrorWasCalled, "plain PKCE method should surface on the error page.");
+        Assert.NotNull(_pipeline.ErrorMessage);
+        Assert.Equal("invalid_request", _pipeline.ErrorMessage!.Error);
+    }
+
+    [Fact]
+    public async Task Authorize_EchoesStateBackToClient()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        const string state = "xyz-csrf-state";
+        var challenge = CreateCodeChallenge(CreateCodeVerifier());
+
+        _pipeline.BrowserClient.AllowAutoRedirect = false;
+        var response = await _pipeline.BrowserClient.GetAsync(
+            BuildAuthorizeUrl(ClientId, "openid", RedirectUri, state, "nonce123", challenge));
+
+        // The state parameter must be returned verbatim so the client can defend against CSRF.
+        var query = QueryHelpers.ParseQuery(response.Headers.Location!.Query);
+        Assert.Equal(state, query["state"]);
+    }
+
+    [Fact]
+    public async Task Authorize_WithPromptNone_AndNoSession_ReturnsLoginRequired()
+    {
+        // No LoginAsync -> there is no authenticated session. With prompt=none the server must not
+        // show any UI; instead it returns the login_required error back to the client.
+        var challenge = CreateCodeChallenge(CreateCodeVerifier());
+
+        _pipeline.BrowserClient.AllowAutoRedirect = true;
+        var response = await _pipeline.BrowserClient.GetAsync(
+            BuildAuthorizeUrl(ClientId, "openid", RedirectUri, "state123", "nonce123", challenge, prompt: "none"));
+
+        // login_required is a "safe" error, so it is redirected to the (registered) client callback,
+        // which has no route on the test host and therefore yields a 404 on the final hop.
+        var finalUri = response.RequestMessage!.RequestUri!;
+        Assert.StartsWith(RedirectUri, finalUri.GetLeftPart(UriPartial.Path));
+        Assert.Equal("login_required", QueryHelpers.ParseQuery(finalUri.Query)["error"]);
+        Assert.False(_pipeline.LoginWasCalled, "prompt=none must not trigger the login UI.");
+    }
+
+    [Fact]
+    public async Task Authorize_WhenConsentIsDenied_ReturnsAccessDenied()
+    {
+        await _pipeline.LoginAsync(SubjectId);
+
+        // The user is asked for consent (RequireConsent=true) and denies it.
+        _pipeline.ConsentResponse = new ConsentResponse { Error = AuthorizationError.AccessDenied };
+
+        var challenge = CreateCodeChallenge(CreateCodeVerifier());
+
+        _pipeline.BrowserClient.AllowAutoRedirect = true;
+        var response = await _pipeline.BrowserClient.GetAsync(
+            BuildAuthorizeUrl(ConsentClientId, "openid api", RedirectUri, "state123", "nonce123", challenge));
+
+        Assert.True(_pipeline.ConsentWasCalled, "Consent page should have been reached.");
+
+        // access_denied is a "safe" error and must be returned to the client (no code is issued).
+        var finalUri = response.RequestMessage!.RequestUri!;
+        Assert.StartsWith(RedirectUri, finalUri.GetLeftPart(UriPartial.Path));
+        var query = QueryHelpers.ParseQuery(finalUri.Query);
+        Assert.Equal("access_denied", query["error"]);
+        Assert.False(query.ContainsKey("code"), "No authorization code must be issued when consent is denied.");
     }
 }

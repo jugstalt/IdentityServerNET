@@ -62,6 +62,12 @@ public class OidcTestPipeline
     public BrowserClient BrowserClient { get; set; } = default!;
     public HttpClient BackChannelClient { get; set; } = default!;
 
+    /// <summary>
+    /// A controllable clock injected into IdentityServer so that token lifetimes / expiry can be
+    /// tested deterministically. Defaults to the (frozen) time at construction.
+    /// </summary>
+    public TestClock Clock { get; } = new TestClock();
+
     public event Action<IServiceCollection> OnPreConfigureServices = _ => { };
     public event Action<IServiceCollection> OnPostConfigureServices = _ => { };
 
@@ -86,6 +92,12 @@ public class OidcTestPipeline
         {
             Options = options;
 
+            // Align the interaction URLs with the routes mapped in ConfigureApp below, so that
+            // consent/login/error redirects reach the in-memory stand-in endpoints.
+            options.UserInteraction.LoginUrl = "/account/login";
+            options.UserInteraction.ConsentUrl = "/account/consent";
+            options.UserInteraction.ErrorUrl = "/home/error";
+
             options.Events = new EventsOptions
             {
                 RaiseErrorEvents = true,
@@ -100,6 +112,10 @@ public class OidcTestPipeline
         .AddInMemoryApiScopes(ApiScopes)
         .AddTestUsers(Users)
         .AddDeveloperSigningCredential(persistKey: false);
+
+        // Override the default ISystemClock AFTER AddIdentityServer so that IdentityServer resolves
+        // the controllable test clock. This makes token lifetime / expiry assertions deterministic.
+        services.AddSingleton<ISystemClock>(Clock);
 
         OnPostConfigureServices(services);
     }
@@ -227,4 +243,16 @@ public class BrowserClient : HttpClient
     public Cookie? GetCookie(string uri, string name) => BrowserHandler.GetCookie(uri, name);
 
     public void RemoveCookie(string uri, string name) => BrowserHandler.RemoveCookie(uri, name);
+}
+
+/// <summary>
+/// A controllable <see cref="ISystemClock"/> for deterministic token lifetime / expiry tests.
+/// The time is frozen at construction and only moves when a test advances it explicitly.
+/// </summary>
+public class TestClock : ISystemClock
+{
+    public DateTimeOffset UtcNow { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>Advances the (frozen) clock by the given amount.</summary>
+    public void Advance(TimeSpan by) => UtcNow = UtcNow.Add(by);
 }

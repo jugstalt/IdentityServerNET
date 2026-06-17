@@ -11,10 +11,15 @@ using Xunit;
 namespace IdentityServerNET.Tests.Oidc;
 
 /// <summary>
-/// Tests the OAuth2 resource owner password credentials (ROPC) grant. While ROPC is discouraged
-/// for new applications, IdentityServer supports it, so these tests pin the happy path and the
-/// security-relevant negatives: wrong password, inactive user, and a client that is not allowed
-/// to use the password grant.
+/// Tests the OAuth2 resource owner password credentials (ROPC) grant.
+/// <para>
+/// SECURITY NOTE: ROPC is deprecated by the OAuth 2.0 Security BCP and removed from OAuth 2.1
+/// because it exposes the user's credentials directly to the client and is incompatible with MFA,
+/// federation and modern phishing-resistant authentication. New applications should use the
+/// authorization code flow with PKCE instead. These tests exist only because IdentityServer still
+/// supports the grant for legacy clients; they pin the happy path and the security-relevant
+/// negatives: wrong password, inactive user, and a client that is not allowed to use the grant.
+/// </para>
 /// </summary>
 public class ResourceOwnerPasswordFlowTests
 {

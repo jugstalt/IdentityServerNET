@@ -113,4 +113,21 @@ public class ClientCredentialsFlowTests
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal("invalid_client", doc.RootElement.GetProperty("error").GetString());
     }
+
+    [Fact]
+    public async Task UnsupportedGrantType_IsRejected()
+    {
+        var response = await RequestTokenAsync(new Dictionary<string, string>
+        {
+            ["grant_type"] = "not-a-real-grant",
+            ["client_id"] = ClientId,
+            ["client_secret"] = ClientSecret,
+            ["scope"] = AllowedScope
+        });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("unsupported_grant_type", doc.RootElement.GetProperty("error").GetString());
+    }
 }
