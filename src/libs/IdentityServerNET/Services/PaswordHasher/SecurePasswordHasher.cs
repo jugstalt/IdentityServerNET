@@ -25,7 +25,7 @@ public class SecurePasswordHasher : PasswordHasher
     }
 
     public override string HashPassword(ApplicationUser user, string password)
-        => _sha512Hasher.HashPassword(user, password);
+        => _pbkdf2Hasher.HashPassword(user, password);
 
     public override PasswordVerificationResult VerifyHashedPassword(
         ApplicationUser user, string hashedPassword, string providedPassword)

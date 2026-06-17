@@ -37,7 +37,7 @@ public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCer
             return Task.FromResult(_certificates[ticks]);
         }
 
-        return null;
+        return Task.FromResult<X509Certificate2>(null);
     }
 
     public Task<IEnumerable<X509Certificate2>> GetCertificatesAsync()

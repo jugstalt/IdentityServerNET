@@ -38,5 +38,10 @@
     <Project Path="src/nuget/IdentityServerNET.Extensions.DependencyInjection/IdentityServerNET.Extensions.DependencyInjection.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Extensions/IdentityServerNET.Extensions.csproj" />
   </Folder>
+  <Folder Name="/src/tests/" />
+  <Folder Name="/test/">
+    <Project Path="test/IdentityServerNET.Models.Tests/IdentityServerNET.Models.Tests.csproj" />
+    <Project Path="test/IdentityServerNET.Tests/IdentityServerNET.Tests.csproj" />
+  </Folder>
   <Project Path="nuke-build/_build.csproj" />
 </Solution>
