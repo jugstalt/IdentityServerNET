@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="6.14.3" />
     <PackageReference Include="Nuke.Common" Version="10.1.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.17" />
   </ItemGroup>
 
   <ItemGroup>
