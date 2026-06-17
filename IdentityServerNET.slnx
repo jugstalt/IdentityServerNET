@@ -20,6 +20,7 @@
     <Project Path="src/libs-is4/AspNetIdentity/src/IdentityServer4.AspNetIdentity.csproj" />
     <Project Path="src/libs-is4/IdentityServer4/src/IdentityServer4.csproj" />
     <Project Path="src/libs-is4/IdentityServer4/test/IdentityServer.IntegrationTests/IdentityServer.IntegrationTests.csproj" />
+    <Project Path="src/libs-is4/IdentityServer4/test/IdentityServer.UnitTests/IdentityServer.UnitTests.csproj" />
     <Project Path="src/libs-is4/Storage/src/IdentityServer4.Storage.csproj" />
   </Folder>
   <Folder Name="/src/libs/">

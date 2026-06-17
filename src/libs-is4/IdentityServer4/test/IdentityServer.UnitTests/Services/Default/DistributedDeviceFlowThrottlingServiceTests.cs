@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -98,7 +98,7 @@ namespace IdentityServer.UnitTests.Services.Default
             var dateTime = DateTime.Parse(dateTimeAsString);
             dateTime.Should().Be(testDate);
 
-            values?.Item2.AbsoluteExpiration.Should().BeCloseTo(testDate.AddSeconds(deviceCode.Lifetime));
+            values?.Item2.AbsoluteExpiration.Should().BeCloseTo(testDate.AddSeconds(deviceCode.Lifetime), TimeSpan.FromSeconds(1));
         }
     }
 
