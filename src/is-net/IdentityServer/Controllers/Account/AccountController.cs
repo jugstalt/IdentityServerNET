@@ -392,13 +392,21 @@ public class AccountController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [AllowAnonymous]
-    public async Task<IActionResult> PasskeySignIn(string returnUrl, string assertionJson)
+    public async Task<IActionResult> PasskeySignIn(
+        string returnUrl, string assertionJson,
+        LoginInputModel model, string button)
     {
+        if (button == "login")
+        {
+            return await Login(model, button);
+        }
+
         if (string.IsNullOrWhiteSpace(assertionJson))
         {
             ModelState.AddModelError(string.Empty, "No passkey response received.");
             var vm = await BuildLoginViewModelAsync(returnUrl);
             return View("Login", vm);
+            //return RedirectToAction("Login");
         }
 
         var assertResult = await _signInManager.PerformPasskeyAssertionAsync(assertionJson);
@@ -409,6 +417,7 @@ public class AccountController : Controller
             ModelState.AddModelError(string.Empty, $"Passkey sign-in failed: {reason}");
             var vm = await BuildLoginViewModelAsync(returnUrl);
             return View("Login", vm);
+            //return RedirectToAction("Login");
         }
 
         await _signInManager.SignInAsync(assertResult.User, isPersistent: false);

@@ -1,4 +1,6 @@
-﻿using Duende.IdentityModel;
+﻿#pragma warning disable CS0618 // ISystemClock is obsolete; required by DefaultTokenService base class
+
+using Duende.IdentityModel;
 using IdentityServer4.Configuration;
 using IdentityServer4.Models;
 using IdentityServer4.Services;

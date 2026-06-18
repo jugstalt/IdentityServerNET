@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -256,25 +258,55 @@ public class UserStoreProxy : IUserStore<ApplicationUser>,
 
     #region IUserTwoFactorRecoveryCodeStore
 
+    // Prefix used to distinguish hashed codes from legacy plaintext codes.
+    private const string HashedCodePrefix = "sha256:";
+
+    private static string HashRecoveryCode(string code)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(code));
+        return HashedCodePrefix + Convert.ToBase64String(bytes);
+    }
+
+    // Returns true when the stored value was written by HashRecoveryCode.
+    private static bool IsHashedCode(string stored) =>
+        stored.StartsWith(HashedCodePrefix, StringComparison.Ordinal);
+
+    // Compares a plaintext candidate against one stored entry (hashed or legacy).
+    private static bool CodeMatches(string stored, string candidate)
+    {
+        if (IsHashedCode(stored))
+        {
+            return stored == HashRecoveryCode(candidate);
+        }
+        // Backward-compatible: legacy plaintext codes stored before hashing was introduced.
+        return stored == candidate;
+    }
+
     async public Task ReplaceCodesAsync(ApplicationUser user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
     {
-        user.TfaRecoveryCodes = recoveryCodes;
+        var hashedCodes = recoveryCodes.Select(HashRecoveryCode).ToArray();
 
         user.TfaRecoveryCodes =
            await (await UserDbContext()).UpdatePropertyAsync<IEnumerable<string>>
-                (user, ApplicationUserProperties.TfaRecoveryCodes, recoveryCodes, cancellationToken);
+                (user, ApplicationUserProperties.TfaRecoveryCodes, hashedCodes, cancellationToken);
     }
 
     async public Task<bool> RedeemCodeAsync(ApplicationUser user, string code, CancellationToken cancellationToken)
     {
-        if (user.TfaRecoveryCodes == null || !user.TfaRecoveryCodes.Contains(code))
+        if (user.TfaRecoveryCodes == null)
+        {
+            return false;
+        }
+
+        var matched = user.TfaRecoveryCodes.FirstOrDefault(c => CodeMatches(c, code));
+        if (matched == null)
         {
             return false;
         }
 
         user.TfaRecoveryCodes = await (await UserDbContext()).UpdatePropertyAsync<IEnumerable<string>>
                 (user, ApplicationUserProperties.TfaRecoveryCodes,
-                user.TfaRecoveryCodes.Where(c => c != code).ToArray(),
+                user.TfaRecoveryCodes.Where(c => c != matched).ToArray(),
                 cancellationToken);
 
         return true;
