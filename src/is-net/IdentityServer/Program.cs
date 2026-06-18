@@ -26,6 +26,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 #region Serilog
 
@@ -96,6 +97,36 @@ builder.Services
         )
     .AddRoles<ApplicationRole>()
     .AddDefaultTokenProviders();
+
+if (builder.Configuration.AllowPasskeyPasswordless() || builder.Configuration.AllowPasskeySecondFactor())
+{
+    builder.Services.Configure<IdentityPasskeyOptions>(options =>
+    {
+        var configuredDomain = builder.Configuration.PasskeyServerDomain();
+        if (!string.IsNullOrEmpty(configuredDomain))
+            options.ServerDomain = configuredDomain;
+
+        // WebAuthn spec: only the origin's hostname (no scheme, no port) must match the RP ID.
+        // The browser always sends scheme+host+port (e.g. "https://localhost:44300"),
+        // so we must not compare the full origin string.
+        options.ValidateOrigin = ctx =>
+        {
+            if (!Uri.TryCreate(ctx.Origin, UriKind.Absolute, out var originUri))
+                return ValueTask.FromResult(false);
+
+            // e.g. "localhost" from "https://localhost:44300"
+            var originHost = originUri.Host;
+
+            // Use the configured RP ID; fall back to the request hostname.
+            var rpId = options.ServerDomain;
+            if (string.IsNullOrEmpty(rpId))
+                rpId = ctx.HttpContext.Request.Host.Host;
+
+            return ValueTask.FromResult(
+                string.Equals(originHost, rpId, StringComparison.OrdinalIgnoreCase));
+        };
+    });
+}
 
 builder.Services.AddAuthorization(options =>
 {

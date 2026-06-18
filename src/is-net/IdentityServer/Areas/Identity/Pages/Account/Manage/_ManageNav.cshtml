@@ -43,6 +43,10 @@
             {
                 <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
             }
+            @if (Model?.ShowPasskeysPage == true)
+            {
+                <li class="@ManageNavPages.PasskeysNavClass(ViewContext)"><a asp-page="./Passkeys">Passkeys</a></li>
+            }
 
             <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)">
                 <a asp-page="./PersonalData">Personal data</a>

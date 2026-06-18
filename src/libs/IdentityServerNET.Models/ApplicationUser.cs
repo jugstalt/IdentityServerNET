@@ -81,6 +81,28 @@ public class ApplicationUser : IdentityUser
 
     #endregion
 
+    #region Passkeys
+
+    private IList<StoredPasskeyCredential>? _passkeys;
+
+    /// <summary>Runtime passkey collection (not serialised directly — use <see cref="SerializablePasskeys"/>).</summary>
+    [JsonIgnore]
+    public IList<StoredPasskeyCredential> Passkeys
+    {
+        get => _passkeys ??= new List<StoredPasskeyCredential>();
+        set => _passkeys = value;
+    }
+
+    /// <summary>JSON-serialised passkey collection (backing store for all backends).</summary>
+    [JsonProperty("Passkeys")]
+    public StoredPasskeyCredential[] SerializablePasskeys
+    {
+        get => Passkeys.ToArray();
+        set => _passkeys = value?.ToList() ?? new List<StoredPasskeyCredential>();
+    }
+
+    #endregion
+
     #region Classes
 
     public class SerializableClaim

@@ -17,6 +17,8 @@ public static class ManageNavPages
 
     public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
+    public static string Passkeys => "Passkeys";
+
     public static string IndexNavClass(ViewContext viewContext, string category)
     {
         return "";
@@ -31,6 +33,8 @@ public static class ManageNavPages
     public static string PersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalData);
 
     public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
+
+    public static string PasskeysNavClass(ViewContext viewContext) => PageNavClass(viewContext, Passkeys);
 
     private static string PageNavClass(ViewContext viewContext, string page)
     {

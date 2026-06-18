@@ -18,6 +18,7 @@ public static class ApplicationUserProperties
     public const string LockoutEnd = "LockoutEnd";
     public const string AccessFailedCount = "AccessFailedCount";
     public const string LockoutEnabled = "LockoutEnabled";
+    public const string Passkeys = "Passkeys";
 }
 
 public static class ApplicationRoleProperties

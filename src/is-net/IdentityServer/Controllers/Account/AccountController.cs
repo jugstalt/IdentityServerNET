@@ -21,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -32,7 +33,6 @@ namespace IdentityServer;
 /// The interaction service provides a way for the UI to communicate with identityserver for validation and context retrieval
 /// </summary>
 [SecurityHeaders]
-[AllowAnonymous]
 public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
@@ -45,6 +45,7 @@ public class AccountController : Controller
     private readonly ILoginBotDetection _loginBotDetection;
     private readonly ICaptchaCodeRenderer _captchaCodeRenderer;
     private readonly IConfiguration _configuration;
+    private readonly IUserPasskeyStore<ApplicationUser> _passkeyStore;
 
     public AccountController(
         ILogger<AccountController> logger,
@@ -55,6 +56,7 @@ public class AccountController : Controller
         IAuthenticationSchemeProvider schemeProvider,
         IEventService events,
         IConfiguration configuration,
+        IUserPasskeyStore<ApplicationUser> passkeyStore = null,
         ILoginBotDetection loginBotDetetion = null,
         ICaptchaCodeRenderer captchaCodeRenderer = null)
     {
@@ -69,6 +71,7 @@ public class AccountController : Controller
         _events = events;
 
         _configuration = configuration;
+        _passkeyStore = passkeyStore;
 
         _loginBotDetection = loginBotDetetion;
         _captchaCodeRenderer = captchaCodeRenderer;
@@ -78,6 +81,7 @@ public class AccountController : Controller
     /// Entry point into the login workflow
     /// </summary>
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(string returnUrl, bool forceLocal = false)
     {
         // build a model so we know what to show on the login page
@@ -100,6 +104,7 @@ public class AccountController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginInputModel model, string button)
     {
         // check if we are in the context of an authorization request
@@ -187,6 +192,24 @@ public class AccountController : Controller
                         await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
                     }
 
+                    // Passkey-only second factor: user has passkeys but app-2FA is not enabled.
+                    // Sign them back out and gate them behind passkey verification.
+                    if (_configuration.AllowPasskeySecondFactor()
+                        && _passkeyStore != null
+                        && (await _userManager.GetPasskeysAsync(user)).Count > 0)
+                    {
+                        await _signInManager.SignOutAsync();
+                        var tfIdentity = new ClaimsIdentity(IdentityConstants.TwoFactorUserIdScheme);
+                        tfIdentity.AddClaim(new Claim(ClaimTypes.Name, user.Id));
+                        await HttpContext.SignInAsync(
+                            IdentityConstants.TwoFactorUserIdScheme,
+                            new ClaimsPrincipal(tfIdentity));
+                        var encodedReturnUrlPk = HttpUtility.UrlEncode(
+                            (context != null || Url.IsLocalUrl(model.ReturnUrl)) ? model.ReturnUrl : "~/");
+                        return Redirect(string.Format(
+                            "~/Identity/Account/LoginWithPasskey?ReturnUrl={0}", encodedReturnUrlPk));
+                    }
+
                     if (context != null)
                     {
                         if (context.IsNativeClient())
@@ -222,15 +245,23 @@ public class AccountController : Controller
                         await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
                     }
 
+                    var encodedReturnUrl = HttpUtility.UrlEncode(
+                        (context != null || Url.IsLocalUrl(model.ReturnUrl)) ? model.ReturnUrl : "~/");
+
+                    // If passkey second-factor is configured and the user has passkeys,
+                    // redirect to the dedicated passkey 2FA page first.
+                    if (_configuration.AllowPasskeySecondFactor())
+                    {
+                        var tfUser = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                        if (tfUser != null && (await _userManager.GetPasskeysAsync(tfUser)).Count > 0)
+                        {
+                            return Redirect(string.Format(
+                                "~/Identity/Account/LoginWithPasskey?ReturnUrl={0}", encodedReturnUrl));
+                        }
+                    }
+
                     string twoFactorUrl = "~/Identity/Account/LoginWith2fa?ReturnUrl={0}";
-                    if (context != null || Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode(model.ReturnUrl)));
-                    }
-                    else
-                    {
-                        return Redirect(string.Format(twoFactorUrl, HttpUtility.UrlEncode("~/")));
-                    }
+                    return Redirect(string.Format(twoFactorUrl, encodedReturnUrl));
                 }
 
                 if (_loginBotDetection != null)
@@ -274,6 +305,7 @@ public class AccountController : Controller
     /// Show logout page
     /// </summary>
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Logout(string logoutId)
     {
         // build a model so the logout page knows what to display
@@ -332,11 +364,122 @@ public class AccountController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult AccessDenied()
     {
         return View();
     }
 
+    // -----------------------------------------------------------------------
+    // Passkey (WebAuthn) endpoints
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Returns assertion options JSON for a passwordless passkey sign-in.
+    /// Called via fetch() from passkey.js.
+    /// </summary>
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> PasskeyChallenge()
+    {
+        var json = await _signInManager.MakePasskeyRequestOptionsAsync(null);
+        return Content(json, "application/json");
+    }
+
+    /// <summary>
+    /// Verifies the WebAuthn assertion and signs the user in (first-factor passwordless).
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [AllowAnonymous]
+    public async Task<IActionResult> PasskeySignIn(string returnUrl, string assertionJson)
+    {
+        if (string.IsNullOrWhiteSpace(assertionJson))
+        {
+            ModelState.AddModelError(string.Empty, "No passkey response received.");
+            var vm = await BuildLoginViewModelAsync(returnUrl);
+            return View("Login", vm);
+        }
+
+        var assertResult = await _signInManager.PerformPasskeyAssertionAsync(assertionJson);
+        if (!assertResult.Succeeded)
+        {
+            var reason = assertResult.Failure?.Message ?? "unknown reason";
+            _logger.LogWarning("Passkey assertion failed: {Reason}", reason);
+            ModelState.AddModelError(string.Empty, $"Passkey sign-in failed: {reason}");
+            var vm = await BuildLoginViewModelAsync(returnUrl);
+            return View("Login", vm);
+        }
+
+        await _signInManager.SignInAsync(assertResult.User, isPersistent: false);
+        await _events.RaiseAsync(new UserLoginSuccessEvent(
+            assertResult.User.UserName, assertResult.User.Id, assertResult.User.UserName));
+
+        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+        if (context != null)
+            return context.IsNativeClient()
+                ? this.LoadingPage("Redirect", returnUrl)
+                : Redirect(returnUrl);
+
+        if (Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+
+        return Redirect("~/");
+    }
+
+    /// <summary>
+    /// Returns attestation options JSON for registering a new passkey (called from Manage/Passkeys page).
+    /// </summary>
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> PasskeyCreationOptions()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Unauthorized();
+
+        var entity = new PasskeyUserEntity
+        {
+            Id   = user.Id,
+            Name = user.UserName ?? user.Email,
+            DisplayName = user.UserName ?? user.Email
+        };
+        var json = await _signInManager.MakePasskeyCreationOptionsAsync(entity);
+        return Content(json, "application/json");
+    }
+
+    /// <summary>
+    /// Saves a newly registered passkey for the currently authenticated user.
+    /// </summary>
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PasskeyRegister(string attestationJson, string returnUrl = "~/Identity/Account/Manage/Passkeys")
+    {
+        if (string.IsNullOrWhiteSpace(attestationJson))
+        {
+            TempData["StatusMessage"] = "Error: No attestation data received.";
+            return LocalRedirect(returnUrl);
+        }
+
+        var attestResult = await _signInManager.PerformPasskeyAttestationAsync(attestationJson);
+        if (!attestResult.Succeeded)
+        {
+            TempData["StatusMessage"] = "Error: Passkey registration failed – " + attestResult.Failure?.Message;
+            return LocalRedirect(returnUrl);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Unauthorized();
+
+        if (_passkeyStore != null)
+        {
+            await _passkeyStore.AddOrUpdatePasskeyAsync(
+                user, attestResult.Passkey, System.Threading.CancellationToken.None);
+        }
+
+        TempData["StatusMessage"] = "Passkey registered successfully.";
+        return LocalRedirect(returnUrl);
+    }
 
     /*****************************************/
     /* helper APIs for the AccountController */
@@ -388,6 +531,7 @@ public class AccountController : Controller
         {
             AllowRememberLogin = AccountOptions.AllowRememberLogin,
             EnableLocalLogin = (allowLocal && AccountOptions.AllowLocalLogin) || forceLocal,
+            AllowPasskeyLogin = _configuration.AllowPasskeyPasswordless(),
             ReturnUrl = returnUrl,
             Username = context?.LoginHint,
             ExternalProviders = providers.ToArray()

@@ -15,6 +15,7 @@ public static class ConfigurationExtensions
             ShowChangeEmailPage = true,
             ShowChangePasswordPage = true,
             ShowTfaPage = true,
+            ShowPasskeysPage = true,
             EditorInfos = new[]
             {
                     KnownUserEditorInfos.ReadOnlyUserName(),

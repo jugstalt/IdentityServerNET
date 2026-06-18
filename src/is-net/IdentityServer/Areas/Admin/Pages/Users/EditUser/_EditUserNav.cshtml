@@ -49,6 +49,10 @@
                    asp-route-id="@Model.CurrentApplicationUser.Id">Set Password</a>
             </li>
         }
+        <li class="@EditUserNavPages.ResetSecondFactorNavClass(ViewContext)">
+            <a asp-page="./ResetSecondFactor"
+               asp-route-id="@Model.CurrentApplicationUser.Id">Reset 2FA</a>
+        </li>
         @if (Model?.EditorInfos?.AllowDelete == true)
         {
             <li class="@EditUserNavPages.DeleteUserNavClass(ViewContext)">

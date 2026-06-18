@@ -36,7 +36,11 @@ static public class ServiceCollectionExtensions
         => services.AddScoped<ColorSchemeService>();
 
     static public IServiceCollection AddUserStore(this IServiceCollection services)
-        => services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
+    {
+        services.AddTransient<IUserStore<ApplicationUser>, UserStoreProxy>();
+        services.AddTransient<IUserPasskeyStore<ApplicationUser>, UserStoreProxy>();
+        return services;
+    }
     static public IServiceCollection AddRoleStore(this IServiceCollection services)
         => services.AddTransient<IRoleStore<ApplicationRole>, RoleStoreProxy>();
 

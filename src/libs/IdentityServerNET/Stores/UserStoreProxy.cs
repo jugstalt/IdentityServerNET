@@ -23,7 +23,8 @@ public class UserStoreProxy : IUserStore<ApplicationUser>,
                               IUserLoginStore<ApplicationUser>,
                               IUserSecurityStampStore<ApplicationUser>,
                               IUserRoleStore<ApplicationUser>,
-                              IUserLockoutStore<ApplicationUser>
+                              IUserLockoutStore<ApplicationUser>,
+                              IUserPasskeyStore<ApplicationUser>
 
 {
     //private IUserDbContext _dbContext;
@@ -484,6 +485,119 @@ public class UserStoreProxy : IUserStore<ApplicationUser>,
 
         user.LockoutEnabled =
             await dbContext.UpdatePropertyAsync<bool>(user, ApplicationUserProperties.LockoutEnabled, enabled, cancellationToken);
+    }
+
+    #endregion
+
+    #region IUserPasskeyStore
+
+    public async Task AddOrUpdatePasskeyAsync(ApplicationUser user, UserPasskeyInfo passkey, CancellationToken cancellationToken)
+    {
+        var credId = Convert.ToBase64String(passkey.CredentialId);
+        var existing = user.Passkeys.FirstOrDefault(p => p.CredentialId == credId);
+        if (existing != null)
+            user.Passkeys.Remove(existing);
+
+        user.Passkeys.Add(new StoredPasskeyCredential
+        {
+            CredentialId      = credId,
+            PublicKey         = Convert.ToBase64String(passkey.PublicKey),
+            Name              = passkey.Name,
+            CreatedAt         = passkey.CreatedAt,
+            SignCount         = passkey.SignCount,
+            Transports        = passkey.Transports,
+            IsUserVerified    = passkey.IsUserVerified,
+            IsBackupEligible  = passkey.IsBackupEligible,
+            IsBackedUp        = passkey.IsBackedUp,
+            AttestationObject = passkey.AttestationObject != null ? Convert.ToBase64String(passkey.AttestationObject) : null,
+            ClientDataJson    = passkey.ClientDataJson    != null ? Convert.ToBase64String(passkey.ClientDataJson)    : null,
+        });
+
+        user.Passkeys = await (await UserDbContext())
+            .UpdatePropertyAsync<IList<StoredPasskeyCredential>>(
+                user, ApplicationUserProperties.Passkeys, user.Passkeys, cancellationToken);
+    }
+
+    public Task<IList<UserPasskeyInfo>> GetPasskeysAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        IList<UserPasskeyInfo> result = user.Passkeys
+            .Select(ToUserPasskeyInfo)
+            .ToList();
+        return Task.FromResult(result);
+    }
+
+    public async Task<ApplicationUser> FindByPasskeyIdAsync(byte[] credentialId, CancellationToken cancellationToken)
+    {
+        var db = await UserDbContext();
+        if (db is IAdminUserDbContext adminDb)
+        {
+            // Linear scan – acceptable for typical deployment sizes.
+            // A credential-to-user index can be added to IUserDbContext for
+            // high-volume scenarios.
+            int skip = 0;
+            const int batchSize = 200;
+            while (true)
+            {
+                var batch = (await adminDb.GetUsersAsync(batchSize, skip, cancellationToken)).ToList();
+                if (batch.Count == 0) break;
+
+                foreach (var u in batch)
+                {
+                    if (u.Passkeys.Any(p =>
+                            !string.IsNullOrEmpty(p.CredentialId) &&
+                            Convert.FromBase64String(p.CredentialId).SequenceEqual(credentialId)))
+                    {
+                        return u;
+                    }
+                }
+
+                if (batch.Count < batchSize) break;
+                skip += batchSize;
+            }
+        }
+        return null;
+    }
+
+    public Task<UserPasskeyInfo> FindPasskeyAsync(ApplicationUser user, byte[] credentialId, CancellationToken cancellationToken)
+    {
+        var stored = user.Passkeys.FirstOrDefault(p =>
+            !string.IsNullOrEmpty(p.CredentialId) &&
+            Convert.FromBase64String(p.CredentialId).SequenceEqual(credentialId));
+
+        return Task.FromResult(stored != null ? ToUserPasskeyInfo(stored) : null);
+    }
+
+    public async Task RemovePasskeyAsync(ApplicationUser user, byte[] credentialId, CancellationToken cancellationToken)
+    {
+        var credId = Convert.ToBase64String(credentialId);
+        var existing = user.Passkeys.FirstOrDefault(p => p.CredentialId == credId);
+        if (existing == null) return;
+
+        user.Passkeys.Remove(existing);
+        user.Passkeys = await (await UserDbContext())
+            .UpdatePropertyAsync<IList<StoredPasskeyCredential>>(
+                user, ApplicationUserProperties.Passkeys, user.Passkeys, cancellationToken);
+    }
+
+    private static UserPasskeyInfo ToUserPasskeyInfo(StoredPasskeyCredential c)
+    {
+        var info = new UserPasskeyInfo(
+            credentialId:     Convert.FromBase64String(c.CredentialId),
+            publicKey:        Convert.FromBase64String(c.PublicKey),
+            createdAt:        c.CreatedAt,
+            signCount:        c.SignCount,
+            transports:       c.Transports ?? Array.Empty<string>(),
+            isUserVerified:   c.IsUserVerified,
+            isBackupEligible: c.IsBackupEligible,
+            isBackedUp:       c.IsBackedUp,
+            attestationObject: c.AttestationObject != null ? Convert.FromBase64String(c.AttestationObject) : Array.Empty<byte>(),
+            clientDataJson:    c.ClientDataJson    != null ? Convert.FromBase64String(c.ClientDataJson)    : Array.Empty<byte>()
+        );
+        info.Name = c.Name;
+        info.SignCount = c.SignCount;
+        info.IsUserVerified = c.IsUserVerified;
+        info.IsBackedUp = c.IsBackedUp;
+        return info;
     }
 
     #endregion

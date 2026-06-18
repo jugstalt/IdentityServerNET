@@ -66,6 +66,36 @@ static public class ConfigurationExtensions
         return configuration["identityserver:Login:RememberLoginDefaultValue"]?.ToLower() == "true";
     }
 
+    /// <summary>
+    /// Returns true when passkey-based passwordless login is enabled globally.
+    /// Configured via <c>identityserver:Login:Passkey:AllowPasswordless = true</c>.
+    /// </summary>
+    static public bool AllowPasskeyPasswordless(this IConfiguration configuration)
+        => configuration["identityserver:Login:Passkey:AllowPasswordless"]?.ToLower() == "true";
+
+    /// <summary>
+    /// Returns true when passkeys may serve as a second factor after username/password.
+    /// Configured via <c>identityserver:Login:Passkey:AllowSecondFactor = true</c>.
+    /// </summary>
+    static public bool AllowPasskeySecondFactor(this IConfiguration configuration)
+        => configuration["identityserver:Login:Passkey:AllowSecondFactor"]?.ToLower() == "true";
+
+    /// <summary>
+    /// The WebAuthn Relying Party ID (RP ID), usually the bare domain name (e.g. "example.com").
+    /// Configured via <c>identityserver:Login:Passkey:ServerDomain</c>.
+    /// Defaults to an empty string when not set.
+    /// </summary>
+    static public string PasskeyServerDomain(this IConfiguration configuration)
+        => configuration["identityserver:Login:Passkey:ServerDomain"] ?? "";
+
+    /// <summary>
+    /// Human-readable name shown to the user during registration.
+    /// Configured via <c>identityserver:Login:Passkey:RelyingPartyName</c>.
+    /// Defaults to "IdentityServer" when not set.
+    /// </summary>
+    static public string PasskeyRelyingPartyName(this IConfiguration configuration)
+        => configuration["identityserver:Login:Passkey:RelyingPartyName"] ?? "IdentityServer";
+
     static public IConfiguration SwitchCase(
             this IConfiguration configuration,
             IEnumerable<string> names,

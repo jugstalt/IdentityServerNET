@@ -1,7 +1,9 @@
 ﻿using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -13,15 +15,18 @@ public class GenerateRecoveryCodesModel : ManageAccountPageModel
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<GenerateRecoveryCodesModel> _logger;
+    private readonly IConfiguration _configuration;
 
     public GenerateRecoveryCodesModel(
         UserManager<ApplicationUser> userManager,
         ILogger<GenerateRecoveryCodesModel> logger,
-        IUserStoreFactory userStoreFactory)
+        IUserStoreFactory userStoreFactory,
+        IConfiguration configuration)
         : base(userStoreFactory)
     {
-        _userManager = userManager;
-        _logger = logger;
+        _userManager   = userManager;
+        _logger        = logger;
+        _configuration = configuration;
     }
 
     [TempData]
@@ -39,7 +44,10 @@ public class GenerateRecoveryCodesModel : ManageAccountPageModel
         }
 
         var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-        if (!isTwoFactorEnabled)
+        var hasPasskeyFactor   = _configuration.AllowPasskeySecondFactor()
+            && (await _userManager.GetPasskeysAsync(user)).Count > 0;
+
+        if (!isTwoFactorEnabled && !hasPasskeyFactor)
         {
             var userId = await _userManager.GetUserIdAsync(user);
             throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{userId}' because they do not have 2FA enabled.");
@@ -57,8 +65,11 @@ public class GenerateRecoveryCodesModel : ManageAccountPageModel
         }
 
         var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-        var userId = await _userManager.GetUserIdAsync(user);
-        if (!isTwoFactorEnabled)
+        var userId             = await _userManager.GetUserIdAsync(user);
+        var hasPasskeyFactor   = _configuration.AllowPasskeySecondFactor()
+            && (await _userManager.GetPasskeysAsync(user)).Count > 0;
+
+        if (!isTwoFactorEnabled && !hasPasskeyFactor)
         {
             throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{userId}' as they do not have 2FA enabled.");
         }

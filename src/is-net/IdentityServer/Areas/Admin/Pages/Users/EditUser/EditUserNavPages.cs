@@ -13,6 +13,8 @@ public static class EditUserNavPages
 
     public static string SetPassword => "SetPassword";
 
+    public static string ResetSecondFactor => "ResetSecondFactor";
+
     public static string DeleteUser => "DeleteUser";
 
     public static string UserEmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, UserEmail);
@@ -20,6 +22,8 @@ public static class EditUserNavPages
     public static string UserRolesNavClass(ViewContext viewContext) => PageNavClass(viewContext, UserRoles);
 
     public static string SetPasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, SetPassword);
+
+    public static string ResetSecondFactorNavClass(ViewContext viewContext) => PageNavClass(viewContext, ResetSecondFactor);
 
     public static string DeleteUserNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeleteUser);
 

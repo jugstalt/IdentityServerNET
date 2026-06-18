@@ -1,0 +1,47 @@
+﻿@page
+@model IdentityServer.Areas.Admin.Pages.Users.EditUser.ResetSecondFactorModel
+@{
+    ViewData["Title"] = "Reset Second Factor";
+    ViewData["ActivePage"] = EditUserNavPages.ResetSecondFactor;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <p class="text-muted">
+            Resetting the second factor disables the authenticator app, removes all registered
+            passkeys, and clears any active account lockout. The user will need to set up
+            two-factor authentication again after their next login.
+        </p>
+
+        @if (!Model.HasAuthenticatorApp && Model.PasskeyCount == 0)
+        {
+            <div class="alert alert-info">
+                This user does not have any second factor configured.
+            </div>
+        }
+        else
+        {
+            <ul>
+                @if (Model.HasAuthenticatorApp)
+                {
+                    <li>Authenticator app is enabled</li>
+                }
+                @if (Model.PasskeyCount > 0)
+                {
+                    <li>@Model.PasskeyCount passkey(s) registered</li>
+                }
+            </ul>
+
+            <form method="post">
+                <input type="hidden" asp-for="UserId" />
+                <button type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Reset all second factors for this user? This action cannot be undone.');">
+                    Reset second factor
+                </button>
+            </form>
+        }
+    </div>
+</div>

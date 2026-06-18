@@ -1,4 +1,4 @@
-@using IdentityServerNET.Abstractions.UI
+﻿@using IdentityServerNET.Abstractions.UI
 @using IdentityServerNET.Extensions
 @using IdentityServerNET.Extensions.DependencyInjection;
 @using Microsoft.Extensions.Options;
@@ -71,6 +71,22 @@
                                     </div>
                                 </fieldset>
                             </form>
+                            @if (Model.AllowPasskeyLogin)
+                            {
+                                <hr />
+                                <div>
+                                    <form id="passkey-signin-form" asp-action="PasskeySignIn" asp-controller="Account" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                                        <input type="hidden" id="passkey-assertion-json" name="assertionJson" />
+                                    </form>
+                                    <button id="passkey-signin-btn"
+                                            class="btn btn-default"
+                                            data-challenge-url="@Url.Action("PasskeyChallenge","Account")">
+                                        Sign in with Passkey
+                                    </button>
+                                </div>
+                            }
                             @if (configuration.DenyForgotPasswordChallange() == false && userInterface.DenyForgotPasswordChallange == false)
                             {
                                 <p>
@@ -117,3 +133,10 @@
         }
     </div>
 </div>
+
+@if (Model.AllowPasskeyLogin)
+{
+    @section scripts {
+        <script src="~/js/passkey.js"></script>
+    }
+}

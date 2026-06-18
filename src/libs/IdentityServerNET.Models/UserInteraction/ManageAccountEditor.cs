@@ -6,4 +6,5 @@ public class ManageAccountEditor : EditorInfoCollection
     public bool ShowChangeEmailPage { get; set; }
     public bool ShowChangePasswordPage { get; set; }
     public bool ShowTfaPage { get; set; }
+    public bool ShowPasskeysPage { get; set; }
 }

@@ -1,0 +1,45 @@
+﻿@page
+@model LoginWithPasskeyModel
+@{
+    ViewData["Title"] = "Passkey verification";
+    Layout = "/Views/Shared/_Layout_Login.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>Use your passkey (fingerprint, face, or security key) to complete sign-in.</p>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form id="passkey-2fa-form" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+    <input type="hidden" id="passkey-assertion-json" name="assertionJson" />
+</form>
+
+<button id="passkey-verify-btn"
+        class="btn btn-primary"
+        data-challenge-url="@Url.Page("LoginWithPasskey", "Challenge")"
+        data-field="passkey-assertion-json"
+        data-form="passkey-2fa-form">
+    Verify with Passkey
+</button>
+
+@if (Model.HasAuthenticatorApp)
+{
+    <hr />
+    <p>
+        <a asp-page="./LoginWith2fa" asp-route-returnUrl="@Model.ReturnUrl">
+            Use authenticator app instead
+        </a>
+    </p>
+}
+
+<hr />
+<p>
+    Lost your passkey? You can
+    <a asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
+</p>
+
+@section scripts {
+    <script src="~/js/passkey.js"></script>
+}

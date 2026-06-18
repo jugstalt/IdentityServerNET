@@ -1,0 +1,73 @@
+@page
+@model PasskeysModel
+@{
+    ViewData["Title"] = "Passkeys";
+    ViewData["ActivePage"] = ManageNavPages.Passkeys;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<p>Passkeys let you sign in using biometrics, a PIN, or a security key — no password required.</p>
+
+@if (Model.Passkeys.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Registered</th>
+                <th>Backed up</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pk in Model.Passkeys)
+            {
+                <tr>
+                    <td>@(pk.Name ?? "(unnamed)")</td>
+                    <td>@pk.CreatedAt.LocalDateTime.ToString("yyyy-MM-dd")</td>
+                    <td>@(pk.IsBackedUp ? "Yes" : "No")</td>
+                    <td>
+                        <form method="post" asp-page-handler="Remove">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="credentialIdBase64Url"
+                                   value="@Convert.ToBase64String(pk.CredentialId).Replace('+','-').Replace('/','_').TrimEnd('=')" />
+                            <button class="btn btn-sm btn-danger"
+                                    data-confirm="Remove this passkey?">
+                                Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>You have no passkeys registered yet.</p>
+}
+
+<hr />
+<h5>Register a new passkey</h5>
+
+<form id="passkey-register-form" method="post" asp-page-handler="Register">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label for="passkey-name">Name (optional)</label>
+        <input id="passkey-name" name="passkeyName" type="text" class="form-control" placeholder="e.g. Work laptop, Phone" maxlength="64" />
+    </div>
+    <input type="hidden" id="passkey-attestation-json" name="attestationJson" />
+</form>
+<button id="passkey-register-btn"
+        class="btn btn-primary"
+        data-options-url="@Url.Page("Passkeys","CreationOptions")"
+        data-field="passkey-attestation-json"
+        data-form="passkey-register-form">
+    Add passkey
+</button>
+
+@section Scripts {
+    <script src="~/js/passkey.js"></script>
+}

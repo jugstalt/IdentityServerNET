@@ -42,7 +42,7 @@ public class DevMigrationService
         _model = new MigrationModel();
         _logger = logger;
 
-        config.Bind("IdentityServer:Migrations", _model);
+        config.Bind("IdentityServer:Migragions", _model);
 
         _userDb = userDb as IAdminUserDbContext;
         _roleDb = roleDb as IAdminRoleDbContext;

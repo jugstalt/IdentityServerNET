@@ -7,7 +7,7 @@
 
 <partial name="_StatusMessage" for="StatusMessage" />
 <h4>@ViewData["Title"]</h4>
-@if (Model.Is2faEnabled)
+@if (Model.CanUseRecoveryCodes)
 {
     if (Model.RecoveryCodesLeft == 0)
     {
@@ -31,17 +31,20 @@
         </div>
     }
 
-    if (Model.IsMachineRemembered)
+    @if (Model.Is2faEnabled)
     {
-        <form method="post" style="display: inline-block">
-            <button type="submit" class="btn btn-default">Forget this browser</button>
-        </form>
+        if (Model.IsMachineRemembered)
+        {
+            <form method="post" style="display: inline-block">
+                <button type="submit" class="btn btn-default">Forget this browser</button>
+            </form>
+        }
+        <a asp-page="./Disable2fa" class="btn btn-default">Disable 2FA</a>
     }
-    <a asp-page="./Disable2fa" class="btn btn-default">Disable 2FA</a>
     <a asp-page="./GenerateRecoveryCodes" class="btn btn-default">Reset recovery codes</a>
 }
 
-<h5>Authenticator app</h5>
+<h5>Two-factor authentication (App)</h5>
 @if (!Model.HasAuthenticator)
 {
     <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Add authenticator app</a>
@@ -50,6 +53,25 @@ else
 {
     <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Setup authenticator app</a>
     <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-default">Reset authenticator app</a>
+}
+
+@if (Model.PasskeySecondFactorAllowed)
+{
+    <hr />
+    <h5>Two-factor authentication (Passkey)</h5>
+    @if (Model.PasskeyCount == 0)
+    {
+        <p class="text-muted">
+            No passkeys registered. <a asp-page="./Passkeys">Register a passkey</a> to use it as a second factor.
+        </p>
+    }
+    else
+    {
+        <p class="text-success">
+            @Model.PasskeyCount passkey(s) registered — you can use a passkey as your second factor at login.
+            <a asp-page="./Passkeys">Manage passkeys</a>
+        </p>
+    }
 }
 
 @section Scripts {
