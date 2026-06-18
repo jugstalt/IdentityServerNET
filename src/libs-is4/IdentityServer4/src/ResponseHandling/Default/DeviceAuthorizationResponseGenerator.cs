@@ -38,7 +38,7 @@ public class DeviceAuthorizationResponseGenerator : IDeviceAuthorizationResponse
     /// <summary>
     /// The clock
     /// </summary>
-    protected readonly ISystemClock Clock;
+    protected readonly TimeProvider Clock;
 
     /// <summary>
     /// The logger
@@ -53,12 +53,12 @@ public class DeviceAuthorizationResponseGenerator : IDeviceAuthorizationResponse
     /// <param name="deviceFlowCodeService">The device flow code service.</param>
     /// <param name="clock">The clock.</param>
     /// <param name="logger">The logger.</param>
-    public DeviceAuthorizationResponseGenerator(IdentityServerOptions options, IUserCodeService userCodeService, IDeviceFlowCodeService deviceFlowCodeService, ISystemClock clock, ILogger<DeviceAuthorizationResponseGenerator> logger)
+    public DeviceAuthorizationResponseGenerator(IdentityServerOptions options, IUserCodeService userCodeService, IDeviceFlowCodeService deviceFlowCodeService, TimeProvider timeProvider, ILogger<DeviceAuthorizationResponseGenerator> logger)
     {
         Options = options;
         UserCodeService = userCodeService;
         DeviceFlowCodeService = deviceFlowCodeService;
-        Clock = clock;
+        Clock = timeProvider;
         Logger = logger;
     }
 
@@ -144,7 +144,7 @@ public class DeviceAuthorizationResponseGenerator : IDeviceAuthorizationResponse
             ClientId = validationResult.ValidatedRequest.Client.ClientId,
             IsOpenId = validationResult.ValidatedRequest.IsOpenIdRequest,
             Lifetime = response.DeviceCodeLifetime,
-            CreationTime = Clock.UtcNow.UtcDateTime,
+            CreationTime = Clock.GetUtcNow().UtcDateTime,
             RequestedScopes = validationResult.ValidatedRequest.ValidatedResources.RawScopeValues
         });
 

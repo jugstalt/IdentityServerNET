@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-	<LangVersion>12</LangVersion>
+	  <LangVersion>12</LangVersion>
     <UserSecretsId>33ba4f5b-c252-47fe-926b-959a2c9af1b0</UserSecretsId>
     <AssemblyVersion>6.25.4701.0</AssemblyVersion>
+    <!--<NoWarn>$(NoWarn);ASP0000</NoWarn>-->
   </PropertyGroup>
 
   <ItemGroup>

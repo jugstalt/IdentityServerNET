@@ -117,7 +117,7 @@ public class PrivateKeyJwtSecretValidator : ISecretValidator
                 return fail;
             }
 
-            var exp = jwtToken.Payload.Exp;
+            var exp = jwtToken.Payload.Expiration;
             if (!exp.HasValue)
             {
                 _logger.LogError("exp is missing.");

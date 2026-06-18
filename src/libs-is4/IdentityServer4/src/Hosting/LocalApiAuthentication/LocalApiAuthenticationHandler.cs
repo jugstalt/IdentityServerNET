@@ -5,9 +5,9 @@
 using Duende.IdentityModel;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authentication;
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -23,8 +23,8 @@ public class LocalApiAuthenticationHandler : AuthenticationHandler<LocalApiAuthe
     private readonly ILogger _logger;
 
     /// <inheritdoc />
-    public LocalApiAuthenticationHandler(IOptionsMonitor<LocalApiAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, ITokenValidator tokenValidator)
-        : base(options, logger, encoder, clock)
+    public LocalApiAuthenticationHandler(IOptionsMonitor<LocalApiAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ITokenValidator tokenValidator)
+        : base(options, logger, encoder)
     {
         _tokenValidator = tokenValidator;
         _logger = logger.CreateLogger<LocalApiAuthenticationHandler>();

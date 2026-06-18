@@ -6,7 +6,6 @@ using Duende.IdentityModel;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -22,19 +21,19 @@ public class IdentityServerTools
 {
     internal readonly IHttpContextAccessor ContextAccessor;
     private readonly ITokenCreationService _tokenCreation;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _clock;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IdentityServerTools" /> class.
     /// </summary>
     /// <param name="contextAccessor">The context accessor.</param>
     /// <param name="tokenCreation">The token creation service.</param>
-    /// <param name="clock">The clock.</param>
-    public IdentityServerTools(IHttpContextAccessor contextAccessor, ITokenCreationService tokenCreation, ISystemClock clock)
+    /// <param name="timeProvider">The time provider.</param>
+    public IdentityServerTools(IHttpContextAccessor contextAccessor, ITokenCreationService tokenCreation, TimeProvider timeProvider)
     {
         ContextAccessor = contextAccessor;
         _tokenCreation = tokenCreation;
-        _clock = clock;
+        _clock = timeProvider;
     }
 
     /// <summary>
@@ -55,7 +54,7 @@ public class IdentityServerTools
 
         var token = new Token
         {
-            CreationTime = _clock.UtcNow.UtcDateTime,
+            CreationTime = _clock.GetUtcNow().UtcDateTime,
             Issuer = issuer,
             Lifetime = lifetime,
 
@@ -87,7 +86,7 @@ public class IdentityServerTools
 
         var token = new Token
         {
-            CreationTime = _clock.UtcNow.UtcDateTime,
+            CreationTime = _clock.GetUtcNow().UtcDateTime,
             Issuer = issuer,
             Lifetime = lifetime,
 

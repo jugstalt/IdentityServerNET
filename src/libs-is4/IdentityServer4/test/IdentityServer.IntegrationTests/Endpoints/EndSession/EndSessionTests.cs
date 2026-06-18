@@ -1,42 +1,25 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Buffers.Text;
+using Duende.IdentityModel;
+using FluentAssertions;
+using IdentityServer.IntegrationTests.Common;
+using IdentityServer4.Models;
+using IdentityServer4.Test;
+using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
-using System.Buffers.Text;
 using System.Linq;
-using System.Buffers.Text;
 using System.Net;
-using System.Buffers.Text;
 using System.Net.Http;
-using System.Buffers.Text;
 using System.Security.Claims;
-using System.Buffers.Text;
 using System.Text;
-using System.Buffers.Text;
 using System.Text.Encodings.Web;
-using System.Buffers.Text;
 using System.Threading.Tasks;
-using System.Buffers.Text;
-using FluentAssertions;
-using System.Buffers.Text;
-using Duende.IdentityModel;
-using System.Buffers.Text;
-using IdentityServer.IntegrationTests.Common;
-using System.Buffers.Text;
-using IdentityServer4.Models;
-using System.Buffers.Text;
-using IdentityServer4.Test;
-using System.Buffers.Text;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Buffers.Text;
-using Newtonsoft.Json.Linq;
-using System.Buffers.Text;
 using Xunit;
-using System.Buffers.Text;
 using static IdentityServer4.IdentityServerConstants;
 
 namespace IdentityServer.IntegrationTests.Endpoints.EndSession
@@ -451,7 +434,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.EndSession
             var id_token = authorization.IdentityToken;
 
             _mockPipeline.BrowserClient.AllowAutoRedirect = true;
-            response = await _mockPipeline.BrowserClient.GetAsync(IdentityServerPipeline.EndSessionEndpoint + 
+            response = await _mockPipeline.BrowserClient.GetAsync(IdentityServerPipeline.EndSessionEndpoint +
                 "?id_token_hint=" + id_token);
 
             _mockPipeline.LogoutRequest.PostLogoutRedirectUri.Should().BeNull();

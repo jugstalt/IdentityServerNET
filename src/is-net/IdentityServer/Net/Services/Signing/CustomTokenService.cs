@@ -1,12 +1,9 @@
-﻿#pragma warning disable CS0618 // ISystemClock is obsolete; required by DefaultTokenService base class
-
-using Duende.IdentityModel;
+﻿using Duende.IdentityModel;
 using IdentityServer4.Configuration;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServerNET.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,10 +25,10 @@ public class CustomTokenService : DefaultTokenService
         IReferenceTokenStore referenceTokenStore,
         ITokenCreationService creationService,
         IHttpContextAccessor contextAccessor,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IKeyMaterialService keyMaterialService,
         IOptionsMonitor<IdentityServerOptions> options,
-        ILogger<DefaultTokenService> logger) : base(claimsProvider, referenceTokenStore, creationService, contextAccessor, clock, keyMaterialService, options.CurrentValue, logger)
+        ILogger<DefaultTokenService> logger) : base(claimsProvider, referenceTokenStore, creationService, contextAccessor, timeProvider, keyMaterialService, options.CurrentValue, logger)
     {
         _httpContext = contextAccessor.HttpContext;
     }

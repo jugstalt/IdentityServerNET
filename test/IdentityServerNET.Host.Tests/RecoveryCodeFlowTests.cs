@@ -170,7 +170,7 @@ public class RecoveryCodeFlowTests
 
         // Generate a fresh set of recovery codes and return the first one.
         var codes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 5);
-        return codes.First();
+        return codes!.First();
     }
 
     private static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string path)

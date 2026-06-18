@@ -54,7 +54,7 @@
   </ItemGroup>
     
     <PropertyGroup>
-        <NoWarn>$(NoWarn);CS0618</NoWarn>
+        <!-- <NoWarn>$(NoWarn);CS0618</NoWarn>-->
     </PropertyGroup>
     
 </Project>

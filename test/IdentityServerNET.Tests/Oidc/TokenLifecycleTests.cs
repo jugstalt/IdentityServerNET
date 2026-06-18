@@ -357,7 +357,7 @@ public class TokenLifecycleTests
     {
         // The clock is frozen, so the token's exp must be exactly issued-at + the configured
         // lifetime, and expires_in must report that same lifetime.
-        var issuedAt = _pipeline.Clock.UtcNow;
+        var issuedAt = _pipeline.Clock.GetUtcNow();
 
         var response = await _pipeline.BackChannelClient.PostAsync(
             OidcTestPipeline.TokenEndpoint,

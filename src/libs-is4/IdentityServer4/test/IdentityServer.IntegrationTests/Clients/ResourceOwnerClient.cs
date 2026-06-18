@@ -1,36 +1,21 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.Buffers.Text;
-using System.Linq;
-using System.Buffers.Text;
-using System.Net;
-using System.Buffers.Text;
-using System.Net.Http;
-using System.Buffers.Text;
-using System.Text;
-using System.Buffers.Text;
-using System.Threading.Tasks;
-using System.Buffers.Text;
-using FluentAssertions;
-using System.Buffers.Text;
-using Duende.IdentityModel;
-using System.Buffers.Text;
 using Duende.IdentityModel.Client;
-using System.Buffers.Text;
+using FluentAssertions;
 using IdentityServer.IntegrationTests.Clients.Setup;
-using System.Buffers.Text;
 using Microsoft.AspNetCore.Hosting;
-using System.Buffers.Text;
 using Microsoft.AspNetCore.TestHost;
-using System.Buffers.Text;
 using Newtonsoft.Json;
-using System.Buffers.Text;
 using Newtonsoft.Json.Linq;
 using System.Buffers.Text;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IdentityServer.IntegrationTests.Clients
@@ -79,7 +64,7 @@ namespace IdentityServer.IntegrationTests.Clients
             payload.Should().Contain("idp", "local");
             payload.Keys.Should().Contain("jti");
             payload.Keys.Should().Contain("iat");
-            
+
             payload["aud"].Should().Be("api");
 
             var scopes = ((JArray)payload["scope"]).Select(x => x.ToString());
@@ -111,7 +96,7 @@ namespace IdentityServer.IntegrationTests.Clients
             response.RefreshToken.Should().NotBeNull();
 
             var payload = GetPayload(response);
-            
+
             payload.Should().Contain("iss", "https://idsvr4");
             payload.Should().Contain("client_id", "roclient");
             payload.Should().Contain("sub", "88421113");
@@ -174,7 +159,7 @@ namespace IdentityServer.IntegrationTests.Clients
             amr.Count().Should().Be(1);
             amr.First().ToString().Should().Be("pwd");
 
-            var scopes = ((JArray)payload["scope"]).Select(x=>x.ToString());
+            var scopes = ((JArray)payload["scope"]).Select(x => x.ToString());
             scopes.Count().Should().Be(3);
             scopes.Should().Contain("api1");
             scopes.Should().Contain("email");
@@ -244,7 +229,7 @@ namespace IdentityServer.IntegrationTests.Clients
             response.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
             response.Error.Should().Be("invalid_grant");
         }
-        
+
         [Fact]
         public async Task User_with_empty_password_should_succeed()
         {

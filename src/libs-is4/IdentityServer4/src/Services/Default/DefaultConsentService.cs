@@ -29,7 +29,7 @@ public class DefaultConsentService : IConsentService
     /// <summary>
     ///  The clock
     /// </summary>
-    protected readonly ISystemClock Clock;
+    protected readonly TimeProvider Clock;
 
     /// <summary>
     /// The logger
@@ -43,9 +43,9 @@ public class DefaultConsentService : IConsentService
     /// <param name="userConsentStore">The user consent store.</param>
     /// <param name="logger">The logger.</param>
     /// <exception cref="System.ArgumentNullException">store</exception>
-    public DefaultConsentService(ISystemClock clock, IUserConsentStore userConsentStore, ILogger<DefaultConsentService> logger)
+    public DefaultConsentService(TimeProvider timeProvider, IUserConsentStore userConsentStore, ILogger<DefaultConsentService> logger)
     {
-        Clock = clock;
+        Clock = timeProvider;
         UserConsentStore = userConsentStore;
         Logger = logger;
     }
@@ -118,7 +118,7 @@ public class DefaultConsentService : IConsentService
             return true;
         }
 
-        if (consent.Expiration.HasExpired(Clock.UtcNow.UtcDateTime))
+        if (consent.Expiration.HasExpired(Clock.GetUtcNow().UtcDateTime))
         {
             Logger.LogDebug("Consent found in consent store is expired, consent is required");
             await UserConsentStore.RemoveUserConsentAsync(consent.SubjectId, consent.ClientId);
@@ -183,7 +183,7 @@ public class DefaultConsentService : IConsentService
 
                 var consent = new Consent
                 {
-                    CreationTime = Clock.UtcNow.UtcDateTime,
+                    CreationTime = Clock.GetUtcNow().UtcDateTime,
                     SubjectId = subjectId,
                     ClientId = clientId,
                     Scopes = scopes

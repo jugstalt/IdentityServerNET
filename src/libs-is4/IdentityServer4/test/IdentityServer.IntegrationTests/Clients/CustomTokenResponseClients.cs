@@ -1,36 +1,21 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Buffers.Text;
+using Duende.IdentityModel.Client;
+using FluentAssertions;
+using IdentityServer.IntegrationTests.Clients.Setup;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
-using System.Buffers.Text;
 using System.Linq;
-using System.Buffers.Text;
 using System.Net.Http;
-using System.Buffers.Text;
 using System.Text;
-using System.Buffers.Text;
 using System.Threading.Tasks;
-using System.Buffers.Text;
-using FluentAssertions;
-using System.Buffers.Text;
-using Duende.IdentityModel;
-using System.Buffers.Text;
-using Duende.IdentityModel.Client;
-using System.Buffers.Text;
-using IdentityServer.IntegrationTests.Clients.Setup;
-using System.Buffers.Text;
-using Microsoft.AspNetCore.Hosting;
-using System.Buffers.Text;
-using Microsoft.AspNetCore.TestHost;
-using System.Buffers.Text;
-using Newtonsoft.Json;
-using System.Buffers.Text;
-using Newtonsoft.Json.Linq;
-using System.Buffers.Text;
 using Xunit;
 
 namespace IdentityServer.IntegrationTests.Clients
@@ -95,7 +80,7 @@ namespace IdentityServer.IntegrationTests.Clients
             response.TokenType.Should().Be("Bearer");
             response.IdentityToken.Should().BeNull();
             response.RefreshToken.Should().BeNull();
-            
+
 
             // token content
             var payload = GetPayload(response);

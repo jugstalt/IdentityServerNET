@@ -36,7 +36,7 @@ internal class TokenRequestValidator : ITokenRequestValidator
     private readonly IResourceOwnerPasswordValidator _resourceOwnerValidator;
     private readonly IProfileService _profile;
     private readonly IDeviceCodeValidator _deviceCodeValidator;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _clock;
     private readonly ILogger _logger;
 
     private ValidatedTokenRequest _validatedRequest;
@@ -70,12 +70,12 @@ internal class TokenRequestValidator : ITokenRequestValidator
         ITokenValidator tokenValidator,
         IRefreshTokenService refreshTokenService,
         IEventService events,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         ILogger<TokenRequestValidator> logger)
     {
         _logger = logger;
         _options = options;
-        _clock = clock;
+        _clock = timeProvider;
         _authorizationCodeStore = authorizationCodeStore;
         _resourceOwnerValidator = resourceOwnerValidator;
         _profile = profile;
@@ -253,7 +253,7 @@ internal class TokenRequestValidator : ITokenRequestValidator
         // todo: set to consumed in the future?
         await _authorizationCodeStore.RemoveAuthorizationCodeAsync(code);
 
-        if (authZcode.CreationTime.HasExceeded(authZcode.Lifetime, _clock.UtcNow.UtcDateTime))
+        if (authZcode.CreationTime.HasExceeded(authZcode.Lifetime, _clock.GetUtcNow().UtcDateTime))
         {
             LogError("Authorization code expired", new { code });
             return Invalid(OidcConstants.TokenErrors.InvalidGrant);
@@ -270,7 +270,7 @@ internal class TokenRequestValidator : ITokenRequestValidator
         /////////////////////////////////////////////
         // validate code expiration
         /////////////////////////////////////////////
-        if (authZcode.CreationTime.HasExceeded(_validatedRequest.Client.AuthorizationCodeLifetime, _clock.UtcNow.UtcDateTime))
+        if (authZcode.CreationTime.HasExceeded(_validatedRequest.Client.AuthorizationCodeLifetime, _clock.GetUtcNow().UtcDateTime))
         {
             LogError("Authorization code is expired");
             return Invalid(OidcConstants.TokenErrors.InvalidGrant);

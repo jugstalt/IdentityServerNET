@@ -36,7 +36,7 @@ public class DefaultTokenCreationService : ITokenCreationService
     /// <summary>
     ///  The clock
     /// </summary>
-    protected readonly ISystemClock Clock;
+    protected readonly TimeProvider Clock;
 
     /// <summary>
     /// The options
@@ -51,12 +51,12 @@ public class DefaultTokenCreationService : ITokenCreationService
     /// <param name="options">The options.</param>
     /// <param name="logger">The logger.</param>
     public DefaultTokenCreationService(
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IKeyMaterialService keys,
         IdentityServerOptions options,
         ILogger<DefaultTokenCreationService> logger)
     {
-        Clock = clock;
+        Clock = timeProvider;
         Keys = keys;
         Options = options;
         Logger = logger;
@@ -97,7 +97,7 @@ public class DefaultTokenCreationService : ITokenCreationService
         if (credential.Key is X509SecurityKey x509Key)
         {
             var cert = x509Key.Certificate;
-            if (Clock.UtcNow.UtcDateTime > cert.NotAfter)
+            if (Clock.GetUtcNow().UtcDateTime > cert.NotAfter)
             {
                 Logger.LogWarning("Certificate {subjectName} has expired on {expiration}", cert.Subject, cert.NotAfter.ToString(CultureInfo.InvariantCulture));
             }

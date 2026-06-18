@@ -113,9 +113,9 @@ public class OidcTestPipeline
         .AddTestUsers(Users)
         .AddDeveloperSigningCredential(persistKey: false);
 
-        // Override the default ISystemClock AFTER AddIdentityServer so that IdentityServer resolves
+        // Override the default TimeProvider AFTER AddIdentityServer so that IdentityServer resolves
         // the controllable test clock. This makes token lifetime / expiry assertions deterministic.
-        services.AddSingleton<ISystemClock>(Clock);
+        services.AddSingleton<TimeProvider>(Clock);
 
         OnPostConfigureServices(services);
     }
@@ -246,13 +246,15 @@ public class BrowserClient : HttpClient
 }
 
 /// <summary>
-/// A controllable <see cref="ISystemClock"/> for deterministic token lifetime / expiry tests.
+/// A controllable <see cref="TimeProvider"/> for deterministic token lifetime / expiry tests.
 /// The time is frozen at construction and only moves when a test advances it explicitly.
 /// </summary>
-public class TestClock : ISystemClock
+public class TestClock : TimeProvider
 {
-    public DateTimeOffset UtcNow { get; set; } = DateTimeOffset.UtcNow;
+    private DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
+
+    public override DateTimeOffset GetUtcNow() => _utcNow;
 
     /// <summary>Advances the (frozen) clock by the given amount.</summary>
-    public void Advance(TimeSpan by) => UtcNow = UtcNow.Add(by);
+    public void Advance(TimeSpan by) => _utcNow = _utcNow.Add(by);
 }
