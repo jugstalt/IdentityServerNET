@@ -1,4 +1,4 @@
-﻿@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 @model ManageAccountEditor
 
 @{
@@ -14,43 +14,38 @@
     }
 }
 
-    <ul class="nav nav-pills nav-stacked">
-        @if (categories != null)
+<ul class="nav nav-pills flex-column">
+    @if (categories != null)
+    {
+        @foreach (var category in categories)
         {
-
-            @foreach (var category in categories)
-            {
-                <li class="@(ViewData["Category"] != null && category.Equals(ViewData["Category"].ToString(), StringComparison.OrdinalIgnoreCase) ? "active" : "")">
-                    <a asp-page="./Index"
-                       asp-route-category="@category">@category</a>
-                </li>
-            }
-        }
-
-            @if (Model?.ShowChangeEmailPage == true)
-            {
-                <li class="@ManageNavPages.EmailNavClass(ViewContext)"><a id="email" asp-page="./Email">Email</a></li>
-            }
-            @if (Model?.ShowChangePasswordPage == true)
-            {
-                <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a id="change-password" asp-page="./ChangePassword">Password</a></li>
-            }
-            @if (hasExternalLogins)
-            {
-                <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a id="external-login" asp-page="./ExternalLogins">External logins</a></li>
-            }
-            @if (Model?.ShowTfaPage == true)
-            {
-                <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-            }
-            @if (Model?.ShowPasskeysPage == true)
-            {
-                <li class="@ManageNavPages.PasskeysNavClass(ViewContext)"><a asp-page="./Passkeys">Passkeys</a></li>
-            }
-
-            <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)">
-                <a asp-page="./PersonalData">Personal data</a>
+            <li class="nav-item">
+                <a class="nav-link @(ViewData["Category"] != null && category.Equals(ViewData["Category"].ToString(), StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                   asp-page="./Index" asp-route-category="@category">@category</a>
             </li>
-        
+        }
+    }
 
-    </ul>
+    @if (Model?.ShowChangeEmailPage == true)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
+    }
+    @if (Model?.ShowChangePasswordPage == true)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+    }
+    @if (hasExternalLogins)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" id="external-login" asp-page="./ExternalLogins">External logins</a></li>
+    }
+    @if (Model?.ShowTfaPage == true)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
+    }
+    @if (Model?.ShowPasskeysPage == true)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.PasskeysNavClass(ViewContext)" asp-page="./Passkeys">Passkeys</a></li>
+    }
+
+    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" asp-page="./PersonalData">Personal data</a></li>
+</ul>

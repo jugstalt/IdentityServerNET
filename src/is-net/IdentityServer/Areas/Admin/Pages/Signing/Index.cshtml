@@ -17,7 +17,7 @@
                 <input asp-for="Expires" class="form-control" />
                 <span asp-validation-for="Expires" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-default">Sign Payload...</button>
+            <button type="submit" class="btn btn-primary">Sign Payload...</button>
         </form>
         @if (!String.IsNullOrEmpty(Model.PayloadToken))
             {

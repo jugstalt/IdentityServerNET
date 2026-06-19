@@ -1,4 +1,4 @@
-﻿@using IdentityServerNET.Abstractions.UI
+@using IdentityServerNET.Abstractions.UI
 @using IdentityServer4.Extensions
 @using IdentityServerNET.Extensions.DependencyInjection;
 @using Microsoft.Extensions.Options;
@@ -18,46 +18,36 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@Configuration["ApplicationTitle"]</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is-net.css" rel="stylesheet" />
     <link href="~/css/is-overrides.css" rel="stylesheet" />
 </head>
 <body class="body-layout-login">
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-expand-md" id="main-navbar">
         <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-
-                <a href="~/">
-                    <span class="navbar-brand">
-                        <img class="icon-banner">
-                        @userInterface.ApplicationTitle
-                    </span>
-                </a>
-
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
+            <a class="navbar-brand" href="~/">
+                <img class="icon-banner">
+                @userInterface.ApplicationTitle
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
+                    aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
                 <partial name="_LoginPartial" />
             </div>
-
         </div>
-    </div>
+    </nav>
 
     <div class="container body-content">
         @RenderBody()
     </div>
 
-    <script src="~/lib/jquery/jquery.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/is-net-ui.js"></script>
     @RenderSection("scripts", required: false)
 </body>

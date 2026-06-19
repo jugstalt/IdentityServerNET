@@ -7,8 +7,8 @@
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "provider": "unpkg",
-      "library": "bootstrap@4.6.2",
+      "provider": "jsdelivr",
+      "library": "bootstrap@5.3.3",
       "destination": "wwwroot/lib/bootstrap/"
     },
     {

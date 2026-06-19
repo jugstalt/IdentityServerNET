@@ -10,7 +10,7 @@
         <partial name="_StatusMessage" model="Model.StatusMessage" />
         <div class="col-md-6">
 
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav nav-pills flex-column">
                 @{ var count = 0; }
                 @foreach (var field in typeof(IdentityServerNET.Models.IdentityServerWrappers.ClientModel).GetProperties())
                 {
@@ -25,7 +25,7 @@
                                asp-route-option="@name"
                                asp-route-value="@(!hasValue)">
                                 <div style="width:32px;height:26px;float:left"
-                                     class="@(hasValue ? "glyphicon glyphicon-ok" : "")">
+                                     class="@(hasValue ? "option-check selected" : "")">
                                 </div>
                                 <div>@(name)</div>
                             </a>
@@ -33,7 +33,7 @@
 
                         @if (++count % 7 == 0)
                         {
-                            @Html.Raw("</ul></div><div class='col-md-6'><ul class='nav nav-pills nav-stacked'>");
+                            @Html.Raw("</ul></div><div class='col-md-6'><ul class='nav nav-pills flex-column'>");
                         }
                     }
                 }

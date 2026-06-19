@@ -10,7 +10,7 @@
     <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
         <h4>Clients</h4>
-        <ul class="nav nav-pills nav-stacked">
+        <ul class="nav nav-pills flex-column">
 
             @if (Model.Clients != null)
             {
@@ -62,7 +62,7 @@
                     <input asp-for="Input.ApiScopes" class="form-control" placeholder="Optional: [scope1] [scope2]..." />
                     <span asp-validation-for="Input.ApiScopes" class="text-danger"></span>
                 </div>
-                <button id="new-client-button" type="submit" class="btn btn-default">Create new client...</button>
+                <button id="new-client-button" type="submit" class="btn btn-primary">Create new client...</button>
             </form>
         </div>
     </div>

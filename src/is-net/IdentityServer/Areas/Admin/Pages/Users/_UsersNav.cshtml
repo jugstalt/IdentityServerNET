@@ -1,6 +1,6 @@
 ﻿@model IdentityServer.Areas.Admin.Pages.Users.IndexModel
 
-<ul class="nav nav-pills nav-stacked">
+<ul class="nav nav-pills flex-column">
     <li class="">
         <a asp-page="../Index">«</a>
     </li>
@@ -11,7 +11,7 @@
                 @* <label asp-for="Filter.Term"></label> *@
                 <input asp-for="Filter.Term" class="form-control" placeholder="Filter users..." />
             </div>
-            <button type="submit" class="btn btn-default">Set Filter</button>
+            <button type="submit" class="btn btn-primary">Set Filter</button>
         </form>
     </li>
 </ul>

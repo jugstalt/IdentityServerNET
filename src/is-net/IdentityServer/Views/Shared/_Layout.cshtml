@@ -4,6 +4,7 @@
 @using Microsoft.Extensions.Options;
 @using Microsoft.Extensions.Configuration
 @using IdentityServerNET.Services.UI;
+@using IdentityServerNET.Models
 
 @inject IConfiguration Configuration
 @inject IUserInterfaceService userInterface;
@@ -14,15 +15,16 @@
     {
         name = Context.User?.GetDisplayName();
     }
+    var footerVersionIs4 = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
+    var footerVersionIsNet = typeof(IdentityServerNET.Models.ApplicationUser).Assembly.GetName().Version.ToString();
 }
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@Configuration["ApplicationTitle"]</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is-net.css" rel="stylesheet" />
     <link href="~/css/is-net-dark.css" rel="stylesheet" />
@@ -31,37 +33,45 @@
     <link href="~/css/basic/content/css/sketchpen-basic-bg-dark.css" rel="stylesheet" />
 </head>
 <body class="colorscheme-@ColorScheme.CurrentColorScheme.ToString().ToLowerInvariant()">
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-expand-md" id="main-navbar">
         <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-
-                <a href="~/">
-                    <span class="navbar-brand">
-                        <img class="icon-banner">
-                        @userInterface.ApplicationTitle
-                    </span>
-                </a>
-
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
+            <a class="navbar-brand" href="~/">
+                <img class="icon-banner">
+                @userInterface.ApplicationTitle
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
+                    aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
                 <partial name="_LoginPartial" />
             </div>
-
         </div>
-    </div>
+    </nav>
 
     <div class="container body-content">
         @RenderBody()
     </div>
 
-    <script src="~/lib/jquery/jquery.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <footer class="is-net-footer">
+        <div class="container">
+            <div class="is-net-footer-inner">
+                <span class="is-net-footer-brand">
+                    <img src="~/icon.png" width="16" height="16" />
+                    IdentityServer NET <span class="is-net-footer-version">@($"v{footerVersionIsNet}")</span>
+                    &nbsp;·&nbsp;
+                    IdentityServer4 <span class="is-net-footer-version">@($"v{footerVersionIs4}")</span>
+                </span>
+                <span class="is-net-footer-links">
+                    <a href="~/.well-known/openid-configuration">Discovery Document</a>
+                    <a href="~/home/about">About</a>
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/is-net-ui.js"></script>
     @RenderSection("scripts", required: false)
 </body>

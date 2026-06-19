@@ -11,7 +11,7 @@
         <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentApiResource.Scopes != null)
         {
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav nav-pills flex-column">
 
                 @foreach (var scope in Model.CurrentApiResource.Scopes)
                 {
@@ -86,7 +86,7 @@
                     <label asp-for="Input.Scope.Emphasize"></label>
                     <span asp-validation-for="Input.Scope.Emphasize" class="text-danger"></span>
                 </div>
-                <button id="add-scope-button" type="submit" class="btn btn-default">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
+                <button id="add-scope-button" type="submit" class="btn btn-primary">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
             </form>
         </div>
     </div>

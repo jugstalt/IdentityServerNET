@@ -1,58 +1,98 @@
-.navbar-inverse {
-    border-color: #0094ff;
+/* Main navbar (register layout) */
+#main-navbar {
     background-color: #0094ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-    .navbar-inverse .navbar-brand {
-        color: #fff;
-    }
+#main-navbar .navbar-brand {
+    color: #fff;
+    font-weight: 600;
+}
 
-    .navbar-inverse .navbar-nav > li > a {
-        color: #fff;
-    }
+#main-navbar .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+}
 
+#main-navbar .navbar-nav .nav-link:hover {
+    color: #fff;
+}
 
+#main-navbar .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+#main-navbar .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Login/Register page background */
 .body-layout-login {
-    background-color: #53aef5;
+    background: linear-gradient(135deg, #0094ff 0%, #53aef5 100%);
+    min-height: 100vh;
 }
 
-    .body-layout-login .panel {
-        box-shadow: 4px 4px 9px rgba(0,0,0,.4);
-    }
+.body-layout-login .container.body-content {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
 
-    .body-layout-login .panel-heading {
-        border: none;
-    }
+.body-layout-login .login-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
 
-    .body-layout-login .panel-body {
-        background-color: #fff;
-        border: none;
-    }
+.body-layout-login .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1.5rem;
+}
 
-    .body-layout-login input.form-control {
-        border: 1px solid #ccc !important;
-        border-radius: 6px !important;
-        height: 56px;
-    }
+.body-layout-login .card-body {
+    background-color: #fff;
+    padding: 1.75rem;
+}
 
-    .body-layout-login .form-group label {
-        color: #0094ff;
-        background-color: #fff;
-        position: relative;
-        top: 15px;
-        left: 6px;
-        border-radius: 6px;
-        padding: 0px 5px;
-    }
+.body-layout-login input.form-control {
+    border-radius: 8px;
+    height: 48px;
+    border: 1.5px solid #d0d0d0;
+}
 
-    .body-layout-login .form-group.login-remember label {
-        position: unset;
-    }
+.body-layout-login input.form-control:focus {
+    border-color: #0094ff;
+    box-shadow: 0 0 0 3px rgba(0, 148, 255, 0.15);
+}
 
-    .body-layout-login .panel-logo {
-        background-image: url('media/openid-logo.png');
-    }
+.body-layout-login .form-label {
+    color: #0094ff;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
 
-    .body-layout-login .panel-title {
-        font-size: 20px;
-    }
+.body-layout-login .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.1rem;
+}
+
+.body-layout-login .btn-primary {
+    width: 100%;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    background-color: #0094ff;
+    border-color: #0094ff;
+}
+
+.body-layout-login .btn-primary:hover {
+    background-color: #007acc;
+    border-color: #007acc;
+}
+
+.body-layout-login .btn-secondary {
+    width: 100%;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}

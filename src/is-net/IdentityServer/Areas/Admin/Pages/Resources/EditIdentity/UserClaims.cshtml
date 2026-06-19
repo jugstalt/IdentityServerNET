@@ -11,7 +11,7 @@
         <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentIdentityResource.UserClaims != null)
         {
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav nav-pills flex-column">
 
                 @foreach (var userClaim in Model.CurrentIdentityResource.UserClaims)
                 {
@@ -36,7 +36,7 @@
                     <input asp-for="Input.UserClaim" class="form-control" placeholder="New claim name" />
                     <span asp-validation-for="Input.UserClaim" class="text-danger"></span>
                 </div>
-                <button id="add-scope-button" type="submit" class="btn btn-default">Add</button>
+                <button id="add-scope-button" type="submit" class="btn btn-primary">Add</button>
             </form>
         </div>
     </div>

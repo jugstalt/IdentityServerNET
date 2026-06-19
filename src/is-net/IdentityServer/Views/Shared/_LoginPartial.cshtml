@@ -1,4 +1,4 @@
-﻿@using IdentityServerNET.Extensions
+@using IdentityServerNET.Extensions
 @using Microsoft.AspNetCore.Identity
 @using IdentityServerNET.Models
 @using IdentityServerNET
@@ -10,61 +10,77 @@
 
 @{
     var applicationUser = await UserManager.GetUserAsync(User);
+    var isDark = ColorScheme.CurrentColorScheme == ColorSchemes.Dark;
+    var toggleUrl = Url.Action("ToggleColorScheme", "Home");
 }
 
 @if (SignInManager.IsSignedIn(User))
 {
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <a href="~/Home/Index" title="Manage">
-                    <div class="@ColorScheme.NavIcon("home")"></div>
-                    Home
+    <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+            <a class="nav-link" href="~/Home/Index" title="Home">
+                <div class="@ColorScheme.NavIcon("home")"></div>
+                Home
+            </a>
+        </li>
+        @if (applicationUser.HasAdministratorRole())
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="~/admin" title="Admin">
+                    <div class="@ColorScheme.NavIcon("admin")"></div>
+                    Admin
                 </a>
             </li>
-            @if(applicationUser.HasAdministratorRole())
+        }
+        <li class="nav-item">
+            @if (Configuration.DenyManageAccount())
             {
-                <li>
-                    <a href="~/admin" title="Admin">
-                        <div class="@ColorScheme.NavIcon("admin")"></div>
-                        Admin
-                    </a>
-                </li>
-            }
-            <li>
-                @if (Configuration.DenyManageAccount())
-                {
-                    <a href="~/Home/Index" title="Manage">
-                        <div class="@ColorScheme.NavIcon("account")"></div>
-                        Hello @UserManager.GetUserName(User)!
-                    </a>
-                }
-                else
-                {
-                    <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                        <div class="@ColorScheme.NavIcon("account")"></div>
-                        Account: @UserManager.GetUserName(User)
-                    </a>
-                }
-            </li>
-            <li>
-                <a href="~/Account/Logout" title="Logout">
-                    <div class="@ColorScheme.NavIcon("account-logout")"></div>
-                    Logout
+                <a class="nav-link" href="~/Home/Index" title="Manage">
+                    <div class="@ColorScheme.NavIcon("account")"></div>
+                    Hello @UserManager.GetUserName(User)!
                 </a>
-            </li>
-        </ul>
+            }
+            else
+            {
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                    <div class="@ColorScheme.NavIcon("account")"></div>
+                    Account: @UserManager.GetUserName(User)
+                </a>
+            }
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="~/Account/Logout" title="Logout">
+                <div class="@ColorScheme.NavIcon("account-logout")"></div>
+                Logout
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link navbar-colorscheme-toggle" href="#"
+               data-toggle-url="@toggleUrl"
+               title="@(isDark ? "Switch to light mode" : "Switch to dark mode")">
+                <div class="@ColorScheme.NavIcon("darkmode")"></div>
+            </a>
+        </li>
+    </ul>
 }
 else
 {
-<ul class="nav navbar-nav navbar-right">
-    @if (!Configuration.DenyRegisterAccount())
-    {
-        <li>
-            <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+    <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+            <a class="nav-link navbar-colorscheme-toggle" href="#"
+               data-toggle-url="@toggleUrl"
+               title="@(isDark ? "Switch to light mode" : "Switch to dark mode")">
+                <div class="@ColorScheme.NavIcon("darkmode")"></div>
+            </a>
         </li>
-    }
-    <li>
-        <a href="~/Account/Login" title="Login">Login</a>
-    </li>
-</ul>
+        @if (!Configuration.DenyRegisterAccount())
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link" href="~/Account/Login" title="Login">Login</a>
+        </li>
+    </ul>
 }

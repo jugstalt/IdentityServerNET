@@ -18,21 +18,21 @@
         @if (Model.EnableLocalLogin || Model.VisibleExternalProviders.Any())
         {
             <div class="col-sm-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+                <div class="card login-card">
+                    <div class="card-header">
                         <table>
                             <tr>
                                 <td>
                                     <div class="panel-logo"></div>
                                 </td>
                                 <td>
-                                    <h3 class="panel-title">@userInterface.ApplicationTitle</h3>
+                                    <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
                                     <div>Login</div>
                                 </td>
                             </tr>
                         </table>
                     </div>
-                    <div class="panel-body">
+                    <div class="card-body">
 
                         @if (Model.EnableLocalLogin)
                         {
@@ -67,7 +67,7 @@
                                     }
                                     <div class="form-group">
                                         <button class="btn btn-primary" name="button" value="login">Login</button>
-                                        @*<button class="btn btn-default" name="button" value="cancel">Cancel</button>*@
+                                        @*<button class="btn btn-primary" name="button" value="cancel">Cancel</button>*@
                                     </div>
                                 </fieldset>
                             </form>
@@ -81,7 +81,7 @@
                                         <input type="hidden" id="passkey-assertion-json" name="assertionJson" />
                                     </form>
                                     <button id="passkey-signin-btn"
-                                            class="btn btn-default"
+                                            class="btn btn-primary"
                                             data-challenge-url="@Url.Action("PasskeyChallenge","Account")">
                                         Sign in with Passkey
                                     </button>
@@ -109,7 +109,7 @@
                                 @foreach (var provider in Model.VisibleExternalProviders)
                                 {
                                     <li class="login-external-provider">
-                                        <a class="btn btn-default"
+                                        <a class="btn btn-primary"
                                            asp-controller="External"
                                            asp-action="Challenge"
                                            asp-route-scheme="@provider.AuthenticationScheme"

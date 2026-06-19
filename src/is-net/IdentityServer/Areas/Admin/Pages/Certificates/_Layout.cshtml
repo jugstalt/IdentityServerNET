@@ -7,6 +7,11 @@
     <hr />
     <div class="row">
         <partial name="_StatusMessage" model="Model.StatusMessage" />
+        <div class="col-md-3 sidebar">
+            <ul class="nav nav-pills flex-column">
+                <li><a href="~/admin">«</a></li>
+            </ul>
+        </div>
         <div class="col-md-9">
             @RenderBody()
         </div>

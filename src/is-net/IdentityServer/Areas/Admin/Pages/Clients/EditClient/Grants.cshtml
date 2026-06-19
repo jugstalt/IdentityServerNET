@@ -10,7 +10,7 @@
     <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
 
-        <ul class="nav nav-pills nav-stacked">
+        <ul class="nav nav-pills flex-column">
             @foreach (var staticField in typeof(OidcConstants.GrantTypes).GetFields(BindingFlags.Static | BindingFlags.Public))
             {
                 var grantName = staticField.Name;
@@ -23,7 +23,7 @@
                        asp-route-grant="@grantValue"
                        asp-route-remove="@hasGrant">
                         <div style="width:32px;height:32px;float:left"
-                             class="@(hasGrant ? "glyphicon glyphicon-ok text-success" : "")">
+                             class="@(hasGrant ? "option-check selected" : "")">
 
                         </div>
                         <div>@(grantName)</div>

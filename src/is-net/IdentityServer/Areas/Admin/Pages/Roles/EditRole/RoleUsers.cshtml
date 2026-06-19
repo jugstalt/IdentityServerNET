@@ -11,7 +11,7 @@
         @if (Model.RoleUsers != null && Model.RoleUsers.Count() >= 0)
         {
         <div class="col-md-6">
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav nav-pills flex-column">
                 @foreach (var user in Model.RoleUsers.OrderBy(u=>u.UserName))
                 {
                     <li class="ui-list-item">
@@ -37,7 +37,7 @@
                     <label asp-for="AddUserInput.Username"></label>
                     <input asp-for="AddUserInput.Username" class="form-control" placeholder="Existing user..." />
                 </div>
-                <button id="add-user-button" type="submit" class="btn btn-default">Add</button>
+                <button id="add-user-button" type="submit" class="btn btn-primary">Add</button>
             </form>
         </div>
     </div>

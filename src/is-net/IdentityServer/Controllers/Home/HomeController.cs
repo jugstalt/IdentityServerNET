@@ -94,7 +94,10 @@ public class HomeController : Controller
                 break;
         }
 
-
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return Json(new { scheme = _colorScheme.CurrentColorScheme.ToString().ToLower() });
+        }
 
         return View("index", applicationUser);
     }
