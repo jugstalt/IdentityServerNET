@@ -12,6 +12,8 @@
     var applicationUser = await UserManager.GetUserAsync(User);
     var isDark = ColorScheme.CurrentColorScheme == ColorSchemes.Dark;
     var toggleUrl = Url.Action("ToggleColorScheme", "Home");
+    var schemeIcon = isDark ? "bulb-shining" : "darkmode";
+    var schemeTitle = isDark ? "Switch to light mode" : "Switch to dark mode";
 }
 
 @if (SignInManager.IsSignedIn(User))
@@ -57,8 +59,8 @@
         <li class="nav-item">
             <a class="nav-link navbar-colorscheme-toggle" href="#"
                data-toggle-url="@toggleUrl"
-               title="@(isDark ? "Switch to light mode" : "Switch to dark mode")">
-                <div class="@ColorScheme.NavIcon("darkmode")"></div>
+               title="@schemeTitle">
+                <div class="@ColorScheme.NavIcon(schemeIcon)"></div>
             </a>
         </li>
     </ul>
@@ -69,8 +71,8 @@ else
         <li class="nav-item">
             <a class="nav-link navbar-colorscheme-toggle" href="#"
                data-toggle-url="@toggleUrl"
-               title="@(isDark ? "Switch to light mode" : "Switch to dark mode")">
-                <div class="@ColorScheme.NavIcon("darkmode")"></div>
+               title="@schemeTitle">
+                <div class="@ColorScheme.NavIcon(schemeIcon)"></div>
             </a>
         </li>
         @if (!Configuration.DenyRegisterAccount())

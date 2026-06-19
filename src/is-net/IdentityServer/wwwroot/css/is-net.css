@@ -146,8 +146,10 @@ body:not(.body-layout-login) .form-group label {
     margin-bottom: 0.35rem;
 }
 
-.btn + .btn {
+.btn + .btn,
+.btn + a.btn {
     margin-left: 0.5rem;
+    vertical-align: middle;
 }
 
 /* ===== Sidebar navigation ===== */
@@ -573,6 +575,7 @@ ul.ui-tiles li.ui-tile a .ui-tile-text {
     border-color: #0094ff;
     box-shadow: 0 0 0 3px rgba(0, 148, 255, 0.15);
 }
+
 
 /* ===== Responsive: stack sidebar + content on small screens ===== */
 @media (max-width: 767px) {
