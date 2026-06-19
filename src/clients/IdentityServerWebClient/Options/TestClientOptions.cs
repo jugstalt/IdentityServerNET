@@ -9,4 +9,6 @@ public class TestClientOptions
     public string ApiClientId { get; set; } = "";
     public string ApiClientSecret { get; set; } = "";
     public string ApiScopes { get; set; } = "";
+    public string IntrospectionClientId { get; set; } = "";
+    public string IntrospectionClientSecret { get; set; } = "";
 }

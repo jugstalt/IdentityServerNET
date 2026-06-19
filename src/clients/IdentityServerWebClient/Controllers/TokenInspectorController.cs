@@ -29,8 +29,8 @@ public class TokenInspectorController : Controller
         {
             Token = savedToken,
             Authority = _options.Authority,
-            IntrospectionClientId = string.IsNullOrEmpty(_options.ApiClientId) ? _options.ClientId : _options.ApiClientId,
-            IntrospectionClientSecret = string.IsNullOrEmpty(_options.ApiClientSecret) ? _options.ClientSecret : _options.ApiClientSecret
+            IntrospectionClientId = string.IsNullOrEmpty(_options.IntrospectionClientId) ? _options.ClientId : _options.IntrospectionClientId,
+            IntrospectionClientSecret = string.IsNullOrEmpty(_options.IntrospectionClientSecret) ? _options.ClientSecret : _options.IntrospectionClientSecret
         });
     }
 

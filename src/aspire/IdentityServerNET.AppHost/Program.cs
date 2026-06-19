@@ -18,8 +18,11 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
 builder.AddProject<Projects.IdentityServerWebClient>("identityserverwebclient")
        .WithEnvironment("OpenIdConnectAuthentication__Authority", "https://localhost:44300")
        .WithEnvironment("TestClient__Authority", "https://localhost:44300")
-       .WithEnvironment("TestClient__ApiClientId", "is-nova-webapi")
-       .WithEnvironment("TestClient__ApiClientSecret", "apisecret")
+       .WithEnvironment("TestClient__ApiClientId", "is-webclient-api")
+       .WithEnvironment("TestClient__ApiClientSecret", "secret")
+       .WithEnvironment("TestClient__ApiScopes", "is-nova-webapi")
+       .WithEnvironment("TestClient__IntrospectionClientId", "is-nova-webapi")
+       .WithEnvironment("TestClient__IntrospectionClientSecret", "apisecret")
        .WaitFor(identityServer);
 
 builder.Build().Run();
