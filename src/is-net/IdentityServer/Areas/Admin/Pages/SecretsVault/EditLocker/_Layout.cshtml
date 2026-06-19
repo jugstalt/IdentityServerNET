@@ -4,6 +4,7 @@
 
 @model IEditLockerPageModel
 
+<nav aria-label="breadcrumb"><ol class="breadcrumb is-breadcrumb"><li class="breadcrumb-item"><a href="~/admin">Admin</a></li><li class="breadcrumb-item"><a href="~/admin/secretsvault">Secrets Vault</a></li><li class="breadcrumb-item active">@Model?.CurrentLocker?.Name</li></ol></nav>
 <h2>Admin Secrets Roles</h2>
 <div class="admin-resources">
     <h4>Edit Locker: @Model?.CurrentLocker?.Name</h4>
@@ -28,4 +29,5 @@
 @section Scripts {
     @RenderSection("scripts", required: false)
 }
+
 

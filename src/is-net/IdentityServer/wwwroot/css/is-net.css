@@ -55,6 +55,59 @@
     color: #0094ff;
 }
 
+/* ===== Breadcrumbs ===== */
+nav[aria-label="breadcrumb"] {
+    margin-bottom: 0.4rem;
+}
+
+.is-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0.35rem 0.75rem;
+    margin: 0;
+    background-color: #f4f7fb;
+    border-radius: 6px;
+    border: 1px solid #e8edf4;
+    font-size: 0.8rem;
+    list-style: none;
+}
+
+.is-breadcrumb .breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.is-breadcrumb .breadcrumb-item + .breadcrumb-item {
+    padding-left: 0;
+}
+
+.is-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #c0c8d8;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 0.4rem;
+    font-weight: 300;
+}
+
+.is-breadcrumb .breadcrumb-item a {
+    color: #0078d4;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.12s;
+}
+
+.is-breadcrumb .breadcrumb-item a:hover {
+    color: #0094ff;
+    text-decoration: underline;
+}
+
+.is-breadcrumb .breadcrumb-item.active {
+    color: #555;
+    font-weight: 400;
+}
+
 /* ===== Navbar ===== */
 #main-navbar {
     background-color: #0094ff;

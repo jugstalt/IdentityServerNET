@@ -18,6 +18,28 @@ body.colorscheme-dark {
     color: #4cc2ff;
 }
 
+/* ===== Dark Breadcrumbs ===== */
+.colorscheme-dark .is-breadcrumb {
+    background-color: #13132a;
+    border-color: #2a2a42;
+}
+
+.colorscheme-dark .is-breadcrumb .breadcrumb-item a {
+    color: #4cc2ff;
+}
+
+.colorscheme-dark .is-breadcrumb .breadcrumb-item a:hover {
+    color: #7dd4ff;
+}
+
+.colorscheme-dark .is-breadcrumb .breadcrumb-item.active {
+    color: #888;
+}
+
+.colorscheme-dark .is-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: #3a3a5a;
+}
+
 /* ===== Dark Navbar ===== */
 .colorscheme-dark #main-navbar {
     background-color: #0a0a1a !important;

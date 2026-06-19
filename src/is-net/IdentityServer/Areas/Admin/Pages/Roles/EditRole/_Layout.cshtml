@@ -4,6 +4,7 @@
 
 @model IEditRolePageModel
 
+<nav aria-label="breadcrumb"><ol class="breadcrumb is-breadcrumb"><li class="breadcrumb-item"><a href="~/admin">Admin</a></li><li class="breadcrumb-item"><a href="~/admin/roles">Roles</a></li><li class="breadcrumb-item active">@Model?.CurrentApplicationRole?.Name</li></ol></nav>
 <h2>Admin Roles</h2>
 <div class="admin-resources">
     <h4>Edit Application Role: @Model?.CurrentApplicationRole?.Name</h4>
@@ -28,4 +29,5 @@
 @section Scripts {
     @RenderSection("scripts", required: false)
 }
+
 

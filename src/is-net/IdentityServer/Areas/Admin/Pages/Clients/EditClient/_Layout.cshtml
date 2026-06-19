@@ -4,6 +4,7 @@
 
 @model IEditClientPageModel
 
+<nav aria-label="breadcrumb"><ol class="breadcrumb is-breadcrumb"><li class="breadcrumb-item"><a href="~/admin">Admin</a></li><li class="breadcrumb-item"><a href="~/admin/clients">Clients</a></li><li class="breadcrumb-item active">@Model?.CurrentClient?.ClientId</li></ol></nav>
 <h2>Admin IdentityServer</h2>
 <div class="admin-resources">
     <h4>Modify Client: @Model?.CurrentClient?.ClientId</h4>
@@ -22,4 +23,5 @@
 @section Scripts {
     @RenderSection("scripts", required: false)
 }
+
 

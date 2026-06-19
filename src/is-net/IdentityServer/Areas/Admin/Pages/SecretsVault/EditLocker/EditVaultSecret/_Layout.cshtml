@@ -4,6 +4,7 @@
 
 @model IEditVaultSecretPageModel
 
+<nav aria-label="breadcrumb"><ol class="breadcrumb is-breadcrumb"><li class="breadcrumb-item"><a href="~/admin">Admin</a></li><li class="breadcrumb-item"><a href="~/admin/secretsvault">Secrets Vault</a></li><li class="breadcrumb-item"><a href="~/admin/secretsvault/editlocker?id=@Model?.LockerName">@Model?.LockerName</a></li><li class="breadcrumb-item active">@Model?.CurrentSecret?.Name</li></ol></nav>
 <h2>Admin Secrets Vault</h2>
 <div class="admin-resources">
     <h4>Edit Secret: @($"{ Model.LockerName }/{ @Model?.CurrentSecret?.Name }")</h4>
@@ -28,4 +29,5 @@
 @section Scripts {
     @RenderSection("scripts", required: false)
 }
+
 
