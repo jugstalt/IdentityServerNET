@@ -16,5 +16,6 @@
     <ProjectReference Include="..\..\nuget\IdentityServerNET.Aspire.Hosting\IdentityServerNET.Aspire.Hosting.csproj" IsAspireProjectResource="false"/>
     <ProjectReference Include="..\ClientApi\ClientApi.csproj" />
     <ProjectReference Include="..\ClientWeb\ClientWeb.csproj" />
+    <ProjectReference Include="..\IdentityServerWebClient\IdentityServerWebClient.csproj" />
   </ItemGroup>
 </Project>

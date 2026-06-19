@@ -94,7 +94,7 @@ public class ClientModel
     public int? UserSsoLifetime { get; set; }
 
     [JsonProperty("UserCodeType")]
-    public string UserCodeType { get; set; } = "";
+    public string? UserCodeType { get; set; } = null;
 
     [JsonProperty("DeviceCodeLifetime")]
     public int DeviceCodeLifetime { get; set; }

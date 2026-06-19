@@ -23,6 +23,7 @@ public class MigrationModel
     public class ApiResource()
     {
         public string Name { get; set; } = "";
+        public string? ApiSecret { get; set; }
         public Scope[]? Scopes { get; set; }
     }
 
@@ -46,6 +47,8 @@ public class MigrationModel
         public string ClientId { get; set; } = "";
         public string ClientSecret { get; set; } = "";
         public string? ClientUrl { get; set; }
+        public string[]? AdditionalRedirectUris { get; set; }
+        public string[]? AdditionalGrantTypes { get; set; }
         public string[]? Scopes { get; set; }
     }
 

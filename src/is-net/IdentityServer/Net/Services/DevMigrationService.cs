@@ -98,11 +98,24 @@ public class DevMigrationService
                     );
                 }
 
-                await _resourceDb.AddApiResourceAsync(new ApiResourceModel()
+                var apiResourceModel = new ApiResourceModel()
                 {
                     Name = apiResouce.Name,
                     Scopes = scopes
-                });
+                };
+
+                if (!string.IsNullOrEmpty(apiResouce.ApiSecret))
+                {
+                    apiResourceModel.ApiSecrets = [
+                        new SecretModel()
+                        {
+                            Type = IdentityServer4.IdentityServerConstants.SecretTypes.SharedSecret,
+                            Value = apiResouce.ApiSecret.Trim().ToSha256()
+                        }
+                    ];
+                }
+
+                await _resourceDb.AddApiResourceAsync(apiResourceModel);
             }
         }
 
@@ -221,7 +234,7 @@ public class DevMigrationService
 
                 if (Enum.TryParse(client.ClientType, true, out ClientTemplateType clientType))
                 {
-                    clientModel.ApplyTemplate(clientType, client.ClientUrl, client.Scopes);
+                    clientModel.ApplyTemplate(clientType, client.ClientUrl, client.Scopes, client.AdditionalRedirectUris, client.AdditionalGrantTypes);
                 }
 
                 await _clientDb.AddClientAsync(clientModel);

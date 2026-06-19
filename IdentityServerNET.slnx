@@ -9,6 +9,9 @@
     <Project Path="src/aspire/IdentityServerNET.AppHost/IdentityServerNET.AppHost.csproj" />
     <Project Path="src/aspire/IdentityServerNET.ServiceDefaults/IdentityServerNET.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/src/clients/">
+    <Project Path="src/clients/IdentityServerWebClient/IdentityServerWebClient.csproj" />
+  </Folder>
   <Folder Name="/src/customize/" Id="f3a74df7-d413-42a0-a26e-e5355cc27ef5">
     <Project Path="src/customize/IdentityServerNET.ServerExtension.Default/IdentityServerNET.ServerExtension.Default.csproj" />
   </Folder>
@@ -40,7 +43,6 @@
     <Project Path="src/nuget/IdentityServerNET.Extensions.DependencyInjection/IdentityServerNET.Extensions.DependencyInjection.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Extensions/IdentityServerNET.Extensions.csproj" />
   </Folder>
-  <Folder Name="/src/tests/" />
   <Folder Name="/test/">
     <Project Path="test/IdentityServerNET.Host.Tests/IdentityServerNET.Host.Tests.csproj" />
     <Project Path="test/IdentityServerNET.Models.Tests/IdentityServerNET.Models.Tests.csproj" />

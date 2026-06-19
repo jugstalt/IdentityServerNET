@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Discovery Document";
+    var authority = ViewBag.Authority as string ?? "";
+    var discoveryJson = ViewBag.DiscoveryJson as string;
+    var error = ViewBag.Error as string;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">Discovery Document</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1"><i class="bi bi-binoculars text-dark me-2"></i>Discovery Document</h2>
+        <p class="text-muted mb-0">
+            Fetches <code>@authority/.well-known/openid-configuration</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-section mb-4">
+    <form method="post" data-testid="form-discovery">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label fw-semibold">Authority</label>
+                <input name="authority" value="@authority" class="form-control font-monospace"
+                       data-testid="input-authority" required />
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-dark w-100" data-testid="btn-submit">
+                    <i class="bi bi-binoculars me-1"></i>Fetch
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger" data-testid="discovery-error">
+        <i class="bi bi-x-circle me-1"></i>@error
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(discoveryJson))
+{
+    <div class="card">
+        <div class="card-header fw-semibold py-2">
+            <i class="bi bi-braces me-1"></i>openid-configuration
+        </div>
+        <div class="card-body p-3">
+            <pre class="json-dark mb-0" data-testid="discovery-json">@discoveryJson</pre>
+        </div>
+    </div>
+}

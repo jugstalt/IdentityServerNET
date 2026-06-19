@@ -2,6 +2,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
+var testClient = builder.AddProject<Projects.IdentityServerWebClient>("identityserverwebclient");
 
 var identityServer = builder.AddIdentityServerNET("is-net-dev")
        .WithMailDev()
@@ -45,6 +46,20 @@ var identityServer = builder.AddIdentityServerNET("is-net-dev")
                                 "is-nova-webapi.query",
                                 "is-nova-webapi.command"
                            ])
+               .AddClient(ClientType.WebApplication,
+                            "is-webclient-test", "secret",
+                            testClient.Resource,
+                            [
+                                "openid", "profile", "role", "offline_access"
+                            ])
+               .AddClient(ClientType.ApiClient,
+                            "is-webclient-api", "secret",
+                            testClient.Resource,
+                            [
+                                "is-nova-webapi",
+                                "is-nova-webapi.query",
+                                "is-nova-webapi.command"
+                           ])
        )
        .WithExternalProviders(external =>
        {
@@ -62,6 +77,11 @@ webApi
 webApp
        //.WithHealthCheck("/health")
        .AddReference(identityServer, "OpenIdConnectAuthentication:Authority")
+       .WaitFor(identityServer);
+
+testClient
+       .AddReference(identityServer, "OpenIdConnectAuthentication:Authority")
+       .AddReference(identityServer, "TestClient:Authority")
        .WaitFor(identityServer);
 
 builder.Build().Run();

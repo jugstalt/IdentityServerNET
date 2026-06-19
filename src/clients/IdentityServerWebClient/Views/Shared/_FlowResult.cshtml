@@ -1,0 +1,126 @@
+@model FlowResultModel
+
+@if (Model is null) { return; }
+
+<div class="mt-4" data-testid="flow-result">
+    @if (!Model.Success)
+    {
+        <div class="alert alert-danger" data-testid="result-error">
+            <strong><i class="bi bi-x-circle"></i> Error:</strong> @Model.Error
+            @if (!string.IsNullOrEmpty(Model.ErrorDescription))
+            {
+                <div class="small mt-1 text-danger-emphasis">@Model.ErrorDescription</div>
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(Model.RawJson))
+        {
+            <h6 class="text-muted mt-3">Raw Response</h6>
+            <pre class="json-dark" data-testid="result-raw">@Model.RawJson</pre>
+        }
+    }
+    else
+    {
+        <div class="alert alert-success py-2" data-testid="result-success">
+            <i class="bi bi-check-circle-fill"></i> <strong>Success</strong>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.AccessToken))
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold"><i class="bi bi-key-fill text-warning me-1"></i>Access Token</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseAt">Toggle</button>
+                </div>
+                <div id="collapseAt" class="collapse show">
+                    <div class="card-body">
+                        <div class="token-mono mb-2" data-testid="access-token">@Model.AccessToken</div>
+                        @if (!string.IsNullOrEmpty(Model.DecodedAccessTokenPayload))
+                        {
+                            <div class="text-muted small mb-1">Decoded Payload</div>
+                            <pre class="json-dark" data-testid="access-token-payload">@Model.DecodedAccessTokenPayload</pre>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.IdToken))
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold"><i class="bi bi-person-badge-fill text-info me-1"></i>ID Token</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseIt">Toggle</button>
+                </div>
+                <div id="collapseIt" class="collapse show">
+                    <div class="card-body">
+                        <div class="token-mono mb-2" data-testid="id-token">@Model.IdToken</div>
+                        @if (!string.IsNullOrEmpty(Model.DecodedIdTokenPayload))
+                        {
+                            <div class="text-muted small mb-1">Decoded Payload</div>
+                            <pre class="json-dark" data-testid="id-token-payload">@Model.DecodedIdTokenPayload</pre>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.RefreshToken))
+        {
+            <div class="card mb-3">
+                <div class="card-header py-2">
+                    <span class="fw-semibold"><i class="bi bi-arrow-clockwise text-secondary me-1"></i>Refresh Token</span>
+                </div>
+                <div class="card-body">
+                    <div class="token-mono" data-testid="refresh-token">@Model.RefreshToken</div>
+                </div>
+            </div>
+        }
+
+        @if (Model.Claims.Count > 0)
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold"><i class="bi bi-list-ul me-1"></i>Claims (@Model.Claims.Count)</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseClaims">Toggle</button>
+                </div>
+                <div id="collapseClaims" class="collapse show">
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-striped mb-0" data-testid="claims-table">
+                            <thead class="table-dark">
+                                <tr><th class="ps-3">Type</th><th>Value</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (type, value) in Model.Claims)
+                                {
+                                    <tr>
+                                        <td class="ps-3 text-muted small font-monospace">@type</td>
+                                        <td class="small">@value</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.RawJson))
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold"><i class="bi bi-braces me-1"></i>Raw Response</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseRaw">Toggle</button>
+                </div>
+                <div id="collapseRaw" class="collapse">
+                    <div class="card-body p-3">
+                        <pre class="json-dark mb-0" data-testid="raw-response">@Model.RawJson</pre>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

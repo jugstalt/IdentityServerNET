@@ -15,7 +15,9 @@ internal static class ClientModelExtensions
                 this ClientModel client,
                 ClientTemplateType templateType,
                 string? clientUrl,
-                string[]? apiScopes)
+                string[]? apiScopes,
+                string[]? additionalRedirectUris = null,
+                string[]? additionalGrantTypes = null)
     {
         switch (templateType)
         {
@@ -72,24 +74,41 @@ internal static class ClientModelExtensions
                     {
                        client.AllowedScopes.Add(apiScope);
                     }
+                    if (apiScopes.Contains("offline_access"))
+                    {
+                        client.AllowOfflineAccess = true;
+                    }
                 }
 
                 if (!String.IsNullOrWhiteSpace(clientUrl))
                 {
                     try
                     {
-                        client.RedirectUris = new[]
+                        var baseUri = new Uri(clientUrl);
+                        var redirectUris = new List<string>
                         {
-                            clientUrl = new Uri(new Uri(clientUrl), "signin-oidc").ToString()
+                            new Uri(baseUri, "signin-oidc").ToString()
                         };
+                        if (additionalRedirectUris?.Length > 0)
+                        {
+                            redirectUris.AddRange(
+                                additionalRedirectUris.Select(r => new Uri(baseUri, r).ToString()));
+                        }
+                        client.RedirectUris = redirectUris;
                         client.PostLogoutRedirectUris = new[]
                         {
-                            clientUrl = new Uri(new Uri(clientUrl), "signout-callback-oidc").ToString()
+                            new Uri(baseUri, "signout-callback-oidc").ToString()
                         };
                     }
                     catch { }
                 }
 
+                if (additionalGrantTypes?.Length > 0)
+                {
+                    var grantTypes = client.AllowedGrantTypes?.ToList() ?? [];
+                    grantTypes.AddRange(additionalGrantTypes);
+                    client.AllowedGrantTypes = grantTypes;
+                }
 
                 break;
         }

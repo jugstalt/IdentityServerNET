@@ -1,0 +1,66 @@
+@model ClientCredentialsModel
+@{
+    ViewData["Title"] = "Client Credentials";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">Client Credentials</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1"><i class="bi bi-key-fill text-warning me-2"></i>Client Credentials</h2>
+        <p class="text-muted mb-0">
+            Machine-to-machine flow. Sends <code>client_id</code> + <code>client_secret</code> to the token endpoint.
+            <span class="badge bg-warning text-dark ms-1">client_credentials grant</span>
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="form-section">
+            <form method="post" data-testid="form-client-credentials">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Authority</label>
+                    <input name="Authority" value="@Model.Authority" class="form-control font-monospace"
+                           data-testid="input-authority" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Client ID</label>
+                    <input name="ClientId" value="@Model.ClientId" class="form-control font-monospace"
+                           data-testid="input-client-id" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Client Secret</label>
+                    <input name="ClientSecret" value="@Model.ClientSecret" class="form-control font-monospace"
+                           data-testid="input-client-secret" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Scope</label>
+                    <input name="Scope" value="@Model.Scope" class="form-control font-monospace"
+                           data-testid="input-scope" />
+                </div>
+                <button type="submit" class="btn btn-warning w-100" data-testid="btn-submit">
+                    <i class="bi bi-send me-1"></i>Request Token
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        @if (Model.Result is not null)
+        {
+            @await Html.PartialAsync("_FlowResult", Model.Result)
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-arrow-left display-4"></i>
+                <p class="mt-2">Fill in the form and click <em>Request Token</em></p>
+            </div>
+        }
+    </div>
+</div>

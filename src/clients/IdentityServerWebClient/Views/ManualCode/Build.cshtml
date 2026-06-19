@@ -1,0 +1,86 @@
+@model ManualCodeBuildModel
+@{
+    ViewData["Title"] = "Manual Code + PKCE – Step 2";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/ManualCode">Manual Code + PKCE</a></li>
+        <li class="breadcrumb-item active">Authorization URL</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-success rounded-pill fs-6">1</span>
+            <span class="text-muted">Configure parameters</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-primary rounded-pill fs-6">2</span>
+            <span class="fw-semibold">Follow authorization URL</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">3</span>
+            <span class="text-muted">Exchange code for tokens</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card mb-3">
+            <div class="card-header fw-semibold py-2"><i class="bi bi-shield-lock me-1"></i>PKCE Parameters</div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td class="text-muted small fw-semibold">state</td>
+                        <td class="font-monospace small" data-testid="pkce-state">@Model.State</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">code_verifier</td>
+                        <td class="font-monospace small" data-testid="pkce-code-verifier">@Model.CodeVerifier</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">code_challenge</td>
+                        <td class="font-monospace small" data-testid="pkce-code-challenge">@Model.CodeChallenge</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">method</td>
+                        <td class="font-monospace small">S256</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold py-2"><i class="bi bi-link-45deg me-1"></i>Authorization URL</div>
+            <div class="card-body">
+                <div class="token-mono mb-3 small" data-testid="authorize-url">@Model.AuthorizeUrl</div>
+                <a href="@Model.AuthorizeUrl" class="btn btn-primary w-100" data-testid="btn-authorize">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Go to Authorization Endpoint
+                </a>
+                <div class="text-muted small mt-2 text-center">
+                    You will be redirected to the IdentityServer login page.
+                    After approving, you'll return to the callback URL.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="alert alert-info">
+            <h6 class="fw-semibold"><i class="bi bi-info-circle me-1"></i>What happens next?</h6>
+            <ol class="mb-0 small">
+                <li>Click <em>Go to Authorization Endpoint</em> — you'll be taken to the IdentityServer login page.</li>
+                <li>Log in and approve the requested scopes.</li>
+                <li>You'll be redirected back to <code>@Model.RedirectUri</code> with a <code>code</code> parameter.</li>
+                <li>The callback page lets you exchange the code for tokens using the stored <code>code_verifier</code>.</li>
+            </ol>
+        </div>
+        <div class="alert alert-warning small">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>Important:</strong> <code>@Model.RedirectUri</code> must be registered as an allowed redirect URI
+            in the <strong>@Model.ClientId</strong> client configuration on the IdentityServer admin panel.
+        </div>
+    </div>
+</div>

@@ -1,0 +1,215 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 fw-bold mb-1"><i class="bi bi-shield-lock-fill text-warning me-2"></i>IdentityServer Test Client</h1>
+        <p class="text-muted mb-0">Select a flow below to test it against your IdentityServer instance.</p>
+    </div>
+</div>
+
+<h5 class="text-muted text-uppercase small fw-bold mb-3 letter-spacing-1">Interactive Flows</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-success">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                </div>
+                <h5 class="card-title">Interactive Login</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Full OIDC Authorization Code + PKCE flow via the ASP.NET Core authentication middleware.
+                    Supports password, passkey, MFA, and external providers — whatever the server offers.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-success badge-grant">code</span>
+                    <span class="badge bg-secondary badge-grant">PKCE</span>
+                    <span class="badge bg-secondary badge-grant">refresh</span>
+                </div>
+                <a href="/Oidc/Login" class="btn btn-success mt-3" data-testid="btn-interactive-login">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-primary">
+                    <i class="bi bi-code-slash"></i>
+                </div>
+                <h5 class="card-title">Manual Code + PKCE</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Step-by-step walkthrough: build the authorization URL manually, follow the redirect,
+                    then exchange the authorization code for tokens — all visible in the UI.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-primary badge-grant">code</span>
+                    <span class="badge bg-secondary badge-grant">PKCE</span>
+                    <span class="badge bg-secondary badge-grant">step-by-step</span>
+                </div>
+                <a href="/ManualCode" class="btn btn-primary mt-3" data-testid="btn-manual-code">
+                    <i class="bi bi-code-slash me-1"></i>Start
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-info">
+                    <i class="bi bi-tv"></i>
+                </div>
+                <h5 class="card-title">Device Flow</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    OAuth 2.0 Device Authorization Grant (RFC 8628). Obtain a user code and verification URL,
+                    approve on another device, and poll for the token.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-info badge-grant">device_code</span>
+                    <span class="badge bg-secondary badge-grant">polling</span>
+                </div>
+                <a href="/DeviceFlow" class="btn btn-info mt-3" data-testid="btn-device-flow">
+                    <i class="bi bi-tv me-1"></i>Start
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="text-muted text-uppercase small fw-bold mb-3">Machine-to-Machine Flows</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-warning">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <h5 class="card-title">Client Credentials</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Request an access token using clientId + clientSecret only. No user involved.
+                    Typical for service-to-service API calls.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-warning text-dark badge-grant">client_credentials</span>
+                </div>
+                <a href="/ClientCredentials" class="btn btn-warning mt-3" data-testid="btn-client-credentials">
+                    <i class="bi bi-key me-1"></i>Request Token
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-danger">
+                    <i class="bi bi-person-key"></i>
+                </div>
+                <h5 class="card-title">Resource Owner Password</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Send username + password directly to the token endpoint (ROPC). Deprecated in OAuth 2.1
+                    but still used in some legacy scenarios.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-danger badge-grant">password</span>
+                    <span class="badge bg-secondary badge-grant">legacy</span>
+                </div>
+                <a href="/Ropc" class="btn btn-danger mt-3" data-testid="btn-ropc">
+                    <i class="bi bi-person-key me-1"></i>Request Token
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-secondary">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </div>
+                <h5 class="card-title">Refresh Token</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Exchange a refresh token for a new access token. If you are logged in, the refresh token
+                    from the session is pre-filled automatically.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-secondary badge-grant">refresh_token</span>
+                </div>
+                <a href="/RefreshToken" class="btn btn-secondary mt-3" data-testid="btn-refresh-token">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="text-muted text-uppercase small fw-bold mb-3">Inspection & Diagnostics</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-teal" style="color:#20c997">
+                    <i class="bi bi-person-lines-fill"></i>
+                </div>
+                <h5 class="card-title">UserInfo</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Call the UserInfo endpoint with an access token. If you are logged in, the token
+                    is pre-filled from your session.
+                </p>
+                <a href="/UserInfo" class="btn mt-3" style="background:#20c997;color:#fff" data-testid="btn-userinfo">
+                    <i class="bi bi-person-lines-fill me-1"></i>Fetch Claims
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2" style="color:#6f42c1">
+                    <i class="bi bi-braces"></i>
+                </div>
+                <h5 class="card-title">Token Inspector</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Decode any JWT (header + payload) locally without any network call. Optionally
+                    call the introspection endpoint to validate the token server-side.
+                </p>
+                <a href="/TokenInspector" class="btn mt-3" style="background:#6f42c1;color:#fff" data-testid="btn-token-inspector">
+                    <i class="bi bi-braces me-1"></i>Inspect
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-dark">
+                    <i class="bi bi-binoculars"></i>
+                </div>
+                <h5 class="card-title">Discovery Document</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    Fetch and display the OpenID Connect discovery document
+                    (<code>.well-known/openid-configuration</code>) from any authority.
+                </p>
+                <a href="/Discovery" class="btn btn-dark mt-3" data-testid="btn-discovery">
+                    <i class="bi bi-binoculars me-1"></i>Fetch
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="card flow-card mt-2">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <i class="bi bi-person-check-fill text-success me-2"></i>
+                Logged in as <strong>@User.Identity.Name</strong> —
+                <a href="/Oidc/Profile">view profile &amp; tokens</a>
+            </div>
+            <a href="/Oidc/Logout" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </a>
+        </div>
+    </div>
+}

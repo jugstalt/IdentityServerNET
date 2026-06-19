@@ -1,0 +1,126 @@
+@model DeviceFlowViewModel
+@{
+    ViewData["Title"] = "Device Flow – Authorize";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/DeviceFlow">Device Flow</a></li>
+        <li class="breadcrumb-item active">Authorize</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-body py-4">
+                <div class="display-4 text-info mb-3"><i class="bi bi-phone"></i></div>
+                <h4 class="fw-bold mb-3">User Authorization Required</h4>
+
+                <div class="mb-3">
+                    <div class="text-muted small mb-1">Visit this URL on another device:</div>
+                    <a href="@Model.VerificationUri" target="_blank" class="btn btn-outline-primary btn-sm"
+                       data-testid="verification-uri">
+                        @Model.VerificationUri
+                    </a>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small mb-1">Enter this code:</div>
+                    <div class="display-5 fw-bold font-monospace text-success letter-spacing-3"
+                         data-testid="user-code">@Model.UserCode</div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.VerificationUriComplete))
+                {
+                    <div class="mb-3">
+                        <div class="text-muted small mb-2">Or scan the QR code:</div>
+                        <div id="qrcode" class="d-flex justify-content-center" data-testid="qr-code"></div>
+                    </div>
+                }
+
+                <div class="text-muted small">
+                    Code expires in <strong data-testid="expires-in">@Model.ExpiresIn</strong> seconds.
+                    Polling every @Model.Interval s.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-semibold py-2"><i class="bi bi-hourglass-split me-1"></i>Polling for token…</div>
+            <div class="card-body" id="poll-status">
+                <div class="d-flex align-items-center gap-2 text-muted">
+                    <div class="spinner-border spinner-border-sm" role="status" data-testid="polling-spinner"></div>
+                    <span>Waiting for user authorization…</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!string.IsNullOrEmpty(Model.VerificationUriComplete))
+    {
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+        <script>
+            new QRCode(document.getElementById('qrcode'), {
+                text: '@Html.Raw(Model.VerificationUriComplete)',
+                width: 160,
+                height: 160
+            });
+        </script>
+    }
+    <script>
+        const deviceCode = '@Html.Raw(Model.DeviceCode)';
+        const interval = @Model.Interval * 1000;
+        const pollStatus = document.getElementById('poll-status');
+
+        const renderResult = (data) => {
+            const decodeHtml = s => s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+            let html = '';
+            if (data.accessToken) {
+                html += `<div class="alert alert-success py-2 mb-2"><i class="bi bi-check-circle-fill me-1"></i><strong>Token received!</strong></div>`;
+                html += `<div class="text-muted small fw-bold mb-1">Access Token</div>`;
+                html += `<div class="token-mono mb-2" data-testid="device-access-token">${decodeHtml(data.accessToken)}</div>`;
+                if (data.decodedAccessToken) {
+                    html += `<div class="text-muted small mb-1">Decoded Payload</div>`;
+                    html += `<pre class="json-dark" data-testid="device-access-token-payload">${decodeHtml(data.decodedAccessToken)}</pre>`;
+                }
+                if (data.idToken) {
+                    html += `<div class="text-muted small fw-bold mt-2 mb-1">ID Token</div>`;
+                    html += `<div class="token-mono mb-2" data-testid="device-id-token">${decodeHtml(data.idToken)}</div>`;
+                    if (data.decodedIdToken) {
+                        html += `<pre class="json-dark" data-testid="device-id-token-payload">${decodeHtml(data.decodedIdToken)}</pre>`;
+                    }
+                }
+                if (data.refreshToken) {
+                    html += `<div class="text-muted small fw-bold mt-2 mb-1">Refresh Token</div>`;
+                    html += `<div class="token-mono" data-testid="device-refresh-token">${decodeHtml(data.refreshToken)}</div>`;
+                }
+            }
+            pollStatus.innerHTML = html;
+        };
+
+        const poll = async () => {
+            try {
+                const resp = await fetch(`/DeviceFlow/Poll?deviceCode=${encodeURIComponent(deviceCode)}`);
+                const data = await resp.json();
+
+                if (data.status === 'pending') {
+                    setTimeout(poll, interval);
+                } else if (data.status === 'success') {
+                    renderResult(data);
+                } else {
+                    pollStatus.innerHTML = `<div class="alert alert-danger" data-testid="device-error"><i class="bi bi-x-circle me-1"></i>${data.error || 'Unknown error'}${data.errorDescription ? ': ' + data.errorDescription : ''}</div>`;
+                }
+            } catch (e) {
+                pollStatus.innerHTML = `<div class="alert alert-danger">Network error: ${e.message}</div>`;
+            }
+        };
+
+        setTimeout(poll, interval);
+    </script>
+}

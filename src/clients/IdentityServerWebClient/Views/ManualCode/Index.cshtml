@@ -1,0 +1,79 @@
+@model ManualCodeInputModel
+@{
+    ViewData["Title"] = "Manual Code + PKCE";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">Manual Code + PKCE</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1 text-primary"><i class="bi bi-code-slash me-2"></i>Manual Authorization Code + PKCE</h2>
+        <p class="text-muted mb-0">
+            Build the authorization URL step-by-step: generate <code>code_verifier</code> + <code>code_challenge</code>,
+            follow the redirect, then exchange the code for tokens manually.
+        </p>
+    </div>
+</div>
+
+@if (ViewBag.Error is string err)
+{
+    <div class="alert alert-danger mb-3"><i class="bi bi-x-circle me-1"></i>@err</div>
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-primary rounded-pill fs-6">1</span>
+            <span class="fw-semibold">Configure parameters</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">2</span>
+            <span class="text-muted">Follow authorization URL</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">3</span>
+            <span class="text-muted">Exchange code for tokens</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <form method="post" action="/ManualCode/Build" data-testid="form-manual-code">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Authority</label>
+                <input name="Authority" value="@Model.Authority" class="form-control font-monospace"
+                       data-testid="input-authority" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Scope</label>
+                <input name="Scope" value="@Model.Scope" class="form-control font-monospace"
+                       data-testid="input-scope" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client ID</label>
+                <input name="ClientId" value="@Model.ClientId" class="form-control font-monospace"
+                       data-testid="input-client-id" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client Secret</label>
+                <input name="ClientSecret" value="@Model.ClientSecret" class="form-control font-monospace"
+                       data-testid="input-client-secret" />
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">
+                    Redirect URI
+                    <span class="text-muted fw-normal small">— must be registered as an allowed redirect URI on the client</span>
+                </label>
+                <input name="RedirectUri" value="@Model.RedirectUri" class="form-control font-monospace"
+                       data-testid="input-redirect-uri" required />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3" data-testid="btn-build">
+            <i class="bi bi-gear me-1"></i>Generate Authorization URL
+        </button>
+    </form>
+</div>

@@ -6,6 +6,7 @@
   <Folder Name="/clients/">
     <Project Path="src/clients/ClientApi/ClientApi.csproj" />
     <Project Path="src/clients/ClientWeb/ClientWeb.csproj" />
+    <Project Path="src/clients/IdentityServerWebClient/IdentityServerWebClient.csproj" />
   </Folder>
   <Folder Name="/http/">
     <File Path="http/api-client.http" />

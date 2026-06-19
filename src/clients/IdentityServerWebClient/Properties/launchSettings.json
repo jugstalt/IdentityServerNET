@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "IdentityServerWebClient": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:44360;http://localhost:44361",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

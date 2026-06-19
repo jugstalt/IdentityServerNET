@@ -1,0 +1,61 @@
+@model DeviceFlowInputModel
+@{
+    ViewData["Title"] = "Device Flow";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">Device Flow</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1 text-info"><i class="bi bi-tv me-2"></i>Device Flow</h2>
+        <p class="text-muted mb-0">
+            RFC 8628 Device Authorization Grant. Obtain a user code, approve on another device, poll for the token.
+            <span class="badge bg-info ms-1">device_code grant</span>
+        </p>
+    </div>
+</div>
+
+<div class="alert alert-warning py-2 small mb-3">
+    <i class="bi bi-exclamation-triangle me-1"></i>
+    The client must have <code>urn:ietf:params:oauth:grant-type:device_code</code> grant type enabled on the server.
+</div>
+
+@if (ViewBag.Error is string err)
+{
+    <div class="alert alert-danger" data-testid="device-error"><i class="bi bi-x-circle me-1"></i>@err</div>
+}
+
+<div class="form-section">
+    <form method="post" action="/DeviceFlow/Start" data-testid="form-device-flow">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Authority</label>
+                <input name="Authority" value="@Model.Authority" class="form-control font-monospace"
+                       data-testid="input-authority" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Scope</label>
+                <input name="Scope" value="@Model.Scope" class="form-control font-monospace"
+                       data-testid="input-scope" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client ID</label>
+                <input name="ClientId" value="@Model.ClientId" class="form-control font-monospace"
+                       data-testid="input-client-id" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client Secret</label>
+                <input name="ClientSecret" value="@Model.ClientSecret" class="form-control font-monospace"
+                       data-testid="input-client-secret" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-info mt-3 text-white" data-testid="btn-start">
+            <i class="bi bi-play-circle me-1"></i>Start Device Flow
+        </button>
+    </form>
+</div>

@@ -1,0 +1,63 @@
+@model UserInfoModel
+@{
+    ViewData["Title"] = "UserInfo";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">UserInfo</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1" style="color:#20c997"><i class="bi bi-person-lines-fill me-2"></i>UserInfo Endpoint</h2>
+        <p class="text-muted mb-0">
+            Call <code>/connect/userinfo</code> with a Bearer access token to retrieve user claims.
+        </p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.AccessToken))
+{
+    <div class="alert alert-info py-2 small mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        Access token pre-filled from your current session (Interactive Login).
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="form-section">
+            <form method="post" data-testid="form-userinfo">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Authority</label>
+                    <input name="Authority" value="@Model.Authority" class="form-control font-monospace"
+                           data-testid="input-authority" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Access Token</label>
+                    <textarea name="AccessToken" class="form-control font-monospace" rows="5"
+                              data-testid="input-access-token" required>@Model.AccessToken</textarea>
+                </div>
+                <button type="submit" class="btn w-100 text-white" style="background:#20c997" data-testid="btn-submit">
+                    <i class="bi bi-person-lines-fill me-1"></i>Fetch Claims
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        @if (Model.Result is not null)
+        {
+            @await Html.PartialAsync("_FlowResult", Model.Result)
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-arrow-left display-4"></i>
+                <p class="mt-2">Provide an access token and click <em>Fetch Claims</em></p>
+            </div>
+        }
+    </div>
+</div>

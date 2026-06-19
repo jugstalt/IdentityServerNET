@@ -1,0 +1,93 @@
+@using Microsoft.AspNetCore.Authentication
+@{
+    ViewData["Title"] = "Login Profile";
+    var props = ViewBag.AuthProperties as IDictionary<string, string?> ?? new Dictionary<string, string?>();
+    var tokens = props.Where(p => p.Key.StartsWith(".Token.")).ToList();
+}
+
+<div class="d-flex align-items-center mb-4">
+    <div>
+        <h2 class="h4 fw-bold mb-0"><i class="bi bi-person-check-fill text-success me-2"></i>Login Successful</h2>
+        <p class="text-muted mb-0">Authenticated via OIDC Authorization Code + PKCE</p>
+    </div>
+    <div class="ms-auto">
+        <a href="/Oidc/Logout" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center py-2">
+                <span class="fw-semibold"><i class="bi bi-list-ul me-1"></i>Claims (@User.Claims.Count())</span>
+                <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapseClaims">Toggle</button>
+            </div>
+            <div id="collapseClaims" class="collapse show">
+                <div class="card-body p-0">
+                    <table class="table table-sm table-striped mb-0" data-testid="profile-claims">
+                        <thead class="table-dark">
+                            <tr><th class="ps-3">Type</th><th>Value</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in User.Claims)
+                            {
+                                <tr>
+                                    <td class="ps-3 text-muted small font-monospace">@claim.Type</td>
+                                    <td class="small">@claim.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        @foreach (var token in tokens)
+        {
+            var tokenName = token.Key.Replace(".Token.", "");
+            var tokenValue = token.Value ?? "";
+            var isJwt = tokenValue.Split('.').Length == 3;
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold small">
+                        <i class="bi bi-key me-1"></i>@tokenName
+                    </span>
+                    @if (isJwt)
+                    {
+                        <button class="btn btn-sm btn-outline-secondary py-0" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapse_@tokenName.Replace("_","-")">
+                            Toggle
+                        </button>
+                    }
+                </div>
+                <div id="collapse_@tokenName.Replace("_","-")" class="@(isJwt ? "collapse show" : "")">
+                    <div class="card-body py-2">
+                        <div class="token-mono mb-2" data-testid="token-@tokenName">@tokenValue</div>
+                        @if (isJwt)
+                        {
+                            var (_, payload) = JwtHelper.Decode(tokenValue);
+                            if (payload is not null)
+                            {
+                                <div class="text-muted small mb-1">Decoded Payload</div>
+                                <pre class="json-dark" data-testid="decoded-@tokenName">@payload</pre>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!tokens.Any())
+        {
+            <div class="alert alert-warning">
+                No tokens found in session. Make sure <code>SaveTokens = true</code> is configured.
+            </div>
+        }
+    </div>
+</div>
