@@ -26,8 +26,8 @@
     <title>@Configuration["ApplicationTitle"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link href="~/css/is-net.css" rel="stylesheet" />
-    <link href="~/css/is-net-dark.css" rel="stylesheet" />
+    <link href="~/css/is-net.css?v=2" rel="stylesheet" />
+    <link href="~/css/is-net-dark.css?v=2" rel="stylesheet" />
     <link href="~/css/is4-overrides.css" rel="stylesheet" />
     <link href="~/css/basic/content/css/sketchpen-basic-bg-light.css" rel="stylesheet" />
     <link href="~/css/basic/content/css/sketchpen-basic-bg-dark.css" rel="stylesheet" />
@@ -38,6 +38,18 @@
             <a class="navbar-brand" href="~/">
                 <img class="icon-banner">
                 @userInterface.ApplicationTitle
+            </a>
+            @{
+                var _isDark = ColorScheme.CurrentColorScheme == IdentityServerNET.ColorSchemes.Dark;
+                var _schemeIcon = _isDark ? "bulb-shining" : "darkmode";
+                var _schemeTitle = _isDark ? "Switch to light mode" : "Switch to dark mode";
+                var _toggleUrl = Url.Action("ToggleColorScheme", "Home");
+            }
+            <a class="nav-link navbar-colorscheme-toggle navbar-toggle-persistent"
+               href="#"
+               data-toggle-url="@_toggleUrl"
+               title="@_schemeTitle">
+                <div class="@ColorScheme.NavIcon(_schemeIcon)"></div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
                     aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">

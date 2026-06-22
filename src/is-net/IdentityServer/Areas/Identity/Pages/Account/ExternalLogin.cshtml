@@ -1,34 +1,41 @@
 ﻿@page
+@using IdentityServerNET.Abstractions.UI
+@inject IUserInterfaceService userInterface
 @model ExternalLoginModel
 @{
+    Layout = "~/Views/Shared/_Layout_Login.cshtml";
     ViewData["Title"] = "Register";
 }
 
-<h2>@ViewData["Title"]</h2>
-<h4>Associate your @Model.LoginProvider account.</h4>
-<hr />
-
-<p class="text-info">
-    You've successfully authenticated with <strong>@Model.LoginProvider</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
-</p>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+<div class="login-page">
+    <div class="card login-card">
+        <div class="card-header">
+            <table><tr>
+                <td><div class="panel-logo"></div></td>
+                <td>
+                    <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
+                    <div>Associate @Model.LoginProvider account</div>
+                </td>
+            </tr></table>
+        </div>
+        <div class="card-body">
+            <p>You've successfully authenticated with <strong>@Model.LoginProvider</strong>. Please enter an email address to finish logging in.</p>
+            <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Input.Email"></label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+            <div class="mt-3 text-center" style="font-size:0.875rem">
+                <a href="~/Account/Login">← Back to Login</a>
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

@@ -299,6 +299,11 @@ static public class ServiceCollectionExtensions
                     .SwitchDefault(() => services.AddTransient<ICustomEmailSender, NullEmailSender>())
             )
 
+            // Mail template service
+            .IfServiceNotRegistered<IMailTemplateService>(() =>
+                services.AddSingleton<IMailTemplateService, MailTemplateService>()
+            )
+
             // Default UserInterface
             .IfServiceNotRegistered<IUserInterfaceService>(() => services.AddUserInterfaceService<DefaultUserInterfaceService>(options =>
             {

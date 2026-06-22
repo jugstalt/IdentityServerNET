@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IdentityServer.Areas.Admin.Pages.Resources.EditApi.ScopesModel
 @{
     ViewData["Title"] = "Api Scopes";
@@ -11,46 +11,40 @@
         <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentApiResource.Scopes != null)
         {
-            <ul class="nav nav-pills flex-column">
-
+            <ul class="nav nav-pills flex-column action-list">
                 @foreach (var scope in Model.CurrentApiResource.Scopes)
                 {
-
-                    <li class="list-item@(scope.Name == Model.Input.Scope?.Name ? " selected" : "")">
-                        <div style="display:inline-block;padding:10px 15px 10px 5px">
-                            @(scope.Name)
-                        </div>
-
+                    <li class="action-list-item">
+                        <span class="action-list-text">@scope.Name</span>
                         @if (scope.Name != Model.Input.Scope?.Name)
                         {
-                            <a style="display:inline-block;float:right"
-                               asp-page-handler="Remove"
-                               asp-route-id="@Model.CurrentApiResource.Name"
-                               asp-route-scopeName="@scope.Name">Remove</a>
-                            <a style="display:inline-block;float:right"
+                            <a class="action-btn action-btn-edit"
                                asp-page="./Scopes"
                                asp-route-id="@Model.CurrentApiResource.Name"
-                               asp-route-scopeName="@scope.Name">Edit</a>
-                        } 
+                               asp-route-scopeName="@scope.Name"
+                               title="Edit">&#x270e;</a>
+                            <a class="action-btn action-btn-remove"
+                               asp-page-handler="Remove"
+                               asp-route-id="@Model.CurrentApiResource.Name"
+                               asp-route-scopeName="@scope.Name"
+                               title="Remove">&#x2715;</a>
+                        }
                         else
                         {
-                            <a style="display:inline-block;float:right"
+                            <a class="action-btn action-btn-cancel"
                                asp-page-handler="Cancel"
-                               asp-route-id="@Model.CurrentApiResource.Name">Cancel</a>
+                               asp-route-id="@Model.CurrentApiResource.Name"
+                               title="Cancel">&#x2715;</a>
                         }
                     </li>
-
-
                 }
             </ul>
         }
-
     </div>
     <div class="col-md-6">
         <div class="@($"row collapsable-tool {(Model.Input.Scope is not null ? "expanded" : "")}")">
-            <h4>@(Model.Input.Scope is not null ? $"Update" : "New") Scope</h4>
+            <h4>@(Model.Input.Scope is not null ? "Update" : "New") Scope</h4>
             <form id="-form" method="post">
-
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <input type="hidden" asp-for="Input.ApiName" />
                 @if (Model.Input.Scope is not null)
@@ -72,8 +66,7 @@
                     <span asp-validation-for="Input.Scope.DisplayName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <textarea asp-for="Input.Scope.Description" class="form-control" placeholder="Optional: scope description..." rows="3" data-val="false">
-                    </textarea>
+                    <textarea asp-for="Input.Scope.Description" class="form-control" placeholder="Optional: scope description..." rows="3" data-val="false"></textarea>
                     <span asp-validation-for="Input.Scope.Description" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -86,7 +79,7 @@
                     <label asp-for="Input.Scope.Emphasize"></label>
                     <span asp-validation-for="Input.Scope.Emphasize" class="text-danger"></span>
                 </div>
-                <button id="add-scope-button" type="submit" class="btn btn-primary">@(Model.Input.Scope!=null ? $"Update { Model.Input.Scope.Name }" : "Add")...</button>
+                <button id="add-scope-button" type="submit" class="btn btn-primary">@(Model.Input.Scope != null ? $"Update {Model.Input.Scope.Name}" : "Add")...</button>
             </form>
         </div>
     </div>

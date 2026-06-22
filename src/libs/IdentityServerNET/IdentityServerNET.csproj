@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-	<LangVersion>10</LangVersion>
     <UserSecretsId>45936590-d798-4c10-bbda-57acb544051f</UserSecretsId>
     <AssemblyVersion>6.25.4701</AssemblyVersion>
 	 

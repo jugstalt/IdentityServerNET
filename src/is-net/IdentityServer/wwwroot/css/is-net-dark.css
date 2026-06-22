@@ -418,6 +418,23 @@ body.colorscheme-dark {
     padding: 0.75rem 1rem;
 }
 
+/* ===== Dark action lists ===== */
+.colorscheme-dark .action-list-item {
+    border-bottom-color: #2a2a42;
+}
+
+.colorscheme-dark .action-list-item:hover {
+    background-color: #1a2540;
+}
+
+.colorscheme-dark .action-list-text strong {
+    color: #e0e0e0;
+}
+
+.colorscheme-dark .action-list-text small {
+    color: #888;
+}
+
 /* ===== Dark external login button ===== */
 .colorscheme-dark li.login-external-provider a {
     border-color: #2e2e4a;

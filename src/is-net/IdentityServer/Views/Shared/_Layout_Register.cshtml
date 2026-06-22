@@ -1,19 +1,10 @@
 @using IdentityServerNET.Abstractions.UI
 @using IdentityServer4.Extensions
-@using IdentityServerNET.Extensions.DependencyInjection;
-@using Microsoft.Extensions.Options;
 @using Microsoft.Extensions.Configuration
 @using IdentityServerNET.Services.UI;
 
 @inject IConfiguration Configuration
 @inject IUserInterfaceService userInterface;
-@{
-    string name = null;
-    if (!true.Equals(ViewData["signed-out"]))
-    {
-        name = Context.User?.GetDisplayName();
-    }
-}
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,25 +13,10 @@
     <title>@Configuration["ApplicationTitle"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link href="~/css/is-net.css" rel="stylesheet" />
-    <link href="~/css/is-overrides.css" rel="stylesheet" />
+    <link href="~/css/is-net.css?v=2" rel="stylesheet" />
+    <link href="~/css/is-overrides.css?v=2" rel="stylesheet" />
 </head>
 <body class="body-layout-login">
-    <nav class="navbar navbar-expand-md" id="main-navbar">
-        <div class="container">
-            <a class="navbar-brand" href="~/">
-                <img class="icon-banner">
-                @userInterface.ApplicationTitle
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
-                    aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbar">
-                <partial name="_LoginPartial" />
-            </div>
-        </div>
-    </nav>
 
     <div class="container body-content">
         @RenderBody()
@@ -48,7 +24,6 @@
 
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/is-net-ui.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

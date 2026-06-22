@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IdentityServer.Areas.Admin.Pages.Resources.EditIdentity.UserClaimsModel
 @{
     ViewData["Title"] = "User Claims";
@@ -11,16 +11,16 @@
         <h4>@ViewData["Title"]</h4>
         @if (Model.CurrentIdentityResource.UserClaims != null)
         {
-            <ul class="nav nav-pills flex-column">
-
+            <ul class="nav nav-pills flex-column action-list">
                 @foreach (var userClaim in Model.CurrentIdentityResource.UserClaims)
                 {
-                    <li style="border-bottom:1px solid #eee">
-                        <div style="display:inline-block;padding:10px 15px 10px 5px">@(userClaim)</div>
-                        <a style="display:inline-block;float:right"
+                    <li class="action-list-item">
+                        <span class="action-list-text">@userClaim</span>
+                        <a class="action-btn action-btn-remove"
                            asp-page-handler="Remove"
                            asp-route-id="@Model.CurrentIdentityResource.Name"
-                           asp-route-userClaim="@userClaim">Remove</a>
+                           asp-route-userClaim="@userClaim"
+                           title="Remove">&#x2715;</a>
                     </li>
                 }
             </ul>

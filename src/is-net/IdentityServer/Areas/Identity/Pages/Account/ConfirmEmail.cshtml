@@ -1,8 +1,28 @@
 ﻿@page
+@using IdentityServerNET.Abstractions.UI
+@inject IUserInterfaceService userInterface
 @model ConfirmEmailModel
 @{
+    Layout = "~/Views/Shared/_Layout_Login.cshtml";
     ViewData["Title"] = "Confirm email";
 }
 
-<h2>@ViewData["Title"]</h2>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="login-page">
+    <div class="card login-card">
+        <div class="card-header">
+            <table><tr>
+                <td><div class="panel-logo"></div></td>
+                <td>
+                    <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
+                    <div>@ViewData["Title"]</div>
+                </td>
+            </tr></table>
+        </div>
+        <div class="card-body">
+            <partial name="_StatusMessage" model="Model.StatusMessage" />
+            <div class="mt-3 text-center" style="font-size:0.875rem">
+                <a href="~/Account/Login">← Back to Login</a>
+            </div>
+        </div>
+    </div>
+</div>

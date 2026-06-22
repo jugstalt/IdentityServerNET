@@ -18,7 +18,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <ul class="navbar-nav ms-auto align-items-center">
+    <ul class="navbar-nav align-items-md-center">
         <li class="nav-item">
             <a class="nav-link" href="~/Home/Index" title="Home">
                 <div class="@ColorScheme.NavIcon("home")"></div>
@@ -56,25 +56,11 @@
                 Logout
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link navbar-colorscheme-toggle" href="#"
-               data-toggle-url="@toggleUrl"
-               title="@schemeTitle">
-                <div class="@ColorScheme.NavIcon(schemeIcon)"></div>
-            </a>
-        </li>
     </ul>
 }
 else
 {
-    <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item">
-            <a class="nav-link navbar-colorscheme-toggle" href="#"
-               data-toggle-url="@toggleUrl"
-               title="@schemeTitle">
-                <div class="@ColorScheme.NavIcon(schemeIcon)"></div>
-            </a>
-        </li>
+    <ul class="navbar-nav align-items-md-center">
         @if (!Configuration.DenyRegisterAccount())
         {
             <li class="nav-item">

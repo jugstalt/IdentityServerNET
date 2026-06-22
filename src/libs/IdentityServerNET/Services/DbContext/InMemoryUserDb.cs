@@ -132,12 +132,13 @@ public class InMemoryUserDb : IUserDbContext, IUserClaimsDbContext, IAdminUserDb
     {
         var storedUser = await FindByIdAsync(user.Id, cancellationToken);
 
-        if (storedUser is null) throw new ArgumentException("Unknown user");
+        // If not persisted yet (e.g. Identity calls setters before CreateAsync), fall back to the in-memory user object
+        var targetUser = storedUser ?? user;
 
-        var propertyInfo = storedUser.GetType().GetProperty(applicationUserProperty);
+        var propertyInfo = targetUser.GetType().GetProperty(applicationUserProperty);
         if (propertyInfo is null) throw new ArgumentException($"Unknown user property: {applicationUserProperty}");
 
-        propertyInfo.SetValue(storedUser, propertyValue, null);
+        propertyInfo.SetValue(targetUser, propertyValue, null);
 
         return propertyValue;
     }
