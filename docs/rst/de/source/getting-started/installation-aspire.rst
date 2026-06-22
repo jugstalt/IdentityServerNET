@@ -147,3 +147,78 @@ Eine *IdentityServerNET*-Instanz kann mit ``.AddReference(identityServer, config
 Projekt gebunden werden. ``configName`` ist dabei der Name des Wertes aus der Konfiguration
 des Projekts, in den die (Aspire-)URL von **IdentityServerNET** geschrieben werden soll.
 
+Dev-Seeding direkt im Projekt (ohne Container)
+----------------------------------------------
+
+Wenn **IdentityServerNET** nicht als Docker-Container, sondern als ASP.NET Core-Projekt direkt
+über *Aspire* gestartet wird (z. B. ``builder.AddProject<Projects.IdentityServer>(...)``), kann das
+Dev-Seeding über die Datei ``appsettings.Development.json`` im IdentityServer-Projekt konfiguriert werden.
+
+Der ``DevMigrationService`` liest beim Start im *Development*-Modus den Abschnitt ``IdentityServer:Migragions``
+und legt automatisch Clients, Ressourcen, Rollen und Benutzer an – sofern eine InMemory-Datenbank verwendet wird.
+
+.. code:: json
+
+    {
+      "IdentityServer": {
+        "Migragions": {
+          "AdminPassword": "admin",
+          "IdentityResources": [
+            { "Name": "openid" }, { "Name": "profile" }, { "Name": "role" }
+          ],
+          "ApiResources": [
+            {
+              "Name": "my-api",
+              "ApiSecret": "apisecret",
+              "Scopes": [ { "Name": "query" }, { "Name": "command" } ]
+            }
+          ],
+          "Roles": [ { "Name": "admin" }, { "Name": "user" } ],
+          "Users": [
+            { "Name": "test@example.com", "Password": "test", "Roles": [ "user" ] }
+          ],
+          "Clients": [
+            {
+              "ClientType": "WebApplication",
+              "ClientId": "my-webclient",
+              "ClientSecret": "secret",
+              "ClientUrl": "https://localhost:44360",
+              "AdditionalRedirectUris": [ "ManualCode/Callback" ],
+              "AdditionalGrantTypes": [ "urn:ietf:params:oauth:grant-type:device_code" ],
+              "Scopes": [ "openid", "profile", "role", "offline_access" ]
+            },
+            {
+              "ClientType": "ApiClient",
+              "ClientId": "my-api-client",
+              "ClientSecret": "secret",
+              "Scopes": [ "my-api", "my-api.query", "my-api.command" ]
+            }
+          ]
+        }
+      }
+    }
+
+**ClientType-Werte:**
+
+* ``WebApplication`` – Interaktiver Client (Authorization Code + PKCE). Erfordert ``ClientUrl``.
+* ``ApiClient`` – Machine-to-Machine-Client (Client Credentials).
+
+**Optionale Felder bei Clients:**
+
+* ``AdditionalRedirectUris`` – Weitere Redirect-URIs relativ zur ``ClientUrl``
+  (z. B. ``"ManualCode/Callback"`` für manuellen PKCE-Flow).
+* ``AdditionalGrantTypes`` – Zusätzliche Grant Types, die über das Template hinaus erlaubt werden sollen
+  (z. B. ``"urn:ietf:params:oauth:grant-type:device_code"`` oder ``"password"``).
+
+**``ApiSecret`` bei API-Ressourcen:**
+
+Wird ``ApiSecret`` angegeben, kann diese Ressource Token Introspection durchführen. Das Secret wird als
+SHA-256-Hash gespeichert. Beim Konfigurieren von Clients, die Introspection nutzen sollen, muss die
+API-Ressource (nicht der Client) als Introspection-Credential angegeben werden.
+
+.. note::
+
+    Der Schlüssel ``Migragions`` (mit Tippfehler) entspricht dem tatsächlichen Schlüsselnamen im Code.
+    Dieser Wert gilt nur im *Development*-Modus und nur bei InMemory-Datenbanken – produktive Datenbanken
+    werden durch diesen Abschnitt nicht verändert.
+

@@ -177,7 +177,13 @@ Section ``Login``
         "DenyForgotPasswordChallange": true,    // default: false
         "DenyRememberLogin": true,              // default: false,
         "RememberLoginDefaultValue": true,      // default: false
-        "DenyLocalLogin": true                  // default: false  
+        "DenyLocalLogin": true,                 // default: false
+        "Passkey": {
+            "AllowPasswordless": true,          // default: false
+            "AllowSecondFactor": true,          // default: false
+            "ServerDomain": "identity.my-server.com",
+            "RelyingPartyName": "My App"        // default: "IdentityServer"
+        }
     }
 
 This section allows control over login behavior and options:
@@ -185,8 +191,35 @@ This section allows control over login behavior and options:
 * **DenyForgotPasswordChallange:** If set to ``true``, users will not have the option to reset their password via ``Forgot password``.
 * **DenyRememberLogin:** If set to ``true``, the ``Remember my login`` option will not be offered at login.
 * **RememberLoginDefaultValue:** If set to ``true``, the ``Remember my login`` option will be selected by default.
-* **DenyLocalLogin:** If set to ``true``, users cannot log in with a username/password. 
+* **DenyLocalLogin:** If set to ``true``, users cannot log in with a username/password.
   This can be useful if login should only be possible via *external identity providers*.
+
+Subsection ``Passkey``
+~~~~~~~~~~~~~~~~~~~~~~
+
+This subsection configures **Passkey** support (WebAuthn). Passkeys enable secure authentication using
+hardware security keys, biometric sensors (fingerprint, face recognition), or a device PIN — without a
+traditional password.
+
+* **AllowPasswordless:** If set to ``true``, users can sign in directly with a passkey — no username or
+  password required. A ``Sign in with passkey`` button appears on the login page. Users can register
+  passkeys under *Manage Account → Passkeys*.
+
+* **AllowSecondFactor:** If set to ``true``, a passkey verification is required after successful password
+  entry — provided the user has at least one passkey registered. This provides strong two-factor
+  authentication (2FA) without a separate authenticator app.
+
+* **ServerDomain:** The *Relying Party* domain — the hostname under which **IdentityServerNET** is
+  accessible (e.g. ``identity.my-server.com``). This value must match the hostname in the ``PublicOrigin``
+  URL, since browsers bind passkeys to their registration domain and refuse to use them on other domains.
+
+* **RelyingPartyName:** The display name shown in the browser dialog when registering a new passkey.
+  Default: ``IdentityServer``.
+
+.. note::
+
+    Passkeys are domain-bound. A passkey registered for ``identity.my-server.com`` cannot be used on a
+    different domain. Ensure ``ServerDomain`` matches the actual public hostname of the server.
 
 Section ``Admin``
 -----------------
@@ -267,25 +300,67 @@ Section ``Mail``
             "FromName": "IdentityServer NET",
             "SmtpServer": "localhost",
             "SmtpPort": 1025
-        }
+        },
         // or
         "MailJet": {
             "FromEmail": "no-reply@identityserver.net",
             "FromName": "IdentityServer NET",
-        	"ApiKey": "...",
+            "ApiKey": "...",
             "ApiSecret": "..."
-        }
+        },
         // or
         "SendGrid": {
             "FromEmail": "no-reply@identityserver.net",
             "FromName": "IdentityServer NET",
-        	"ApiKey": "...",
-        }
+            "ApiKey": "..."
+        },
+        "TemplatesPath": "custom/mails"   // optional, default: custom/mails
     }
 
-For ``Forget Password`` and ``Register new user`` actions, emails are sent to the user. This section allows you to specify how these emails are sent.
-By default, ``Smtp``, ``MailJet``, and ``SendGrid`` are available. If no option is specified, the email will not be sent but will be output to *logging* instead.
-This option should only be used during development.
+For ``Forget Password`` and ``Register new user`` actions, emails are sent to the user. This section allows
+you to specify how these emails are sent. By default, ``Smtp``, ``MailJet``, and ``SendGrid`` are available.
+If no option is specified, the email will not be sent but will be output to *logging* instead — this should
+only be used during development.
+
+Email Templates
+~~~~~~~~~~~~~~~
+
+**IdentityServerNET** supports customizable HTML templates for outgoing emails. On startup, templates are
+loaded from the directory specified by ``TemplatesPath`` (default: ``custom/mails`` relative to the
+application directory). If a template file is not found, a built-in default template is used as a fallback.
+
+The following template files are supported:
+
+* ``confirm-email.html`` – Sent when a user registers and needs to confirm their email address
+* ``reset-password.html`` – Sent when a user requests a password reset
+* ``generic.html`` – Default template for any other emails
+
+The following placeholders are available inside templates:
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 1
+
+   * - Placeholder
+     - Description
+   * - ``{{applicationName}}``
+     - Application name (from ``ApplicationTitle``)
+   * - ``{{subject}}``
+     - Email subject line
+   * - ``{{email}}``
+     - Recipient email address
+   * - ``{{link}}``
+     - Action URL (e.g. confirmation or password reset link)
+   * - ``{{content}}``
+     - Original HTML message content (most useful in the ``generic`` template)
+   * - ``{{year}}``
+     - Current year (for copyright lines in the footer)
+
+.. note::
+
+    An absolute path for ``TemplatesPath`` is used as-is. A relative path is resolved relative to the
+    application base directory. If the folder or a specific template file is not found, the built-in
+    fallback template is used silently — no error is raised.
 
 Section ``Configure``
 ---------------------

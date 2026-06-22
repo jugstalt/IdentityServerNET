@@ -137,8 +137,83 @@ The ``IdentityServerNETResourceBuilder`` allows additional optional methods to b
 References
 ----------
 
-An *IdentityServerNET* instance can be linked to a project with ``.AddReference(identityServer, configName)``. 
-``configName`` is the name of the key in the project’s configuration where the (Aspire) URL of **IdentityServerNET** 
+An *IdentityServerNET* instance can be linked to a project with ``.AddReference(identityServer, configName)``.
+``configName`` is the name of the key in the project’s configuration where the (Aspire) URL of **IdentityServerNET**
 should be written.
+
+Dev Seeding directly in the project (without a container)
+---------------------------------------------------------
+
+When **IdentityServerNET** is started as an ASP.NET Core project directly via *Aspire*
+(e.g. ``builder.AddProject<Projects.IdentityServer>(...)``) rather than as a Docker container, dev seeding
+can be configured through ``appsettings.Development.json`` in the IdentityServer project.
+
+The ``DevMigrationService`` reads the ``IdentityServer:Migragions`` section at startup in *Development* mode
+and automatically creates clients, resources, roles, and users — provided an in-memory database is used.
+
+.. code:: json
+
+    {
+      "IdentityServer": {
+        "Migragions": {
+          "AdminPassword": "admin",
+          "IdentityResources": [
+            { "Name": "openid" }, { "Name": "profile" }, { "Name": "role" }
+          ],
+          "ApiResources": [
+            {
+              "Name": "my-api",
+              "ApiSecret": "apisecret",
+              "Scopes": [ { "Name": "query" }, { "Name": "command" } ]
+            }
+          ],
+          "Roles": [ { "Name": "admin" }, { "Name": "user" } ],
+          "Users": [
+            { "Name": "test@example.com", "Password": "test", "Roles": [ "user" ] }
+          ],
+          "Clients": [
+            {
+              "ClientType": "WebApplication",
+              "ClientId": "my-webclient",
+              "ClientSecret": "secret",
+              "ClientUrl": "https://localhost:44360",
+              "AdditionalRedirectUris": [ "ManualCode/Callback" ],
+              "AdditionalGrantTypes": [ "urn:ietf:params:oauth:grant-type:device_code" ],
+              "Scopes": [ "openid", "profile", "role", "offline_access" ]
+            },
+            {
+              "ClientType": "ApiClient",
+              "ClientId": "my-api-client",
+              "ClientSecret": "secret",
+              "Scopes": [ "my-api", "my-api.query", "my-api.command" ]
+            }
+          ]
+        }
+      }
+    }
+
+**ClientType values:**
+
+* ``WebApplication`` – Interactive client (Authorization Code + PKCE). Requires ``ClientUrl``.
+* ``ApiClient`` – Machine-to-machine client (Client Credentials).
+
+**Optional client fields:**
+
+* ``AdditionalRedirectUris`` – Additional redirect URIs relative to ``ClientUrl``
+  (e.g. ``"ManualCode/Callback"`` for a manual PKCE flow).
+* ``AdditionalGrantTypes`` – Extra grant types beyond what the client template provides
+  (e.g. ``"urn:ietf:params:oauth:grant-type:device_code"`` or ``"password"``).
+
+**``ApiSecret`` on API resources:**
+
+If ``ApiSecret`` is set, the resource can be used for token introspection. The secret is stored as a
+SHA-256 hash. When configuring introspection, the API resource credentials (not the OAuth client) must
+be used.
+
+.. note::
+
+    The key ``Migragions`` (with the typo) matches the actual key name in the source code — use it as-is.
+    This section is only applied in *Development* mode with in-memory databases; production databases
+    are not modified by this configuration.
 
 

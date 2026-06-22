@@ -178,7 +178,13 @@ Abschnitt ``Login``
         "DenyForgotPasswordChallange": true,    // default: false
         "DenyRememberLogin": true,              // default: false,
         "RememberLoginDefaultValue": true,      // default: false
-        "DenyLocalLogin": true                  // default: false  
+        "DenyLocalLogin": true,                 // default: false
+        "Passkey": {
+            "AllowPasswordless": true,          // default: false
+            "AllowSecondFactor": true,          // default: false
+            "ServerDomain": "identity.mein-server.com",
+            "RelyingPartyName": "Meine App"     // default: "IdentityServer"
+        }
     }
 
 Hier kann das Verhalten und die Möglichkeiten beim Login gesteuert werden:
@@ -186,8 +192,36 @@ Hier kann das Verhalten und die Möglichkeiten beim Login gesteuert werden:
 * **DenyForgotPasswordChallange:** Wenn auf ``true`` gesetzt, hat ein Anwender keine Möglichkeit, sein Passwort über ``Passwort vergessen`` zurückzusetzen.
 * **DenyRememberLogin:** Wenn auf ``true`` gesetzt, wird die Option ``Remember my login`` beim Login nicht angeboten.
 * **RememberLoginDefaultValue:** Wenn auf ``true`` gesetzt, ist die Option ``Remember my login`` standardmäßig ausgewählt.
-* **DenyLocalLogin:** Wenn auf ``true`` gesetzt, können sich Anwender nicht mit Benutzername/Passwort anmelden. 
+* **DenyLocalLogin:** Wenn auf ``true`` gesetzt, können sich Anwender nicht mit Benutzername/Passwort anmelden.
   Dies kann sinnvoll sein, wenn die Anmeldung ausschließlich über *externe Identity Provider* erfolgen soll.
+
+Unterabschnitt ``Passkey``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Mit diesem Unterabschnitt wird die **Passkey**-Unterstützung (WebAuthn) konfiguriert. Passkeys ermöglichen eine
+sichere Anmeldung über Hardware-Sicherheitsschlüssel, biometrische Sensoren (Fingerabdruck, Gesichtserkennung)
+oder den Geräte-PIN – ohne herkömmliches Passwort.
+
+* **AllowPasswordless:** Wenn auf ``true`` gesetzt, können sich Benutzer direkt mit einem Passkey anmelden –
+  ohne Benutzername und Passwort. Auf der Login-Seite erscheint eine ``Sign in with passkey``-Schaltfläche.
+  Benutzer können Passkeys unter *Manage Account → Passkeys* registrieren.
+
+* **AllowSecondFactor:** Wenn auf ``true`` gesetzt, wird nach erfolgreicher Passworteingabe eine zusätzliche
+  Passkey-Verifizierung verlangt – sofern der Benutzer mindestens einen Passkey registriert hat. Dies bietet
+  starke Zwei-Faktor-Authentifizierung (2FA) ohne separaten Authenticator.
+
+* **ServerDomain:** Die Domain des *Relying Party*, also der Hostname, unter dem **IdentityServerNET**
+  erreichbar ist (z. B. ``identity.mein-server.com``). Dieser Wert muss dem Hostnamen der ``PublicOrigin``-URL
+  entsprechen – Browser speichern Passkeys domaingebunden und verweigern die Verwendung auf anderen Domains.
+
+* **RelyingPartyName:** Der Anzeigename, der beim Registrieren eines Passkeys im Browser-Dialog erscheint.
+  Standardwert: ``IdentityServer``.
+
+.. note::
+
+    Passkeys sind an die Domain gebunden. Ein Passkey, der für ``identity.mein-server.com`` registriert wurde,
+    kann nicht auf einer anderen Domain verwendet werden. ``ServerDomain`` muss daher der tatsächlichen
+    öffentlichen Domain des Servers entsprechen.
 
 Abschnitt ``Admin``
 -------------------
@@ -269,25 +303,67 @@ Abschnitt ``Mail``
             "FromName": "IdentityServer NET",
             "SmtpServer": "localhost",
             "SmtpPort": 1025
-        }
+        },
         // or
         "MailJet": {
             "FromEmail": "no-reply@identityserver.net",
             "FromName": "IdentityServer NET",
-        	"ApiKey": "...",
+            "ApiKey": "...",
             "ApiSecret": "..."
-        }
+        },
         // or
         "SendGrid": {
             "FromEmail": "no-reply@identityserver.net",
             "FromName": "IdentityServer NET",
-        	"ApiKey": "...",
-        }
+            "ApiKey": "..."
+        },
+        "TemplatesPath": "custom/mails"   // optional, default: custom/mails
     }
 
-Bei ``Forget Password`` und ``Register new user`` werden E-Mails an den Benutzer gesendet. In diesem Abschnitt kann festgelegt werden, wie diese E-Mails verschickt werden.
-Standardmäßig stehen ``Smtp``, ``MailJet`` und ``SendGrid`` zur Verfügung. Wird keine Option angegeben, wird die E-Mail nicht verschickt, sondern ins *Logging* ausgegeben.
-Diese Möglichkeit sollte nur für die Entwicklung verwendet werden.
+Bei ``Forget Password`` und ``Register new user`` werden E-Mails an den Benutzer gesendet. In diesem Abschnitt
+kann festgelegt werden, wie diese E-Mails verschickt werden. Standardmäßig stehen ``Smtp``, ``MailJet`` und
+``SendGrid`` zur Verfügung. Wird keine Option angegeben, wird die E-Mail nicht verschickt, sondern ins
+*Logging* ausgegeben – diese Möglichkeit sollte nur für die Entwicklung verwendet werden.
+
+E-Mail-Templates
+~~~~~~~~~~~~~~~~
+
+**IdentityServerNET** verwendet anpassbare HTML-Templates für den E-Mail-Versand. Beim Start werden Templates
+aus dem Verzeichnis ``TemplatesPath`` geladen (Standard: ``custom/mails`` relativ zum Programmverzeichnis).
+Wird für ein Template keine Datei gefunden, greift ein eingebautes Standard-Template.
+
+Folgende Template-Dateien werden unterstützt:
+
+* ``confirm-email.html`` – Bestätigungsmail nach der Registrierung eines neuen Benutzers
+* ``reset-password.html`` – Mail zum Zurücksetzen des Passworts
+* ``generic.html`` – Standardtemplate für alle anderen E-Mails
+
+In den Templates können folgende Platzhalter verwendet werden:
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 1
+
+   * - Platzhalter
+     - Bedeutung
+   * - ``{{applicationName}}``
+     - Name der Anwendung (aus ``ApplicationTitle``)
+   * - ``{{subject}}``
+     - Betreff der E-Mail
+   * - ``{{email}}``
+     - E-Mail-Adresse des Empfängers
+   * - ``{{link}}``
+     - Aktions-URL (z. B. Bestätigungs- oder Reset-Link)
+   * - ``{{content}}``
+     - Originaler HTML-Nachrichteninhalt (nur im ``generic``-Template sinnvoll)
+   * - ``{{year}}``
+     - Aktuelles Jahr (für Copyright-Zeilen im Footer)
+
+.. note::
+
+    Ein absoluter Pfad bei ``TemplatesPath`` wird direkt verwendet. Ein relativer Pfad wird relativ zum
+    Programmverzeichnis aufgelöst. Wird der Ordner oder eine Datei nicht gefunden, wird ohne Fehler auf das
+    eingebaute Template zurückgegriffen.
 
 Abschnitt ``Configure``
 -----------------------

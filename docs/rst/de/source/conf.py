@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'IdentityserverNET'
-copyright = '2024, Jürgen Gstaltmaier'
+copyright = '2026, Jürgen Gstaltmaier'
 author = 'Jürgen Gstaltmaier'
-release = '5.0.0'
+release = '7.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
