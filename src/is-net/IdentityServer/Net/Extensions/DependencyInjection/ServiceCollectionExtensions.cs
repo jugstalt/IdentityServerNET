@@ -10,6 +10,9 @@ using IdentityServerNET.HttpProxy.Services.DbContext;
 using IdentityServerNET.LiteDb.Services.DbContext;
 using IdentityServerNET.Models;
 using IdentityServerNET.MongoDb.Services.DbContext;
+using IdentityServerNET.Postgres.Services.DbContext;
+using IdentityServerNET.Sqlite.Services.DbContext;
+using IdentityServerNET.SqlServer.Services.DbContext;
 using IdentityServerNET.Reflection;
 using IdentityServerNET.Services;
 using IdentityServerNET.Services.Cryptography;
@@ -148,6 +151,27 @@ static public class ServiceCollectionExtensions
                             options.AddDefaults(configSection);
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Users:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddUserDbContext<SqlServerUserDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Users:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddUserDbContext<PostgresUserDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Users:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddUserDbContext<SqliteUserDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
                     .SwitchCase(["ConnectionStrings:Users:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
                         services
                         .AddUserDbContext<HttpProxyUserDb>(options =>
@@ -183,6 +207,24 @@ static public class ServiceCollectionExtensions
                         services.AddRoleDbContext<LiteDbRoleDb>(options =>
                         {
                             options.ConnectionString = configuration.AssetPath(value);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Roles:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddRoleDbContext<SqlServerRoleDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Roles:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddRoleDbContext<PostgresRoleDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Roles:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddRoleDbContext<SqliteRoleDb>(options =>
+                        {
+                            options.ConnectionString = value;
                         })
                     )
                     .SwitchCase(["ConnectionStrings:Roles:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
@@ -233,6 +275,27 @@ static public class ServiceCollectionExtensions
                             options.AddDefaults(configSection);
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Resources:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddResourceDbContext<SqlServerResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Resources:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddResourceDbContext<PostgresResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Resources:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddResourceDbContext<SqliteResourceDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
                     .SwitchCase(["ConnectionStrings:Resources:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
                         services
                         .AddResourceDbContext<HttpProxyResourceDb>(_ => { })
@@ -278,6 +341,27 @@ static public class ServiceCollectionExtensions
                     )
                     .SwitchCase(["ConnectionStrings:Clients:MongoDb", "ConnectionStrings:MongoDb"], value =>
                         services.AddClientDbContext<MongoBlobClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Clients:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddClientDbContext<SqlServerClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Clients:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddClientDbContext<PostgresClientDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                            options.AddDefaults(configSection);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Clients:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddClientDbContext<SqliteClientDb>(options =>
                         {
                             options.ConnectionString = value;
                             options.AddDefaults(configSection);

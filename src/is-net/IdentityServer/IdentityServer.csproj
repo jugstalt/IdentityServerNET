@@ -35,6 +35,9 @@
     <ProjectReference Include="..\..\libs\IdentityServerNET.HttpProxy\IdentityServerNET.HttpProxy.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.LiteDb\IdentityServerNET.LiteDb.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET.MongoDb\IdentityServerNET.MongoDb.csproj" />
+    <ProjectReference Include="..\..\libs\IdentityServerNET.SqlServer\IdentityServerNET.SqlServer.csproj" />
+    <ProjectReference Include="..\..\libs\IdentityServerNET.Postgres\IdentityServerNET.Postgres.csproj" />
+    <ProjectReference Include="..\..\libs\IdentityServerNET.Sqlite\IdentityServerNET.Sqlite.csproj" />
     <ProjectReference Include="..\..\libs\IdentityServerNET\IdentityServerNET.csproj" />
     <ProjectReference Include="..\..\nuget\IdentityServerNET.Extensions\IdentityServerNET.Extensions.csproj" />
   </ItemGroup>

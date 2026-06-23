@@ -34,6 +34,9 @@
     <Project Path="src/libs/IdentityServerNET.LiteDb/IdentityServerNET.LiteDb.csproj" />
     <Project Path="src/libs/IdentityServerNET.Models/IdentityServerNET.Models.csproj" />
     <Project Path="src/libs/IdentityServerNET.MongoDb/IdentityServerNET.MongoDb.csproj" />
+    <Project Path="src/libs/IdentityServerNET.Postgres/IdentityServerNET.Postgres.csproj" />
+    <Project Path="src/libs/IdentityServerNET.Sqlite/IdentityServerNET.Sqlite.csproj" />
+    <Project Path="src/libs/IdentityServerNET.SqlServer/IdentityServerNET.SqlServer.csproj" />
     <Project Path="src/libs/IdentityServerNET/IdentityServerNET.csproj" />
     <Project Path="src/nuget/IdentityServerNET.Distribution/IdentityServerNET.Distribution.csproj" />
   </Folder>

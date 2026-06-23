@@ -1,8 +1,35 @@
-﻿var builder = DistributedApplication.CreateBuilder(args);
+﻿// Uncomment ONE of the following lines to enable a specific storage backend.
+// When a SQL backend is selected, the corresponding container is started automatically.
+// Without any define, InMemory storage is used (default).
+//#define STORAGE_LITEDB
+//#define STORAGE_SQLSERVER
+//#define STORAGE_POSTGRE
+#define STORAGE_SQLITE
+
+var builder = DistributedApplication.CreateBuilder(args);
 
 var mailpit = builder.AddContainer("mailpit", "axllent/mailpit")
     .WithEndpoint(targetPort: 1025, port: 1025, name: "smtp")
     .WithHttpEndpoint(targetPort: 8025, port: 8025, name: "http");
+
+#if STORAGE_SQLSERVER
+// AddSqlServer: manages dynamic host port, waits until SQL Server is truly ready,
+// and injects the correct connection string (Server=host,PORT;...) at launch time.
+var sqlServer = builder.AddSqlServer("sqlserver")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume();
+var sqlServerDb = sqlServer.AddDatabase("identityserver-db", databaseName: "identityserver");
+#elif STORAGE_POSTGRE
+// AddContainer with dynamic port avoids conflicts with a local PostgreSQL on port 5432.
+// ReferenceExpression resolves the actual host port at launch time.
+var postgres = builder.AddContainer("postgres", "postgres", "17")
+    .WithEnvironment("POSTGRES_PASSWORD", "postgres")
+    .WithEnvironment("POSTGRES_USER", "postgres")
+    .WithEnvironment("POSTGRES_DB", "identityserver")
+    .WithEndpoint(targetPort: 5432, name: "pg")
+    .WithLifetime(ContainerLifetime.Persistent);
+var pgEndpoint = postgres.GetEndpoint("pg");
+#endif
 
 //var maildev = builder.AddMailDev("maildev", smtpPort: 1025);
 var dbContextApi = builder.AddProject<Projects.IdentityServer_DbContext>("identityserver-dbcontext");
@@ -13,6 +40,29 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
        .WithEnvironment("IdentityServer__Mail__Smtp__FromEmail", "no-reply@dev.local")
        .WithEnvironment("IdentityServer__Mail__Smtp__FromName", "IdentityServer Dev")
        .WaitFor(mailpit)
+
+#if STORAGE_LITEDB
+       .WithEnvironment("IdentityServer__ConnectionStrings__LiteDb", "identityserver-litedb.db")
+#elif STORAGE_SQLSERVER
+       // WaitFor(sqlServerDb) waits until SQL Server is actually ready (not just container start).
+       // ConnectionStringExpression resolves to Server=host,PORT;... at launch time.
+       .WithEnvironment(ctx =>
+       {
+           ctx.EnvironmentVariables["IdentityServer__ConnectionStrings__SqlServer"] =
+               sqlServerDb.Resource.ConnectionStringExpression;
+       })
+       .WaitFor(sqlServerDb)
+#elif STORAGE_POSTGRE
+       .WithEnvironment(ctx =>
+       {
+           ctx.EnvironmentVariables["IdentityServer__ConnectionStrings__Postgres"] =
+               ReferenceExpression.Create(
+                   $"Host=localhost;Port={pgEndpoint.Property(EndpointProperty.Port)};Database=identityserver;Username=postgres;Password=postgres");
+       })
+       .WaitFor(postgres)
+#elif STORAGE_SQLITE
+       .WithEnvironment("IdentityServer__ConnectionStrings__Sqlite", "Data Source=identityserver-sqlite.db")
+#endif
 
        //.WithEnvironment(e =>
        //{
