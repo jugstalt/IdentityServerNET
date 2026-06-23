@@ -3,27 +3,14 @@
 
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-
-    string[] categories = null;
-    if (Model?.EditorInfos != null)
-    {
-        categories = Model.EditorInfos
-                            .Select(p => p.Category)
-                            .Distinct()
-                            .ToArray();
-    }
 }
 
 <ul class="nav nav-pills flex-column">
-    @if (categories != null)
+    @if (Model?.EditorInfos?.Length > 0)
     {
-        @foreach (var category in categories)
-        {
-            <li class="nav-item">
-                <a class="nav-link @(ViewData["Category"] != null && category.Equals(ViewData["Category"].ToString(), StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                   asp-page="./Index" asp-route-category="@category">@category</a>
-            </li>
-        }
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">Profile</a>
+        </li>
     }
 
     @if (Model?.ShowChangeEmailPage == true)

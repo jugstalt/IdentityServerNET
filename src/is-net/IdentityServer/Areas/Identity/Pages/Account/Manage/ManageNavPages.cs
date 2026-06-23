@@ -19,10 +19,8 @@ public static class ManageNavPages
 
     public static string Passkeys => "Passkeys";
 
-    public static string IndexNavClass(ViewContext viewContext, string category)
-    {
-        return "";
-    }
+    public static string IndexNavClass(ViewContext viewContext)
+        => PageNavClass(viewContext, Index);
 
     public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
 

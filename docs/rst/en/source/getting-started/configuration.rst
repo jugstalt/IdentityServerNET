@@ -264,6 +264,38 @@ This section can be used to restrict the administrative tools. This can be usefu
 Administration can, for example, be restricted to an instance that is not accessible over the internet (only intranet, etc.) and that shares the same
 database as the public instance.
 
+Section ``Security``
+--------------------
+
+.. code:: javascript
+
+    "Security": {
+        "PasswordHashing": {
+            "Template": "{password}{username}"   // default: "{password}"
+        }
+    }
+
+This optional section configures the input format used by the password hasher.
+By default, only the password itself is hashed. For migrations from legacy systems that appended
+additional user data as a salt, the template can be adjusted accordingly.
+
+Supported placeholders (always replaced with lowercase values from the user profile):
+
+* ``{password}`` — the plain-text password provided by the user (always required)
+* ``{email}`` — the user's email address
+* ``{username}`` — the user's username
+
+Example for a legacy system that hashed ``password + username``::
+
+    "Template": "{password}{username}"
+
+.. note::
+
+    The template affects both **new hash creation** and **verification** of existing hashes.
+    After a completed migration, the template can be reset to the default ``"{password}"`` —
+    hashes that have already been upgraded to PBKDF2 remain valid because the ``SecurePasswordHasher``
+    handles the rehash signal correctly.
+
 Section ``Account``
 -------------------
 

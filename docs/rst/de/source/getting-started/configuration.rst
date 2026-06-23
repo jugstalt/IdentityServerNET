@@ -267,6 +267,38 @@ zugänglich ist. Wenn eine öffentliche Instanz keine Administrationswerkzeuge b
 Die Administration kann hier beispielsweise nur über eine Instanz erfolgen, die nicht über das Internet erreichbar ist (nur Intranet, ...) und auf die gleiche
 Datenbank zugreift wie die öffentliche Instanz.
 
+Abschnitt ``Security``
+----------------------
+
+.. code:: javascript
+
+    "Security": {
+        "PasswordHashing": {
+            "Template": "{password}{username}"   // default: "{password}"
+        }
+    }
+
+Über diesen optionalen Abschnitt kann das Eingabe-Format für den Passwort-Hasher konfiguriert werden.
+Standardmäßig wird nur das Passwort gehasht. Für Migrationen von Legacy-Systemen, die dem Passwort
+zusätzliche Benutzerdaten als Salz beigefügt haben, kann das Template entsprechend angepasst werden.
+
+Unterstützte Platzhalter (werden immer durch Kleinschreibung ersetzt):
+
+* ``{password}`` — das eingegebene Klartext-Passwort (immer erforderlich)
+* ``{email}`` — die E-Mail-Adresse des Benutzers
+* ``{username}`` — der Benutzername
+
+Beispiel für ein Legacy-System, das ``password + username`` zusammengehasht hat::
+
+    "Template": "{password}{username}"
+
+.. note::
+
+    Dieses Template betrifft sowohl das **Erstellen neuer Hashes** als auch die **Verifikation** bestehender.
+    Nach einer erfolgreichen Migration kann das Template wieder auf ``"{password}"`` (Standard) zurückgesetzt
+    werden — bereits auf PBKDF2 aktualisierte Hashes bleiben gültig, da der ``SecurePasswordHasher`` auch
+    bei aktiviertem Rehashing korrekt verfährt.
+
 Abschnitt ``Account``
 ---------------------
 

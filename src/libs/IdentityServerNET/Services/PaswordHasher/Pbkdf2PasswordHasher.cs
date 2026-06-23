@@ -11,18 +11,24 @@ namespace IdentityServerNET.Services.PasswordHasher;
 public class Pbkdf2PasswordHasher : PasswordHasher
 {
     private readonly Pbkdf2PasswordHasherOptions _options;
+    private readonly string _template;
 
-    public Pbkdf2PasswordHasher(IOptions<Pbkdf2PasswordHasherOptions>? options = null)
+    public Pbkdf2PasswordHasher(
+        IOptions<Pbkdf2PasswordHasherOptions>? options = null,
+        IOptions<PasswordHashingOptions>? hashingOptions = null)
     {
         _options = options?.Value ?? new Pbkdf2PasswordHasherOptions();
+        _template = hashingOptions?.Value?.Template ?? "{password}";
     }
 
     public override string HashPassword(ApplicationUser user, string password)
     {
+        var input = _template.ApplyPasswordHashingTemplate(user, password);
+
         byte[] salt = RandomNumberGenerator.GetBytes(_options.SaltSize);
 
         byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
-            password,
+            input,
             salt,
             _options.Iterations,
             _options.HashAlgorithmName,
@@ -38,6 +44,8 @@ public class Pbkdf2PasswordHasher : PasswordHasher
 
     public override PasswordVerificationResult VerifyHashedPassword(ApplicationUser user, string hashedPassword, string providedPassword)
     {
+        var input = _template.ApplyPasswordHashingTemplate(user, providedPassword);
+
         byte[] hashBytes;
         try
         {
@@ -59,7 +67,7 @@ public class Pbkdf2PasswordHasher : PasswordHasher
 
         // Re-hash the provided password with the extracted salt
         byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
-            providedPassword,
+            input,
             salt,
             _options.Iterations,
             _options.HashAlgorithmName,

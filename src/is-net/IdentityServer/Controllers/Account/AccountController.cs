@@ -144,6 +144,9 @@ public class AccountController : Controller
                 if (String.IsNullOrWhiteSpace(model.Password))
                     throw new Exception("Password is empty");
 
+                // Allow login with email address — resolve to the stored UserName
+                var loginUsername = await ResolveLoginUsernameAsync(model.Username);
+
                 bool suspicous = false;
                 if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                 {
@@ -160,11 +163,11 @@ public class AccountController : Controller
 
                 var result = suspicous == true ?
                     Microsoft.AspNetCore.Identity.SignInResult.Failed :
-                    await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                    await _signInManager.PasswordSignInAsync(loginUsername, model.Password, model.RememberLogin, lockoutOnFailure: true);
 
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Username);
+                    var user = await _userManager.FindByNameAsync(loginUsername);
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
                     // only set explicit expiration here if user chooses "remember me". 
@@ -189,7 +192,7 @@ public class AccountController : Controller
 
                     if (_loginBotDetection != null)
                     {
-                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(loginUsername);
                     }
 
                     // Passkey-only second factor: user has passkeys but app-2FA is not enabled.
@@ -242,7 +245,7 @@ public class AccountController : Controller
                 {
                     if (_loginBotDetection != null)
                     {
-                        await _loginBotDetection.RemoveSuspiciousUserAsync(model.Username);
+                        await _loginBotDetection.RemoveSuspiciousUserAsync(loginUsername);
                     }
 
                     var encodedReturnUrl = HttpUtility.UrlEncode(
@@ -493,6 +496,23 @@ public class AccountController : Controller
     /*****************************************/
     /* helper APIs for the AccountController */
     /*****************************************/
+
+    /// <summary>
+    /// If the supplied input looks like an email address, attempt to find the user by email
+    /// and return their stored UserName. Falls back to the original input if no match is found,
+    /// so that the standard "invalid credentials" path is taken rather than a confusing 404.
+    /// </summary>
+    private async Task<string> ResolveLoginUsernameAsync(string input)
+    {
+        if (!string.IsNullOrWhiteSpace(input) && input.Contains('@'))
+        {
+            var user = await _userManager.FindByEmailAsync(input);
+            if (user?.UserName != null)
+                return user.UserName;
+        }
+        return input;
+    }
+
     private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl, bool forceLocal = false)
     {
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);

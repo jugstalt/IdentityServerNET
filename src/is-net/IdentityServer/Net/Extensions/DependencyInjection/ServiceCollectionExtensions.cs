@@ -72,6 +72,18 @@ static public class ServiceCollectionExtensions
 
         // Default PasswordHasher (override aspnet core defaults)
         // for custom Hashers override this with ConfigureCustomStartup
+        services.AddOptions<PasswordHashingOptions>()
+            .Configure(options =>
+            {
+                var template = configuration["IdentityServer:Security:PasswordHashing:Template"];
+                if (!string.IsNullOrWhiteSpace(template))
+                    options.Template = template;
+            })
+            .Validate(
+                options => options.Template.Contains("{password}"),
+                "IdentityServer:Security:PasswordHashing:Template must contain the {password} placeholder — " +
+                "hashing without the actual password is not allowed.")
+            .ValidateOnStart();
         services.AddTransient<IPasswordHasher<ApplicationUser>, SecurePasswordHasher>();
 
         #region Add ExportClientDbContext (optional)
