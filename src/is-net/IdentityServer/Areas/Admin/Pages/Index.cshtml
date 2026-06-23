@@ -100,4 +100,16 @@
             </a>
         </li>
     }
+    @if (configuration.AllowDataTransfer() && Model.ApplicationUser.IsUserAdministrator())
+    {
+        <li class="ui-tile">
+            <a asp-page="./DataTransfer/Index">
+                <div class="@ColorScheme.TileIcon("share")">
+                </div>
+                <div class="ui-tile-text">
+                    Data Transfer
+                </div>
+            </a>
+        </li>
+    }
 </ul>

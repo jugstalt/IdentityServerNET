@@ -1,0 +1,96 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.DataTransfer.IndexModel
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Data Transfer";
+    var importSummaryJson = TempData["ImportSummaryJson"] as string;
+    var importSummary = importSummaryJson != null
+        ? JsonConvert.DeserializeObject<ImportSummary>(importSummaryJson)
+        : null;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="row">
+
+    <div class="col-md-5">
+        <h4>Export</h4>
+        <p>
+            Exports all users, roles, clients and resources of this IdentityServer instance
+            to a single JSON file. The file can be imported into another instance.
+        </p>
+        <p class="text-muted" style="font-size:.85em">
+            Password hashes are included in the export. Passkeys are exported but will
+            <strong>not work</strong> on a different domain (WebAuthn is domain-bound).
+        </p>
+        <a asp-page="./Index" asp-page-handler="Export" class="btn btn-primary">
+            &#8659; Download Export
+        </a>
+    </div>
+
+    <div class="col-md-7">
+        <h4>Import</h4>
+        <p>
+            Upload a JSON file previously exported from an IdentityServer instance.
+            Existing entries are <strong>skipped</strong> — nothing is overwritten.
+        </p>
+
+        <form method="post" asp-page-handler="Import" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input asp-for="ImportFile" type="file" class="form-control" accept=".json" />
+            </div>
+            <button type="submit" class="btn btn-warning">&#8657; Upload &amp; Import</button>
+        </form>
+
+        @if (importSummary != null)
+        {
+            <div class="mt-4">
+                <h5>Import Result</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Entity</th>
+                            <th class="text-end">Imported</th>
+                            <th class="text-end">Skipped</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Users</td>
+                            <td class="text-end">@importSummary.UsersImported</td>
+                            <td class="text-end text-muted">@importSummary.UsersSkipped</td>
+                        </tr>
+                        <tr>
+                            <td>Roles</td>
+                            <td class="text-end">@importSummary.RolesImported</td>
+                            <td class="text-end text-muted">@importSummary.RolesSkipped</td>
+                        </tr>
+                        <tr>
+                            <td>Clients</td>
+                            <td class="text-end">@importSummary.ClientsImported</td>
+                            <td class="text-end text-muted">@importSummary.ClientsSkipped</td>
+                        </tr>
+                        <tr>
+                            <td>Resources</td>
+                            <td class="text-end">@importSummary.ResourcesImported</td>
+                            <td class="text-end text-muted">@importSummary.ResourcesSkipped</td>
+                        </tr>
+                    </tbody>
+                </table>
+                @if (importSummary.Errors.Count > 0)
+                {
+                    <div class="alert alert-warning">
+                        <strong>Errors during import:</strong>
+                        <ul class="mb-0 mt-1">
+                            @foreach (var err in importSummary.Errors)
+                            {
+                                <li>@err</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>

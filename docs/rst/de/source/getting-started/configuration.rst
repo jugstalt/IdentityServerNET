@@ -235,7 +235,8 @@ Abschnitt ``Admin``
         "DenyAdminClients": true,           // default: false
         "DenyAdminSecretsVault": true,      // default: false
         "DenySigningUI": true,              // default: false
-        "DenyAdminCreateCerts": true        // default: false
+        "DenyAdminCreateCerts": true,       // default: false
+        "AllowDataTransfer": true           // default: false
     }
 
 Hier kann bestimmt werden, welche *Admin Tools* in der **IdentityServerNET**-Instanz zur Verfügung stehen:
@@ -248,9 +249,22 @@ Hier kann bestimmt werden, welche *Admin Tools* in der **IdentityServerNET**-Ins
 * **DenySigningUI:** Das **Payload Signing**-Werkzeug steht dem Administrator nicht zur Verfügung.
 * **DenyAdminCreateCerts:** Das **Selbst-Signierte Zertifikate**-Werkzeug steht dem Administrator nicht zur Verfügung.
 
-Mit diesem Abschnitt können die Administrationswerkzeuge eingeschränkt werden. Dies kann sinnvoll sein, wenn eine **IdentityServer**-Instanz öffentlich 
+* **DenyAdminCreateCerts:** Das **Selbst-Signierte Zertifikate**-Werkzeug steht dem Administrator nicht zur Verfügung.
+
+* **AllowDataTransfer:** Wenn auf ``true`` gesetzt, erscheint im Admin-Bereich die Kachel **Data Transfer**.
+  Administratoren können damit alle Benutzer, Rollen, Clients und Ressourcen als JSON-Datei exportieren
+  und in eine andere Instanz importieren. Bestehende Einträge werden beim Import übersprungen, nie überschrieben.
+  Diese Option sollte nur während der Installations-/Migrationsphase aktiviert sein und danach wieder deaktiviert werden.
+
+  .. note::
+
+      Passwort-Hashes werden mit exportiert – sie sind kompatibel, solange Quell- und Zielinstanz denselben
+      ASP.NET Identity-Hashing-Algorithmus verwenden. Passkeys sind im Export enthalten, funktionieren jedoch
+      auf einer anderen Domain nicht (WebAuthn ist domain-gebunden).
+
+Mit diesem Abschnitt können die Administrationswerkzeuge eingeschränkt werden. Dies kann sinnvoll sein, wenn eine **IdentityServer**-Instanz öffentlich
 zugänglich ist. Wenn eine öffentliche Instanz keine Administrationswerkzeuge besitzt, erhöht dies die Sicherheit der **IdentityServer-Datenbanken**.
-Die Administration kann hier beispielsweise nur über eine Instanz erfolgen, die nicht über das Internet erreichbar ist (nur Intranet, ...) und auf die gleiche 
+Die Administration kann hier beispielsweise nur über eine Instanz erfolgen, die nicht über das Internet erreichbar ist (nur Intranet, ...) und auf die gleiche
 Datenbank zugreift wie die öffentliche Instanz.
 
 Abschnitt ``Account``

@@ -233,7 +233,8 @@ Section ``Admin``
         "DenyAdminClients": true,           // default: false
         "DenyAdminSecretsVault": true,      // default: false
         "DenySigningUI": true,              // default: false
-        "DenyAdminCreateCerts": true        // default: false
+        "DenyAdminCreateCerts": true,       // default: false
+        "AllowDataTransfer": true           // default: false
     }
 
 This section allows you to control which *admin tools* are available in the **IdentityServerNET** instance:
@@ -246,8 +247,21 @@ This section allows you to control which *admin tools* are available in the **Id
 * **DenySigningUI:** The **Payload Signing** tool is not available to the administrator.
 * **DenyAdminCreateCerts:** The **Self-Signed Certificates** tool is not available to the administrator.
 
+* **DenyAdminCreateCerts:** The **Self-Signed Certificates** tool is not available to the administrator.
+
+* **AllowDataTransfer:** If set to ``true``, a **Data Transfer** tile appears in the admin area.
+  Administrators can export all users, roles, clients, and resources as a JSON file and import them into
+  another instance. Existing entries are skipped during import — nothing is ever overwritten.
+  This option should only be enabled during the installation or migration phase and disabled afterwards.
+
+  .. note::
+
+      Password hashes are included in the export and remain compatible as long as the source and target
+      instance use the same ASP.NET Identity hashing algorithm. Passkeys are exported but will not work
+      on a different domain (WebAuthn is domain-bound).
+
 This section can be used to restrict the administrative tools. This can be useful if an **IdentityServer** instance is publicly accessible. If a public instance has no admin tools available, it enhances the security of the **IdentityServer databases**.
-Administration can, for example, be restricted to an instance that is not accessible over the internet (only intranet, etc.) and that shares the same 
+Administration can, for example, be restricted to an instance that is not accessible over the internet (only intranet, etc.) and that shares the same
 database as the public instance.
 
 Section ``Account``
