@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,6 +43,9 @@ public class IndexModel : SecurePageModel
 
     [BindProperty]
     public IFormFile? ImportFile { get; set; }
+
+    [BindProperty]
+    public IFormFile? ImportCsvFile { get; set; }
 
     public ImportSummary? LastImport { get; set; }
 
@@ -248,6 +252,211 @@ public class IndexModel : SecurePageModel
         while (page.Count() == batch);
         return result;
     }
+
+    // ------------------------------------------------------------------
+    // CSV import
+
+    public async Task<IActionResult> OnPostImportCsvAsync()
+    {
+        if (!_configuration.AllowDataTransfer())
+            return NotFound();
+
+        if (ImportCsvFile is null || ImportCsvFile.Length == 0)
+        {
+            StatusMessage = "Error: No CSV file selected.";
+            return Page();
+        }
+
+        if (_userDb is null)
+        {
+            StatusMessage = "Error: No user database available.";
+            return Page();
+        }
+
+        string csvContent;
+        using (var stream = ImportCsvFile.OpenReadStream())
+        using (var reader = new StreamReader(stream, Encoding.UTF8))
+            csvContent = await reader.ReadToEndAsync();
+
+        List<ApplicationUser> users;
+        List<string> parseErrors;
+        try
+        {
+            (users, parseErrors) = ParseUsersCsv(csvContent);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: Could not parse CSV — {ex.Message}";
+            return Page();
+        }
+
+        var summary = new ImportSummary();
+        summary.Errors.AddRange(parseErrors);
+
+        foreach (var user in users)
+        {
+            try
+            {
+                var existing = await _userDb.FindByEmailAsync(user.NormalizedEmail, CancellationToken.None);
+                if (existing != null) { summary.UsersSkipped++; continue; }
+                await _userDb.CreateAsync(user, CancellationToken.None);
+                summary.UsersImported++;
+            }
+            catch (Exception ex)
+            {
+                summary.Errors.Add($"User '{user.UserName}': {ex.Message}");
+            }
+        }
+
+        StatusMessage = summary.Errors.Count == 0
+            ? $"CSV import completed: {summary.UsersImported} users imported, {summary.UsersSkipped} skipped."
+            : $"CSV import completed with {summary.Errors.Count} error(s): {summary.UsersImported} imported, {summary.UsersSkipped} skipped.";
+
+        TempData["ImportSummaryJson"] = JsonConvert.SerializeObject(summary);
+        return RedirectToPage();
+    }
+
+    private static (List<ApplicationUser> users, List<string> errors) ParseUsersCsv(string csv)
+    {
+        var users = new List<ApplicationUser>();
+        var errors = new List<string>();
+
+        var lines = csv.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length < 2)
+            return (users, errors);
+
+        var headers = SplitCsvLine(lines[0])
+            .Select(h => h.Trim().ToLowerInvariant())
+            .ToArray();
+
+        int ColIdx(params string[] names)
+        {
+            foreach (var name in names)
+            {
+                var idx = Array.IndexOf(headers, name);
+                if (idx >= 0) return idx;
+            }
+            return -1;
+        }
+
+        int emailIdx     = ColIdx("email");
+        int hashIdx      = ColIdx("passwordhash", "password_hash");
+        int firstIdx     = ColIdx("firstname", "first_name", "givenname", "given_name");
+        int lastIdx      = ColIdx("lastname", "last_name", "familyname", "family_name");
+        int rolesIdx     = ColIdx("roles", "role");
+
+        if (emailIdx < 0)
+            throw new Exception("Required column 'Email' not found in CSV header.");
+        if (hashIdx < 0)
+            throw new Exception("Required column 'PasswordHash' not found in CSV header.");
+
+        for (int i = 1; i < lines.Length; i++)
+        {
+            var cells = SplitCsvLine(lines[i]);
+            if (cells.Length <= emailIdx) continue;
+
+            var email = cells[emailIdx].Trim();
+            if (string.IsNullOrWhiteSpace(email)) continue;
+
+            var hash = hashIdx < cells.Length ? cells[hashIdx].Trim() : "";
+            if (string.IsNullOrWhiteSpace(hash))
+            {
+                errors.Add($"Line {i + 1}: '{email}' skipped — no PasswordHash.");
+                continue;
+            }
+
+            string firstName, lastName;
+            if (firstIdx >= 0 && firstIdx < cells.Length && !string.IsNullOrWhiteSpace(cells[firstIdx]))
+            {
+                firstName = cells[firstIdx].Trim();
+                lastName  = lastIdx >= 0 && lastIdx < cells.Length ? cells[lastIdx].Trim() : "";
+            }
+            else
+            {
+                (firstName, lastName) = DeriveNameFromEmail(email);
+            }
+
+            var roleList = rolesIdx >= 0 && rolesIdx < cells.Length
+                ? cells[rolesIdx].Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                 .Select(r => r.Trim())
+                                 .Where(r => r.Length > 0)
+                                 .ToList()
+                : new List<string>();
+
+            var user = new ApplicationUser
+            {
+                Id                 = Guid.NewGuid().ToString(),
+                UserName           = email,
+                NormalizedUserName = email.ToUpperInvariant(),
+                Email              = email,
+                NormalizedEmail    = email.ToUpperInvariant(),
+                EmailConfirmed     = true,
+                PasswordHash       = hash,
+                Roles              = roleList.Count > 0 ? roleList : null,
+            };
+
+            user.Claims = new List<Claim>
+            {
+                new Claim("given_name",  Capitalize(firstName)),
+                new Claim("family_name", Capitalize(lastName)),
+            };
+
+            users.Add(user);
+        }
+
+        return (users, errors);
+    }
+
+    private static string[] SplitCsvLine(string line)
+    {
+        var fields = new List<string>();
+        var sb = new StringBuilder();
+        bool inQuotes = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    sb.Append('"');
+                    i++;
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ';' && !inQuotes)
+            {
+                fields.Add(sb.ToString());
+                sb.Clear();
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+        fields.Add(sb.ToString());
+        return [.. fields];
+    }
+
+    private static (string firstName, string lastName) DeriveNameFromEmail(string email)
+    {
+        var at = email.IndexOf('@');
+        var local  = at > 0 ? email[..at]      : email;
+        var domain = at > 0 ? email[(at + 1)..] : "";
+
+        var sepIdx = local.IndexOfAny(['.', '-']);
+        if (sepIdx > 0)
+            return (local[..sepIdx], local[(sepIdx + 1)..]);
+
+        return (local, domain);
+    }
+
+    private static string Capitalize(string s)
+        => string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s[1..];
 }
 
 public class ImportSummary
