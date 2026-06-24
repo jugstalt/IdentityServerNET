@@ -42,7 +42,7 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
        .WaitFor(mailpit)
 
 #if STORAGE_LITEDB
-       .WithEnvironment("IdentityServer__ConnectionStrings__LiteDb", "identityserver-litedb.db")
+       .WithEnvironment("IdentityServer__ConnectionStrings__LiteDb", "c:\\temp\\identityserver-litedb.db")
 #elif STORAGE_SQLSERVER
        // WaitFor(sqlServerDb) waits until SQL Server is actually ready (not just container start).
        // ConnectionStringExpression resolves to Server=host,PORT;... at launch time.
@@ -61,7 +61,7 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
        })
        .WaitFor(postgres)
 #elif STORAGE_SQLITE
-       .WithEnvironment("IdentityServer__ConnectionStrings__Sqlite", "Data Source=identityserver-sqlite.db")
+       .WithEnvironment("IdentityServer__ConnectionStrings__Sqlite", "Data Source=c:\\temp\\identityserver-sqlite.db")
 #endif
 
        //.WithEnvironment(e =>
