@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Serialize;
@@ -8,7 +8,6 @@ using IdentityServerNET.Services.Serialize;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace IdentityServerNET.Postgres.Services.DbContext;
 
@@ -57,7 +56,7 @@ public class PostgresUIDb : IUIDbContext
 
         if (blob is null) return Task.FromResult<UICustomizationSettings?>(null);
         return Task.FromResult(
-            _blobSerializer.DeserializeObject<UICustomizationSettings>(_cryptoService.DecryptText(blob)));
+            _blobSerializer.DeserializeObject<UICustomizationSettings?>(_cryptoService.DecryptText(blob)));
     }
 
     public Task SaveSettingsAsync(UICustomizationSettings settings)

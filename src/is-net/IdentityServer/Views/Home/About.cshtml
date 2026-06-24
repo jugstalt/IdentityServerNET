@@ -1,6 +1,9 @@
-@{
-    var version = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
-    var version_is_net = typeof(IdentityServerNET.Models.ApplicationUser).Assembly.GetName().Version.ToString();
+﻿@{
+    #nullable enable
+
+    static string ShortVersion(System.Version? v) => v is null ? "" : $"{v.Major}.{v.Minor}.{v.Build}";
+    var version = ShortVersion(typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version);
+    var version_is_net = ShortVersion(typeof(IdentityServerNET.Models.ApplicationUser).Assembly.GetName().Version);
 }
 
 <div class="welcome-page">

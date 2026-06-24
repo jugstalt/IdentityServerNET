@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿#nullable enable
+
+using Microsoft.Extensions.Options;
 
 namespace IdentityServerNET.Services.UI;
 public class DefaultUserInterfaceService : UserInterfaceService

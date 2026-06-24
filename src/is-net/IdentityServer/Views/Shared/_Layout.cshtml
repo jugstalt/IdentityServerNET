@@ -1,22 +1,21 @@
 ﻿@using IdentityServerNET.Abstractions.UI
 @using IdentityServer4.Extensions
-@using IdentityServerNET.Extensions.DependencyInjection;
-@using Microsoft.Extensions.Options;
 @using Microsoft.Extensions.Configuration
-@using IdentityServerNET.Services.UI;
-@using IdentityServerNET.Models
 
 @inject IConfiguration Configuration
 @inject IUserInterfaceService userInterface;
 @inject IdentityServerNET.Services.ColorSchemeService ColorScheme
 @{
-    string name = null;
+    #nullable enable
+
+    string? name = null;
     if (!true.Equals(ViewData["signed-out"]))
     {
-        name = Context.User?.GetDisplayName();
+        name = Context.User?.GetDisplayName() ?? "";
     }
-    var footerVersionIs4 = typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version.ToString();
-    var footerVersionIsNet = typeof(IdentityServerNET.Models.ApplicationUser).Assembly.GetName().Version.ToString();
+    static string ShortVersion(System.Version? v) => v is null ? "" : $"{v.Major}.{v.Minor}.{v.Build}";
+    var footerVersionIs4 = ShortVersion(typeof(IdentityServer4.Hosting.IdentityServerMiddleware).Assembly.GetName().Version);
+    var footerVersionIsNet = ShortVersion(typeof(IdentityServerNET.Models.ApplicationUser).Assembly.GetName().Version);
 }
 <!DOCTYPE html>
 <html>

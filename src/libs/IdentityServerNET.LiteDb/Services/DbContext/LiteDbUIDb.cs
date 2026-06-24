@@ -1,4 +1,4 @@
-using IdentityServerNET.Abstractions.Cryptography;
+﻿using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Serialize;
 using IdentityServerNET.Abstractions.Services;
@@ -38,7 +38,7 @@ public class LiteDbUIDb : IUIDbContext
         var doc = col.FindOne(d => d.Name == SettingsName);
         if (doc is null) return Task.FromResult<UICustomizationSettings?>(null);
         return Task.FromResult(
-            _blobSerializer.DeserializeObject<UICustomizationSettings>(_cryptoService.DecryptText(doc.BlobData)));
+            _blobSerializer.DeserializeObject<UICustomizationSettings?>(_cryptoService.DecryptText(doc.BlobData)));
     }
 
     public Task SaveSettingsAsync(UICustomizationSettings settings)

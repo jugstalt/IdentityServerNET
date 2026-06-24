@@ -1,4 +1,6 @@
-﻿using IdentityServerNET.Abstractions.UI;
+﻿#nullable enable
+
+using IdentityServerNET.Abstractions.UI;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;

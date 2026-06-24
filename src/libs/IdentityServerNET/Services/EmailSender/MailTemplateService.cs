@@ -1,3 +1,5 @@
+﻿#nullable enable
+
 using IdentityServerNET.Abstractions.EmailSender;
 using IdentityServerNET.Services.UI;
 using Microsoft.Extensions.Configuration;

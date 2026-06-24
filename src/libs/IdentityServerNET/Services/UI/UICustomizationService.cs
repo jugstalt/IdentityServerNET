@@ -1,8 +1,9 @@
+﻿#nullable enable
+
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.UI;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -129,12 +130,12 @@ public class UICustomizationService
         var sb = new StringBuilder();
         sb.AppendLine(_baseOverrideCss);
 
-        bool hasPrimary  = !string.IsNullOrEmpty(settings.PrimaryColor);
+        bool hasPrimary = !string.IsNullOrEmpty(settings.PrimaryColor);
         bool hasOnPrimary = !string.IsNullOrEmpty(settings.OnPrimaryColor);
-        bool hasHeading   = !string.IsNullOrEmpty(settings.HeadingColor);
-        bool hasBodyText  = !string.IsNullOrEmpty(settings.BodyTextColor);
-        bool hasLogo      = settings.HasLogo;
-        bool hasBg        = settings.BackgroundCount > 0;
+        bool hasHeading = !string.IsNullOrEmpty(settings.HeadingColor);
+        bool hasBodyText = !string.IsNullOrEmpty(settings.BodyTextColor);
+        bool hasLogo = settings.HasLogo;
+        bool hasBg = settings.BackgroundCount > 0;
 
         if (!hasPrimary && !hasOnPrimary && !hasHeading && !hasBodyText && !hasLogo && !hasBg)
             return _baseOverrideCss;
@@ -145,7 +146,7 @@ public class UICustomizationService
         if (hasPrimary)
         {
             var primary = settings.PrimaryColor!;
-            var darker  = AdjustBrightness(primary, 0.82f);
+            var darker = AdjustBrightness(primary, 0.82f);
             var lighter = AdjustBrightness(primary, 1.22f);
 
             sb.AppendLine($"#main-navbar {{ background-color: {primary} !important; }}");

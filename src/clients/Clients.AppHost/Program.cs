@@ -1,11 +1,12 @@
-var builder = DistributedApplication.CreateBuilder(args);
+﻿var builder = DistributedApplication.CreateBuilder(args);
 
 var webApp = builder.AddProject<Projects.ClientWeb>("clientweb");
 var webApi = builder.AddProject<Projects.ClientApi>("clientapi");
 var testClient = builder.AddProject<Projects.IdentityServerWebClient>("identityserverwebclient");
 
 var identityServer = builder.AddIdentityServerNET("is-net-dev")
-       .WithMailDev()
+       //.WithMailDev()
+       .WithMailPit()
        .WithBindMountPersistance()
 
        .WithConfiguration(config =>
@@ -14,8 +15,12 @@ var identityServer = builder.AddIdentityServerNET("is-net-dev")
                 //.DenyRememberLogin()
                 .RememberLoginDefaultValue(true)
                 .DenyForgotPasswordChallange()
-                .DenyManageAccount()
+                //.DenyManageAccount()
                 //.DenyLocalLogin()
+                .AllowPasskeyPasswordless()
+              
+                .WithApplicationTitle("xxx")
+
                 ;
        })
        .WithMigrations(migrations =>

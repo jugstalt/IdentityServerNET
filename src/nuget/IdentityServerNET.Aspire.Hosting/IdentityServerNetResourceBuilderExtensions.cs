@@ -3,6 +3,7 @@
 using Aspire.Hosting.ApplicationModel;
 using IdentityServerNET.Aspire.Hosting.Utilitities;
 using System;
+using System.Linq;
 
 namespace Aspire.Hosting;
 
@@ -63,6 +64,34 @@ static public class IdentityServerNetResourceBuilderExtensions
                 "/home/app/identityserver-net",
                 isReadOnly: false
              );
+
+        return builder;
+    }
+
+    public static IdentityServerNetResourceBuilder WithMailPit(
+        this IdentityServerNetResourceBuilder builder,
+        int? smtpPort = null)
+    {
+        var mailPit = builder.AppBuilder.AddMailPit(
+            name: $"{builder.ResourceBuilder.Resource.Name}-mailpit",
+            smtpPort: smtpPort);
+
+        builder.ResourceBuilder
+            .WithEnvironment(e =>
+            {
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromEmail", "no-reply@is.net");
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__FromName", "IdentityServer NET");
+                e.EnvironmentVariables.Add(
+                    "IdentityServer__Mail__Smtp__SmtpServer",
+                    mailPit.Resource.ContainerName);
+                e.EnvironmentVariables.Add(
+                    "IdentityServer__Mail__Smtp__SmtpPort",
+                    mailPit.Resource.ContainerSmtpPort.ToString());
+                e.EnvironmentVariables.Add("IdentityServer__Mail__Smtp__EnableSsl", false.ToString());
+            });
+
+        builder.ResourceBuilder
+            .WaitFor(mailPit);
 
         return builder;
     }

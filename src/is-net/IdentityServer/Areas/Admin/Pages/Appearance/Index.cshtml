@@ -1,6 +1,8 @@
-@page
+﻿@page
 @model IdentityServer.Areas.Admin.Pages.Appearance.IndexModel
 @{
+    #nullable enable
+
     var settings = Model.Settings;
 }
 
@@ -29,6 +31,8 @@
                 <div class="card-header">Colors</div>
                 <div class="card-body">
                     @{
+                        #nullable enable
+
                         string ColorVal(string? stored, string fallback) => stored ?? fallback;
                     }
 

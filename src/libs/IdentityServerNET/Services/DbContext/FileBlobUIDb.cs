@@ -1,3 +1,5 @@
+﻿#nullable enable
+
 using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Serialize;
@@ -40,7 +42,7 @@ public class FileBlobUIDb : IUIDbContext
 
         var encrypted = File.ReadAllText(path, Encoding.UTF8);
         var json = _cryptoService.DecryptText(encrypted);
-        return Task.FromResult(_blobSerializer.DeserializeObject<UICustomizationSettings>(json));
+        return Task.FromResult(_blobSerializer.DeserializeObject<UICustomizationSettings?>(json));
     }
 
     public Task SaveSettingsAsync(UICustomizationSettings settings)

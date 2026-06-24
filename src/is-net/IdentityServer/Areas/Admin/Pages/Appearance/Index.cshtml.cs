@@ -1,3 +1,5 @@
+﻿#nullable enable
+
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Models;
 using IdentityServerNET.Services.UI;

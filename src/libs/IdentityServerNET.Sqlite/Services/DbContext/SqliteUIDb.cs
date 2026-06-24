@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Serialize;
@@ -67,7 +67,7 @@ public class SqliteUIDb : IUIDbContext
 
         if (blob is null) return Task.FromResult<UICustomizationSettings?>(null);
         return Task.FromResult(
-            _blobSerializer.DeserializeObject<UICustomizationSettings>(_cryptoService.DecryptText(blob)));
+            _blobSerializer.DeserializeObject<UICustomizationSettings?>(_cryptoService.DecryptText(blob)));
     }
 
     public Task SaveSettingsAsync(UICustomizationSettings settings)

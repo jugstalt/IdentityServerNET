@@ -1,3 +1,5 @@
+﻿#nullable enable
+
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.UI;
 using System.Threading.Tasks;
