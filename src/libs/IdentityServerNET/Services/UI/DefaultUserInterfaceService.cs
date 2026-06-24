@@ -3,8 +3,10 @@
 namespace IdentityServerNET.Services.UI;
 public class DefaultUserInterfaceService : UserInterfaceService
 {
-    public DefaultUserInterfaceService(IOptionsMonitor<UserInterfaceServiceOptions> optionsMonitor)
-        : base(optionsMonitor)
+    public DefaultUserInterfaceService(
+        IOptionsMonitor<UserInterfaceServiceOptions> optionsMonitor,
+        UICustomizationService? customization = null)
+        : base(optionsMonitor, customization)
     {
     }
 }

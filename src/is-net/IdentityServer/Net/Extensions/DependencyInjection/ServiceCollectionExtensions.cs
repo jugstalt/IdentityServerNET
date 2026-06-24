@@ -24,6 +24,7 @@ using IdentityServerNET.Services.SigningCredential;
 using IdentityServerNET.Services.UI;
 using IdentityServerNET.Stores;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -386,6 +387,44 @@ static public class ServiceCollectionExtensions
                     )
             )
 
+            // Default UIDbContext
+            .IfServiceNotRegistered<IUIDbContext>(() =>
+                configSection
+                    .SwitchCase(["ConnectionStrings:UI:FilesDb", "ConnectionStrings:FilesDb"], value =>
+                        services.AddUIDbContext<FileBlobUIDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "ui");
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:UI:LiteDb", "ConnectionStrings:LiteDb"], value =>
+                        services.AddUIDbContext<LiteDbUIDb>(options =>
+                        {
+                            options.ConnectionString = configuration.AssetPath(value);
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:UI:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddUIDbContext<SqlServerUIDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:UI:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddUIDbContext<PostgresUIDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:UI:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddUIDbContext<SqliteUIDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchDefault(() =>
+                        services.AddTransient<IUIDbContext, InMemoryUIDb>()
+                    )
+            )
+
             // Default EmailSender
             .IfServiceNotRegistered<ICustomEmailSender>(() =>
                 configSection
@@ -405,15 +444,13 @@ static public class ServiceCollectionExtensions
             {
                 options.ApplicationTitle = configSection["ApplicationTitle"] ?? "IdentityServer NET";
                 options.OverrideCssContent = IdentityServer.Properties.Resources.is4_overrides;
-                //options.MediaContent = new Dictionary<string, byte[]>()
-                //{
-                //    { "openid-logo.png", Properties.Resources.openid_logo }
-                //};
             }))
             // BotDetection
             .IfServiceNotRegistered<ILoginBotDetection>(() => services.AddLoginBotDetection<LoginBotDetection>())
             // Captcha
             .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<CaptchaCodeRenderer>());
+
+        services.AddSingleton<UICustomizationService>();
 
         return services;
     }

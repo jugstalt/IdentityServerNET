@@ -112,4 +112,16 @@
             </a>
         </li>
     }
+    @if (Model.ApplicationUser.IsUserAdministrator())
+    {
+        <li class="ui-tile">
+            <a asp-page="./Appearance/Index">
+                <div class="@ColorScheme.TileIcon("settings")">
+                </div>
+                <div class="ui-tile-text">
+                    Appearance
+                </div>
+            </a>
+        </li>
+    }
 </ul>

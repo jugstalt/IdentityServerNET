@@ -123,6 +123,19 @@ public static class ServicesExtensions
 
     #endregion
 
+    #region UIDbContext
+
+    static public IServiceCollection AddUIDbContext<T>(this IServiceCollection services, Action<UIDbContextConfiguration> setupAction)
+        where T : class, IUIDbContext
+    {
+        services.Configure(setupAction);
+        services.AddTransient<IUIDbContext, T>();
+
+        return services;
+    }
+
+    #endregion
+
     #region SecretsVaultDb
 
     static public IServiceCollection AddSecretsVaultDbContext<T>(this IServiceCollection services, IConfiguration configuration, Action<SecretsVaultDbContextConfiguration> setupAction)

@@ -11,8 +11,10 @@ using IdentityServerNET.Models;
 using IdentityServerNET.Services;
 using IdentityServerNET.Services.SecretsVault;
 using IdentityServerNET.Services.Signing;
+using IdentityServerNET.Services.UI;
 using IdentityServerNET.Services.Validators;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -369,38 +371,8 @@ if (app.Environment.IsDevelopment())
 
 #region UserInterface (Styling)
 
-try
-{
-    var overrideCss = userInterface?.OverrideCssContent ?? String.Empty;
-
-    FileInfo fi = new FileInfo($"{app.Environment.WebRootPath}/css/is4-overrides.css");
-    if (fi.Exists)
-    {
-        fi.Delete();
-    }
-    File.WriteAllText(fi.FullName, overrideCss);
-
-    if (userInterface?.MediaContent != null)
-    {
-        foreach (var media in userInterface.MediaContent)
-        {
-            fi = new FileInfo($"{app.Environment.WebRootPath}/css/media/{media.Key}");
-            if (!fi.Directory.Exists)
-            {
-                fi.Directory.Create();
-            }
-            if (fi.Exists)
-            {
-                fi.Delete();
-            }
-            File.WriteAllBytes(fi.FullName, media.Value);
-        }
-    }
-}
-catch /*(Exception ex)*/
-{
-    Log.Logger.Error("Styling overrrides not updated");
-}
+var uiCustomization = app.Services.GetRequiredService<UICustomizationService>();
+uiCustomization.Initialize(userInterface?.OverrideCssContent ?? string.Empty);
 
 #endregion
 
@@ -433,6 +405,23 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+// UI customization endpoints — served from in-memory cache, no filesystem required
+app.MapGet("/ui/overrides.css", async (UICustomizationService svc) =>
+    Results.Content(await svc.GetOverrideCssAsync(), "text/css"))
+    .AllowAnonymous();
+
+app.MapGet("/ui/logo", async (UICustomizationService svc) =>
+{
+    var result = await svc.GetLogoAsync();
+    return result is null ? Results.NotFound() : Results.File(result.Value.data, result.Value.mime);
+}).AllowAnonymous();
+
+app.MapGet("/ui/background/{index:int}", async (int index, UICustomizationService svc) =>
+{
+    var result = await svc.GetBackgroundAsync(index);
+    return result is null ? Results.NotFound() : Results.File(result.Value.data, result.Value.mime);
+}).AllowAnonymous();
 //app.MapControllerRoute(
 //        name: "login",
 //        pattern: "Identity/Account/Login",

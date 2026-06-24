@@ -1,0 +1,159 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Appearance.IndexModel
+@{
+    var settings = Model.Settings;
+}
+
+<div class="row">
+    <div class="col-md-8">
+
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            @* Application Title *@
+            <div class="card mb-3">
+                <div class="card-header">Application Title</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="ApplicationTitle">Title</label>
+                        <input asp-for="ApplicationTitle" class="form-control"
+                               value="@(settings.ApplicationTitle ?? "")"
+                               placeholder="IdentityServer NET" />
+                        <small class="form-text text-muted">Shown in navbar and login page. Leave empty to use the configured default.</small>
+                    </div>
+                </div>
+            </div>
+
+            @* Colors *@
+            <div class="card mb-3">
+                <div class="card-header">Colors</div>
+                <div class="card-body">
+                    @{
+                        string ColorVal(string? stored, string fallback) => stored ?? fallback;
+                    }
+
+                    <div class="form-group d-flex align-items-center gap-3 mb-3">
+                        <input type="color" name="PrimaryColor"
+                               value="@ColorVal(settings.PrimaryColor, "#0094ff")"
+                               class="form-control form-control-color flex-shrink-0" style="width:56px;height:40px;" />
+                        <div>
+                            <div class="fw-semibold">Primary Color</div>
+                            <small class="text-muted">Navbar &amp; sidebar background, buttons background, login gradient</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-2" />
+
+                    <div class="form-group d-flex align-items-center gap-3 mb-3">
+                        <input type="color" name="OnPrimaryColor"
+                               value="@ColorVal(settings.OnPrimaryColor, "#ffffff")"
+                               class="form-control form-control-color flex-shrink-0" style="width:56px;height:40px;" />
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">Navbar &amp; Button Text Color</div>
+                            <small class="text-muted">Text on navbar, buttons, active sidebar items (defaults to white)</small>
+                        </div>
+                        @if (!string.IsNullOrEmpty(settings.OnPrimaryColor))
+                        {
+                            <button type="submit" formaction="?action=reset-on-primary"
+                                    class="btn btn-sm btn-outline-secondary flex-shrink-0">Reset</button>
+                        }
+                    </div>
+
+                    <div class="form-group d-flex align-items-center gap-3 mb-3">
+                        <input type="color" name="HeadingColor"
+                               value="@ColorVal(settings.HeadingColor, "#1a1a1a")"
+                               class="form-control form-control-color flex-shrink-0" style="width:56px;height:40px;" />
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">Heading Color</div>
+                            <small class="text-muted">H1–H4 headings, card titles, form labels. Also used for inactive sidebar text.</small>
+                        </div>
+                        @if (!string.IsNullOrEmpty(settings.HeadingColor))
+                        {
+                            <button type="submit" formaction="?action=reset-heading"
+                                    class="btn btn-sm btn-outline-secondary flex-shrink-0">Reset</button>
+                        }
+                    </div>
+
+                    <div class="form-group d-flex align-items-center gap-3">
+                        <input type="color" name="BodyTextColor"
+                               value="@ColorVal(settings.BodyTextColor, "#1a1a1a")"
+                               class="form-control form-control-color flex-shrink-0" style="width:56px;height:40px;" />
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">Body Text Color</div>
+                            <small class="text-muted">Paragraphs, table cells, labels. Fallback for sidebar text if Heading Color is not set.</small>
+                        </div>
+                        @if (!string.IsNullOrEmpty(settings.BodyTextColor))
+                        {
+                            <button type="submit" formaction="?action=reset-body-text"
+                                    class="btn btn-sm btn-outline-secondary flex-shrink-0">Reset</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* Logo *@
+            <div class="card mb-3">
+                <div class="card-header">Logo</div>
+                <div class="card-body">
+                    @if (settings.HasLogo)
+                    {
+                        <div class="mb-2 d-flex align-items-center gap-3">
+                            <img src="/ui/logo" height="64" style="border-radius:8px;" alt="Logo" />
+                            <button type="submit" formaction="?action=remove-logo" class="btn btn-sm btn-outline-danger">Remove Logo</button>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label asp-for="LogoFile">@(settings.HasLogo ? "Replace logo" : "Upload logo") (PNG or JPG)</label>
+                        <input asp-for="LogoFile" type="file" class="form-control" accept=".png,.jpg,.jpeg" />
+                    </div>
+                </div>
+            </div>
+
+            @* Backgrounds *@
+            <div class="card mb-3">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <span>Background Images</span>
+                    @if (settings.BackgroundCount > 0)
+                    {
+                        <button type="submit" formaction="?action=remove-all-backgrounds"
+                                class="btn btn-sm btn-outline-danger">Remove All</button>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (settings.BackgroundCount > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @for (int i = 1; i <= settings.BackgroundCount; i++)
+                            {
+                                <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3">
+                                    <img src="/ui/background/@i"
+                                         style="width:140px;height:88px;object-fit:cover;border-radius:5px;flex-shrink:0;"
+                                         alt="Background @i" />
+                                    <span class="flex-grow-1 text-muted small">Background @i</span>
+                                    <button type="submit" formaction="?action=remove-background-@i"
+                                            class="btn btn-sm btn-outline-danger flex-shrink-0 ms-2">Remove</button>
+                                </div>
+                            }
+                        </div>
+                        <div class="px-3 py-2 text-muted small border-top">
+                            @settings.BackgroundCount image(s) — displayed randomly on the login page.
+                        </div>
+                    }
+                    <div class="form-group p-3 @(settings.BackgroundCount > 0 ? "border-top" : "")">
+                        <label asp-for="BackgroundFiles">Add background images (PNG or JPG, multiple allowed)</label>
+                        <input asp-for="BackgroundFiles" type="file" class="form-control" accept=".png,.jpg,.jpeg" multiple />
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Appearance</button>
+                <a asp-page="../Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

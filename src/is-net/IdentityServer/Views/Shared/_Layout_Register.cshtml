@@ -1,4 +1,4 @@
-@using IdentityServerNET.Abstractions.UI
+﻿@using IdentityServerNET.Abstractions.UI
 @using IdentityServer4.Extensions
 @using Microsoft.Extensions.Configuration
 @using IdentityServerNET.Services.UI;
@@ -15,8 +15,9 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is-net.css?v=2" rel="stylesheet" />
     <link href="~/css/is-overrides.css?v=2" rel="stylesheet" />
+    <link href="/ui/overrides.css" rel="stylesheet" />
 </head>
-<body class="body-layout-login">
+<body class="body-layout-login var-@((1 + new Random().Next(12)).ToString()) @(userInterface.LoginLayoutBodyClass)">
 
     <div class="container body-content">
         @RenderBody()
