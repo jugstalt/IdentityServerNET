@@ -23,7 +23,7 @@
                        asp-route-grant="@grantValue"
                        asp-route-remove="@hasGrant">
                         <div style="width:32px;height:32px;float:left"
-                             class="@(hasGrant ? "option-check selected" : "")">
+                             class="option-check @(hasGrant ? "selected" : "")">
 
                         </div>
                         <div>@(grantName)</div>

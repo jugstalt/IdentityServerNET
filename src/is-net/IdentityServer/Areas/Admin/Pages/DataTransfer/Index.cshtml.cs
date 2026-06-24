@@ -124,7 +124,7 @@ public class IndexModel : SecurePageModel
             {
                 try
                 {
-                    var existing = await _roleDb.FindByNameAsync(role.NormalizedName ?? role.Name.ToUpperInvariant(), CancellationToken.None);
+                    var existing = await _roleDb.FindByNameAsync(role.NormalizedName ?? role.Name?.ToUpperInvariant() ?? "", CancellationToken.None);
                     if (existing != null) { summary.RolesSkipped++; continue; }
                     role.Id ??= Guid.NewGuid().ToString();
                     await _roleDb.CreateAsync(role, CancellationToken.None);
@@ -143,7 +143,7 @@ public class IndexModel : SecurePageModel
             {
                 try
                 {
-                    var existing = await _userDb.FindByNameAsync(user.NormalizedUserName ?? user.UserName?.ToUpperInvariant(), CancellationToken.None);
+                    var existing = await _userDb.FindByNameAsync(user.NormalizedUserName ?? user.UserName?.ToUpperInvariant() ?? "", CancellationToken.None);
                     if (existing != null) { summary.UsersSkipped++; continue; }
                     user.Id ??= Guid.NewGuid().ToString();
                     await _userDb.CreateAsync(user, CancellationToken.None);
@@ -297,7 +297,7 @@ public class IndexModel : SecurePageModel
         {
             try
             {
-                var existing = await _userDb.FindByEmailAsync(user.NormalizedEmail, CancellationToken.None);
+                var existing = await _userDb.FindByEmailAsync(user.NormalizedEmail ?? "", CancellationToken.None);
                 if (existing != null) { summary.UsersSkipped++; continue; }
                 await _userDb.CreateAsync(user, CancellationToken.None);
                 summary.UsersImported++;

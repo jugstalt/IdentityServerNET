@@ -355,6 +355,11 @@ body.colorscheme-dark {
     color: #999;
 }
 
+/* ===== Dark option-check subtext ===== */
+.colorscheme-dark .nav.nav-pills.flex-column > li > a:has(.option-check) > div:not(.option-check) ~ div:not(.option-check) {
+    color: #666;
+}
+
 /* ===== Dark option-check box ===== */
 .colorscheme-dark .nav.nav-pills.flex-column > li > a > div:not([class*="sketchpen"]):not(.option-check) {
     color: #c0c8d8;
