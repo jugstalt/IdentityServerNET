@@ -124,8 +124,48 @@ einzeln angegeben, kann ein Fallback angegeben werden.
 
 .. note::
 
-    Die beiden Klassen ``Clients`` und ``Resources`` können auch in **Azure Tables** 
+    Die beiden Klassen ``Clients`` und ``Resources`` können auch in **Azure Tables**
     oder einer **MongoDB** gespeichert werden.
+
+Seit Version 7 stehen zusätzlich **relationale Datenbanken** als Backend zur Verfügung:
+
+.. code:: javascript
+
+    "ConnectionStrings": {
+        // Microsoft SQL Server
+        "SqlServer": "Server=localhost,1433;Database=identityserver;User Id=sa;Password=...;TrustServerCertificate=True"
+
+        // PostgreSQL
+        "Postgres": "Host=localhost;Port=5432;Database=identityserver;Username=postgres;Password=postgres"
+
+        // SQLite
+        "Sqlite": "Data Source=identityserver.db"
+        // or with explicit path
+        "Sqlite": "Data Source=c:\\apps\\identityserver-net\\identityserver.db"
+    }
+
+* **SqlServer:** Verbindungsstring für eine **Microsoft SQL Server**-Datenbank. Tabellen werden beim ersten Start automatisch erstellt.
+* **Postgres:** Verbindungsstring für eine **PostgreSQL**-Datenbank. Tabellen werden beim ersten Start automatisch erstellt.
+* **Sqlite:** Verbindungsstring für eine **SQLite**-Datenbankdatei. Die Datei und alle notwendigen Verzeichnisse werden automatisch angelegt.
+
+Auch für SQL-Backends können einzelne *Klassen* auf unterschiedliche Backends aufgeteilt werden:
+
+.. code:: javascript
+
+    "ConnectionStrings": {
+        "Users":     { "SqlServer": "Server=...;Database=identityserver;..." },
+        "Roles":     { "SqlServer": "Server=...;Database=identityserver;..." },
+        "Clients":   { "Postgres":  "Host=...;Database=identityserver;..." },
+        "Resources": { "Sqlite":    "Data Source=identityserver.db" }
+    }
+
+.. note::
+
+    Alle SQL-Backends speichern Objekte (Benutzer, Rollen, Clients, Ressourcen) als
+    verschlüsseltes JSON in einer ``BlobData``-Spalte – dasselbe Prinzip wie bei LiteDb.
+    Die Tabellen werden beim ersten Verbindungsaufbau automatisch erstellt, sofern sie noch
+    nicht existieren. Bei **PostgreSQL** und **SQLite** werden Benutzernamen und E-Mail-Adressen
+    intern immer in Kleinschreibung gespeichert und verglichen.
 
 Abschnitt ``Crypto``
 --------------------

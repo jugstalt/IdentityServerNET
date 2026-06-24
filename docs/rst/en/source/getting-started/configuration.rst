@@ -124,8 +124,47 @@ A connection string can be defined for each *class*. If not all *classes* are sp
 
 .. note::
 
-    The ``Clients`` and ``Resources`` classes can also be stored in **Azure Tables** 
+    The ``Clients`` and ``Resources`` classes can also be stored in **Azure Tables**
     or a **MongoDB**.
+
+Starting with version 7, **relational databases** are also available as storage backends:
+
+.. code:: javascript
+
+    "ConnectionStrings": {
+        // Microsoft SQL Server
+        "SqlServer": "Server=localhost,1433;Database=identityserver;User Id=sa;Password=...;TrustServerCertificate=True"
+
+        // PostgreSQL
+        "Postgres": "Host=localhost;Port=5432;Database=identityserver;Username=postgres;Password=postgres"
+
+        // SQLite
+        "Sqlite": "Data Source=identityserver.db"
+        // or with explicit path
+        "Sqlite": "Data Source=c:\\apps\\identityserver-net\\identityserver.db"
+    }
+
+* **SqlServer:** Connection string for a **Microsoft SQL Server** database. Tables are created automatically on first startup.
+* **Postgres:** Connection string for a **PostgreSQL** database. Tables are created automatically on first startup.
+* **Sqlite:** Connection string for a **SQLite** database file. The file and all required directories are created automatically.
+
+SQL backends also support per-class routing to different databases:
+
+.. code:: javascript
+
+    "ConnectionStrings": {
+        "Users":     { "SqlServer": "Server=...;Database=identityserver;..." },
+        "Roles":     { "SqlServer": "Server=...;Database=identityserver;..." },
+        "Clients":   { "Postgres":  "Host=...;Database=identityserver;..." },
+        "Resources": { "Sqlite":    "Data Source=identityserver.db" }
+    }
+
+.. note::
+
+    All SQL backends store objects (users, roles, clients, resources) as encrypted JSON
+    in a ``BlobData`` column — the same pattern as LiteDb. Tables are created automatically
+    on the first connection if they do not yet exist. For **PostgreSQL** and **SQLite**,
+    usernames and email addresses are always stored and compared in lowercase.
 
 Section ``Crypto``
 ------------------
