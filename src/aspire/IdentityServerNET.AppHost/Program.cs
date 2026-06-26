@@ -6,6 +6,8 @@
 //#define STORAGE_POSTGRE
 #define STORAGE_SQLITE
 
+//#define DBCONTEXT_API   // experimental
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var mailpit = builder.AddContainer("mailpit", "axllent/mailpit")
@@ -31,8 +33,9 @@ var postgres = builder.AddContainer("postgres", "postgres", "17")
 var pgEndpoint = postgres.GetEndpoint("pg");
 #endif
 
-//var maildev = builder.AddMailDev("maildev", smtpPort: 1025);
+#if DBCONTEXT_API
 var dbContextApi = builder.AddProject<Projects.IdentityServer_DbContext>("identityserver-dbcontext");
+#endif
 
 var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver", launchProfileName: "SelfHost")
        .WithEnvironment("IdentityServer__Mail__Smtp__SmtpServer", "localhost")

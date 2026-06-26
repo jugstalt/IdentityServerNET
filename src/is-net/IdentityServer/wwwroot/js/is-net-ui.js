@@ -55,6 +55,29 @@ $(function () {
         });
     });
 
+    // Captcha input — auto uppercase
+    $(document).on('input', '.captcha-input', function () {
+        var pos = this.selectionStart;
+        this.value = this.value.toUpperCase();
+        this.setSelectionRange(pos, pos);
+    });
+
+    // Submit spinner — show loading indicator on primary submit buttons
+    $('form').on('submit', function () {
+        var $form = $(this);
+        var $btn = $form.find('button.btn-primary:not([type=button]):not([type=reset])').not('[data-no-spinner]');
+        if ($btn.length && !$btn.data('submitting')) {
+            $btn.data('submitting', true);
+            // preserve name/value so the server still receives the button's submit signal
+            if ($btn.attr('name')) {
+                $('<input>').attr({ type: 'hidden', name: $btn.attr('name'), value: $btn.attr('value') || '' })
+                            .appendTo($form);
+            }
+            $btn.prop('disabled', true);
+            $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+        }
+    });
+
     $('.collapsable-tool').each(function (i, collapsable) {
         var $collapsable = $(collapsable);
 

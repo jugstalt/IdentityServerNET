@@ -15,8 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="3.119.2" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.2" />
+    <PackageReference Include="SkiaSharp" Version="4.148.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.148.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="CaptchaCodeRenderer_system_drawing.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -352,10 +352,7 @@ builder.Services
 
 if (builder.Environment.IsDevelopment())
 {
-    if (builder.Environment.IsDevelopment())
-{
     builder.Services.AddTransient<DevMigrationService>();
-}
 }
 
 var app = builder.Build();

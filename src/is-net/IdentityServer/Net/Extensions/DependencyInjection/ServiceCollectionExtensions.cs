@@ -4,6 +4,7 @@ using IdentityServerNET.Abstractions.Security;
 using IdentityServerNET.Abstractions.SigningCredential;
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Azure.Services.DbContext;
+using IdentityServerNET.CaptchaRenderers;
 using IdentityServerNET.Distribution.Extensions.DependencyInjection;
 using IdentityServerNET.Factories;
 using IdentityServerNET.HttpProxy.Services.DbContext;
@@ -11,8 +12,6 @@ using IdentityServerNET.LiteDb.Services.DbContext;
 using IdentityServerNET.Models;
 using IdentityServerNET.MongoDb.Services.DbContext;
 using IdentityServerNET.Postgres.Services.DbContext;
-using IdentityServerNET.Sqlite.Services.DbContext;
-using IdentityServerNET.SqlServer.Services.DbContext;
 using IdentityServerNET.Reflection;
 using IdentityServerNET.Services;
 using IdentityServerNET.Services.Cryptography;
@@ -22,9 +21,10 @@ using IdentityServerNET.Services.PasswordHasher;
 using IdentityServerNET.Services.Security;
 using IdentityServerNET.Services.SigningCredential;
 using IdentityServerNET.Services.UI;
+using IdentityServerNET.Sqlite.Services.DbContext;
+using IdentityServerNET.SqlServer.Services.DbContext;
 using IdentityServerNET.Stores;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -448,7 +448,7 @@ static public class ServiceCollectionExtensions
             // BotDetection
             .IfServiceNotRegistered<ILoginBotDetection>(() => services.AddLoginBotDetection<LoginBotDetection>())
             // Captcha
-            .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<CaptchaCodeRenderer>());
+            .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<ModernCaptchaCodeRenderer>());
 
         services.AddSingleton<UICustomizationService>();
 

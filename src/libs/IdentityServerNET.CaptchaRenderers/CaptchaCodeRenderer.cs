@@ -5,9 +5,12 @@ using SkiaSharp;
 using System;
 using System.IO;
 
+namespace IdentityServerNET.CaptchaRenderers;
+
 public class CaptchaCodeRenderer : ICaptchaCodeRenderer
 {
     private CaptchaCodeRendererOptions _options;
+    private Random _random = new Random(DateTime.Now.Millisecond);
 
     public CaptchaCodeRenderer(IOptionsMonitor<CaptchaCodeRendererOptions> options)
     {
@@ -52,74 +55,91 @@ public class CaptchaCodeRenderer : ICaptchaCodeRenderer
 
     private SKColor GetRandomDeepColor(byte alpha = 255)
     {
-        Random rand = new Random();
         int redlow = 160, greenLow = 100, blueLow = 160;
 
-        return new SKColor((byte)rand.Next(redlow), (byte)rand.Next(greenLow), (byte)rand.Next(blueLow), alpha);
+        return new SKColor((byte)_random.Next(redlow), (byte)_random.Next(greenLow), (byte)_random.Next(blueLow), alpha);
+    }
+
+    public float GetRandomBoldFactor()
+    {
+        return _random.Next(4, 12) / 100f;
     }
 
     private SKColor GetRandomLightColor()
     {
-        Random rand = new Random();
         int low = 180, high = 255;
 
-        int nRend = rand.Next(low, high);
-        int nGreen = rand.Next(low, high);
-        int nBlue = rand.Next(low, high);
+        int nRend = _random.Next(low, high);
+        int nGreen = _random.Next(low, high);
+        int nBlue = _random.Next(low, high);
 
         return new SKColor((byte)nRend, (byte)nGreen, (byte)nBlue);
     }
 
     private void DrawCaptchaCode(SKCanvas canvas, string captchaCode, int width, int height)
     {
-        Random rand = new Random();
         int fontSize = GetFontSize(width, captchaCode.Length);
 
         using (SKPaint paint = new SKPaint())
         using (SKFont font = new SKFont())
         {
             paint.IsAntialias = true;
+            paint.Style = SKPaintStyle.StrokeAndFill;
+           
             font.Size = fontSize;
-            font.Typeface = SKTypeface.FromFamilyName("Serif", SKFontStyle.Bold);
+            font.Typeface = SKTypeface.FromFamilyName("Serif", SKFontStyle.Normal);
+            
+            SKTextAlign textAlign = new SKTextAlign();
 
             for (int i = 0; i < captchaCode.Length; i++)
             {
                 paint.Color = _options.TextColorType == ColorType.Random ? GetRandomDeepColor() : SKColors.Black;
+                paint.StrokeWidth = fontSize * GetRandomBoldFactor(); // make the text bold!
 
                 int shiftPx = fontSize / 6;
-                float x = i * fontSize + rand.Next(-shiftPx, shiftPx) + fontSize / 4;
+                float x = i * fontSize + _random.Next(-shiftPx, shiftPx) + fontSize / 4;
                 int maxY = height - fontSize;
-                float y = rand.Next(0, maxY > 0 ? maxY : 0);
+                float y = _random.Next(0, maxY > 0 ? maxY : 0);
 
-                canvas.DrawText(captchaCode[i].ToString(), x, y + fontSize - fontSize / 8, font, paint);
+                canvas.DrawText(captchaCode[i].ToString(), x, y + fontSize - fontSize / 8, textAlign, font, paint);
             }
         }
     }
 
     private void DrawDisorderLine(SKCanvas canvas, int width, int height)
     {
-        Random rand = new Random();
         using (SKPaint paint = new SKPaint())
         {
             paint.IsAntialias = true;
             paint.StrokeWidth = _options.DisorderLinePenWidth;
 
-            for (int i = 0; i < rand.Next(7, 12); i++)
+            for (int i = 0; i < _random.Next(7, 12); i++)
             {
                 paint.Color = GetRandomDeepColor(60);
 
-                SKPoint startPoint = new SKPoint(rand.Next(0, width), rand.Next(0, height));
-                SKPoint endPoint = new SKPoint(rand.Next(0, width), rand.Next(0, height));
+                SKPoint startPoint = new SKPoint(_random.Next(0, width), _random.Next(0, height));
+                SKPoint endPoint = new SKPoint(_random.Next(0, width), _random.Next(0, height));
                 canvas.DrawLine(startPoint, endPoint, paint);
 
-                SKPoint bezierPoint1 = new SKPoint(rand.Next(0, width), rand.Next(0, height));
-                SKPoint bezierPoint2 = new SKPoint(rand.Next(0, width), rand.Next(0, height));
+                SKPoint bezierPoint1 = new SKPoint(_random.Next(0, width), _random.Next(0, height));
+                SKPoint bezierPoint2 = new SKPoint(_random.Next(0, width), _random.Next(0, height));
 
-                using (var path = new SKPath())
+                //using (var path = new SKPath())
+                //{
+                //    path.MoveTo(startPoint);
+                //    path.QuadTo(bezierPoint1, endPoint);
+                //    canvas.DrawPath(path, paint);
+                //}
+
+                using (var builder = new SKPathBuilder())
                 {
-                    path.MoveTo(startPoint);
-                    path.QuadTo(bezierPoint1, endPoint);
-                    canvas.DrawPath(path, paint);
+                    builder.MoveTo(startPoint);
+                    builder.QuadTo(bezierPoint1, endPoint);
+
+                    using (var path = builder.Snapshot()) // or .Detach()
+                    {
+                        canvas.DrawPath(path, paint);
+                    }
                 }
             }
         }
@@ -180,7 +200,7 @@ public class CaptchaCodeRenderer : ICaptchaCodeRenderer
             var canvas = surface.Canvas;
             canvas.Clear(SKColors.Transparent);
             canvas.SetMatrix(SKMatrix.CreateScale(1.01f, 1.01f)); // Leichte Vergrößerung um 1%
-            canvas.DrawBitmap(baseMap, 0, 0);
+            canvas.DrawBitmap(baseMap, 0, 0, new SKSamplingOptions());
             canvas.Flush();
         }
     }
