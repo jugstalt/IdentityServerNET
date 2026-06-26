@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identityserver-config
+  namespace: default   # change to your namespace
+data:
+  # ── ASP.NET Core runtime ────────────────────────────────────────────────────
+  ASPNETCORE_URLS: "http://*:8080"
+
+  # ── Application ─────────────────────────────────────────────────────────────
+  # Public-facing URL (scheme + host + optional port).
+  # Must match the URL clients use to reach the server.
+  IDENTITYSERVER__PUBLICORIGIN: "http://localhost:8080"
+
+  IDENTITYSERVER__APPLICATIONTITLE: "IdentityServer.NET"
+
+  # ── Storage / Database ──────────────────────────────────────────────────────
+  # LiteDB is the default (file-based, no extra service required).
+  # The path lives inside the PVC mounted at /home/app.
+  # For SQL Server / PostgreSQL / MongoDB set the connection string in secret.yaml
+  # and comment out the LiteDB line below.
+  IDENTITYSERVER__CONNECTIONSTRINGS__LITEDB: "/home/app/identityserver-net/is_identityserver-net.db"
+  # IDENTITYSERVER__CONNECTIONSTRINGS__SQLITE: "Data Source=/home/app/identityserver-net/is.sqlite"
+
+  # ── Reverse-proxy / HTTPS termination ───────────────────────────────────────
+  # Behind an ingress controller that terminates TLS:
+  IDENTITYSERVER__CONFIGURE__USEHTTPSREDIRECTION: "false"
+  IDENTITYSERVER__CONFIGURE__ADDXFORWARDEDPROTOMIDDLEWARE: "true"
+
+  # ── Cookie ──────────────────────────────────────────────────────────────────
+  IDENTITYSERVER__COOKIE__NAME: "identityserver-net"
+  IDENTITYSERVER__COOKIE__PATH: "/"
+  IDENTITYSERVER__COOKIE__EXPIREDAYS: "1"
+  # IDENTITYSERVER__COOKIE__DOMAIN: ""
+
+  # ── Login options ───────────────────────────────────────────────────────────
+  # IDENTITYSERVER__LOGIN__DENYLOCALLOGIN: "false"
+  # IDENTITYSERVER__LOGIN__DENYFORGOTPASSWORDCHALLANGE: "false"
+  # IDENTITYSERVER__LOGIN__DENYREMEMBERLOGIN: "false"
+  # IDENTITYSERVER__LOGIN__REMEMBERLOGINDEFAULTVALUE: "false"
+  # IDENTITYSERVER__REDIRECTAUTHUSERSTOCLIENTURL: ""
+  # IDENTITYSERVER__REDIRECTANONYMOUSUSERSTOCLIENTURL: ""
+
+  # ── Passkey (WebAuthn / FIDO2) ───────────────────────────────────────────────
+  # IDENTITYSERVER__LOGIN__PASSKEY__ALLOWPASSWORDLESS: "false"
+  # IDENTITYSERVER__LOGIN__PASSKEY__ALLOWSECONDFACTOR: "false"
+  # IDENTITYSERVER__LOGIN__PASSKEY__SERVERDOMAIN: ""
+  # IDENTITYSERVER__LOGIN__PASSKEY__RELYINGPARTYNAME: "IdentityServer.NET"
+
+  # ── Account self-service ─────────────────────────────────────────────────────
+  # IDENTITYSERVER__ACCOUNT__DENYREGISTERACCOUNT: "false"
+  # IDENTITYSERVER__ACCOUNT__DENYMANAGEACCOUNT: "false"
+
+  # ── Admin UI section visibility ──────────────────────────────────────────────
+  # IDENTITYSERVER__ADMIN__DENYADMINUSERS: "false"
+  # IDENTITYSERVER__ADMIN__DENYADMINROLES: "false"
+  # IDENTITYSERVER__ADMIN__DENYADMINRESOURCES: "false"
+  # IDENTITYSERVER__ADMIN__DENYADMINCLIENTS: "false"
+  # IDENTITYSERVER__ADMIN__DENYADMINSECRETSVAULT: "false"
+  # IDENTITYSERVER__ADMIN__DENYSIGNINGUI: "false"
+  # IDENTITYSERVER__ADMIN__DENYADMINCREATECERTS: "false"
+  # IDENTITYSERVER__ADMIN__ALLOWDATATRANSFER: "false"
+
+  # ── External identity providers ──────────────────────────────────────────────
+  # IDENTITYSERVER__EXTERNAL__MICROSOFTIDENTITYWEB__CLIENTID: ""
+  # IDENTITYSERVER__EXTERNAL__MICROSOFTIDENTITYWEB__TENANTID: ""
+  # IDENTITYSERVER__EXTERNAL__MICROSOFTIDENTITYWEB__DOMAIN: ""
+  # IDENTITYSERVER__EXTERNAL__MICROSOFTIDENTITYWEB__NAME: "Microsoft"
+
+  # ── Mail ─────────────────────────────────────────────────────────────────────
+  # IDENTITYSERVER__MAIL__SMTP__HOST: "smtp.example.com"
+  # IDENTITYSERVER__MAIL__SMTP__PORT: "587"
+  # IDENTITYSERVER__MAIL__SMTP__USERNAME: "user@example.com"
+  # IDENTITYSERVER__MAIL__SMTP__FROM: "noreply@example.com"
+  # IDENTITYSERVER__MAIL__SMTP__ENABLESSL: "true"
+  # IDENTITYSERVER__MAIL__SENDGRID__FROM: "noreply@example.com"
+  # IDENTITYSERVER__MAIL__MAILJET__APIKEY: ""
+  # IDENTITYSERVER__MAIL__MAILJET__FROM: "noreply@example.com"
+
+  # ── Seeding (Migrations) ─────────────────────────────────────────────────────
+  # Migrations run only when ASPNETCORE_ENVIRONMENT=Development.
+  # They create missing entries on first start and never overwrite existing data.
+  # Remove ASPNETCORE_ENVIRONMENT after the first successful start, or leave it
+  # in place — subsequent runs will not modify anything that already exists.
+  ASPNETCORE_ENVIRONMENT: "Development"
+
+  # Identity Resources
+  IDENTITYSERVER__MIGRATIONS__IDENTITYRESOURCES__0__NAME: "openid"
+  IDENTITYSERVER__MIGRATIONS__IDENTITYRESOURCES__1__NAME: "profile"
+  IDENTITYSERVER__MIGRATIONS__IDENTITYRESOURCES__2__NAME: "role"
+
+  # API Resource with scopes
+  # IDENTITYSERVER__MIGRATIONS__APIRESOURCES__0__NAME: "my-api"
+  # IDENTITYSERVER__MIGRATIONS__APIRESOURCES__0__SCOPES__0__NAME: "read"
+  # IDENTITYSERVER__MIGRATIONS__APIRESOURCES__0__SCOPES__1__NAME: "write"
+  # API secret goes into secret.yaml:
+  # IDENTITYSERVER__MIGRATIONS__APIRESOURCES__0__APISECRET: "apisecret"
+
+  # Roles
+  # IDENTITYSERVER__MIGRATIONS__ROLES__0__NAME: "admin"
+  # IDENTITYSERVER__MIGRATIONS__ROLES__1__NAME: "user"
+
+  # Additional users (password goes into secret.yaml)
+  # IDENTITYSERVER__MIGRATIONS__USERS__0__NAME: "alice@example.com"
+  # IDENTITYSERVER__MIGRATIONS__USERS__0__ROLES__0: "admin"
+
+  # Web Application Client (Authorization Code + PKCE)
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__CLIENTTYPE: "WebApplication"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__CLIENTID: "my-webapp"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__CLIENTURL: "https://myapp.example.com"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__SCOPES__0: "openid"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__SCOPES__1: "profile"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__SCOPES__2: "role"
+  # Client secret goes into secret.yaml:
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__0__CLIENTSECRET: "secret"
+
+  # API Client (Client Credentials)
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__1__CLIENTTYPE: "ApiClient"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__1__CLIENTID: "my-service"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__1__SCOPES__0: "my-api"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__1__SCOPES__1: "my-api.read"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__1__CLIENTSECRET: "secret"   → secret.yaml
+
+  # JavaScript / SPA Client (no secret)
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__2__CLIENTTYPE: "JavascriptClient"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__2__CLIENTID: "my-spa"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__2__CLIENTURL: "https://spa.example.com"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__2__SCOPES__0: "openid"
+  # IDENTITYSERVER__MIGRATIONS__CLIENTS__2__SCOPES__1: "profile"

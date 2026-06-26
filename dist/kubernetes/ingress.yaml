@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: identityserver
+  namespace: default   # change to your namespace
+  annotations:
+    # ── nginx ingress controller ─────────────────────────────────────────────
+    kubernetes.io/ingress.class: "nginx"
+    # nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+
+    # ── TLS via cert-manager (Let's Encrypt) ─────────────────────────────────
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  # tls:
+  #   - hosts:
+  #       - auth.example.com
+  #     secretName: identityserver-tls
+  rules:
+    - host: auth.example.com   # replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: identityserver
+                port:
+                  name: http

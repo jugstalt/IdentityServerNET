@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identityserver
+  namespace: default   # change to your namespace
+  labels:
+    app: identityserver
+spec:
+  replicas: 1
+  # LiteDB and the file-based signing key storage do not support multiple replicas.
+  # For horizontal scaling, switch to SQL Server / PostgreSQL / MongoDB and a
+  # shared PVC (ReadWriteMany) or an external key vault.
+  selector:
+    matchLabels:
+      app: identityserver
+  template:
+    metadata:
+      labels:
+        app: identityserver
+    spec:
+      # The .NET chiseled image runs as the non-root user 'app' (UID 1654).
+      # fsGroup ensures the mounted volume is writable by that user.
+      securityContext:
+        fsGroup: 1654
+        runAsNonRoot: true
+      containers:
+        - name: identityserver
+          image: gstalt/identityserver-net:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: identityserver-config
+            - secretRef:
+                name: identityserver-secret
+          volumeMounts:
+            # Mount at /home/app so the image's ownership (app user) is preserved.
+            # Mounting one level deeper (/home/app/identityserver-net) would create
+            # the directory as root, causing a permission error on first start.
+            - name: data
+              mountPath: /home/app
+          livenessProbe:
+            httpGet:
+              path: /.well-known/openid-configuration
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /.well-known/openid-configuration
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: identityserver-pvc

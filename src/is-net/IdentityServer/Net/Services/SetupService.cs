@@ -75,7 +75,7 @@ public class SetupService
 
                 var adminPassword = 
                     migration?.AdminPassword 
-                    ?? config["IdentityServer:Migragions:AdminPassword"]
+                    ?? config["IdentityServer:Migrations:AdminPassword"]
                     ?? PasswordGenerator.GenerateSecurePassword(16);
 
                 adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, adminPassword);

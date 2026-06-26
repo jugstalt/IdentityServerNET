@@ -1,0 +1,19 @@
+services:
+  identityserver:
+    image: gstalt/identityserver-net:latest
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:8080"
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_URLS: "http://*:8080"
+    volumes:
+      # Mount at /home/app so Docker inherits the image's ownership (app user).
+      # Mounting one level deeper (/home/app/identityserver-net) would create the
+      # directory as root, causing a permission error on first start.
+      # The app writes its data to /home/app/identityserver-net/ inside this volume.
+      - identityserver-data:/home/app
+
+volumes:
+  identityserver-data:

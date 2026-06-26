@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identityserver
+  namespace: default   # change to your namespace
+  labels:
+    app: identityserver
+spec:
+  selector:
+    app: identityserver
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  type: ClusterIP
+  # Change to NodePort or LoadBalancer if you don't use an Ingress controller:
+  # type: NodePort
+  # type: LoadBalancer
