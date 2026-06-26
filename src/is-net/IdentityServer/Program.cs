@@ -240,6 +240,9 @@ var identityServerBuilder = builder.Services.AddIdentityServer(options =>
         CookieSlidingExpiration = true,
     };
 
+    if (builder.Configuration["IdentityServer:Endpoints:EnablePushedAuthorization"] is string parEnabled)
+        options.Endpoints.EnablePushedAuthorizationEndpoint = !parEnabled.Equals("false", StringComparison.OrdinalIgnoreCase);
+
     // use ForwaredHeaders: https://github.com/IdentityServer/IdentityServer4/issues/4631
     //if (!String.IsNullOrEmpty(Configuration["IdentityServer:PublicOrigin"]))
     //{

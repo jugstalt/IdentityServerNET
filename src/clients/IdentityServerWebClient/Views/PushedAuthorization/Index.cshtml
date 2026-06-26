@@ -1,0 +1,74 @@
+@model PushedAuthorizationInputModel
+@{
+    ViewData["Title"] = "PAR – Pushed Authorization Requests";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">PAR</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2 class="h4 fw-bold mb-1 text-primary"><i class="bi bi-shield-lock me-2"></i>Pushed Authorization Requests (PAR)</h2>
+        <p class="text-muted mb-0">
+            RFC 9126 — Parameters are POSTed to <code>/connect/par</code> first (Backchannel).
+            The browser only sees a short-lived <code>request_uri</code>, never the actual parameters.
+        </p>
+    </div>
+</div>
+
+@if (ViewBag.Error is string err)
+{
+    <div class="alert alert-danger mb-3"><i class="bi bi-x-circle me-1"></i>@err</div>
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge bg-primary rounded-pill fs-6">1</span>
+            <span class="fw-semibold">Configure &amp; push parameters</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">2</span>
+            <span class="text-muted">Follow authorize URL (with request_uri)</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">3</span>
+            <span class="text-muted">Exchange code for tokens</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <form method="post" action="/PushedAuthorization/Push">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Authority</label>
+                <input name="Authority" value="@Model.Authority" class="form-control font-monospace" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Scope</label>
+                <input name="Scope" value="@Model.Scope" class="form-control font-monospace" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client ID</label>
+                <input name="ClientId" value="@Model.ClientId" class="form-control font-monospace" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Client Secret</label>
+                <input name="ClientSecret" value="@Model.ClientSecret" class="form-control font-monospace" />
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">
+                    Redirect URI
+                    <span class="text-muted fw-normal small">— must be registered as an allowed redirect URI on the client</span>
+                </label>
+                <input name="RedirectUri" value="@Model.RedirectUri" class="form-control font-monospace" required />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">
+            <i class="bi bi-send me-1"></i>Push Authorization Request
+        </button>
+    </form>
+</div>

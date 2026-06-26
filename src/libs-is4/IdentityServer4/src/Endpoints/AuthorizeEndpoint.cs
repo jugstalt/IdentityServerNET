@@ -7,17 +7,22 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Hosting;
 using IdentityServer4.ResponseHandling;
 using IdentityServer4.Services;
+using IdentityServer4.Stores;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Collections.Specialized;
 using System.Net;
 using System.Threading.Tasks;
+using Duende.IdentityModel;
 
 namespace IdentityServer4.Endpoints;
 
 internal class AuthorizeEndpoint : AuthorizeEndpointBase
 {
+    private readonly IPushedAuthorizationRequestStore _parStore;
+    private readonly IClientStore _clientStore;
+
     public AuthorizeEndpoint(
        IEventService events,
        ILogger<AuthorizeEndpoint> logger,
@@ -25,9 +30,13 @@ internal class AuthorizeEndpoint : AuthorizeEndpointBase
        IAuthorizeRequestValidator validator,
        IAuthorizeInteractionResponseGenerator interactionGenerator,
        IAuthorizeResponseGenerator authorizeResponseGenerator,
-       IUserSession userSession)
+       IUserSession userSession,
+       IPushedAuthorizationRequestStore parStore,
+       IClientStore clientStore)
         : base(events, logger, options, validator, interactionGenerator, authorizeResponseGenerator, userSession)
     {
+        _parStore = parStore;
+        _clientStore = clientStore;
     }
 
     public override async Task<IEndpointResult> ProcessAsync(HttpContext context)
@@ -52,6 +61,53 @@ internal class AuthorizeEndpoint : AuthorizeEndpointBase
         else
         {
             return new StatusCodeResult(HttpStatusCode.MethodNotAllowed);
+        }
+
+        // PAR: check RequirePushedAuthorization on client
+        var requestUri = values["request_uri"];
+        if (requestUri == null)
+        {
+            var clientId = values["client_id"];
+            if (clientId != null)
+            {
+                var client = await _clientStore.FindClientByIdAsync(clientId);
+                if (client != null && client.RequirePushedAuthorization)
+                {
+                    Logger.LogWarning("Client {clientId} requires PAR but request_uri is missing", clientId);
+                    return new TokenErrorResult(new TokenErrorResponse
+                    {
+                        Error = OidcConstants.AuthorizeErrors.InvalidRequest,
+                        ErrorDescription = "client requires pushed authorization requests"
+                    });
+                }
+            }
+        }
+
+        // PAR: resolve request_uri to stored parameters
+        if (requestUri != null)
+        {
+            var storedParams = await _parStore.GetAsync(requestUri);
+            if (storedParams == null)
+            {
+                Logger.LogWarning("PAR request_uri not found or expired: {requestUri}", requestUri);
+                return new TokenErrorResult(new TokenErrorResponse
+                {
+                    Error = "invalid_request",
+                    ErrorDescription = "request_uri expired or not found"
+                });
+            }
+
+            // consume – request_uri is single-use per RFC 9126
+            await _parStore.RemoveAsync(requestUri);
+
+            // keep client_id from query string (required by spec), merge with stored params
+            var merged = new NameValueCollection(storedParams);
+            var clientId = values["client_id"];
+            if (clientId != null)
+                merged["client_id"] = clientId;
+
+            values = merged;
+            Logger.LogDebug("PAR: resolved request_uri to stored parameters for client {clientId}", merged["client_id"]);
         }
 
         var user = await UserSession.GetUserAsync();

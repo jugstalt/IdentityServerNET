@@ -23,6 +23,7 @@ internal static class EndpointOptionsExtensions
             EndpointNames.Revocation => options.EnableTokenRevocationEndpoint,
             EndpointNames.Token => options.EnableTokenEndpoint,
             EndpointNames.UserInfo => options.EnableUserInfoEndpoint,
+            EndpointNames.PushedAuthorization => options.EnablePushedAuthorizationEndpoint,
             _ => true
         };
     }

@@ -43,6 +43,9 @@ Aufbau der Config-Datei:
             "Mail": {
                 // ...
             },
+            "Stores": {
+                // ...
+            },
             "Configure": {
                 // ...
             }
@@ -450,6 +453,107 @@ In den Templates können folgende Platzhalter verwendet werden:
     Ein absoluter Pfad bei ``TemplatesPath`` wird direkt verwendet. Ein relativer Pfad wird relativ zum
     Programmverzeichnis aufgelöst. Wird der Ordner oder eine Datei nicht gefunden, wird ohne Fehler auf das
     eingebaute Template zurückgegriffen.
+
+Abschnitt ``Stores``
+--------------------
+
+Dieser optionale Abschnitt steuert serverseitige Stores, die während des Autorisierungsflows verwendet werden.
+
+.. code:: javascript
+
+    "Stores": {
+        "ParameterMessageStore": "DistributedMemoryCache"
+        // oder
+        "ParameterMessageStore": "DistributedRedisCache",
+        "ParameterMessageStoreConnectionString": "localhost:6379"
+    }
+
+**Hintergrund — Pushed Authorization Requests (PAR)**
+
+**IdentityServerNET** unterstützt `Pushed Authorization Requests (PAR) <https://www.rfc-editor.org/rfc/rfc9126>`_
+(RFC 9126). Bei PAR schickt ein OIDC-Client zuerst alle Autorisierungsparameter per POST an den
+``/connect/par``-Endpoint (Server-zu-Server, Backchannel). Der Server liefert eine kurzlebige
+``request_uri`` zurück. Der Browser folgt anschließend nur einem Redirect mit ``client_id`` und
+``request_uri`` – sensible Parameter (``client_secret``, ``scope``, ``code_challenge`` usw.) sind
+damit weder in der Browser-URL noch in Server-Access-Logs sichtbar.
+
+Die ASP.NET Core OIDC-Middleware (``Microsoft.AspNetCore.Authentication.OpenIdConnect``, ab .NET 9)
+nutzt PAR automatisch, sobald der Server es im Discovery-Dokument ankündigt. Das Verhalten wird über
+``PushedAuthorizationBehavior`` gesteuert:
+
+.. code:: csharp
+
+    options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.UseIfAvailable; // Standard
+
+**ParameterMessageStore — Autorisierungsparameter serverseitig halten**
+
+Beim interaktiven Login-Flow muss IdentityServer die Autorisierungsparameter über den
+Login-Seiten-Redirect hinweg mitführen. Standardmäßig werden sie in den ``ReturnUrl``-Querystring
+kodiert, was die Login-URL lang aber nicht unsicher macht. Um die URL kurz zu halten und die Parameter
+vollständig serverseitig zu speichern, kann ein ``ParameterMessageStore`` konfiguriert werden:
+
+* **DistributedMemoryCache** — Parameter werden im In-Process-Memory-Cache gespeichert. Einfach,
+  ohne zusätzliche Infrastruktur – aber **nicht geeignet für Multi-Instanz-Deployments** (jede
+  Instanz hat ihren eigenen Speicher).
+
+* **DistributedRedisCache** — Parameter werden in einem Redis-Cache gespeichert. Für Produktion und
+  Multi-Instanz-Deployments geeignet. Erfordert ``ParameterMessageStoreConnectionString``.
+
+.. code:: javascript
+
+    // In-Process-Memory (Einzelinstanz / Entwicklung)
+    "Stores": {
+        "ParameterMessageStore": "DistributedMemoryCache"
+    }
+
+    // Redis (Produktion, Multi-Instanz)
+    "Stores": {
+        "ParameterMessageStore": "DistributedRedisCache",
+        "ParameterMessageStoreConnectionString": "redis-host:6379"
+    }
+
+Mit einem konfigurierten ``ParameterMessageStore`` ändert sich die Login-URL von:
+
+.. code::
+
+    /Account/Login?ReturnUrl=/connect/authorize/callback?client_id=...&scope=...&code_challenge=...
+
+zu:
+
+.. code::
+
+    /Account/Login?ReturnUrl=/connect/authorize/callback?authzId=<kurze-opake-ID>
+
+.. note::
+
+    **Aspire:** Wenn das Präprozessorsymbol ``#define USE_REDIS`` in
+    ``IdentityServerNET.AppHost/Program.cs`` aktiv ist, wird automatisch ein Redis-Container
+    gestartet und der ``DistributedRedisCache``-Store über Umgebungsvariablen konfiguriert –
+    ein manueller Connection String ist dann nicht erforderlich.
+
+Abschnitt ``Endpoints``
+-----------------------
+
+Dieser optionale Abschnitt steuert, welche IdentityServer-Protokoll-Endpoints aktiv sind.
+
+.. code:: javascript
+
+    "Endpoints": {
+        "EnablePushedAuthorization": "false"   // Standard: true
+    }
+
+* **EnablePushedAuthorization:** Wird auf ``false`` gesetzt, wird der ``/connect/par``-Endpoint
+  deaktiviert und ``pushed_authorization_request_endpoint`` verschwindet aus dem Discovery-Dokument.
+  Die ASP.NET Core OIDC-Middleware fällt dann automatisch auf den normalen Authorization Code Flow
+  ohne PAR zurück. Nützlich zum Testen des reinen PKCE-Flows oder in Deployments, bei denen PAR
+  nicht gewünscht ist.
+
+**RequirePushedAuthorization bei Clients**
+
+Einzelne Clients können so konfiguriert werden, dass PAR zwingend erforderlich ist. Im Admin-UI
+unter *Clients → Options* wird dazu ``RequirePushedAuthorization = true`` gesetzt. Ein direkter
+Aufruf von ``/connect/authorize`` ohne vorherigen PAR-Request wird dann mit ``invalid_request``
+abgewiesen.
 
 Abschnitt ``Configure``
 -----------------------

@@ -108,6 +108,12 @@ namespace IdentityServer4.Models
         public bool RequireRequestObject { get; set; } = false;
 
         /// <summary>
+        /// Specifies whether this client must use Pushed Authorization Requests (PAR, RFC 9126).
+        /// When true, direct calls to /authorize without a prior PAR request are rejected.
+        /// </summary>
+        public bool RequirePushedAuthorization { get; set; } = false;
+
+        /// <summary>
         /// Controls whether access tokens are transmitted via the browser for this client (defaults to <c>false</c>).
         /// This can prevent accidental leakage of access tokens when multiple response types are allowed.
         /// </summary>

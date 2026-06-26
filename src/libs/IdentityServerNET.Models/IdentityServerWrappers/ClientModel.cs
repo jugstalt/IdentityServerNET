@@ -1,6 +1,7 @@
 ﻿using IdentityServer4.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Security.Claims;
 
@@ -37,6 +38,7 @@ public class ClientModel
     }
 
     [JsonProperty("AllowOfflineAccess")]
+    [Description("Allows clients to request refresh tokens for offline access.")]
     public bool AllowOfflineAccess { get; set; }
 
     [JsonProperty("IdentityTokenLifetime")]
@@ -61,6 +63,7 @@ public class ClientModel
     public TokenUsage RefreshTokenUsage { get; set; }
 
     [JsonProperty("UpdateAccessTokenClaimsOnRefresh")]
+    [Description("Re-issues updated access token claims when a refresh token is used.")]
     public bool UpdateAccessTokenClaimsOnRefresh { get; set; }
 
     [JsonProperty("RefreshTokenExpiration")]
@@ -70,18 +73,21 @@ public class ClientModel
     public AccessTokenType AccessTokenType { get; set; }
 
     [JsonProperty("EnableLocalLogin")]
+    [Description("Allows users to log in with a local username and password.")]
     public bool EnableLocalLogin { get; set; }
 
     [JsonProperty("IdentityProviderRestrictions")]
     public ICollection<string> IdentityProviderRestrictions { get; set; }
 
     [JsonProperty("IncludeJwtId")]
+    [Description("Adds a unique jti claim to each JWT access token for tracking.")]
     public bool IncludeJwtId { get; set; }
 
     [JsonProperty("Claims")]
     public ICollection<Claim> Claims { get; set; }
 
     [JsonProperty("AlwaysSendClientClaims")]
+    [Description("Always includes client claims in the token, even without user interaction.")]
     public bool AlwaysSendClientClaims { get; set; }
 
     [JsonProperty("ClientClaimsPrefix")]
@@ -100,6 +106,7 @@ public class ClientModel
     public int DeviceCodeLifetime { get; set; }
 
     [JsonProperty("AlwaysIncludeUserClaimsInIdToken")]
+    [Description("Includes all requested user claims directly in the identity token.")]
     public bool AlwaysIncludeUserClaimsInIdToken { get; set; }
 
     [JsonProperty("AllowedScopes")]
@@ -109,9 +116,11 @@ public class ClientModel
     public IDictionary<string, string> Properties { get; set; }
 
     [JsonProperty("BackChannelLogoutSessionRequired")]
+    [Description("Sends the session ID in back-channel logout notifications.")]
     public bool BackChannelLogoutSessionRequired { get; set; }
 
     [JsonProperty("Enabled")]
+    [Description("Enables or disables this client entirely.")]
     public bool Enabled { get; set; }
 
     [JsonProperty("ClientId")]
@@ -124,6 +133,7 @@ public class ClientModel
     public ICollection<SecretModel> ClientSecrets { get; set; }
 
     [JsonProperty("RequireClientSecret")]
+    [Description("Requires a client secret for token endpoint requests.")]
     public bool RequireClientSecret { get; set; }
 
     [JsonProperty("ClientName")]
@@ -142,18 +152,26 @@ public class ClientModel
     public ICollection<string> AllowedCorsOrigins { get; set; }
 
     [JsonProperty("RequireConsent")]
+    [Description("Displays the consent screen to users before authorizing the client.")]
     public bool RequireConsent { get; set; }
 
     [JsonProperty("AllowedGrantTypes")]
     public ICollection<string> AllowedGrantTypes { get; set; }
 
     [JsonProperty("RequirePkce")]
+    [Description("Enforces Proof Key for Code Exchange (PKCE) for authorization code flows.")]
     public bool RequirePkce { get; set; }
 
     [JsonProperty("AllowPlainTextPkce")]
+    [Description("Permits the less secure plain text code challenge method for PKCE.")]
     public bool AllowPlainTextPkce { get; set; }
 
+    [JsonProperty("RequirePushedAuthorization")]
+    [Description("Requires authorization requests to use Pushed Authorization Requests (PAR).")]
+    public bool RequirePushedAuthorization { get; set; }
+
     [JsonProperty("AllowAccessTokensViaBrowser")]
+    [Description("Allows access tokens to be returned in browser URL fragments (implicit flow).")]
     public bool AllowAccessTokensViaBrowser { get; set; }
 
     [JsonProperty("RedirectUris")]
@@ -166,12 +184,14 @@ public class ClientModel
     public string FrontChannelLogoutUri { get; set; } = "";
 
     [JsonProperty("FrontChannelLogoutSessionRequired")]
+    [Description("Includes the session ID in front-channel logout iframe requests.")]
     public bool FrontChannelLogoutSessionRequired { get; set; }
 
     [JsonProperty("BackChannelLogoutUri")]
     public string BackChannelLogoutUri { get; set; } = "";
 
     [JsonProperty("AllowRememberConsent")]
+    [Description("Lets users save their consent decision to skip the consent screen next time.")]
     public bool AllowRememberConsent { get; set; }
 
     [JsonIgnore]
@@ -228,7 +248,8 @@ public class ClientModel
                 FrontChannelLogoutUri = this.FrontChannelLogoutUri,
                 FrontChannelLogoutSessionRequired = this.FrontChannelLogoutSessionRequired,
                 BackChannelLogoutUri = this.BackChannelLogoutUri,
-                AllowRememberConsent = this.AllowRememberConsent
+                AllowRememberConsent = this.AllowRememberConsent,
+                RequirePushedAuthorization = this.RequirePushedAuthorization
             };
         }
     }

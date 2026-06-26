@@ -58,6 +58,28 @@
     <div class="col-md-4">
         <div class="card flow-card h-100">
             <div class="card-body d-flex flex-column">
+                <div class="flow-icon mb-2 text-warning">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <h5 class="card-title">Pushed Authorization (PAR)</h5>
+                <p class="card-text text-muted small flex-grow-1">
+                    RFC 9126 — Authorization parameters are POSTed server-to-server first.
+                    The browser only sees a short-lived <code>request_uri</code>, never the actual parameters.
+                </p>
+                <div class="mt-2">
+                    <span class="badge bg-warning text-dark badge-grant">PAR</span>
+                    <span class="badge bg-secondary badge-grant">code</span>
+                    <span class="badge bg-secondary badge-grant">confidential</span>
+                </div>
+                <a href="/PushedAuthorization" class="btn btn-warning mt-3">
+                    <i class="bi bi-shield-lock me-1"></i>Start
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card flow-card h-100">
+            <div class="card-body d-flex flex-column">
                 <div class="flow-icon mb-2 text-info">
                     <i class="bi bi-tv"></i>
                 </div>

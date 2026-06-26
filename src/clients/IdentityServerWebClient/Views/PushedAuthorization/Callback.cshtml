@@ -1,0 +1,103 @@
+@model PushedAuthorizationCallbackModel
+@{
+    ViewData["Title"] = "PAR – Step 3: Exchange Code";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/PushedAuthorization">PAR</a></li>
+        <li class="breadcrumb-item active">Callback / Exchange</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge bg-success rounded-pill fs-6">1</span>
+            <span class="text-muted">Push parameters</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-success rounded-pill fs-6">2</span>
+            <span class="text-muted">Authorization approved</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-primary rounded-pill fs-6">3</span>
+            <span class="fw-semibold">Exchange code for tokens</span>
+        </div>
+    </div>
+</div>
+
+@if (Model.Result is { Success: false })
+{
+    <div class="alert alert-danger mb-3">
+        <i class="bi bi-x-circle me-1"></i><strong>@Model.Result.Error</strong>
+        @if (!string.IsNullOrEmpty(Model.Result.ErrorDescription))
+        {
+            <span> — @Model.Result.ErrorDescription</span>
+        }
+    </div>
+}
+else if (string.IsNullOrEmpty(Model.Code))
+{
+    <div class="alert alert-warning mb-3">
+        <i class="bi bi-exclamation-triangle me-1"></i>No authorization code received in the callback.
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.Code))
+{
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="card mb-3">
+                <div class="card-header fw-semibold py-2"><i class="bi bi-check-circle-fill text-success me-1"></i>Authorization Code Received</div>
+                <div class="card-body">
+                    <div class="font-monospace small text-break mb-1">@Model.Code</div>
+                    <div class="text-muted small">state: <span class="font-monospace">@Model.State</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header fw-semibold py-2"><i class="bi bi-arrow-right-circle me-1"></i>Token Exchange</div>
+                <div class="card-body">
+                    <form method="post" action="/PushedAuthorization/Exchange">
+                        <input type="hidden" name="Code" value="@Model.Code" />
+                        <input type="hidden" name="State" value="@Model.State" />
+                        <input type="hidden" name="CodeVerifier" value="@Model.CodeVerifier" />
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Authority</label>
+                            <input name="Authority" value="@Model.Authority" class="form-control form-control-sm font-monospace" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Client ID</label>
+                            <input name="ClientId" value="@Model.ClientId" class="form-control form-control-sm font-monospace" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Client Secret</label>
+                            <input name="ClientSecret" value="@Model.ClientSecret" class="form-control form-control-sm font-monospace" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Redirect URI</label>
+                            <input name="RedirectUri" value="@Model.RedirectUri" class="form-control form-control-sm font-monospace" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-arrow-right-circle me-1"></i>Exchange Code for Tokens
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            @if (Model.Result is not null)
+            {
+                @await Html.PartialAsync("_FlowResult", Model.Result)
+            }
+            else
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-arrow-left display-4"></i>
+                    <p class="mt-2">Click <em>Exchange Code for Tokens</em> to complete the flow.</p>
+                </div>
+            }
+        </div>
+    </div>
+}

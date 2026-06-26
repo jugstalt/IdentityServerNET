@@ -1,4 +1,6 @@
-﻿using IdentityServerNET.Abstractions.DbContext;
+﻿using IdentityServer4.Stores;
+using IdentityServer4.Stores.Default;
+using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.EmailSender;
 using IdentityServerNET.Abstractions.Security;
 using IdentityServerNET.Abstractions.SigningCredential;
@@ -448,7 +450,29 @@ static public class ServiceCollectionExtensions
             // BotDetection
             .IfServiceNotRegistered<ILoginBotDetection>(() => services.AddLoginBotDetection<LoginBotDetection>())
             // Captcha
-            .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<ModernCaptchaCodeRenderer>());
+            .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<ModernCaptchaCodeRenderer>())
+            // AuthorizationParametersMessageStore (optional – keeps authorize params server-side instead of in the ReturnUrl)
+            // Config: IdentityServer:Stores:ParameterMessageStore = DistributedMemoryCache | DistributedRedisCache
+            .IfServiceNotRegistered<IAuthorizationParametersMessageStore>(() =>
+                configSection
+                    .SwitchCase(["Stores:ParameterMessageStore"], value =>
+                    {
+                        if (string.Equals(value, "DistributedMemoryCache", StringComparison.OrdinalIgnoreCase))
+                        {
+                            services.AddDistributedMemoryCache();
+                            services.AddTransient<IAuthorizationParametersMessageStore, DistributedCacheAuthorizationParametersMessageStore>();
+                        }
+                        else if (string.Equals(value, "DistributedRedisCache", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var connectionString = configSection["Stores:ParameterMessageStoreConnectionString"]
+                                ?? throw new InvalidOperationException(
+                                    "IdentityServer:Stores:ParameterMessageStoreConnectionString is required for DistributedRedisCache");
+                            services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+                            services.AddTransient<IAuthorizationParametersMessageStore, DistributedCacheAuthorizationParametersMessageStore>();
+                        }
+                    })
+                    .SwitchDefault(() => { })  // no config → no registration (IdentityServer default: params in ReturnUrl)
+            );
 
         services.AddSingleton<UICustomizationService>();
 

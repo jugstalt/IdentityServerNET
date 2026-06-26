@@ -1,0 +1,129 @@
+@model PushedAuthorizationPushedModel
+@{
+    ViewData["Title"] = "PAR – Step 2: Follow Authorization URL";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/PushedAuthorization">PAR</a></li>
+        <li class="breadcrumb-item active">Authorization URL</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge bg-success rounded-pill fs-6">1</span>
+            <span class="text-muted">Push parameters</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-primary rounded-pill fs-6">2</span>
+            <span class="fw-semibold">Follow authorize URL</span>
+            <span class="text-muted">→</span>
+            <span class="badge bg-secondary rounded-pill fs-6">3</span>
+            <span class="text-muted">Exchange code for tokens</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold py-2 bg-success bg-opacity-10">
+                <i class="bi bi-arrow-up-circle me-1 text-success"></i>Step 1 — PAR Request (Backchannel POST)
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="badge bg-secondary">POST</span>
+                    <code class="ms-1 small">@(Model.Authority.TrimEnd('/'))/connect/par</code>
+                </div>
+                <pre class="bg-light p-2 rounded small text-break" style="white-space:pre-wrap">@Model.ParRequestRaw</pre>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold py-2 bg-success bg-opacity-10">
+                <i class="bi bi-arrow-down-circle me-1 text-success"></i>Step 1 — PAR Response
+            </div>
+            <div class="card-body">
+                <pre class="bg-light p-2 rounded small" style="white-space:pre-wrap">@Model.ParResponseRaw</pre>
+                <table class="table table-sm mb-0 mt-2">
+                    <tr>
+                        <td class="text-muted small fw-semibold">request_uri</td>
+                        <td class="font-monospace small text-break">@Model.RequestUri</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">expires_in</td>
+                        <td class="font-monospace small">@Model.ExpiresIn s</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">state</td>
+                        <td class="font-monospace small">@Model.State</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">code_verifier</td>
+                        <td class="font-monospace small text-break">@Model.CodeVerifier</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted small fw-semibold">code_challenge</td>
+                        <td class="font-monospace small text-break">@Model.CodeChallenge</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold py-2">
+                <i class="bi bi-link-45deg me-1"></i>Step 2 — Authorization URL (Browser)
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">
+                    Only <code>client_id</code> and <code>request_uri</code> are exposed in the browser URL —
+                    all other parameters stay server-side.
+                </p>
+                <div class="token-mono mb-3 small text-break">@Model.AuthorizeUrl</div>
+                <a href="@Model.AuthorizeUrl" class="btn btn-primary w-100">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Go to Authorization Endpoint
+                </a>
+                <div class="text-muted small mt-2 text-center">
+                    You'll be redirected to the IdentityServer login page.
+                    After approving, you return to the callback URL.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="alert alert-info">
+            <h6 class="fw-semibold"><i class="bi bi-info-circle me-1"></i>How PAR differs from PKCE</h6>
+            <ul class="mb-0 small">
+                <li>All authorization parameters are sent <strong>server-to-server</strong> (never visible in browser history or logs)</li>
+                <li>The browser only follows a redirect with a short-lived <code>request_uri</code></li>
+                <li>Client authentication happens at the PAR endpoint — strongly bound to the client secret</li>
+                <li>The <code>request_uri</code> is single-use and expires in <strong>@Model.ExpiresIn seconds</strong></li>
+            </ul>
+        </div>
+        <div class="alert alert-warning small">
+            <i class="bi bi-clock me-1"></i>
+            <strong>Time-sensitive:</strong> The <code>request_uri</code> expires in @Model.ExpiresIn seconds.
+            Click <em>Go to Authorization Endpoint</em> promptly.
+        </div>
+        <div class="card">
+            <div class="card-header fw-semibold py-2 small">PAR vs. PKCE comparison</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0 small">
+                    <thead class="table-light">
+                        <tr><th></th><th>PKCE</th><th>PAR</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Params in URL</td><td><i class="bi bi-check text-danger"></i> Yes</td><td><i class="bi bi-x text-success"></i> No</td></tr>
+                        <tr><td>Client auth at /authorize</td><td><i class="bi bi-x text-danger"></i> No</td><td><i class="bi bi-check text-success"></i> Yes (PAR)</td></tr>
+                        <tr><td>Public clients</td><td><i class="bi bi-check text-success"></i> Yes</td><td>Possible</td></tr>
+                        <tr><td>Extra roundtrip</td><td><i class="bi bi-x"></i> No</td><td><i class="bi bi-check"></i> Yes (PAR POST)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

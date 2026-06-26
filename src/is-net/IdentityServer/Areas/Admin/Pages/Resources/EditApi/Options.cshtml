@@ -17,16 +17,20 @@
                 {
                     var name = field.Name;
                     var hasValue = (bool)field.GetValue(Model.CurrentApiResource);
+                    var descAttr = (System.ComponentModel.DescriptionAttribute)field.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false).FirstOrDefault();
+                    var description = descAttr?.Description;
 
                     <li style="border-bottom:1px solid #eee">
                         <a asp-page-handler="Set"
                            asp-route-id="@Model.CurrentApiResource.Name"
                            asp-route-option="@name"
                            asp-route-value="@(!hasValue)">
-                            <div style="width:32px;height:26px;float:left"
-                                 class="option-check @(hasValue ? "selected" : "")">
-                            </div>
-                            <div>@(name)</div>
+                            <div class="option-check @(hasValue ? "selected" : "")"></div>
+                            <div>@System.Text.RegularExpressions.Regex.Replace(name, "(?<=[a-z])([A-Z])", " $1")</div>
+                            @if (!string.IsNullOrEmpty(description))
+                            {
+                                <div>@description</div>
+                            }
                         </a>
                     </li>
                 }

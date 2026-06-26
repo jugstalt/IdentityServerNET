@@ -4,11 +4,20 @@
 //#define STORAGE_LITEDB
 //#define STORAGE_SQLSERVER
 //#define STORAGE_POSTGRE
-#define STORAGE_SQLITE
+//#define STORAGE_SQLITE
 
 //#define DBCONTEXT_API   // experimental
 
+// Uncomment to start a Redis container and use it as the authorization parameters message store.
+// This keeps OIDC authorize params server-side instead of in the browser ReturnUrl.
+//#define USE_REDIS
+
 var builder = DistributedApplication.CreateBuilder(args);
+
+#if USE_REDIS
+var redis = builder.AddRedis("redis")
+    .WithLifetime(ContainerLifetime.Persistent);
+#endif
 
 var mailpit = builder.AddContainer("mailpit", "axllent/mailpit")
     .WithEndpoint(targetPort: 1025, port: 1025, name: "smtp")
@@ -65,6 +74,16 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
        .WaitFor(postgres)
 #elif STORAGE_SQLITE
        .WithEnvironment("IdentityServer__ConnectionStrings__Sqlite", "Data Source=c:\\temp\\identityserver-sqlite.db")
+#endif
+
+#if USE_REDIS
+       .WithEnvironment("IdentityServer__Stores__ParameterMessageStore", "DistributedRedisCache")
+       .WithEnvironment(ctx =>
+       {
+           ctx.EnvironmentVariables["IdentityServer__Stores__ParameterMessageStoreConnectionString"] =
+               redis.Resource.ConnectionStringExpression;
+       })
+       .WaitFor(redis)
 #endif
 
        //.WithEnvironment(e =>

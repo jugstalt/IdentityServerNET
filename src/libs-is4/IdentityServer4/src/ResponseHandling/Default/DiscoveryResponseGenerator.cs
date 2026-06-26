@@ -152,6 +152,11 @@ public class DiscoveryResponseGenerator : IDiscoveryResponseGenerator
                 entries.Add(OidcConstants.Discovery.DeviceAuthorizationEndpoint, baseUrl + Constants.ProtocolRoutePaths.DeviceAuthorization);
             }
 
+            if (Options.Endpoints.EnablePushedAuthorizationEndpoint)
+            {
+                entries.Add("pushed_authorization_request_endpoint", baseUrl + Constants.ProtocolRoutePaths.PushedAuthorization);
+            }
+
             if (Options.MutualTls.Enabled)
             {
                 var mtlsEndpoints = new Dictionary<string, string>();

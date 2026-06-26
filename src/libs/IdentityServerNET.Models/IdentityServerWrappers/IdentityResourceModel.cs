@@ -1,5 +1,6 @@
 ﻿using IdentityServer4.Models;
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace IdentityServerNET.Models.IdentityServerWrappers;
 
@@ -31,12 +32,15 @@ public class IdentityResourceModel : ResourceModel
     }
 
     [JsonProperty("Required")]
+    [Description("Marks this identity resource as required — users cannot uncheck it on the consent screen.")]
     public bool Required { get; set; }
 
     [JsonProperty("Emphasize")]
+    [Description("Highlights this resource on the consent screen to draw the user's attention.")]
     public bool Emphasize { get; set; }
 
     [JsonProperty("ShowInDiscoveryDocument")]
+    [Description("Includes this resource in the OIDC discovery document.")]
     public bool ShowInDiscoveryDocument { get; set; }
 
     [JsonIgnore]

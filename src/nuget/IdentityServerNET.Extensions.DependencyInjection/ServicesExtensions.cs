@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -47,6 +48,7 @@ static public class ServicesExtensions
                 options.ClientId = configuration.OpenIdConnectClientId();
                 options.ClientSecret = configuration.OpenIdConnectClientSecret();
                 options.ResponseType = "code";
+                options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.UseIfAvailable;
 
                 options.GetClaimsFromUserInfoEndpoint = configuration.OpenIdConnectGetClaimsFromUserInfoEndpoint();
                 options.SaveTokens = configuration.OpenIdConnectSaveTokens();

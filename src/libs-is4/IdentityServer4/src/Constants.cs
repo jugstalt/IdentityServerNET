@@ -205,6 +205,7 @@ internal static class Constants
         public const string EndSession = "Endsession";
         public const string CheckSession = "Checksession";
         public const string UserInfo = "Userinfo";
+        public const string PushedAuthorization = "PushedAuthorization";
     }
 
     public static class ProtocolRoutePaths
@@ -223,6 +224,7 @@ internal static class Constants
         public const string EndSessionCallback = EndSession + "/callback";
         public const string CheckSession = ConnectPathPrefix + "/checksession";
         public const string DeviceAuthorization = ConnectPathPrefix + "/deviceauthorization";
+        public const string PushedAuthorization = ConnectPathPrefix + "/par";
 
         public const string MtlsPathPrefix = ConnectPathPrefix + "/mtls";
         public const string MtlsToken = MtlsPathPrefix + "/token";

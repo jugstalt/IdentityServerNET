@@ -6,6 +6,21 @@
 }
 
 <h4>@ViewData["Title"]</h4>
+@{
+    var grantDescriptions = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["password"]                                            = "Resource Owner Password — user provides credentials directly to the client. Avoid for public clients.",
+        ["authorization_code"]                                  = "Recommended for web apps — exchanges a short-lived code for tokens after user login.",
+        ["client_credentials"]                                  = "Machine-to-machine — client authenticates with its own secret, no user involved.",
+        ["refresh_token"]                                       = "Allows clients to obtain new access tokens without re-authentication using a long-lived refresh token.",
+        ["implicit"]                                            = "Legacy browser flow — tokens returned directly from the authorization endpoint. Deprecated, prefer Authorization Code + PKCE.",
+        ["urn:ietf:params:oauth:grant-type:saml2-bearer"]       = "Exchange a SAML 2.0 assertion for an OAuth access token.",
+        ["urn:ietf:params:oauth:grant-type:jwt-bearer"]         = "Exchange a signed JWT assertion for an OAuth access token (federation / service accounts).",
+        ["urn:ietf:params:oauth:grant-type:device_code"]        = "For input-constrained devices (TV, CLI) — user authorizes on a secondary device with a browser.",
+        ["urn:ietf:params:oauth:grant-type:token-exchange"]     = "Exchange one token for another; supports impersonation and delegation scenarios.",
+        ["urn:openid:params:grant-type:ciba"]                   = "Client-Initiated Backchannel Authentication — authenticate the user via an out-of-band channel (e.g. push notification).",
+    };
+}
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
     <div class="col-md-6">
@@ -14,20 +29,19 @@
             @foreach (var staticField in typeof(OidcConstants.GrantTypes).GetFields(BindingFlags.Static | BindingFlags.Public))
             {
                 var grantName = staticField.Name;
-                var grantValue = staticField.GetValue(null);
+                var grantValue = (string)staticField.GetValue(null);
                 var hasGrant = Model.CurrentClient.AllowedGrantTypes != null && Model.CurrentClient.AllowedGrantTypes.Contains(grantValue);
+                var displayName = System.Text.RegularExpressions.Regex.Replace(grantName, "(?<=[a-z])([A-Z])", " $1");
+                grantDescriptions.TryGetValue(grantValue, out var grantDescription);
 
                 <li style="border-bottom:1px solid #eee">
                     <a asp-page-handler="Set"
                        asp-route-id="@Model.CurrentClient.ClientId"
                        asp-route-grant="@grantValue"
                        asp-route-remove="@hasGrant">
-                        <div style="width:32px;height:32px;float:left"
-                             class="option-check @(hasGrant ? "selected" : "")">
-
-                        </div>
-                        <div>@(grantName)</div>
-                        <div style="color:#aaa;font-size:.85em">@(grantValue)</div>
+                        <div class="option-check @(hasGrant ? "selected" : "")"></div>
+                        <div>@displayName</div>
+                        <div>@(string.IsNullOrEmpty(grantDescription) ? grantValue : grantDescription)</div>
                     </a>
                 </li>
             }
