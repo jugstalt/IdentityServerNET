@@ -451,6 +451,29 @@ static public class ServiceCollectionExtensions
             .IfServiceNotRegistered<ILoginBotDetection>(() => services.AddLoginBotDetection<LoginBotDetection>())
             // Captcha
             .IfServiceNotRegistered<ICaptchaCodeRenderer>(() => services.AddCaptchaRenderer<ModernCaptchaCodeRenderer>())
+            // PushedAuthorizationRequestStore (optional – distributed store for PAR request_uri; default: InMemory)
+            // Config: IdentityServer:Stores:PushedAuthorizationStore = DistributedMemoryCache | DistributedRedisCache
+            .IfServiceNotRegistered<IPushedAuthorizationRequestStore>(() =>
+                configSection
+                    .SwitchCase(["Stores:PushedAuthorizationStore"], value =>
+                    {
+                        if (string.Equals(value, "DistributedMemoryCache", StringComparison.OrdinalIgnoreCase))
+                        {
+                            services.AddDistributedMemoryCache();
+                            services.AddTransient<IPushedAuthorizationRequestStore, DistributedCachePushedAuthorizationRequestStore>();
+                        }
+                        else if (string.Equals(value, "DistributedRedisCache", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var connectionString = configSection["Stores:PushedAuthorizationStoreConnectionString"]
+                                ?? throw new InvalidOperationException(
+                                    "IdentityServer:Stores:PushedAuthorizationStoreConnectionString is required for DistributedRedisCache");
+                            services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+                            services.AddTransient<IPushedAuthorizationRequestStore, DistributedCachePushedAuthorizationRequestStore>();
+                        }
+                    })
+                    .SwitchDefault(() => { })  // no config → InMemory (registered by IS4 Core.cs via TryAddSingleton)
+            )
+
             // AuthorizationParametersMessageStore (optional – keeps authorize params server-side instead of in the ReturnUrl)
             // Config: IdentityServer:Stores:ParameterMessageStore = DistributedMemoryCache | DistributedRedisCache
             .IfServiceNotRegistered<IAuthorizationParametersMessageStore>(() =>

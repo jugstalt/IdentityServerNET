@@ -458,11 +458,34 @@ This optional section controls server-side stores used during the authorization 
 .. code:: javascript
 
     "Stores": {
-        "ParameterMessageStore": "DistributedMemoryCache"
+        // Authorization parameters store (login ReturnUrl)
+        "ParameterMessageStore": "DistributedMemoryCache",
         // or
         "ParameterMessageStore": "DistributedRedisCache",
-        "ParameterMessageStoreConnectionString": "localhost:6379"
+        "ParameterMessageStoreConnectionString": "localhost:6379",
+
+        // PAR request_uri store
+        "PushedAuthorizationStore": "DistributedMemoryCache",
+        // or
+        "PushedAuthorizationStore": "DistributedRedisCache",
+        "PushedAuthorizationStoreConnectionString": "localhost:6379"
     }
+
+If a store is not configured, the built-in fallback is used:
+
+.. list-table::
+   :widths: 30 25 45
+   :header-rows: 1
+
+   * - Setting
+     - Default (no config)
+     - Notes
+   * - ``ParameterMessageStore``
+     - Parameters in ``ReturnUrl``
+     - Long login URL, but no secrets exposed
+   * - ``PushedAuthorizationStore``
+     - In-process ``ConcurrentDictionary``
+     - Lazy expiry, single-instance only
 
 **Background — Pushed Authorization Requests (PAR)**
 
@@ -520,12 +543,37 @@ to:
 
     /Account/Login?ReturnUrl=/connect/authorize/callback?authzId=<short-opaque-id>
 
+**PushedAuthorizationStore — Distributed store for PAR request_uri**
+
+The PAR ``request_uri`` is stored server-side with a 60-second TTL. By default an in-process
+``ConcurrentDictionary`` is used. Expired entries are evicted lazily (on next access), which can
+cause unbounded memory growth under heavy load, and the store is not shared across instances.
+Configure a distributed store to fix both:
+
+* **DistributedMemoryCache** — in-process memory with automatic TTL eviction. Suitable for
+  single-instance deployments.
+* **DistributedRedisCache** — Redis-backed, shared across all instances. Required for
+  multi-instance deployments.
+
+.. code:: javascript
+
+    // Single instance / development
+    "Stores": {
+        "PushedAuthorizationStore": "DistributedMemoryCache"
+    }
+
+    // Production, multi-instance
+    "Stores": {
+        "PushedAuthorizationStore": "DistributedRedisCache",
+        "PushedAuthorizationStoreConnectionString": "redis-host:6379"
+    }
+
 .. note::
 
     **Aspire:** When the ``#define USE_REDIS`` preprocessor symbol is active in
     ``IdentityServerNET.AppHost/Program.cs``, a Redis container is started automatically and
-    the ``DistributedRedisCache`` store is configured via environment variables — no manual
-    connection string setup is needed.
+    **both** the ``ParameterMessageStore`` and the ``PushedAuthorizationStore`` are configured
+    via environment variables — no manual connection string setup is needed.
 
 Section ``Endpoints``
 ---------------------

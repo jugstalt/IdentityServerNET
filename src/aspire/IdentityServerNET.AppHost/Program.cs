@@ -10,7 +10,7 @@
 
 // Uncomment to start a Redis container and use it as the authorization parameters message store.
 // This keeps OIDC authorize params server-side instead of in the browser ReturnUrl.
-//#define USE_REDIS
+#define USE_REDIS
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -81,6 +81,12 @@ var identityServer = builder.AddProject<Projects.IdentityServer>("identityserver
        .WithEnvironment(ctx =>
        {
            ctx.EnvironmentVariables["IdentityServer__Stores__ParameterMessageStoreConnectionString"] =
+               redis.Resource.ConnectionStringExpression;
+       })
+       .WithEnvironment("IdentityServer__Stores__PushedAuthorizationStore", "DistributedRedisCache")
+       .WithEnvironment(ctx =>
+       {
+           ctx.EnvironmentVariables["IdentityServer__Stores__PushedAuthorizationStoreConnectionString"] =
                redis.Resource.ConnectionStringExpression;
        })
        .WaitFor(redis)

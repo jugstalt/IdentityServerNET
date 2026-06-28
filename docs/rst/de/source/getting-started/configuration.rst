@@ -462,11 +462,34 @@ Dieser optionale Abschnitt steuert serverseitige Stores, die während des Autori
 .. code:: javascript
 
     "Stores": {
-        "ParameterMessageStore": "DistributedMemoryCache"
+        // Autorisierungsparameter-Store (Login ReturnUrl)
+        "ParameterMessageStore": "DistributedMemoryCache",
         // oder
         "ParameterMessageStore": "DistributedRedisCache",
-        "ParameterMessageStoreConnectionString": "localhost:6379"
+        "ParameterMessageStoreConnectionString": "localhost:6379",
+
+        // PAR request_uri Store
+        "PushedAuthorizationStore": "DistributedMemoryCache",
+        // oder
+        "PushedAuthorizationStore": "DistributedRedisCache",
+        "PushedAuthorizationStoreConnectionString": "localhost:6379"
     }
+
+Wird kein Store konfiguriert, greift jeweils der eingebaute Fallback:
+
+.. list-table::
+   :widths: 30 30 40
+   :header-rows: 1
+
+   * - Einstellung
+     - Standard (keine Konfiguration)
+     - Hinweis
+   * - ``ParameterMessageStore``
+     - Parameter in ``ReturnUrl``
+     - Lange Login-URL, aber keine Secrets exponiert
+   * - ``PushedAuthorizationStore``
+     - In-Process ``ConcurrentDictionary``
+     - Lazy Expiry, nur Einzelinstanz
 
 **Hintergrund — Pushed Authorization Requests (PAR)**
 
@@ -524,12 +547,38 @@ zu:
 
     /Account/Login?ReturnUrl=/connect/authorize/callback?authzId=<kurze-opake-ID>
 
+**PushedAuthorizationStore — Verteilter Store für PAR request_uri**
+
+Die PAR-``request_uri`` wird serverseitig mit einer TTL von 60 Sekunden gespeichert. Standardmäßig
+wird ein In-Process-``ConcurrentDictionary`` verwendet. Abgelaufene Einträge werden nur lazy
+(beim nächsten Zugriff) entfernt, was bei hoher Last zu unbegrenztem Speicherwachstum führen kann.
+Außerdem ist der Store nicht instanzübergreifend geteilt. Ein verteilter Store behebt beides:
+
+* **DistributedMemoryCache** — In-Process-Memory mit automatischer TTL-Ablaufsteuerung. Geeignet
+  für Einzelinstanz-Deployments.
+* **DistributedRedisCache** — Redis-basiert, von allen Instanzen geteilt. Erforderlich für
+  Multi-Instanz-Deployments.
+
+.. code:: javascript
+
+    // Einzelinstanz / Entwicklung
+    "Stores": {
+        "PushedAuthorizationStore": "DistributedMemoryCache"
+    }
+
+    // Produktion, Multi-Instanz
+    "Stores": {
+        "PushedAuthorizationStore": "DistributedRedisCache",
+        "PushedAuthorizationStoreConnectionString": "redis-host:6379"
+    }
+
 .. note::
 
     **Aspire:** Wenn das Präprozessorsymbol ``#define USE_REDIS`` in
     ``IdentityServerNET.AppHost/Program.cs`` aktiv ist, wird automatisch ein Redis-Container
-    gestartet und der ``DistributedRedisCache``-Store über Umgebungsvariablen konfiguriert –
-    ein manueller Connection String ist dann nicht erforderlich.
+    gestartet und **beide** Stores – ``ParameterMessageStore`` und ``PushedAuthorizationStore`` –
+    werden über Umgebungsvariablen konfiguriert. Ein manueller Connection String ist nicht
+    erforderlich.
 
 Abschnitt ``Endpoints``
 -----------------------
