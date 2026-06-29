@@ -1,105 +1,96 @@
 @model ConsentViewModel
 @inject IdentityServerNET.Services.ColorSchemeService ColorScheme
 
-<div class="page-consent">
-    <div class="lead">
-        @if (Model.ClientLogoUrl != null)
-        {
-            <div class="client-logo"><img src="@Model.ClientLogoUrl"></div>
-        }
-        <h1>
-            @Model.ClientName
-            <small class="text-muted">is requesting your permission</small>
-        </h1>
-        <p>Uncheck the permissions you do not wish to grant.</p>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-8">
-            <partial name="_ValidationSummary" />
+<div class="login-page consent-page">
+    <div class="card login-card">
+        <div class="card-header">
+            <table>
+                <tr>
+                    <td>
+                        @if (Model.ClientHasLogoImage)
+                        {
+                            <img src="/ui/client-logo/@Model.ClientId" class="consent-logo" alt="@Model.ClientName" />
+                        }
+                        else
+                        {
+                            <div class="panel-logo"></div>
+                        }
+                    </td>
+                    <td>
+                        <h3 class="card-title h5">@Model.ClientName</h3>
+                        <div>is requesting your permission</div>
+                    </td>
+                </tr>
+            </table>
         </div>
-    </div>
+        <div class="card-body">
+            <partial name="_ValidationSummary" />
+            <p class="text-muted mb-3" style="font-size:0.875rem;">Uncheck the permissions you do not wish to grant.</p>
 
-    <form asp-action="Index">
-        <input type="hidden" asp-for="ReturnUrl" />
-        <div class="row">
-            <div class="col-sm-8">
+            <form asp-action="Index">
+                <input type="hidden" asp-for="ReturnUrl" />
+
                 @if (Model.IdentityScopes.Any())
                 {
-                    <div class="form-group">
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="@ColorScheme.Icon("account")"></span>
-                                Personal Information
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                @foreach (var scope in Model.IdentityScopes)
-                                {
-                                    <partial name="_ScopeListItem" model="@scope" />
-                                }
-                            </ul>
+                    <div class="consent-scope-group">
+                        <div class="consent-scope-header">
+                            <span class="@ColorScheme.Icon("account")"></span>
+                            Personal Information
                         </div>
+                        <ul class="list-group list-group-flush consent-scope-list">
+                            @foreach (var scope in Model.IdentityScopes)
+                            {
+                                <partial name="_ScopeListItem" model="@scope" />
+                            }
+                        </ul>
                     </div>
                 }
 
                 @if (Model.ApiScopes.Any())
                 {
-                    <div class="form-group">
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="glyphicon glyphicon-tasks"></span>
-                                Application Access
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                @foreach (var scope in Model.ApiScopes)
-                                {
-                                    <partial name="_ScopeListItem" model="scope" />
-                                }
-                            </ul>
+                    <div class="consent-scope-group">
+                        <div class="consent-scope-header">
+                            <span class="@ColorScheme.Icon("api")"></span>
+                            Application Access
                         </div>
+                        <ul class="list-group list-group-flush consent-scope-list">
+                            @foreach (var scope in Model.ApiScopes)
+                            {
+                                <partial name="_ScopeListItem" model="scope" />
+                            }
+                        </ul>
                     </div>
                 }
 
-                <div class="form-group">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="glyphicon glyphicon-tasks"></span>
-                            Description
-                        </div>
-                        <div class="card-body">
-                            <input class="form-control" placeholder="Description or name of device" asp-for="Description" autofocus>
-                        </div>
+                <div class="consent-scope-group">
+                    <div class="consent-scope-header">Description</div>
+                    <div style="padding: 0.6rem 0;">
+                        <input class="form-control" placeholder="Description or name of device" asp-for="Description" autofocus>
                     </div>
                 </div>
 
                 @if (Model.AllowRememberConsent)
                 {
-                    <div class="form-group">
-                        <div class="form-check">
-                            <input class="form-check-input" asp-for="RememberConsent">
-                            <label class="form-check-label" asp-for="RememberConsent">
-                                <strong>Remember My Decision</strong>
-                            </label>
-                        </div>
+                    <div class="form-check my-3">
+                        <input class="form-check-input" asp-for="RememberConsent">
+                        <label class="form-check-label" asp-for="RememberConsent">
+                            <strong>Remember My Decision</strong>
+                        </label>
                     </div>
                 }
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-sm-4">
-                <button name="button" value="yes" class="btn btn-primary" autofocus>Yes, Allow</button>
-                <button name="button" value="no" class="btn btn-primary">No, Do Not Allow</button>
-            </div>
-            <div class="col-sm-4 col-lg-auto">
+                <div class="d-flex gap-2 mt-3">
+                    <button name="button" value="yes" class="btn btn-primary flex-fill">Yes, Allow</button>
+                    <button name="button" value="no" class="btn btn-outline-secondary flex-fill">No, Do Not Allow</button>
+                </div>
+
                 @if (Model.ClientUrl != null)
                 {
-                    <a class="btn btn-outline-info" href="@Model.ClientUrl">
-                        <span class="glyphicon glyphicon-info-sign"></span>
-                        <strong>@Model.ClientName</strong>
-                    </a>
+                    <div class="text-center mt-3">
+                        <a class="btn btn-link btn-sm text-muted" href="@Model.ClientUrl">@Model.ClientName</a>
+                    </div>
                 }
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

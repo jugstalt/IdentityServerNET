@@ -194,6 +194,16 @@ public class ClientModel
     [Description("Lets users save their consent decision to skip the consent screen next time.")]
     public bool AllowRememberConsent { get; set; }
 
+    // Consent screen logo — stored as base64, served via /ui/client-logo/{id}
+    [JsonProperty("LogoBase64")]
+    public string? LogoBase64 { get; set; }
+
+    [JsonProperty("LogoMimeType")]
+    public string? LogoMimeType { get; set; }
+
+    [JsonIgnore]
+    public bool HasLogoImage => !string.IsNullOrEmpty(LogoBase64);
+
     [JsonIgnore]
     public Client IdentityServer4Instance
     {

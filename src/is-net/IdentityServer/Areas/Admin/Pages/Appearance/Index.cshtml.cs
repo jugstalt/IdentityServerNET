@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
+using IdentityServer.Net.Services;
 using IdentityServerNET.Abstractions.UI;
+using IdentityServerNET.Exceptions;
 using IdentityServerNET.Models;
 using IdentityServerNET.Services.UI;
 using Microsoft.AspNetCore.Http;
@@ -92,9 +94,10 @@ public class IndexModel : SecurePageModel
 
             if (LogoFile is { Length: > 0 })
             {
-                using var ms = new MemoryStream();
-                await LogoFile.CopyToAsync(ms);
-                Settings.LogoBase64   = Convert.ToBase64String(ms.ToArray());
+                var (valid, error, bytes) = await ImageUploadValidator.ValidateAsync(LogoFile);
+                if (!valid) throw new StatusMessageException(error);
+
+                Settings.LogoBase64   = Convert.ToBase64String(bytes!);
                 Settings.LogoMimeType = LogoFile.ContentType;
             }
 
@@ -104,11 +107,13 @@ public class IndexModel : SecurePageModel
                 foreach (var file in BackgroundFiles)
                 {
                     if (file.Length == 0) continue;
-                    using var ms = new MemoryStream();
-                    await file.CopyToAsync(ms);
+
+                    var (valid, error, bytes) = await ImageUploadValidator.ValidateAsync(file);
+                    if (!valid) throw new StatusMessageException($"Background '{file.FileName}': {error}");
+
                     Settings.Backgrounds.Add(new UIBackgroundImage
                     {
-                        Base64   = Convert.ToBase64String(ms.ToArray()),
+                        Base64   = Convert.ToBase64String(bytes!),
                         MimeType = file.ContentType
                     });
                 }

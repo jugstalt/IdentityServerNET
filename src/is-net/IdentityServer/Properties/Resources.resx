@@ -157,7 +157,7 @@
 }
 
 .body-layout-login .panel-logo {
-    background-image: url(&apos;media/openid-logo.png&apos;);
+    background-image: url(&apos;/css/media/openid-logo.png&apos;);
     display: inline-block;
     width: 48px;
     height: 48px;

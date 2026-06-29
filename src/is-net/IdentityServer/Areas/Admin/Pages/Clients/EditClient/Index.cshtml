@@ -9,7 +9,7 @@
     <div class="row">
         <partial name="_StatusMessage" model="Model.StatusMessage" />
         <div class="col-md-6">
-            <form id="-form" method="post">
+            <form id="-form" method="post" enctype="multipart/form-data">
                 <h4>@ViewData["Title"]</h4>
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <input type="hidden" asp-for="Input.ClientId" />
@@ -29,7 +29,32 @@
                 </textarea>
                     <span asp-validation-for="Input.ClientDescription" class="text-danger"></span>
                 </div>
-                <button id="update-client-button" type="submit" class="btn btn-primary">Save</button>
+                <hr />
+                <h5>Consent Screen Logo</h5>
+                @if (Model.CurrentClient.HasLogoImage)
+                {
+                    <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+                        <img src="/ui/client-logo/@Model.CurrentClient.ClientId" alt="Logo" style="height:48px;border-radius:8px;border:1px solid #eee;" />
+                        <div>
+                            <label class="form-label mb-0">Replace logo</label>
+                            <input asp-for="Input.LogoFile" type="file" class="form-control form-control-sm" accept=".png,.jpg,.jpeg,.svg" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label asp-for="Input.LogoFile">Upload Logo (PNG, JPG, SVG)</label>
+                        <input asp-for="Input.LogoFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.svg" />
+                    </div>
+                }
+                <div class="d-flex gap-2 mt-2">
+                    <button id="update-client-button" type="submit" class="btn btn-primary">Save</button>
+                    @if (Model.CurrentClient.HasLogoImage)
+                    {
+                        <button type="submit" asp-page-handler="RemoveLogo" class="btn btn-outline-danger" data-no-spinner>Remove Logo</button>
+                    }
+                </div>
             </form>
         </div>
     </div>

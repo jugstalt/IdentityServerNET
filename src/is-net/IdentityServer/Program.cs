@@ -425,6 +425,13 @@ app.MapGet("/ui/background/{index:int}", async (int index, UICustomizationServic
     var result = await svc.GetBackgroundAsync(index);
     return result is null ? Results.NotFound() : Results.File(result.Value.data, result.Value.mime);
 }).AllowAnonymous();
+
+app.MapGet("/ui/client-logo/{clientId}", async (string clientId, IdentityServerNET.Abstractions.DbContext.IClientDbContext clientDb) =>
+{
+    var client = await clientDb.FindClientByIdAsync(clientId);
+    if (client is null || !client.HasLogoImage) return Results.NotFound();
+    return Results.File(Convert.FromBase64String(client.LogoBase64!), client.LogoMimeType ?? "image/png");
+}).AllowAnonymous();
 //app.MapControllerRoute(
 //        name: "login",
 //        pattern: "Identity/Account/Login",

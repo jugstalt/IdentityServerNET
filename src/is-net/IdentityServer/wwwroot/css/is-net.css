@@ -183,7 +183,7 @@ nav[aria-label="breadcrumb"] {
 
 /* ===== Icon / Logo ===== */
 .navbar-brand .icon-banner {
-    content: url('../icon.png');
+    content: url('/css/media/openid-logo.png');
     width: 32px;
     height: 32px;
 }
@@ -192,7 +192,7 @@ nav[aria-label="breadcrumb"] {
     display: inline-block;
     width: 48px;
     height: 48px;
-    background-image: url('../icon.png');
+    background-image: url('/css/media/openid-logo.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: 42px;

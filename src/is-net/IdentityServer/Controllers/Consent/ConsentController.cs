@@ -1,4 +1,4 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -7,6 +7,7 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
+using IdentityServerNET.Abstractions.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -27,15 +28,18 @@ public class ConsentController : Controller
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IEventService _events;
     private readonly ILogger<ConsentController> _logger;
+    private readonly IClientDbContext _clientDb;
 
     public ConsentController(
         IIdentityServerInteractionService interaction,
         IEventService events,
-        ILogger<ConsentController> logger)
+        ILogger<ConsentController> logger,
+        IClientDbContext clientDb)
     {
         _interaction = interaction;
         _events = events;
         _logger = logger;
+        _clientDb = clientDb;
     }
 
     /// <summary>
@@ -169,7 +173,7 @@ public class ConsentController : Controller
         var request = await _interaction.GetAuthorizationContextAsync(returnUrl);
         if (request != null)
         {
-            return CreateConsentViewModel(model, returnUrl, request);
+            return await CreateConsentViewModel(model, returnUrl, request);
         }
         else
         {
@@ -179,7 +183,7 @@ public class ConsentController : Controller
         return null;
     }
 
-    private ConsentViewModel CreateConsentViewModel(
+    async private Task<ConsentViewModel> CreateConsentViewModel(
         ConsentInputModel model, string returnUrl,
         AuthorizationRequest request)
     {
@@ -191,9 +195,11 @@ public class ConsentController : Controller
 
             ReturnUrl = returnUrl,
 
+            ClientId = request.Client.ClientId,
             ClientName = request.Client.ClientName ?? request.Client.ClientId,
             ClientUrl = request.Client.ClientUri,
             ClientLogoUrl = request.Client.LogoUri,
+            ClientHasLogoImage = false, // set below after client model lookup
             AllowRememberConsent = request.Client.AllowRememberConsent
         };
 
@@ -214,6 +220,13 @@ public class ConsentController : Controller
             apiScopes.Add(GetOfflineAccessScope(vm.ScopesConsented.Contains(IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess) || model == null));
         }
         vm.ApiScopes = apiScopes;
+
+        var clientModel = await _clientDb.FindClientByIdAsync(request.Client.ClientId);
+        if (clientModel?.HasLogoImage == true)
+        {
+            vm.ClientHasLogoImage = true;
+            vm.ClientLogoUrl = null; // uploaded image takes priority over URL
+        }
 
         return vm;
     }

@@ -52,6 +52,10 @@
     margin: 0 !important;
 }
 
+.body-layout-login .login-page.consent-page {
+    max-width: 540px;
+}
+
 /* Override Bootstrap col to full width inside login layout */
 .body-layout-login .login-page .row {
     display: block;
@@ -133,6 +137,48 @@
     width: 100%;
     border-radius: 8px;
     padding: 0.6rem 1rem;
+}
+
+.consent-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.consent-scope-group {
+    border: 1px solid #e8eaf0;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+}
+
+.consent-scope-header {
+    background: #f6f8fb;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #e8eaf0;
+}
+
+.consent-scope-list .list-group-item {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid #f0f2f5;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.consent-scope-list .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.consent-scope-list .consent-description {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
 }
 
 /* Mobile: card ganz oben, minimales Padding */
