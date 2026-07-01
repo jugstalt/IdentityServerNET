@@ -411,11 +411,14 @@ static public class ServiceCollectionExtensions
             )
 
             // Realm context — resolves the current realm from the logged-in user's e-mail domain.
-            // Consumed by the realm-scoping DbContext decorators.
+            // Consumed by the realm-scoping DbContext decorators. Registered transient (not scoped) so
+            // it can also be resolved from the root provider during startup/seeding (no HttpContext ->
+            // null realm -> global namespace); it only depends on IHttpContextAccessor (singleton) and
+            // IRealmDbContext (transient), so no scoped service is captured.
             .IfServiceNotRegistered<IRealmContext>(() =>
             {
                 services.AddHttpContextAccessor();
-                services.AddScoped<IRealmContext, RealmContext>();
+                services.AddTransient<IRealmContext, RealmContext>();
             })
 
             // Default UIDbContext
