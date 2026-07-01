@@ -69,7 +69,8 @@ public class SetupService
                         KnownRoles.ResourceAdministrator,
                         KnownRoles.ClientAdministrator,
                         KnownRoles.SigningAdministrator,
-                        KnownRoles.SecretsVaultAdministrator
+                        KnownRoles.SecretsVaultAdministrator,
+                        KnownRoles.RealmAdministrator
                         }
                 };
 

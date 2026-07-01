@@ -3,6 +3,7 @@ using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using IdentityServerNET;
+using IdentityServerNET.Authorization;
 using IdentityServerNET.Abstractions.SigningCredential;
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Extensions;
@@ -152,33 +153,51 @@ builder.Services.AddAuthorization(options =>
            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
         options.AddPolicy("admin-createcerts-policy",
             policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+        options.AddPolicy("admin-realm-policy",
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
     }
     else
     {
+        // Realm-delegatable capabilities: satisfied by the global role (system admin) or by the
+        // role@realm variant (realm admin). The data is scoped to the same realm by the DbContext
+        // decorators / IRealmUserScope.
         options.AddPolicy("admin-policy",
-            policy => policy.RequireRole(KnownRoles.UserAdministrator,
+            policy => policy.AddRequirements(new RealmAdminRequirement(
+                                         KnownRoles.UserAdministrator,
                                          KnownRoles.RoleAdministrator,
                                          KnownRoles.ResourceAdministrator,
-                                         KnownRoles.ClientAdministrator));
+                                         KnownRoles.ClientAdministrator)));
         options.AddPolicy("admin-user-policy",
-            policy => policy.RequireRole(KnownRoles.UserAdministrator));
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.UserAdministrator)));
         options.AddPolicy("admin-role-policy",
-            policy => policy.RequireRole(KnownRoles.RoleAdministrator));
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.RoleAdministrator)));
         options.AddPolicy("admin-resource-policy",
-            policy => policy.RequireRole(KnownRoles.ResourceAdministrator));
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.ResourceAdministrator)));
         options.AddPolicy("admin-client-policy",
-            policy => policy.RequireRole(KnownRoles.ClientAdministrator));
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.ClientAdministrator)));
+
+        // System-level capabilities (signing keys, secrets vault, certificate creation) are never
+        // realm-delegated: only the holder of the global role (the system admin) passes. Realm admins
+        // hold only role@realm variants, so RequireRole(<global>) excludes them by design.
         options.AddPolicy("admin-secretsvault-policy",
            policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
         options.AddPolicy("admin-signing-ui-policy",
            policy => policy.RequireRole(KnownRoles.SigningAdministrator));
         options.AddPolicy("admin-createcerts-policy",
             policy => policy.RequireRole(KnownRoles.ClientAdministrator));
+
+        // Realm management — system admin only (realm admins never hold the realm-administrator role).
+        options.AddPolicy("admin-realm-policy",
+            policy => policy.RequireRole(KnownRoles.RealmAdministrator));
     }
 
     // DoTo: find a policy that never matches!!
     options.AddPolicy("forbidden", policy => policy.RequireRole("")); // "_#_locked_for_everybody_#_"));
 });
+
+// Realm-aware authorization: resolves role@realm against the caller's current realm.
+builder.Services.AddTransient<Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
+    IdentityServerNET.Authorization.RealmAdminAuthorizationHandler>();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer-Secrets", options =>

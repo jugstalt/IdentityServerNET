@@ -11,6 +11,21 @@ public class KnownRoles
     public const string SecretsVaultAdministrator = "identityserver-secretsvault-administrator";
     public const string SigningAdministrator = "identityserver-signing-administrator";
 
+    // Manages realms themselves (create realm, provision realm admin). Global only — never realm-scoped.
+    public const string RealmAdministrator = "identityserver-realm-administrator";
+
+    /// <summary>
+    /// The administrator roles a realm admin receives for its own realm (user, role, resource and
+    /// client administration). Signing / secrets-vault / realm administration stay system-level.
+    /// </summary>
+    public static readonly string[] RealmDelegatedRoles =
+    {
+        UserAdministrator,
+        RoleAdministrator,
+        ResourceAdministrator,
+        ClientAdministrator,
+    };
+
     public ApplicationRole UserAdministratorRole()
     {
         return new ApplicationRole()
@@ -68,6 +83,16 @@ public class KnownRoles
             Id = KnownRoles.SigningAdministrator,
             Name = KnownRoles.SigningAdministrator,
             Description = "Role to sign payload with signung UI"
+        };
+    }
+
+    public ApplicationRole RealmAdministratorRole()
+    {
+        return new ApplicationRole()
+        {
+            Id = KnownRoles.RealmAdministrator,
+            Name = KnownRoles.RealmAdministrator,
+            Description = "Role to administrate realms (create realms and provision realm admins)"
         };
     }
 }
