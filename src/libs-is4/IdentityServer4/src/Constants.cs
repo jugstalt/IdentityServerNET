@@ -11,6 +11,8 @@ namespace IdentityServer4;
 
 internal static class Constants
 {
+    public const string PushedAuthorizationRequestUriPrefix = "urn:ietf:params:oauth:request_uri:";
+
     public const string IdentityServerName = "IdentityServer4";
     public const string IdentityServerAuthenticationType = IdentityServerName;
     public const string ExternalAuthenticationMethod = "external";

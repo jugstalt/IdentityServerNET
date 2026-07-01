@@ -19,8 +19,11 @@ Von hier aus können neue Clients erstellt bzw. bestehende Clients verwaltet wer
    :maxdepth: 2
    :caption: Contents:
 
+   grants-and-flows
    webapp
+   spa
    api
+   advanced-options
 
    
 

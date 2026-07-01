@@ -73,6 +73,8 @@ Da beim Erstellen des Clients der Typ ``ApiClient`` gewählt wurde, sollte hier 
 
 .. image:: img/api6.png
 
+Der Client-Credentials-Flow (und alle anderen Grant Types) ist in :doc:`grants-and-flows` beschrieben.
+
 ``Allowed Scopes``
 ++++++++++++++++++
 

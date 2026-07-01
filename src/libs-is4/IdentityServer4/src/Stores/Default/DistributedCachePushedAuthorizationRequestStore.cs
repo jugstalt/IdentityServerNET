@@ -29,12 +29,12 @@ public class DistributedCachePushedAuthorizationRequestStore : IPushedAuthorizat
             AbsoluteExpirationRelativeToNow = System.TimeSpan.FromSeconds(expiresInSeconds)
         };
 
-        return _cache.SetStringAsync(CacheKeyPrefix + requestUri, json, options);
+        return _cache.SetStringAsync($"{CacheKeyPrefix}{requestUri}", json, options);
     }
 
     public async Task<NameValueCollection> GetAsync(string requestUri)
     {
-        var json = await _cache.GetStringAsync(CacheKeyPrefix + requestUri);
+        var json = await _cache.GetStringAsync($"{CacheKeyPrefix}{requestUri}");
         if (json == null) return null;
 
         var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
@@ -44,5 +44,5 @@ public class DistributedCachePushedAuthorizationRequestStore : IPushedAuthorizat
     }
 
     public Task RemoveAsync(string requestUri)
-        => _cache.RemoveAsync(CacheKeyPrefix + requestUri);
+        => _cache.RemoveAsync($"{CacheKeyPrefix}{requestUri}");
 }

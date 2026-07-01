@@ -31,8 +31,8 @@ internal class AuthorizeEndpoint : AuthorizeEndpointBase
        IAuthorizeInteractionResponseGenerator interactionGenerator,
        IAuthorizeResponseGenerator authorizeResponseGenerator,
        IUserSession userSession,
-       IPushedAuthorizationRequestStore parStore,
-       IClientStore clientStore)
+       IPushedAuthorizationRequestStore parStore = null,
+       IClientStore clientStore = null)
         : base(events, logger, options, validator, interactionGenerator, authorizeResponseGenerator, userSession)
     {
         _parStore = parStore;
@@ -83,8 +83,8 @@ internal class AuthorizeEndpoint : AuthorizeEndpointBase
             }
         }
 
-        // PAR: resolve request_uri to stored parameters
-        if (requestUri != null)
+        // PAR: resolve request_uri to stored parameters — only for PAR URNs, not JAR http(s):// URIs
+        if (requestUri.IsParRequestUri())
         {
             var storedParams = await _parStore.GetAsync(requestUri);
             if (storedParams == null)

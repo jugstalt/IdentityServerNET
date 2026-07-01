@@ -84,7 +84,7 @@ internal class PushedAuthorizationEndpoint : IEndpointHandler
         }
 
         // generate unique request_uri
-        var requestUri = "urn:ietf:params:oauth:request_uri:" + CryptoRandom.CreateUniqueId(32);
+        var requestUri = CryptoRandom.CreateUniqueId(32).CreateParRequestUri();
 
         // strip client authentication parameters — these must not leak into the authorize flow
         var authorizationParams = form.AllKeys

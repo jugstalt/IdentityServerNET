@@ -54,6 +54,9 @@ Clients ``WebApplication`` als Template gewählt wurde, sollten hier bereits die
 
 .. image:: img/webapp4.png
 
+Eine Erklärung aller Grant Types und der dahinterliegenden Flows (mit Sequenzdiagrammen und
+Beispiel-HTTP-Requests) findet sich in :doc:`grants-and-flows`.
+
 ``Allowed Scopes``:
 +++++++++++++++++++
 
@@ -64,14 +67,16 @@ Für Web-Anwendungen sind hier standardmäßig ``openid`` und ``profile`` einget
 
 .. image:: img/webapp5.png
 
-``Advanced Settings``:
-++++++++++++++++++++++
+``Advanced Options``:
++++++++++++++++++++++
 
 Hier können weitere Optionen angegeben werden, die für die Anmeldung verwendet werden. Beispielsweise kann festgelegt werden, ob ein **Secret** vom Client zwingend übergeben werden muss
 (``RequireClientSecret``).
 Über die Option ``RequireConsent`` kann gesteuert werden, ob ein User nach der Anmeldung noch zustimmen muss, dass die Web-Anwendung Zugriff auf die angeforderten **Scopes** (Claims) erhält:
 
 .. image:: img/webapp6.png
+
+Alle verfügbaren Optionen sind in :doc:`advanced-options` dokumentiert.
 
 ``Advanced Collections``:
 +++++++++++++++++++++++++
@@ -87,6 +92,7 @@ Kommt die Anmeldeanforderung später von einer Seite, die hier nicht aufgelistet
 ++++++++++++++++++++++++
 
 Erweiterte Einstellungen für den Client, wie ``IdentityTokenLifetime``, ``AccessTokenLifetime`` usw. Diese Werte müssen in der Regel nicht geändert werden.
+Eine vollständige Referenz aller Properties findet sich in :doc:`advanced-options`.
 
 ``Delete``:
 +++++++++++

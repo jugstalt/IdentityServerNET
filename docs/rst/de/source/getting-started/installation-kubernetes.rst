@@ -1,5 +1,5 @@
 Installation mit Kubernetes
-==========================
+===========================
 
 Die Kubernetes-Manifeste befinden sich im Repository unter
 `dist/kubernetes/ <https://github.com/jugstalt/identityserver.net/tree/master/dist/kubernetes>`_.
@@ -434,7 +434,7 @@ Häufige Ursachen:
 * ``IDENTITYSERVER__PUBLICORIGIN`` nicht gesetzt — der Server kann ohne einen gültigen
   Public Origin nicht starten.
 
-**Pod ist** ``Running``**, aber die Site ist nicht erreichbar**
+**Pod ist** ``Running``\ **, aber die Site ist nicht erreichbar**
 
 .. code:: bash
 

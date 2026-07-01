@@ -278,4 +278,12 @@ internal static class StringExtensions
 
         return "****" + last4Chars;
     }
+
+    [DebuggerStepThrough]
+    public static bool IsParRequestUri(this string value)
+        => value != null && value.StartsWith(Constants.PushedAuthorizationRequestUriPrefix, StringComparison.Ordinal);
+
+    [DebuggerStepThrough]
+    public static string CreateParRequestUri(this string uniqueId)
+        => $"{Constants.PushedAuthorizationRequestUriPrefix}{uniqueId}";
 }

@@ -18,8 +18,11 @@ From here, you can create new clients or manage existing ones.
    :maxdepth: 2
    :caption: Contents:
 
+   grants-and-flows
    webapp
+   spa
    api
+   advanced-options
 
    
 

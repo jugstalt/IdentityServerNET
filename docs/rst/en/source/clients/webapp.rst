@@ -49,10 +49,13 @@ The **secret** should be secure. For simplicity in this example, we will use the
 ``Allowed Grants``:
 +++++++++++++++++++
 
-This section allows you to set the **grants** permitted for login. Each login method uses different **grants**. Since the ``WebApplication`` 
+This section allows you to set the **grants** permitted for login. Each login method uses different **grants**. Since the ``WebApplication``
 template was selected when creating the client, the appropriate **grants** should already be set here:
 
 .. image:: img/webapp4.png
+
+For an explanation of every grant type and the flows behind them (with sequence diagrams and example
+HTTP requests), see :doc:`grants-and-flows`.
 
 ``Allowed Scopes``:
 +++++++++++++++++++
@@ -64,14 +67,16 @@ For web applications, ``openid`` and ``profile`` are entered by default:
 
 .. image:: img/webapp5.png
 
-``Advanced Settings``:
-++++++++++++++++++++++
+``Advanced Options``:
++++++++++++++++++++++
 
 Here, you can specify additional options for authentication. For example, you can specify whether a **secret** must always be provided by the client
 (``RequireClientSecret``).
 The ``RequireConsent`` option controls whether a user must consent after logging in to allow the web application access to the requested **scopes** (claims):
 
 .. image:: img/webapp6.png
+
+All available options are documented in :doc:`advanced-options`.
 
 ``Advanced Collections``:
 +++++++++++++++++++++++++
@@ -87,6 +92,7 @@ If a login request later comes from a page not listed here, **IdentityServerNET*
 ++++++++++++++++++++++++
 
 Advanced settings for the client, such as ``IdentityTokenLifetime`` and ``AccessTokenLifetime``. These values generally do not need to be changed.
+A full reference of all properties is available in :doc:`advanced-options`.
 
 ``Delete``:
 +++++++++++

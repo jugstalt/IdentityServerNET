@@ -121,6 +121,29 @@ class Build : NukeBuild
                     globFile.DeleteFile();
                 }
             }
+
+            var libDpb = new[]
+            {
+                 "identityserver/artifacts/*.pdb"
+            };
+
+            Log.Information($"Delete thirdparty PDB Files");
+            // eg. libskia.pdb is > 82 MB!!!
+            foreach (var pattern in libDpb)
+            {
+                foreach (var pdbFile in (RootDirectory / "publish" / Platform).GlobFiles(pattern))
+                { 
+                    if (pdbFile.Name.Contains("IdentityServer.", StringComparison.OrdinalIgnoreCase)
+                        || pdbFile.Name.Contains("IdentityServerNET.", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //Log.Information($"Skipping {pdbFile}");
+                        continue;
+                    }
+
+                    Log.Information($"Deleting {pdbFile}");
+                    pdbFile.DeleteFile();
+                }
+            }
         });
 
     AbsolutePath DeployRoot => (AbsolutePath)(SystemInfo.IsLinux ? "~/deploy/identityserver-net" : @"c:\deploy\identityserver-net");
