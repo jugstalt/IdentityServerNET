@@ -419,6 +419,8 @@ static public class ServiceCollectionExtensions
             {
                 services.AddHttpContextAccessor();
                 services.AddTransient<IRealmContext, RealmContext>();
+                // Domain-based user scoping for the admin UI (users carry no @realm suffix).
+                services.AddTransient<IRealmUserScope, RealmUserScope>();
             })
 
             // Default UIDbContext

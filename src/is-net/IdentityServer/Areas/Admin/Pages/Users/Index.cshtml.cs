@@ -1,4 +1,5 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Models;
 using IdentityServerNET.Models.Extensions;
@@ -18,13 +19,16 @@ public class IndexModel : SecurePageModel
 {
     private IPasswordHasher<ApplicationUser> _passwordHasher = null;
     private IUserDbContext _userDb = null;
+    private IRealmUserScope _userScope = null;
 
     public IndexModel(
         IPasswordHasher<ApplicationUser> passwordHasher,
-        IUserDbContext userDbContext)
+        IUserDbContext userDbContext,
+        IRealmUserScope userScope)
     {
         _passwordHasher = passwordHasher;
         _userDb = userDbContext;
+        _userScope = userScope;
     }
 
     public IEnumerable<ApplicationUser> ApplicationUsers { get; set; }
@@ -58,7 +62,8 @@ public class IndexModel : SecurePageModel
     {
         if (_userDb is IAdminUserDbContext)
         {
-            this.ApplicationUsers = await ((IAdminUserDbContext)_userDb).GetUsersAsync(100, skip, CancellationToken.None);
+            var users = await ((IAdminUserDbContext)_userDb).GetUsersAsync(100, skip, CancellationToken.None);
+            this.ApplicationUsers = await _userScope.FilterToCurrentRealmAsync(users, CancellationToken.None);
         }
 
         return Page();
@@ -73,6 +78,12 @@ public class IndexModel : SecurePageModel
             if (!ModelState.IsValid)
             {
                 throw new StatusMessageException($"Type a valid username.");
+            }
+
+            var realmError = await _userScope.ValidateUserInCurrentRealmAsync(CreateInput.Username, CancellationToken.None);
+            if (realmError != null)
+            {
+                throw new StatusMessageException(realmError);
             }
 
             var user = new ApplicationUser()
@@ -128,6 +139,7 @@ public class IndexModel : SecurePageModel
                 };
 
                 this.ApplicationUsers = this.ApplicationUsers.Where(u => u != null).ToArray();
+                this.ApplicationUsers = await _userScope.FilterToCurrentRealmAsync(this.ApplicationUsers, CancellationToken.None);
                 if (this.ApplicationUsers?.Any() == false)
                 {
                     throw new StatusMessageException($"{Filter.Term} do not match any user");
