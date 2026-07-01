@@ -129,7 +129,7 @@ public static class ServicesExtensions
     static public IRoleDbContextBuilder AddRoleDbContext<T>(this IServiceCollection services)
         where T : class, IRoleDbContext
     {
-        services.AddTransient<IRoleDbContext, T>();
+        services.AddRealmScopedRoleDbContext<T>();
 
         return new RoleDbContextBuilder(services);
     }
@@ -138,7 +138,21 @@ public static class ServicesExtensions
         where T : class, IRoleDbContext
     {
         services.Configure(setupAction);
-        services.AddTransient<IRoleDbContext, T>();
+        services.AddRealmScopedRoleDbContext<T>();
+
+        return services;
+    }
+
+    // Register the raw backend by its concrete type and expose IRoleDbContext through the
+    // realm-scoping decorator (see AddClientDbContext for the rationale).
+    private static IServiceCollection AddRealmScopedRoleDbContext<T>(this IServiceCollection services)
+        where T : class, IRoleDbContext
+    {
+        services.AddTransient<T>();
+        services.AddTransient<IRoleDbContext>(sp =>
+            new IdentityServerNET.Services.DbContext.RealmScopedRoleDbContext(
+                sp.GetRequiredService<T>(),
+                sp.GetService<IRealmContext>()));
 
         return services;
     }
