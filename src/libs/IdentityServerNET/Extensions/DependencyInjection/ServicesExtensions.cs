@@ -104,7 +104,14 @@ public static class ServicesExtensions
         where T : class, IResourceDbContext
     {
         services.Configure(setupAction);
-        services.AddTransient<IResourceDbContext, T>();
+
+        // Raw backend by concrete type; IResourceDbContext exposed through the realm-scoping decorator
+        // (reads stay pass-through for IdentityServer; admin Add/Update/Remove become realm-scoped).
+        services.AddTransient<T>();
+        services.AddTransient<IResourceDbContext>(sp =>
+            new IdentityServerNET.Services.DbContext.RealmScopedResourceDbContext(
+                sp.GetRequiredService<T>(),
+                sp.GetService<IRealmContext>()));
 
         return services;
     }
