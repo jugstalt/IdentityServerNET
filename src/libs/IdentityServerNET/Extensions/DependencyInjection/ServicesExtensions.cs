@@ -63,6 +63,19 @@ public static class ServicesExtensions
 
     #endregion
 
+    #region RealmDbContext
+
+    static public IServiceCollection AddRealmDbContext<T>(this IServiceCollection services, Action<RealmDbContextConfiguration> setupAction)
+        where T : class, IRealmDbContext
+    {
+        services.Configure(setupAction);
+        services.AddTransient<IRealmDbContext, T>();
+
+        return services;
+    }
+
+    #endregion
+
     #region ExportClientDbContext
 
     static public IServiceCollection AddExportClientDbContext<T>(this IServiceCollection services, Action<ExportClientDbContextConfiguration> setupAction)

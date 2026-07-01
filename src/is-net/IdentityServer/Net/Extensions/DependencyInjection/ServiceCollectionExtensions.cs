@@ -389,6 +389,26 @@ static public class ServiceCollectionExtensions
                     )
             )
 
+            // Default RealmDbContext (multi-tenancy). Always registered; harmless until realms are used.
+            .IfServiceNotRegistered<IRealmDbContext>(() =>
+                configSection
+                    .SwitchCase(["ConnectionStrings:Realms:FilesDb", "ConnectionStrings:FilesDb"], value =>
+                        services.AddRealmDbContext<FileBlobRealmDb>(options =>
+                        {
+                            options.ConnectionString = Path.Combine(configuration.StorageAssetPath(value), "realms");
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Realms:LiteDb", "ConnectionStrings:LiteDb"], value =>
+                        services.AddRealmDbContext<LiteDbRealmDb>(options =>
+                        {
+                            options.ConnectionString = configuration.AssetPath(value);
+                        })
+                    )
+                    .SwitchDefault(() =>
+                        services.AddRealmDbContext<InMemoryRealmDb>(_ => { })
+                    )
+            )
+
             // Default UIDbContext
             .IfServiceNotRegistered<IUIDbContext>(() =>
                 configSection

@@ -75,6 +75,28 @@ public static class ValidationExtensions
         return @namespace.CheckRegex(NamespaceRegex);
     }
 
+    /// <summary>
+    /// Validates a realm slug. A realm name has the same shape as a namespace:
+    /// lowercase letters, digits and single dashes, at least 3 characters, no leading/trailing/double dash.
+    /// </summary>
+    public static bool IsValidRealmName(this string realm)
+        => realm.IsValidNamespace();
+
+    /// <summary>
+    /// Validates the local (user-facing) part of a realm-scoped identifier — a client id, role name
+    /// or resource name before the realm is appended. It must be non-empty and must not itself contain
+    /// the realm separator, so that <c>name@realm</c> always parses back unambiguously.
+    /// </summary>
+    public static bool IsValidRealmScopedName(this string localName)
+    {
+        if (String.IsNullOrWhiteSpace(localName))
+        {
+            return false;
+        }
+
+        return localName.IndexOf(RealmConventionExtensions.RealmSeparator) < 0;
+    }
+
 
     public static bool CheckRegex(this string input, string regex)
     {
