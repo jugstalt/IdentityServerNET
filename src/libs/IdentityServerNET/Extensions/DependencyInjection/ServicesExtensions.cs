@@ -56,7 +56,16 @@ public static class ServicesExtensions
         where T : class, IClientDbContext
     {
         services.Configure(setupAction);
-        services.AddTransient<IClientDbContext, T>();
+
+        // Register the raw backend by its concrete type and expose IClientDbContext through the
+        // realm-scoping decorator. Reads stay pass-through (used by IdentityServer), while the admin
+        // CRUD path (cast to IClientDbContextModify) becomes realm-scoped. IRealmContext is optional:
+        // when it is not registered the decorator operates on the global namespace.
+        services.AddTransient<T>();
+        services.AddTransient<IClientDbContext>(sp =>
+            new IdentityServerNET.Services.DbContext.RealmScopedClientDbContext(
+                sp.GetRequiredService<T>(),
+                sp.GetService<IRealmContext>()));
 
         return services;
     }

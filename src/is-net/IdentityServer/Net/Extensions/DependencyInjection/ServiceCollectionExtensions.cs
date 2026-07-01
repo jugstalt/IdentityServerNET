@@ -3,6 +3,7 @@ using IdentityServer4.Stores.Default;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.EmailSender;
 using IdentityServerNET.Abstractions.Security;
+using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Abstractions.SigningCredential;
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Azure.Services.DbContext;
@@ -408,6 +409,14 @@ static public class ServiceCollectionExtensions
                         services.AddRealmDbContext<InMemoryRealmDb>(_ => { })
                     )
             )
+
+            // Realm context — resolves the current realm from the logged-in user's e-mail domain.
+            // Consumed by the realm-scoping DbContext decorators.
+            .IfServiceNotRegistered<IRealmContext>(() =>
+            {
+                services.AddHttpContextAccessor();
+                services.AddScoped<IRealmContext, RealmContext>();
+            })
 
             // Default UIDbContext
             .IfServiceNotRegistered<IUIDbContext>(() =>
