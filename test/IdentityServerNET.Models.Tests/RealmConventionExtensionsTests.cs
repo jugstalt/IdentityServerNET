@@ -98,6 +98,46 @@ public class RealmConventionExtensionsTests
 
     #endregion
 
+    #region Reserved names
+
+    [Theory]
+    [InlineData("openid")]
+    [InlineData("profile")]
+    [InlineData("email")]
+    [InlineData("offline_access")]
+    [InlineData("OpenId")]        // case-insensitive
+    public void IsGlobalReservedName_AcceptsStandardScopes(string name)
+    {
+        Assert.True(name.IsGlobalReservedName());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("my-api")]
+    [InlineData("openidish")]
+    public void IsGlobalReservedName_RejectsCustomNames(string? name)
+    {
+        Assert.False(name.IsGlobalReservedName());
+    }
+
+    #endregion
+
+    #region ClientAllowsUserRealm (runtime cross-realm guard)
+
+    [Theory]
+    [InlineData("my-client@xyz", "xyz", true)]   // realm client, matching user realm
+    [InlineData("my-client@xyz", "acme", false)] // realm client, foreign user realm
+    [InlineData("my-client@xyz", null, false)]   // realm client, global user
+    [InlineData("my-client", "xyz", true)]       // global client, realm user -> allowed
+    [InlineData("my-client", null, true)]        // global client, global user
+    public void ClientAllowsUserRealm_EnforcesTheRule(string clientId, string? userRealm, bool expected)
+    {
+        Assert.Equal(expected, clientId.ClientAllowsUserRealm(userRealm));
+    }
+
+    #endregion
+
     #region Validation
 
     [Theory]

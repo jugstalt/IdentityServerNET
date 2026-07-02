@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace IdentityServerNET.Models.Extensions;
@@ -25,6 +26,14 @@ public static class RealmConventionExtensions
     // distinguishable from an e-mail-shaped value (user@foo.com).
     private static readonly Regex _realmSlugShape =
         new(@"^[a-z0-9\-]+$", RegexOptions.Compiled);
+
+    // Standard OIDC scopes / identity resources that are global by definition and must never be
+    // realm-namespaced — every realm's clients rely on them.
+    private static readonly HashSet<string> _globalReservedNames =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            "openid", "profile", "email", "address", "phone", "offline_access", "roles",
+        };
 
     /// <summary>
     /// Returns <c>true</c> if the identifier carries a realm namespace (e.g. <c>my-client@xyz</c>).
@@ -113,5 +122,25 @@ public static class RealmConventionExtensions
         return string.IsNullOrEmpty(realm)
             ? valueRealm is null
             : string.Equals(valueRealm, realm, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> if the (local) name is a global reserved name — a standard OIDC scope /
+    /// identity resource (openid, profile, …) that must never be realm-namespaced.
+    /// </summary>
+    public static bool IsGlobalReservedName(this string? value)
+        => value is not null && _globalReservedNames.Contains(value.GetRealmScopedName());
+
+    /// <summary>
+    /// Whether a user of realm <paramref name="userRealm"/> may use the client with the given id.
+    /// A global client (no realm suffix) is usable by everyone; a realm client only by users of that
+    /// same realm. This is the runtime cross-realm guard.
+    /// </summary>
+    public static bool ClientAllowsUserRealm(this string? clientId, string? userRealm)
+    {
+        string? clientRealm = clientId.GetRealm();
+
+        return clientRealm is null
+            || string.Equals(clientRealm, userRealm, StringComparison.Ordinal);
     }
 }

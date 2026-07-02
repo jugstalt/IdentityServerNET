@@ -60,7 +60,7 @@ public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbConte
         var modify = Modify();
         var realm = await CurrentRealmAsync();
 
-        apiResource.Name = apiResource.Name.AddRealmNamespace(realm);
+        apiResource.Name = ScopeName(apiResource.Name, realm);
 
         await modify.AddApiResourceAsync(apiResource);
     }
@@ -86,7 +86,7 @@ public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbConte
         var modify = Modify();
         var realm = await CurrentRealmAsync();
 
-        identityResource.Name = identityResource.Name.AddRealmNamespace(realm);
+        identityResource.Name = ScopeName(identityResource.Name, realm);
 
         await modify.AddIdentityResourceAsync(identityResource);
     }
@@ -111,6 +111,11 @@ public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbConte
 
     private async Task<string> CurrentRealmAsync()
         => _realmContext is null ? null : await _realmContext.GetCurrentRealmNameAsync();
+
+    // Applies the realm suffix, except for global reserved names (standard OIDC scopes such as
+    // openid/profile), which must stay global even when a realm admin creates them.
+    private static string ScopeName(string name, string realm)
+        => name.IsGlobalReservedName() ? name.GetRealmScopedName() : name.AddRealmNamespace(realm);
 
     private async Task EnsureOwnedByCurrentRealmAsync(string name)
     {

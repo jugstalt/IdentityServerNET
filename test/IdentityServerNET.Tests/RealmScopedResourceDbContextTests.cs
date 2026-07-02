@@ -95,6 +95,19 @@ public class RealmScopedResourceDbContextTests
     }
 
     [Fact]
+    public async Task AddIdentityResource_StandardScope_StaysGlobal_EvenForRealmAdmin()
+    {
+        // openid/profile/... are global by definition and must never be realm-namespaced.
+        var backend = new FakeResourceDb();
+        IResourceDbContextModify sut = Scoped(backend, "xyz");
+
+        await sut.AddIdentityResourceAsync(Identity("openid"));
+
+        Assert.True(backend.Identities.ContainsKey("openid"));
+        Assert.False(backend.Identities.ContainsKey("openid@xyz"));
+    }
+
+    [Fact]
     public async Task SystemAdmin_AddApiResource_StaysGlobal()
     {
         var backend = new FakeResourceDb();
