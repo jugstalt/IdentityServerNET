@@ -275,6 +275,9 @@ var identityServerBuilder = builder.Services.AddIdentityServer(options =>
     .AddSecretValidator<SecretsVaultSecretValidator>()
     // Add Identity
     .AddAspNetIdentity<ApplicationUser>()
+    // Override the default profile service with our realm-aware implementation.
+    // Must come after AddAspNetIdentity so it wins the IProfileService registration.
+    .AddProfileService<IdentityServerNET.Services.ProfileService>()
     // Add Strores
     .AddResourceStore<ResourceStore>()
     .AddClientStore<ClientStore>()

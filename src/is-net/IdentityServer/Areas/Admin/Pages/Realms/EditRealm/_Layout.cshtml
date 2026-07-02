@@ -1,0 +1,30 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@model IEditRealmPageModel
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb is-breadcrumb">
+        <li class="breadcrumb-item"><a href="~/admin">Admin</a></li>
+        <li class="breadcrumb-item"><a href="~/admin/realms">Realms</a></li>
+        <li class="breadcrumb-item active">@Model?.CurrentRealm?.Name</li>
+    </ol>
+</nav>
+<h2>Admin Realms</h2>
+<div class="admin-resources">
+    <h4>Edit Realm: <strong>@Model?.CurrentRealm?.Name</strong></h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-3 sidebar">
+            <partial name="_EditRealmNav" model="Model" />
+        </div>
+        <div class="col-md-9">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("scripts", required: false)
+}

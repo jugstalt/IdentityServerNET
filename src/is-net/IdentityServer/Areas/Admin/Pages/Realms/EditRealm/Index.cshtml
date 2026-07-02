@@ -1,0 +1,29 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Realms.EditRealm.IndexModel
+@{
+    ViewData["Title"] = "General";
+    ViewData["ActivePage"] = EditRealmNavPages.Index;
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <input type="hidden" asp-for="Input.Name" />
+            <div class="form-group mb-2">
+                <label>Realm name</label>
+                <input value="@Model.Input.Name" class="form-control" disabled />
+            </div>
+            <div class="form-group mb-2">
+                <label>Primary domain</label>
+                <input value="@Model.CurrentRealm?.PrimaryDomain" class="form-control" disabled />
+                <small class="text-muted">Anchors the realm admin account — cannot be changed after creation.</small>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Input.DisplayName"></label>
+                <input asp-for="Input.DisplayName" class="form-control" placeholder="Human-readable name" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>

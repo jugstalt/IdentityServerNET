@@ -1,10 +1,22 @@
-﻿@{
+@{
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
 @model IEditUserPageModel
 
-<nav aria-label="breadcrumb"><ol class="breadcrumb is-breadcrumb"><li class="breadcrumb-item"><a href="~/admin">Admin</a></li><li class="breadcrumb-item"><a href="~/admin/users">Users</a></li><li class="breadcrumb-item active">@Model?.CurrentApplicationUser?.UserName</li></ol></nav>
+@{
+    var _returnUrl   = Context.Request.Query["returnUrl"].ToString();
+    var _returnLabel = Context.Request.Query["returnLabel"].ToString();
+    var _safeReturnUrl = !string.IsNullOrEmpty(_returnUrl) && _returnUrl.StartsWith("/") ? _returnUrl : null;
+    var _breadcrumbLabel = !string.IsNullOrEmpty(_returnLabel) ? _returnLabel : "Users";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb is-breadcrumb">
+        <li class="breadcrumb-item"><a href="~/admin">Admin</a></li>
+        <li class="breadcrumb-item"><a href="@(_safeReturnUrl ?? "~/admin/users")">@_breadcrumbLabel</a></li>
+        <li class="breadcrumb-item active">@Model?.CurrentApplicationUser?.UserName</li>
+    </ol>
+</nav>
 <h2>Admin Users</h2>
 <div class="admin-resources">
     <h4>Edit Application User: @Model?.CurrentApplicationUser?.UserName</h4>

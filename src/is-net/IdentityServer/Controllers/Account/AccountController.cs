@@ -8,10 +8,12 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Security;
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
+using IdentityServerNET.Models.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -46,6 +49,7 @@ public class AccountController : Controller
     private readonly ICaptchaCodeRenderer _captchaCodeRenderer;
     private readonly IConfiguration _configuration;
     private readonly IUserPasskeyStore<ApplicationUser> _passkeyStore;
+    private readonly IRealmDbContext _realmDb;
 
     public AccountController(
         ILogger<AccountController> logger,
@@ -56,6 +60,7 @@ public class AccountController : Controller
         IAuthenticationSchemeProvider schemeProvider,
         IEventService events,
         IConfiguration configuration,
+        IRealmDbContext realmDb = null,
         IUserPasskeyStore<ApplicationUser> passkeyStore = null,
         ILoginBotDetection loginBotDetetion = null,
         ICaptchaCodeRenderer captchaCodeRenderer = null)
@@ -71,6 +76,7 @@ public class AccountController : Controller
         _events = events;
 
         _configuration = configuration;
+        _realmDb = realmDb;
         _passkeyStore = passkeyStore;
 
         _loginBotDetection = loginBotDetetion;
@@ -169,6 +175,16 @@ public class AccountController : Controller
                 {
                     var user = await _userManager.FindByNameAsync(loginUsername);
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+
+                    // Realm guard: if the requested client is realm-scoped, ensure this user belongs to that realm.
+                    if (!await IsUserAllowedForClientAsync(user, context))
+                    {
+                        await _signInManager.SignOutAsync();
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "realm access denied", clientId: context?.Client.ClientId));
+                        ModelState.AddModelError(string.Empty, "Your account is not permitted to access this application.");
+                        var vmDenied = await BuildLoginViewModelAsync(model);
+                        return View(vmDenied);
+                    }
 
                     // only set explicit expiration here if user chooses "remember me". 
                     // otherwise we rely upon expiration configured in cookie middleware.
@@ -496,6 +512,29 @@ public class AccountController : Controller
     /*****************************************/
     /* helper APIs for the AccountController */
     /*****************************************/
+
+    /// <summary>
+    /// Returns false when the client is realm-scoped and the user's email domain does not belong
+    /// to that realm. Global clients (no realm suffix) always return true.
+    /// </summary>
+    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, AuthorizationRequest context)
+    {
+        var clientId = context?.Client?.ClientId;
+        if (_realmDb is null || !clientId.HasRealm())
+            return true;
+
+        var email = string.IsNullOrEmpty(user.Email) ? user.UserName : user.Email;
+        if (string.IsNullOrEmpty(email))
+            return false;
+
+        int at = email!.LastIndexOf('@');
+        if (at <= 0 || at == email.Length - 1)
+            return false;
+
+        var domain = email.Substring(at + 1).ToLowerInvariant();
+        var realm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
+        return clientId.ClientAllowsUserRealm(realm?.Name);
+    }
 
     /// <summary>
     /// If the supplied input looks like an email address, attempt to find the user by email

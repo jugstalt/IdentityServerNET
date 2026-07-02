@@ -1,20 +1,62 @@
 ﻿@page
 @model IdentityServer.Areas.Admin.Pages.Users.IndexModel
 @{
+    var domains = Model.ApplicationUsers?
+        .Select(u => {
+            var name = u.UserName ?? "";
+            int at = name.LastIndexOf('@');
+            return at > 0 && at < name.Length - 1 ? name.Substring(at + 1).ToLowerInvariant() : null;
+        })
+        .Where(d => d != null)
+        .Distinct()
+        .OrderBy(d => d)
+        .ToList() ?? new List<string>();
+
+    var showDomainFilter = domains.Count > 1;
 }
 @inject IdentityServerNET.Services.ColorSchemeService ColorScheme
 
 <div class="row">
     @if (Model.ApplicationUsers != null)
     {
-
         <div class="col-md-6">
-            <ul class="nav nav-pills flex-column">
+
+            @* Letter navigation bar *@
+            <div class="letter-nav mb-1" id="letter-nav">
+                <a class="letter-btn active" data-filter="*" href="#">All</a>
+                @foreach (var ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                {
+                    <a class="letter-btn" data-filter="@ch" href="#">@ch</a>
+                }
+            </div>
+
+            @* Domain filter — only shown when multiple domains present *@
+            @if (showDomainFilter)
+            {
+                <div class="letter-nav mt-1 mb-1" id="domain-nav">
+                    <a class="domain-btn active" data-domain="*" href="#">All domains</a>
+                    @foreach (var domain in domains)
+                    {
+                        <a class="domain-btn" data-domain="@domain" href="#">@domain</a>
+                    }
+                </div>
+            }
+
+            <div class="mb-2 text-muted" style="font-size:.85em">
+                <span id="user-count">@Model.ApplicationUsers.Count()</span> user(s)
+            </div>
+
+            <ul class="nav nav-pills flex-column" id="user-list">
                 @foreach (var user in Model.ApplicationUsers)
                 {
-                    <li class="ui-list-item">
-                        <a asp-page="EditUser/Index"
-                           asp-route-id="@user.Id">
+                    var name     = user.UserName ?? "";
+                    var atIdx    = name.LastIndexOf('@');
+                    var domain   = atIdx > 0 && atIdx < name.Length - 1
+                                   ? name.Substring(atIdx + 1).ToLowerInvariant()
+                                   : "";
+                    var firstLetter = char.ToUpperInvariant(name.FirstOrDefault()).ToString();
+                    <li class="ui-list-item" data-letter="@firstLetter" data-domain="@domain">
+                        <a asp-page="EditUser/Index" asp-route-id="@user.Id">
                             <div class="@ColorScheme.LeftIcon("account")"></div>
                             <strong>@user.UserName</strong>
                             <div>
@@ -26,7 +68,6 @@
                 }
             </ul>
         </div>
-
     }
     <div class="col-md-6">
         <div class="row collapsable-tool">
@@ -51,4 +92,99 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .letter-nav { display: flex; flex-wrap: wrap; gap: 3px; }
+        .letter-btn, .domain-btn {
+            display: inline-block;
+            padding: 1px 6px;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            text-decoration: none;
+            font-size: .8em;
+            text-align: center;
+        }
+        .letter-btn           { min-width: 22px; color: #0d6efd; }
+        .letter-btn.active    { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+        .letter-btn.no-match  { color: #ccc; border-color: #eee; pointer-events: none; }
+        .domain-btn           { color: #198754; border-color: #a3cfbb; }
+        .domain-btn.active    { background: #198754; color: #fff; border-color: #198754; }
+    </style>
+    <script>
+        (function () {
+            const list      = document.getElementById('user-list');
+            const letterNav = document.getElementById('letter-nav');
+            const domainNav = document.getElementById('domain-nav');
+            const countEl   = document.getElementById('user-count');
+            if (!list || !letterNav) return;
+
+            const items = Array.from(list.querySelectorAll('li[data-letter]'));
+
+            let activeLetter = '*';
+            let activeDomain = '*';
+
+            // --- helpers ---
+
+            function updateLetterNav() {
+                // Which letters have at least one visible-by-domain item?
+                const available = new Set(
+                    items
+                        .filter(li => activeDomain === '*' || li.dataset.domain === activeDomain)
+                        .map(li => li.dataset.letter)
+                );
+                letterNav.querySelectorAll('.letter-btn[data-filter]').forEach(btn => {
+                    const f = btn.dataset.filter;
+                    if (f === '*') { btn.classList.remove('no-match'); return; }
+                    btn.classList.toggle('no-match', !available.has(f));
+                });
+                // If current letter became unavailable, reset to '*'
+                if (activeLetter !== '*' && !available.has(activeLetter)) {
+                    activeLetter = '*';
+                    setActive(letterNav, '*', 'letter-btn', 'data-filter');
+                }
+            }
+
+            function applyFilters() {
+                let visible = 0;
+                items.forEach(li => {
+                    const ok = (activeLetter === '*' || li.dataset.letter === activeLetter) &&
+                               (activeDomain === '*' || li.dataset.domain === activeDomain);
+                    li.style.display = ok ? '' : 'none';
+                    if (ok) visible++;
+                });
+                countEl.textContent = visible;
+            }
+
+            function setActive(nav, value, cls, attr) {
+                nav.querySelectorAll('.' + cls).forEach(b => b.classList.remove('active'));
+                const match = nav.querySelector(`.${cls}[${attr}="${value}"]`);
+                if (match) match.classList.add('active');
+            }
+
+            // --- initial state ---
+            updateLetterNav();
+
+            // --- letter clicks ---
+            letterNav.addEventListener('click', e => {
+                const btn = e.target.closest('.letter-btn');
+                if (!btn || btn.classList.contains('no-match')) return;
+                e.preventDefault();
+                activeLetter = btn.dataset.filter;
+                setActive(letterNav, activeLetter, 'letter-btn', 'data-filter');
+                applyFilters();
+            });
+
+            // --- domain clicks ---
+            if (domainNav) {
+                domainNav.addEventListener('click', e => {
+                    const btn = e.target.closest('.domain-btn');
+                    if (!btn) return;
+                    e.preventDefault();
+                    activeDomain = btn.dataset.domain;
+                    setActive(domainNav, activeDomain, 'domain-btn', 'data-domain');
+                    updateLetterNav();
+                    applyFilters();
+                });
+            }
+        })();
+    </script>
 }

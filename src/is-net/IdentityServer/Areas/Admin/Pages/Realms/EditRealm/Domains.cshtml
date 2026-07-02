@@ -1,0 +1,25 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Realms.EditRealm.DomainsModel
+@{
+    ViewData["Title"] = "Domains";
+    ViewData["ActivePage"] = EditRealmNavPages.Domains;
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <input type="hidden" asp-for="Input.Name" />
+            <div class="form-group mb-3">
+                <label asp-for="Input.Domains"></label>
+                <textarea asp-for="Input.Domains" class="form-control" rows="8"></textarea>
+                <small class="text-muted">
+                    One domain per line. The primary domain (<code>@Model.CurrentRealm?.PrimaryDomain</code>)
+                    is always included automatically.
+                    Users whose e-mail belongs to any of these domains are members of this realm.
+                </small>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>

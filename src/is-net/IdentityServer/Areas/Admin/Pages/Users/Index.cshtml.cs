@@ -62,8 +62,12 @@ public class IndexModel : SecurePageModel
     {
         if (_userDb is IAdminUserDbContext)
         {
-            var users = await ((IAdminUserDbContext)_userDb).GetUsersAsync(100, skip, CancellationToken.None);
-            this.ApplicationUsers = await _userScope.FilterToCurrentRealmAsync(users, CancellationToken.None);
+            // Fetch a generous batch so the domain filter always sees all relevant users.
+            // Proper server-side domain filtering would require interface changes; for now
+            // 2000 covers any realistic realm size.
+            var users = await ((IAdminUserDbContext)_userDb).GetUsersAsync(2000, skip, CancellationToken.None);
+            this.ApplicationUsers = (await _userScope.FilterToCurrentRealmAsync(users, CancellationToken.None))
+                .OrderBy(u => u.UserName);
         }
 
         return Page();
@@ -139,7 +143,8 @@ public class IndexModel : SecurePageModel
                 };
 
                 this.ApplicationUsers = this.ApplicationUsers.Where(u => u != null).ToArray();
-                this.ApplicationUsers = await _userScope.FilterToCurrentRealmAsync(this.ApplicationUsers, CancellationToken.None);
+                this.ApplicationUsers = (await _userScope.FilterToCurrentRealmAsync(this.ApplicationUsers, CancellationToken.None))
+                    .OrderBy(u => u.UserName);
                 if (this.ApplicationUsers?.Any() == false)
                 {
                     throw new StatusMessageException($"{Filter.Term} do not match any user");

@@ -1,0 +1,23 @@
+@model IEditRealmPageModel
+
+<ul class="nav nav-pills flex-column">
+    <li>
+        <a asp-page="../Index">«</a>
+    </li>
+
+    <li class="@EditRealmNavPages.IndexNavClass(ViewContext)">
+        <a asp-page="./Index" asp-route-name="@Model.CurrentRealm?.Name">General</a>
+    </li>
+
+    <li class="@EditRealmNavPages.DomainsNavClass(ViewContext)">
+        <a asp-page="./Domains" asp-route-name="@Model.CurrentRealm?.Name">Domains</a>
+    </li>
+
+    <li class="@EditRealmNavPages.RealmUsersNavClass(ViewContext)">
+        <a asp-page="./RealmUsers" asp-route-name="@Model.CurrentRealm?.Name">Users</a>
+    </li>
+
+    <li class="@EditRealmNavPages.DeleteRealmNavClass(ViewContext)">
+        <a asp-page="./DeleteRealm" asp-route-name="@Model.CurrentRealm?.Name">Delete</a>
+    </li>
+</ul>

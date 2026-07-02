@@ -8,7 +8,7 @@ namespace IdentityServerNET.Tests;
 
 /// <summary>
 /// Pins the domain-based user isolation. Users carry no @realm suffix, so a realm admin sees/creates
-/// only users in its realm's domains, and the system admin only users whose domain belongs to no realm.
+/// only users in its realm's domains; the system admin sees global users plus realm admin accounts.
 /// </summary>
 public class RealmUserScopeTests
 {
@@ -89,11 +89,26 @@ public class RealmUserScopeTests
     }
 
     [Fact]
-    public async Task SystemAdmin_SeesOnlyUsersWithNoRealmDomain()
+    public async Task SystemAdmin_SeesGlobalUsersAndRealmAdmins()
     {
-        var result = await Scope(null).FilterToCurrentRealmAsync(AllUsers, CancellationToken.None);
+        // Xyz primary domain = foo.com → realm admin is admin@foo.com
+        // Acme primary domain = acme.com → realm admin is admin@acme.com
+        var all = new[]
+        {
+            User("alice@foo.com"),   // xyz realm user  → hidden
+            User("bob@bar.org"),     // xyz realm user  → hidden
+            User("admin@foo.com"),   // xyz realm admin → visible
+            User("carol@acme.com"),  // acme realm user → hidden
+            User("admin@acme.com"),  // acme realm admin → visible
+            User("root@is.net"),     // global user      → visible
+        };
 
-        Assert.Equal(new[] { "root@is.net" }, result.Select(u => u.UserName).ToArray());
+        var result = await Scope(null).FilterToCurrentRealmAsync(all, CancellationToken.None);
+        var names = result.Select(u => u.UserName).OrderBy(x => x).ToArray();
+
+        Assert.Equal(
+            new[] { "admin@acme.com", "admin@foo.com", "root@is.net" },
+            names);
     }
 
     #endregion

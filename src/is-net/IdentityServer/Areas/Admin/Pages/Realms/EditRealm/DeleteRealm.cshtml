@@ -1,0 +1,35 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Realms.EditRealm.DeleteRealmModel
+@{
+    ViewData["Title"] = "Delete Realm";
+    ViewData["ActivePage"] = EditRealmNavPages.DeleteRealm;
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <h4 class="text-danger">Delete Realm</h4>
+        <p>This will permanently remove all of the following that belong to realm <strong>@Model.CurrentRealm?.Name</strong>:</p>
+        <ul>
+            <li>Realm-scoped <strong>clients</strong></li>
+            <li>Realm-scoped <strong>roles</strong></li>
+            <li>Realm-scoped <strong>resources</strong></li>
+            <li>The realm <strong>admin account</strong></li>
+        </ul>
+        <p class="text-muted">End-user accounts in the realm's domains are <strong>retained</strong>.</p>
+        <form method="post">
+            <input type="hidden" asp-for="Input.Name" />
+            <div class="form-group mb-3">
+                <label asp-for="Input.ConfirmName"></label>
+                <input asp-for="Input.ConfirmName" class="form-control"
+                       placeholder="Type the realm name to confirm" autocomplete="off" />
+                <span asp-validation-for="Input.ConfirmName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-danger">Delete Realm</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

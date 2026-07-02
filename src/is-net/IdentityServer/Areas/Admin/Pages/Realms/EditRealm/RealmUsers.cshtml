@@ -1,0 +1,33 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Realms.EditRealm.RealmUsersModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["ActivePage"] = EditRealmNavPages.RealmUsers;
+    var returnUrl   = $"{ViewContext.HttpContext.Request.Path}{ViewContext.HttpContext.Request.QueryString}";
+    var returnLabel = $"Realms / {Model.CurrentRealm?.Name} / Users";
+}
+@inject IdentityServerNET.Services.ColorSchemeService ColorScheme
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+@if (Model.Users.Any())
+{
+    <ul class="nav nav-pills flex-column">
+        @foreach (var user in Model.Users.OrderBy(u => u.UserName))
+        {
+            <li class="ui-list-item">
+                <a asp-area="Admin" asp-page="/Users/EditUser/Index"
+                   asp-route-id="@user.Id"
+                   asp-route-returnUrl="@returnUrl"
+                   asp-route-returnLabel="@returnLabel">
+                    <div class="@ColorScheme.LeftIcon("account")"></div>
+                    <strong>@user.UserName</strong>
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">No users found in this realm's domains yet.</p>
+}

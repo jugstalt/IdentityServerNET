@@ -92,13 +92,4 @@ public class IndexModel : SecurePageModel
         return result;
     }
 
-    public Task<IActionResult> OnPostDeleteAsync(string name)
-        => SecureHandlerAsync(async () =>
-        {
-            await _provisioning.DeleteRealmAsync(new RealmModel { Name = name }, CancellationToken.None);
-        },
-        onFinally: () => RedirectToPage(),
-        successMessage: $"Realm '{name}' removed together with its clients, roles, resources and realm admin. " +
-                        "End-user accounts of the realm's domains are retained.",
-        onException: (ex) => RedirectToPage());
 }

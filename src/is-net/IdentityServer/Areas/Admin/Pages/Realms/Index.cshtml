@@ -13,16 +13,18 @@
                 @foreach (var realm in Model.Realms)
                 {
                     <li class="ui-list-item">
-                        <div class="@ColorScheme.LeftIcon("package")"></div>
-                        <strong>@realm.Name</strong>
-                        <div>
-                            Primary: <code>@realm.PrimaryDomain</code>
-                            &#160;| Domains: <code>@(string.Join(", ", realm.Domains))</code>
-                        </div>
-                        <form method="post" asp-page-handler="Delete" asp-route-name="@realm.Name"
-                              onsubmit="return confirm('Remove realm @realm.Name? The realm admin and realm-scoped roles stay but become inaccessible.');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                        </form>
+                        <a asp-page="EditRealm/Index" asp-route-name="@realm.Name">
+                            <div class="@ColorScheme.LeftIcon("package")"></div>
+                            <strong>@realm.Name</strong>
+                            @if (!string.IsNullOrEmpty(realm.DisplayName) && realm.DisplayName != realm.Name)
+                            {
+                                <span class="text-muted"> — @realm.DisplayName</span>
+                            }
+                            <div>
+                                Primary: <code>@realm.PrimaryDomain</code>
+                                &#160;| Domains: <code>@(string.Join(", ", realm.Domains))</code>
+                            </div>
+                        </a>
                     </li>
                 }
             </ul>

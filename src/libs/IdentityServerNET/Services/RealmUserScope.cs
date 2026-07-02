@@ -35,9 +35,25 @@ public class RealmUserScope : IRealmUserScope
             return users.Where(u => u != null && domains.Contains(DomainOf(u))).ToArray();
         }
 
-        // System admin: only users whose domain is owned by no realm (the global namespace).
-        var ownedDomains = await AllRealmDomainsAsync(cancellationToken);
-        return users.Where(u => u != null && !ownedDomains.Contains(DomainOf(u))).ToArray();
+        // System admin: global users (domain not owned by any realm) + realm admin accounts.
+        var realms = await _realmDb.GetAllAsync(cancellationToken);
+        var ownedDomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var realmAdmins = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var r in realms)
+        {
+            if (r.Domains != null)
+                foreach (var d in r.Domains) ownedDomains.Add(d);
+            if (!string.IsNullOrEmpty(r.PrimaryDomain))
+                realmAdmins.Add($"admin@{r.PrimaryDomain}");
+        }
+
+        return users.Where(u =>
+            u != null && (
+                !ownedDomains.Contains(DomainOf(u)) ||
+                realmAdmins.Contains(u.UserName ?? "", StringComparer.OrdinalIgnoreCase)
+            )
+        ).ToArray();
     }
 
     public async Task<string> ValidateUserInCurrentRealmAsync(string userName, CancellationToken cancellationToken)
@@ -68,27 +84,6 @@ public class RealmUserScope : IRealmUserScope
         }
 
         return null;
-    }
-
-    private async Task<HashSet<string>> AllRealmDomainsAsync(CancellationToken cancellationToken)
-    {
-        var realms = await _realmDb.GetAllAsync(cancellationToken);
-        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var realm in realms)
-        {
-            if (realm.Domains == null)
-            {
-                continue;
-            }
-
-            foreach (var domain in realm.Domains)
-            {
-                set.Add(domain);
-            }
-        }
-
-        return set;
     }
 
     private static string DomainOf(ApplicationUser user)
