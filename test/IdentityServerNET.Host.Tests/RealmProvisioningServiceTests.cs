@@ -2,6 +2,7 @@ using IdentityServerNET;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Models;
+using IdentityServerNET.Models.IdentityServerWrappers;
 using IdentityServerNET.Models.UserInteraction;
 using IdentityServerNET.Services;
 using Microsoft.AspNetCore.Identity;
@@ -61,6 +62,21 @@ public class RealmProvisioningServiceTests
             => PasswordVerificationResult.Success;
     }
 
+    // Not used by CreateRealmAsync, but required by the constructor.
+    private sealed class FakeClientDb : IClientDbContext
+    {
+        public Task<ClientModel?> FindClientByIdAsync(string clientId) => Task.FromResult<ClientModel?>(null);
+    }
+
+    private sealed class FakeResourceDb : IResourceDbContext
+    {
+        public Task<ApiResourceModel?> FindApiResourceAsync(string name) => Task.FromResult<ApiResourceModel?>(null);
+        public Task<IEnumerable<ApiResourceModel>> FindApiResourcesByScopeAsync(IEnumerable<string> s) => Task.FromResult<IEnumerable<ApiResourceModel>>(Array.Empty<ApiResourceModel>());
+        public Task<IEnumerable<ApiResourceModel>> GetAllApiResources() => Task.FromResult<IEnumerable<ApiResourceModel>>(Array.Empty<ApiResourceModel>());
+        public Task<IdentityResourceModel?> FindIdentityResource(string name) => Task.FromResult<IdentityResourceModel?>(null);
+        public Task<IEnumerable<IdentityResourceModel>> GetAllIdentityResources() => Task.FromResult<IEnumerable<IdentityResourceModel>>(Array.Empty<IdentityResourceModel>());
+    }
+
     #endregion
 
     [Fact]
@@ -69,7 +85,7 @@ public class RealmProvisioningServiceTests
         var realmDb = new FakeRealmDb();
         var roleDb = new FakeRoleDb();
         var userDb = new FakeUserDb();
-        var sut = new RealmProvisioningService(realmDb, roleDb, userDb, new FakePasswordHasher());
+        var sut = new RealmProvisioningService(realmDb, roleDb, userDb, new FakeClientDb(), new FakeResourceDb(), new FakePasswordHasher());
 
         var realm = new RealmModel
         {
@@ -102,7 +118,7 @@ public class RealmProvisioningServiceTests
     [Fact]
     public async Task CreateRealm_InvalidRealm_Throws()
     {
-        var sut = new RealmProvisioningService(new FakeRealmDb(), new FakeRoleDb(), new FakeUserDb(), new FakePasswordHasher());
+        var sut = new RealmProvisioningService(new FakeRealmDb(), new FakeRoleDb(), new FakeUserDb(), new FakeClientDb(), new FakeResourceDb(), new FakePasswordHasher());
 
         // Primary domain not part of the domain set is normalized in; but an empty name is invalid.
         var realm = new RealmModel { Name = "", PrimaryDomain = "foo.com", Domains = new List<string> { "foo.com" } };

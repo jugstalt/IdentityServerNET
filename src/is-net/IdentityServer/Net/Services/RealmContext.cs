@@ -31,6 +31,14 @@ public class RealmContext : IRealmContext
 
     public async Task<RealmModel?> GetCurrentRealmAsync(CancellationToken cancellationToken = default)
     {
+        // A privileged provisioning/deprovisioning scope overrides the caller's realm.
+        if (RealmScopeOverride.IsActive)
+        {
+            return RealmScopeOverride.Current is null
+                ? null
+                : await _realmDb.FindByNameAsync(RealmScopeOverride.Current, cancellationToken);
+        }
+
         if (_resolved)
         {
             return _current;
@@ -50,7 +58,15 @@ public class RealmContext : IRealmContext
     }
 
     public async Task<string?> GetCurrentRealmNameAsync(CancellationToken cancellationToken = default)
-        => (await GetCurrentRealmAsync(cancellationToken))?.Name;
+    {
+        // Cheap path for the override: no domain/name lookup needed.
+        if (RealmScopeOverride.IsActive)
+        {
+            return RealmScopeOverride.Current;
+        }
+
+        return (await GetCurrentRealmAsync(cancellationToken))?.Name;
+    }
 
     private static string? GetCurrentUserEmail(ClaimsPrincipal? principal)
     {

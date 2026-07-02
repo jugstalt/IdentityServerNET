@@ -19,7 +19,10 @@ public class EditIdentityResourcePageModel : AdminPageModel, IEditIdentityResour
 
     async public Task LoadCurrentIdentityResourceAsync(string id)
     {
-        this.CurrentIdentityResource = await _resourceDb.FindIdentityResource(id);
+        var identityResource = await _resourceDb.FindIdentityResource(id);
+        this.CurrentIdentityResource = identityResource != null && await this.IsInCurrentRealmAsync(identityResource.Name)
+            ? identityResource
+            : null;
     }
 
     protected IResourceDbContextModify _resourceDb = null;

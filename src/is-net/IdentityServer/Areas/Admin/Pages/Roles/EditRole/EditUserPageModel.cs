@@ -20,7 +20,10 @@ public class EditRolePageModel : SecurePageModel, IEditRolePageModel
 
     async protected Task LoadCurrentApplicationRoleAsync(string id)
     {
-        this.CurrentApplicationRole = await _roleDbContext.FindByIdAsync(id, CancellationToken.None);
+        var role = await _roleDbContext.FindByIdAsync(id, CancellationToken.None);
+        this.CurrentApplicationRole = role != null && await this.IsInCurrentRealmAsync(role.Name)
+            ? role
+            : null;
     }
 
     public string Category { get; set; }

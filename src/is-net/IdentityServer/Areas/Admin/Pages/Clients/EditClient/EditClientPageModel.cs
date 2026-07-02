@@ -19,7 +19,10 @@ public class EditClientPageModel : AdminPageModel, IEditClientPageModel
 
     async public Task LoadCurrentClientAsync(string id)
     {
-        this.CurrentClient = await _clientDb.FindClientByIdAsync(id);
+        var client = await _clientDb.FindClientByIdAsync(id);
+        this.CurrentClient = client != null && await this.IsInCurrentRealmAsync(client.ClientId)
+            ? client
+            : null;
     }
 
     protected IClientDbContextModify _clientDb = null;

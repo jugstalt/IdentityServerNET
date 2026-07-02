@@ -12,6 +12,13 @@ public interface IRealmProvisioningService
     /// context. Throws when the realm/domain/admin already exists or the realm is invalid.
     /// </summary>
     Task<RealmProvisioningResult> CreateRealmAsync(RealmModel realm, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes a realm and deprovisions everything it owns: its realm-scoped clients, roles and
+    /// resources, plus the realm admin user, then the realm record itself. End-user accounts of the
+    /// realm's domains are retained. Runs from the system-admin context via a realm override.
+    /// </summary>
+    Task DeleteRealmAsync(RealmModel realm, CancellationToken cancellationToken);
 }
 
 public class RealmProvisioningResult

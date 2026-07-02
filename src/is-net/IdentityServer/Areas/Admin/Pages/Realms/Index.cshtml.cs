@@ -95,14 +95,10 @@ public class IndexModel : SecurePageModel
     public Task<IActionResult> OnPostDeleteAsync(string name)
         => SecureHandlerAsync(async () =>
         {
-            var realm = await _realmDb.FindByNameAsync(name, CancellationToken.None);
-            if (realm != null)
-            {
-                await _realmDb.DeleteAsync(realm, CancellationToken.None);
-            }
+            await _provisioning.DeleteRealmAsync(new RealmModel { Name = name }, CancellationToken.None);
         },
         onFinally: () => RedirectToPage(),
-        successMessage: $"Realm '{name}' removed. Its realm admin and realm-scoped roles are left in place " +
-                        "and become inaccessible (their domain no longer maps to a realm).",
+        successMessage: $"Realm '{name}' removed together with its clients, roles, resources and realm admin. " +
+                        "End-user accounts of the realm's domains are retained.",
         onException: (ex) => RedirectToPage());
 }

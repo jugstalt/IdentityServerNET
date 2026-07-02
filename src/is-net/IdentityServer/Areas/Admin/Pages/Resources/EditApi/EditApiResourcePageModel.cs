@@ -19,7 +19,10 @@ public class EditApiResourcePageModel : AdminPageModel, IEditApiResourcePageMode
 
     async public Task LoadCurrentApiResourceAsync(string id)
     {
-        this.CurrentApiResource = await _resourceDb.FindApiResourceAsync(id);
+        var apiResource = await _resourceDb.FindApiResourceAsync(id);
+        this.CurrentApiResource = apiResource != null && await this.IsInCurrentRealmAsync(apiResource.Name)
+            ? apiResource
+            : null;
     }
 
     protected IResourceDbContextModify _resourceDb = null;
