@@ -1,5 +1,6 @@
 ﻿using Duende.IdentityModel;
 using IdentityServerNET.Models;
+using IdentityServerNET.Models.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -56,7 +57,8 @@ static public class ApplicationUserExtensions
             return false;
         }
 
-        return user.Roles.Contains(KnownRoles.UserAdministrator);
+        // Realm-aware: matches the global role (system admin) or role@realm (realm admin).
+        return user.Roles.Any(r => r.GetRealmScopedName() == KnownRoles.UserAdministrator);
     }
 
     static public bool IsRoleAdministrator(this ApplicationUser user)
@@ -71,7 +73,7 @@ static public class ApplicationUserExtensions
             return false;
         }
 
-        return user.Roles.Contains(KnownRoles.RoleAdministrator);
+        return user.Roles.Any(r => r.GetRealmScopedName() == KnownRoles.RoleAdministrator);
     }
 
     static public bool IsResourceAdministrator(this ApplicationUser user)
@@ -86,7 +88,7 @@ static public class ApplicationUserExtensions
             return false;
         }
 
-        return user.Roles.Contains(KnownRoles.ResourceAdministrator);
+        return user.Roles.Any(r => r.GetRealmScopedName() == KnownRoles.ResourceAdministrator);
     }
 
     static public bool IsClientAdministrator(this ApplicationUser user)
@@ -101,7 +103,7 @@ static public class ApplicationUserExtensions
             return false;
         }
 
-        return user.Roles.Contains(KnownRoles.ClientAdministrator);
+        return user.Roles.Any(r => r.GetRealmScopedName() == KnownRoles.ClientAdministrator);
     }
 
     static public bool IsSecretVaultAdministrator(this ApplicationUser user)
@@ -134,6 +136,22 @@ static public class ApplicationUserExtensions
         return user.Roles.Contains(KnownRoles.SigningAdministrator);
     }
 
+    // Realm administration is a system-level capability and is never realm-scoped.
+    static public bool IsRealmAdministrator(this ApplicationUser user)
+    {
+        if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
+        {
+            return true;
+        }
+
+        if (user?.Roles == null)
+        {
+            return false;
+        }
+
+        return user.Roles.Contains(KnownRoles.RealmAdministrator);
+    }
+
     static public bool HasAdministratorRole(this ApplicationUser user)
     {
         if (!String.IsNullOrWhiteSpace(AdminUserName) && AdminUserName.Equals(user?.UserName))
@@ -151,6 +169,7 @@ static public class ApplicationUserExtensions
                user.IsResourceAdministrator() ||
                user.IsClientAdministrator() ||
                user.IsSecretVaultAdministrator() ||
-               user.IsSignungUIAdministrator();
+               user.IsSignungUIAdministrator() ||
+               user.IsRealmAdministrator();
     }
 }

@@ -1,0 +1,65 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.Realms.IndexModel
+@{
+}
+@inject IdentityServerNET.Services.ColorSchemeService ColorScheme
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Realms</h4>
+        @if (Model.Realms != null)
+        {
+            <ul class="nav nav-pills flex-column">
+                @foreach (var realm in Model.Realms)
+                {
+                    <li class="ui-list-item">
+                        <div class="@ColorScheme.LeftIcon("package")"></div>
+                        <strong>@realm.Name</strong>
+                        <div>
+                            Primary: <code>@realm.PrimaryDomain</code>
+                            &#160;| Domains: <code>@(string.Join(", ", realm.Domains))</code>
+                        </div>
+                        <form method="post" asp-page-handler="Delete" asp-route-name="@realm.Name"
+                              onsubmit="return confirm('Remove realm @realm.Name? The realm admin and realm-scoped roles stay but become inaccessible.');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+            @if (!Model.Realms.Any())
+            {
+                <p class="text-muted">No realms yet.</p>
+            }
+        }
+    </div>
+    <div class="col-md-6">
+        <h4>Create new realm</h4>
+        <p class="text-muted">
+            A realm admin <code>admin@@&lt;primary-domain&gt;</code> is created with a one-time password.
+            A domain may belong to only one realm.
+        </p>
+        <form id="create-realm-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CreateInput.Name"></label>
+                <input asp-for="CreateInput.Name" class="form-control" placeholder="e.g. acme" />
+                <span asp-validation-for="CreateInput.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreateInput.PrimaryDomain"></label>
+                <input asp-for="CreateInput.PrimaryDomain" class="form-control" placeholder="e.g. acme.com" />
+                <span asp-validation-for="CreateInput.PrimaryDomain" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreateInput.AdditionalDomains"></label>
+                <input asp-for="CreateInput.AdditionalDomains" class="form-control" placeholder="e.g. acme.org, acme.net" />
+                <span asp-validation-for="CreateInput.AdditionalDomains" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Create realm</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

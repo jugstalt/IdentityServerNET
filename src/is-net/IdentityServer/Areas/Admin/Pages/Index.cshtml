@@ -10,6 +10,19 @@
 }
 
 <ul class="ui-tiles">
+    @if (Model.ApplicationUser.IsRealmAdministrator())
+    {
+        <li class="ui-tile">
+            <a asp-page="./Realms/Index">
+                <div class="@ColorScheme.TileIcon("package")">
+
+                </div>
+                <div class="ui-tile-text ">
+                    Realms...
+                </div>
+            </a>
+        </li>
+    }
     @if (!configuration.DenyAdminUsers() && Model.HasUserDb && Model.ApplicationUser.IsUserAdministrator())
     {
         <li class="ui-tile">

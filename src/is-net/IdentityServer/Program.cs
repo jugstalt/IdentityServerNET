@@ -227,6 +227,7 @@ builder.Services.AddMvc()
                 options.Conventions.AuthorizeAreaFolder("Admin", "/secretsvault", builder.Configuration.DenyAdminSecretsVault() ? "_forbidden" : "admin-secretsvault-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/signing", builder.Configuration.DenySigningUI() ? "_forbidden" : "admin-signing-ui-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/certificates", builder.Configuration.DenyAdminCreateCerts() ? "_forbidden" : "admin-createcerts-policy");
+                options.Conventions.AuthorizeAreaFolder("Admin", "/realms", "admin-realm-policy");
                 if (builder.Configuration.DenyManageAccount() == true)
                 {
                     options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage", "_forbidden");
