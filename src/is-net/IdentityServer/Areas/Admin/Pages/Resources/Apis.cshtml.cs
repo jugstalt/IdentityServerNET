@@ -96,7 +96,11 @@ public class ApisModel : AdminPageModel
     private Task<IActionResult> CreateApiResource(
             string apiName,
             string displayName
-        ) => SecureHandlerAsync(async () =>
+        )
+    {
+        string redirectId = apiName;
+
+        return SecureHandlerAsync(async () =>
     {
         if (_resourceDb != null)
         {
@@ -120,9 +124,13 @@ public class ApisModel : AdminPageModel
             };
 
             await _resourceDb.AddApiResourceAsync(apiResource);
+
+            // The realm-scoping decorator may have appended @realm to the name in place.
+            redirectId = apiResource.Name;
         }
     }
-    , onFinally: () => RedirectToPage("EditApi/Index", new { id = apiName })
+    , onFinally: () => RedirectToPage("EditApi/Index", new { id = redirectId })
     , successMessage: "API resource successfully created"
     , onException: (ex) => RedirectToPage());
+    }
 }

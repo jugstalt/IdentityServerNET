@@ -56,6 +56,10 @@ public class ClientsModel : AdminPageModel
                 #endregion
 
                 await _clientDb.AddClientAsync(client);
+
+                // The realm-scoping decorator may have appended @realm to the id in place — redirect to
+                // the stored id so the edit page resolves it.
+                clientId = client.ClientId;
             }
         }
         , onFinally: () => RedirectToPage("EditClient/Index", new { id = clientId })

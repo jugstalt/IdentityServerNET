@@ -46,6 +46,9 @@ public class IdentitiesModel : AdminPageModel
                 };
 
                 await _resourceDb.AddIdentityResourceAsync(identityResource);
+
+                // The realm-scoping decorator may have appended @realm to the name in place.
+                identityName = identityResource.Name;
             }
         }
         , onFinally: () => RedirectToPage("EditIdentity/Index", new { id = identityName })

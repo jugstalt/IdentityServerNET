@@ -88,6 +88,18 @@ public class RealmScopedClientDbContextTests
     }
 
     [Fact]
+    public async Task AddClient_MutatesClientIdInPlace()
+    {
+        // The create page relies on this in-place mutation to redirect to the stored (realm-scoped) id.
+        var client = new ClientModel { ClientId = "my-client" };
+        IClientDbContextModify sut = Scoped(new FakeClientDb(), "xyz");
+
+        await sut.AddClientAsync(client);
+
+        Assert.Equal("my-client@xyz", client.ClientId);
+    }
+
+    [Fact]
     public async Task GetAllClients_ReturnsOnlyOwnRealm()
     {
         IClientDbContextModify sut = Scoped(SeededBackend(), "xyz");

@@ -72,6 +72,18 @@ public class RealmScopedResourceDbContextTests
     }
 
     [Fact]
+    public async Task AddApiResource_MutatesNameInPlace()
+    {
+        // The create page relies on this in-place mutation to redirect to the stored (realm-scoped) name.
+        var api = Api("myapi");
+        IResourceDbContextModify sut = Scoped(new FakeResourceDb(), "xyz");
+
+        await sut.AddApiResourceAsync(api);
+
+        Assert.Equal("myapi@xyz", api.Name);
+    }
+
+    [Fact]
     public async Task AddIdentityResource_AppendsCurrentRealm()
     {
         var backend = new FakeResourceDb();
