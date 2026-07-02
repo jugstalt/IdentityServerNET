@@ -153,6 +153,19 @@ public class RealmScopedRoleDbContextTests
     }
 
     [Fact]
+    public async Task SystemContext_Create_PreservesExplicitRealmSuffix()
+    {
+        // Realm provisioning runs in the system context (realm == null) and creates explicit
+        // role@realm names — the decorator must not strip the suffix.
+        var backend = new FakeRoleDb();
+        IRoleDbContext sut = Scoped(backend, realm: null);
+
+        await sut.CreateAsync(Role("identityserver-user-administrator@xyz"), CancellationToken.None);
+
+        Assert.Equal("identityserver-user-administrator@xyz", backend.Store[0].Name);
+    }
+
+    [Fact]
     public async Task SystemAdmin_Delete_OfRealmRole_IsDenied()
     {
         IRoleDbContext sut = Scoped(SeededBackend(), realm: null);

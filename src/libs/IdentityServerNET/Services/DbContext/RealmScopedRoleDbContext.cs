@@ -41,11 +41,17 @@ public class RealmScopedRoleDbContext : IRoleDbContext, IAdminRoleDbContext
     {
         var realm = await CurrentRealmAsync();
 
-        role.Name = role.Name.AddRealmNamespace(realm);
-        if (!string.IsNullOrEmpty(role.Id))
+        if (realm != null)
         {
-            role.Id = role.Id.AddRealmNamespace(realm);
+            // Realm admin: force the role into the caller's realm.
+            role.Name = role.Name.AddRealmNamespace(realm);
+            if (!string.IsNullOrEmpty(role.Id))
+            {
+                role.Id = role.Id.AddRealmNamespace(realm);
+            }
         }
+        // System context (realm == null): keep the name as given. Global roles stay global, and realm
+        // provisioning can create explicit role@realm names for a new realm from the system context.
 
         return await _inner.CreateAsync(role, cancellationToken);
     }

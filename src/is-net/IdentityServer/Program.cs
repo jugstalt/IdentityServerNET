@@ -363,6 +363,7 @@ builder.Services
             .AddTransient<IEmailSender, EmailSenderProxy>()
             .AddScoped<CustomTokenService>()
             .AddTransient<SetupService>()
+            .AddTransient<IRealmProvisioningService, RealmProvisioningService>()
             .AddColorSchemeService();
 
 builder.Services
