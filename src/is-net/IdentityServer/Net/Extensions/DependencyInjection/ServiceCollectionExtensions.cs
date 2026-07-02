@@ -435,6 +435,18 @@ static public class ServiceCollectionExtensions
                             options.ConnectionString = value;
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Realms:HttpProxy", "ConnectionStrings:HttpProxy"], value =>
+                        services
+                        .AddRealmDbContext<HttpProxyRealmDb>(_ => { })
+                        .AddHttpInvoker<IRealmDbContext>(invoker =>
+                        {
+                            invoker.UrlPath = "api/realms";
+                        },
+                        client =>
+                        {
+                            client.BaseAddress = new Uri(value);
+                        })
+                    )
                     .SwitchDefault(() =>
                         services.AddRealmDbContext<InMemoryRealmDb>(_ => { })
                     )

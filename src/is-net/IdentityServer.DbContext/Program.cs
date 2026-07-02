@@ -19,11 +19,13 @@ builder.Services.AddTransient<IClientDbContextModify, InMemoryClientDb>();
 builder.Services.AddTransient<IResourceDbContextModify, InMemoryResourceDb>();
 builder.Services.AddTransient<IAdminRoleDbContext, InMemoryRoleDb>();
 builder.Services.AddTransient<IAdminUserDbContext, InMemoryUserDb>();
+builder.Services.AddTransient<IRealmDbContext, InMemoryRealmDb>();
 
 builder.Services.AddTransient<InvokerService<IClientDbContextModify>>();
 builder.Services.AddTransient<InvokerService<IResourceDbContextModify>>();
 builder.Services.AddTransient<InvokerService<IAdminRoleDbContext>>();
 builder.Services.AddTransient<InvokerService<IAdminUserDbContext>>();
+builder.Services.AddTransient<InvokerService<IRealmDbContext>>();
 
 
 var app = builder.Build();
@@ -42,5 +44,6 @@ app.MapInvokeEndpoints<IClientDbContextModify>("api/clients");
 app.MapInvokeEndpoints<IResourceDbContextModify>("api/resources");
 app.MapInvokeEndpoints<IAdminRoleDbContext>("api/roles");
 app.MapInvokeEndpoints<IAdminUserDbContext>("api/users");
+app.MapInvokeEndpoints<IRealmDbContext>("api/realms");
 
 app.Run();
