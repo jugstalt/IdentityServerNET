@@ -1,8 +1,11 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Services;
+using IdentityServerNET.Models.Extensions;
 using IdentityServerNET.Models.IdentityServerWrappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources;
@@ -10,16 +13,22 @@ namespace IdentityServer.Areas.Admin.Pages.Resources;
 public class IdentitiesModel : AdminPageModel
 {
     private IResourceDbContextModify _resourceDb = null;
-    public IdentitiesModel(IResourceDbContext clientDbContext)
+    private IRealmContext _realmContext;
+    public IdentitiesModel(IResourceDbContext clientDbContext, IRealmContext realmContext)
     {
         _resourceDb = clientDbContext as IResourceDbContextModify;
+        _realmContext = realmContext;
     }
 
     async public Task<IActionResult> OnGetAsync()
     {
         if (_resourceDb != null)
         {
-            this.IdentityResources = await _resourceDb.GetAllIdentityResources();
+            // Scoped at the page: GetAllIdentityResources is the shared runtime read.
+            var realm = await _realmContext.GetCurrentRealmNameAsync();
+            this.IdentityResources = (await _resourceDb.GetAllIdentityResources())
+                .Where(r => r.Name.BelongsToRealm(realm))
+                .ToArray();
 
             Input = new NewIdentityResource();
         }

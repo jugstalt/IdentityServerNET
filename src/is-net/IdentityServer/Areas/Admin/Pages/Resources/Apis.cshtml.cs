@@ -1,6 +1,8 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Extensions;
+using IdentityServerNET.Models.Extensions;
 using IdentityServerNET.Models.IdentityServerWrappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -33,28 +35,39 @@ public class ApisModel : AdminPageModel
 
     private IResourceDbContextModify _resourceDb = null;
     private IConfiguration _configuration;
-    public ApisModel(IResourceDbContext clientDbContext, IConfiguration configuration)
+    private IRealmContext _realmContext;
+    public ApisModel(IResourceDbContext clientDbContext, IConfiguration configuration, IRealmContext realmContext)
     {
         _resourceDb = clientDbContext as IResourceDbContextModify;
         _configuration = configuration;
+        _realmContext = realmContext;
     }
 
     async public Task<IActionResult> OnGetAsync()
     {
         if (_resourceDb != null)
         {
-            this.ApiResources = await _resourceDb.GetAllApiResources();
+            // GetAllApiResources is the shared runtime read (used by IdentityServer), so the list is
+            // scoped to the current realm here, at the admin page, rather than in the store decorator.
+            var realm = await _realmContext.GetCurrentRealmNameAsync();
+            this.ApiResources = (await _resourceDb.GetAllApiResources())
+                .Where(r => r.Name.BelongsToRealm(realm))
+                .ToArray();
 
-            if (!_configuration.DenyAdminSecretsVault()
-               && !this.ApiResources.Any(r => r.Name == SecretsVaultApiName))
+            // The built-in system APIs are only offered to the system admin (global namespace).
+            if (realm is null)
             {
-                DefaultApiResources.Add(SecretsVaultApi);
-            }
+                if (!_configuration.DenyAdminSecretsVault()
+                   && !this.ApiResources.Any(r => r.Name == SecretsVaultApiName))
+                {
+                    DefaultApiResources.Add(SecretsVaultApi);
+                }
 
-            if (!_configuration.DenySigningUI()
-               && !this.ApiResources.Any(r => r.Name == SigningApiName))
-            {
-                DefaultApiResources.Add(SigningApi);
+                if (!_configuration.DenySigningUI()
+                   && !this.ApiResources.Any(r => r.Name == SigningApiName))
+                {
+                    DefaultApiResources.Add(SigningApi);
+                }
             }
 
             Input = new NewApiResource();

@@ -1,4 +1,6 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Services;
+using IdentityServerNET.Models.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,13 +11,20 @@ namespace IdentityServer.Areas.Admin.Pages.Clients.EditClient;
 
 public class ScopesModel : EditClientPageModel
 {
-    public ScopesModel(IClientDbContext clientDbContext, IResourceDbContext resourceDbContext)
+    public ScopesModel(IClientDbContext clientDbContext, IResourceDbContext resourceDbContext, IRealmContext realmContext)
          : base(clientDbContext)
     {
         _resourceDb = resourceDbContext as IResourceDbContextModify;
+        _realmContext = realmContext;
     }
 
     private IResourceDbContextModify _resourceDb = null;
+    private IRealmContext _realmContext;
+
+    // A client may be assigned scopes from resources of its own realm plus the global (system)
+    // resources — the latter carry the standard OIDC scopes (openid, profile, ...) every realm needs.
+    private static bool IsAssignable(string resourceName, string realm)
+        => resourceName.BelongsToRealm(realm) || !resourceName.HasRealm();
 
     public string[] IdentityResourceScopes = null;
     public string[] ApiResouceScopes = null;
@@ -27,12 +36,14 @@ public class ScopesModel : EditClientPageModel
         List<ResourceScope> resourceScopes = new List<ResourceScope>();
         if (_resourceDb != null)
         {
+            var realm = await _realmContext.GetCurrentRealmNameAsync();
+
             var identityResources = this.CurrentClient.AllowedGrantTypes.Contains("authorization_code")
-                ? await _resourceDb.GetAllIdentityResources()
+                ? (await _resourceDb.GetAllIdentityResources()).Where(r => IsAssignable(r.Name, realm)).ToArray()
                 : null;
 
             var apiResources = this.CurrentClient.AllowedGrantTypes.Contains("client_credentials")
-                ? await _resourceDb.GetAllApiResources()
+                ? (await _resourceDb.GetAllApiResources()).Where(r => IsAssignable(r.Name, realm)).ToArray()
                 : null;
 
             IdentityResourceScopes = identityResources?
