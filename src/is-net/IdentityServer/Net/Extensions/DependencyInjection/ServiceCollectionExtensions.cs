@@ -405,6 +405,36 @@ static public class ServiceCollectionExtensions
                             options.ConnectionString = configuration.AssetPath(value);
                         })
                     )
+                    .SwitchCase(["ConnectionStrings:Realms:SqlServer", "ConnectionStrings:SqlServer"], value =>
+                        services.AddRealmDbContext<SqlServerRealmDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Realms:Postgres", "ConnectionStrings:Postgres"], value =>
+                        services.AddRealmDbContext<PostgresRealmDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Realms:Sqlite", "ConnectionStrings:Sqlite"], value =>
+                        services.AddRealmDbContext<SqliteRealmDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Realms:AzureStorage", "ConnectionStrings:AzureStorage"], value =>
+                        services.AddRealmDbContext<TableStorageBlobRealmDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
+                    .SwitchCase(["ConnectionStrings:Realms:MongoDb", "ConnectionStrings:MongoDb"], value =>
+                        services.AddRealmDbContext<MongoBlobRealmDb>(options =>
+                        {
+                            options.ConnectionString = value;
+                        })
+                    )
                     .SwitchDefault(() =>
                         services.AddRealmDbContext<InMemoryRealmDb>(_ => { })
                     )
