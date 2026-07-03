@@ -90,6 +90,10 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login(string returnUrl, bool forceLocal = false)
     {
+        // Pick up any pending error forwarded via TempData from PasskeySignIn or other POST redirects.
+        if (TempData["PendingLoginError"] is string pendingError)
+            ModelState.AddModelError(string.Empty, pendingError);
+
         var vm = await BuildIdentifierViewModelAsync(returnUrl, forceLocal);
 
         if (vm.IsExternalLoginOnly)
@@ -131,7 +135,24 @@ public class AccountController : Controller
                 return View(vmError);
             }
 
-            return RedirectToAction("LoginPassword", new { username = model.Username, returnUrl = model.ReturnUrl });
+            // Detect user's realm from email domain (for UI on the password page).
+            // Always clear first so "Change username" to a non-realm user resets the realm UI.
+            TempData.Remove("LoginPendingRealm");
+            if (_realmDb is not null)
+            {
+                var atIdx = model.Username.LastIndexOf('@');
+                if (atIdx > 0)
+                {
+                    var domain = model.Username[(atIdx + 1)..].ToLowerInvariant();
+                    var userRealm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
+                    if (userRealm?.Name is not null)
+                        TempData["LoginPendingRealm"] = userRealm.Name;
+                }
+            }
+
+            // Store username in TempData (encrypted cookie) — keeps it out of the URL and logs.
+            TempData["LoginPendingUsername"] = model.Username;
+            return RedirectToAction("LoginPassword", new { returnUrl = model.ReturnUrl });
         }
 
         var vm = await BuildIdentifierViewModelAsync(model.ReturnUrl);
@@ -141,11 +162,14 @@ public class AccountController : Controller
 
     /// <summary>
     /// Step 2 — show the password form with optional client branding.
+    /// Username is read from TempData (encrypted cookie set by Login POST) to keep it out of the URL.
     /// </summary>
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> LoginPassword(string username, string returnUrl, bool forceLocal = false)
+    public async Task<IActionResult> LoginPassword(string returnUrl, bool forceLocal = false)
     {
+        // Peek keeps the value alive across page refreshes (does not consume TempData).
+        var username = TempData.Peek("LoginPendingUsername") as string;
         if (string.IsNullOrEmpty(username))
             return RedirectToAction("Login", new { returnUrl });
 
@@ -206,6 +230,10 @@ public class AccountController : Controller
                 {
                     var user = await _userManager.FindByNameAsync(loginUsername);
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+
+                    // Consume pending TempData now that login succeeded.
+                    TempData.Remove("LoginPendingUsername");
+                    TempData.Remove("LoginPendingRealm");
 
                     // Realm guard — also enforced here (in addition to step 1) for security.
                     if (!await IsUserAllowedForClientAsync(user, context))
@@ -407,9 +435,8 @@ public class AccountController : Controller
 
         if (string.IsNullOrWhiteSpace(assertionJson))
         {
-            ModelState.AddModelError(string.Empty, "No passkey response received.");
-            var vm = await BuildIdentifierViewModelAsync(returnUrl);
-            return View("Login", vm);
+            TempData["PendingLoginError"] = "No passkey response received.";
+            return RedirectToAction("Login", new { returnUrl });
         }
 
         var assertResult = await _signInManager.PerformPasskeyAssertionAsync(assertionJson);
@@ -417,16 +444,25 @@ public class AccountController : Controller
         {
             var reason = assertResult.Failure?.Message ?? "unknown reason";
             _logger.LogWarning("Passkey assertion failed: {Reason}", reason);
-            ModelState.AddModelError(string.Empty, $"Passkey sign-in failed: {reason}");
-            var vm = await BuildIdentifierViewModelAsync(returnUrl);
-            return View("Login", vm);
+            TempData["PendingLoginError"] = $"Passkey sign-in failed: {reason}";
+            return RedirectToAction("Login", new { returnUrl });
+        }
+
+        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+
+        // Realm guard — check before signing in so no session cookie is issued on denial.
+        if (!await IsUserAllowedForClientAsync(assertResult.User, context))
+        {
+            await _events.RaiseAsync(new UserLoginFailureEvent(
+                assertResult.User.UserName, "realm access denied", clientId: context?.Client.ClientId));
+            TempData["PendingLoginError"] = "Users from this domain are not permitted to access this application.";
+            return RedirectToAction("Login", new { returnUrl });
         }
 
         await _signInManager.SignInAsync(assertResult.User, isPersistent: false);
         await _events.RaiseAsync(new UserLoginSuccessEvent(
             assertResult.User.UserName, assertResult.User.Id, assertResult.User.UserName));
 
-        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
         if (context != null)
             return context.IsNativeClient()
                 ? this.LoadingPage("Redirect", returnUrl)

@@ -4,10 +4,21 @@
     #nullable enable
 
     var settings = Model.Settings;
+    var realm = Model.CurrentRealm;
+    string LogoUrl()       => realm is not null ? $"/ui/logo?realm={realm}" : "/ui/logo";
+    string BgUrl(int i)    => realm is not null ? $"/ui/background/{i}?realm={realm}" : $"/ui/background/{i}";
 }
 
 <div class="row">
     <partial name="_StatusMessage" model="Model.StatusMessage" />
+    @if (realm is not null)
+    {
+        <div class="alert alert-info mb-3" role="alert">
+            <strong>Realm Appearance: @realm</strong><br />
+            These settings apply only when users log in to apps of realm <code>@realm</code> or manage their account.
+            Global IdentityServer appearance is not affected.
+        </div>
+    }
     <div class="col-md-8">
 
         <form method="post" enctype="multipart/form-data">
@@ -103,7 +114,7 @@
                     @if (settings.HasLogo)
                     {
                         <div class="mb-2 d-flex align-items-center gap-3">
-                            <img src="/ui/logo" height="64" style="border-radius:8px;" alt="Logo" />
+                            <img src="@LogoUrl()" height="64" style="border-radius:8px;" alt="Logo" />
                             <button type="submit" formaction="?action=remove-logo" class="btn btn-sm btn-outline-danger">Remove Logo</button>
                         </div>
                     }
@@ -131,7 +142,7 @@
                             @for (int i = 1; i <= settings.BackgroundCount; i++)
                             {
                                 <div class="list-group-item d-flex align-items-center gap-3 py-2 px-3">
-                                    <img src="/ui/background/@i"
+                                    <img src="@BgUrl(i)"
                                          style="width:140px;height:88px;object-fit:cover;border-radius:5px;flex-shrink:0;"
                                          alt="Background @i" />
                                     <span class="flex-grow-1 text-muted small">Background @i</span>

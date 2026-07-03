@@ -1,5 +1,6 @@
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.Services;
+using IdentityServerNET.Exceptions;
 using IdentityServerNET.Models.Extensions;
 using IdentityServerNET.Models.IdentityServerWrappers;
 using System;
@@ -86,8 +87,20 @@ public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbConte
         var modify = Modify();
         var realm = await CurrentRealmAsync();
 
-        identityResource.Name = ScopeName(identityResource.Name, realm);
+        // Global reserved names (openid, profile, email, …) must not be realm-scoped.
+        // If a realm admin tries to create one that already exists, explain clearly instead
+        // of letting a cryptic DB duplicate-key error surface.
+        var baseName = identityResource.Name.GetRealmScopedName();
+        if (realm is not null && baseName.IsGlobalReservedName())
+        {
+            var existing = await _inner.FindIdentityResource(baseName);
+            if (existing is not null)
+                throw new StatusMessageException(
+                    $"'{baseName}' is a standard OIDC resource and is globally available to all clients, " +
+                    $"including realm-scoped ones. It does not need to be added to your realm.");
+        }
 
+        identityResource.Name = ScopeName(identityResource.Name, realm);
         await modify.AddIdentityResourceAsync(identityResource);
     }
 

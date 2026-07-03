@@ -22,12 +22,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Configuration["ApplicationTitle"]</title>
+    <title>@(Context.Items["UIRealmTitle"] as string ?? Configuration["ApplicationTitle"])</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is-net.css?v=2" rel="stylesheet" />
     <link href="~/css/is-net-dark.css?v=2" rel="stylesheet" />
     <link href="/ui/overrides.css" rel="stylesheet" />
+    @if (Context.Items["UIRealm"] is string _uiRealm)
+    {
+        <link href="/ui/overrides.css?realm=@_uiRealm" rel="stylesheet" />
+    }
     <link href="~/css/basic/content/css/sketchpen-basic-bg-light.css" rel="stylesheet" />
     <link href="~/css/basic/content/css/sketchpen-basic-bg-dark.css" rel="stylesheet" />
 </head>
@@ -36,7 +40,7 @@
         <div class="container">
             <a class="navbar-brand" href="~/">
                 <img class="icon-banner">
-                @userInterface.ApplicationTitle
+                @(Context.Items["UIRealmTitle"] as string ?? userInterface.ApplicationTitle)
             </a>
             @{
                 var _isDark = ColorScheme.CurrentColorScheme == IdentityServerNET.ColorSchemes.Dark;

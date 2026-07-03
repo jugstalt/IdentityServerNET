@@ -15,7 +15,8 @@ namespace IdentityServer.Net.Services;
 /// </summary>
 public static class ImageUploadValidator
 {
-    private const int MaxFileSizeBytes = 512 * 1024; // 512 KB
+    public const int LogoMaxBytes       = 512 * 1024;      // 512 KB
+    public const int BackgroundMaxBytes = 2 * 1024 * 1024; // 2 MB
 
     // Known raster image magic bytes
     private static readonly byte[] PngMagic = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
@@ -27,13 +28,14 @@ public static class ImageUploadValidator
     /// ready for storage — the caller must not read the IFormFile stream again.
     /// On failure, <c>bytes</c> is null and <c>error</c> contains the user-facing message.
     /// </summary>
-    public static async Task<(bool valid, string error, byte[]? bytes)> ValidateAsync(IFormFile file)
+    public static async Task<(bool valid, string error, byte[]? bytes)> ValidateAsync(
+        IFormFile file, int maxFileSizeBytes = LogoMaxBytes)
     {
         if (file is null || file.Length == 0)
             return (false, "No file provided.", null);
 
-        if (file.Length > MaxFileSizeBytes)
-            return (false, $"File too large. Maximum size is {MaxFileSizeBytes / 1024} KB.", null);
+        if (file.Length > maxFileSizeBytes)
+            return (false, $"File too large. Maximum size is {maxFileSizeBytes / 1024} KB.", null);
 
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);

@@ -31,4 +31,7 @@ public class RealmModel
     public ICollection<string> Domains { get; set; } = new List<string>();
 
     public DateTime CreateDate { get; set; }
+
+    /// <summary>Realm-specific UI branding, configured by the realm admin.</summary>
+    public RealmAppearanceSettings? Appearance { get; set; }
 }

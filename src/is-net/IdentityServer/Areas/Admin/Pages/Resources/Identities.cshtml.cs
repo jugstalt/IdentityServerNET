@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Areas.Admin.Pages.Resources;
@@ -24,11 +25,16 @@ public class IdentitiesModel : AdminPageModel
     {
         if (_resourceDb != null)
         {
-            // Scoped at the page: GetAllIdentityResources is the shared runtime read.
-            var realm = await _realmContext.GetCurrentRealmNameAsync();
+            CurrentRealm = await _realmContext.GetCurrentRealmNameAsync();
             this.IdentityResources = (await _resourceDb.GetAllIdentityResources())
-                .Where(r => r.Name.BelongsToRealm(realm))
+                .Where(r => r.Name.BelongsToRealm(CurrentRealm))
                 .ToArray();
+
+            // For the "Add Standard" section (system admin only): track all existing names
+            // so we can suppress already-present resources from the add list.
+            AllIdentityResourceNames = CurrentRealm is null
+                ? this.IdentityResources.Select(r => r.Name.ToLower()).ToHashSet()
+                : null; // realm admins don't see this section at all
 
             Input = new NewIdentityResource();
         }
@@ -66,6 +72,8 @@ public class IdentitiesModel : AdminPageModel
     }
 
     public IEnumerable<IdentityResourceModel> IdentityResources { get; set; }
+    public string CurrentRealm { get; private set; }
+    public HashSet<string> AllIdentityResourceNames { get; private set; }
 
     [BindProperty]
     public NewIdentityResource Input { get; set; }

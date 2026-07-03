@@ -20,6 +20,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityServer4.Models;
+using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Models.Extensions;
 
 namespace IdentityServer;
@@ -35,6 +37,7 @@ public class ExternalController : Controller
     private readonly IEventService _events;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IConfiguration _configuration;
+    private readonly IRealmDbContext? _realmDb;
 
     public ExternalController(
         IIdentityServerInteractionService interaction,
@@ -43,7 +46,8 @@ public class ExternalController : Controller
         ILogger<ExternalController> logger,
         IUserStore<ApplicationUser> users,
         SignInManager<ApplicationUser> signInManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IRealmDbContext? realmDb = null)
     {
         _users = users;
 
@@ -53,6 +57,7 @@ public class ExternalController : Controller
         _events = events;
         _signInManager = signInManager;
         _configuration = configuration;
+        _realmDb = realmDb;
     }
 
     /// <summary>
@@ -146,6 +151,30 @@ public class ExternalController : Controller
             throw new Exception("Can't determine external user");
         }
 
+        // Resolve return URL and IS4 context early so they are available for the realm guard.
+        var returnUrl = result.Properties?.Items["returnUrl"] ?? "~/";
+        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+
+        // Realm guard — verify the external user is allowed to access this client before signing in.
+        if (!await IsUserAllowedForClientAsync(user, context?.Client?.ClientId))
+        {
+            // Clean up the external auth cookies without issuing an app session cookie.
+            await HttpContext.SignOutAsync($"{externalAuthScheme}");
+            await HttpContext.SignOutAsync($"{externalAuthScheme}.cookie");
+
+            await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "realm access denied", clientId: context?.Client.ClientId));
+
+            if (context != null)
+            {
+                // Send a proper OAuth error back to the client application.
+                await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+                if (context.IsNativeClient())
+                    return this.LoadingPage("Redirect", returnUrl);
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("AccessDenied", "Account");
+        }
+
         // this allows us to collect any additional claims or properties
         // for the specific protocols used and store them in the local auth cookie.
         // this is typically used to store data needed for signout from those protocols.
@@ -162,19 +191,12 @@ public class ExternalController : Controller
             AdditionalClaims = additionalLocalClaims
         };
 
-
-        //await HttpContext.SignInAsync("Identity.Application", isuser.CreatePrincipal()/*, localSignInProps*/);
         await _signInManager.SignInAsync(user, localSignInProps);
 
         // delete temporary cookie used during external authentication
         await HttpContext.SignOutAsync($"{externalAuthScheme}");
         await HttpContext.SignOutAsync($"{externalAuthScheme}.cookie");
 
-        // retrieve return URL
-        var returnUrl = result.Properties?.Items["returnUrl"] ?? "~/";
-
-        // check if external login is in the context of an OIDC request
-        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
         await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Id, user.UserName, true, context?.Client.ClientId));
 
         if (context != null)
@@ -188,6 +210,22 @@ public class ExternalController : Controller
         }
 
         return Redirect(returnUrl);
+    }
+
+    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, string? clientId)
+    {
+        if (_realmDb is null || !clientId.HasRealm())
+            return true;
+
+        var email = string.IsNullOrEmpty(user.Email) ? user.UserName : user.Email;
+        if (string.IsNullOrEmpty(email)) return false;
+
+        int at = email!.LastIndexOf('@');
+        if (at <= 0 || at == email.Length - 1) return false;
+
+        var domain = email.Substring(at + 1).ToLowerInvariant();
+        var realm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
+        return clientId.ClientAllowsUserRealm(realm?.Name);
     }
 
     async private Task<(ApplicationUser? user, string provider, string providerUserId, IEnumerable<Claim> claims)> FindUserFromExternalProvider(AuthenticateResult result)

@@ -26,7 +26,7 @@
                                     <div class="panel-logo"></div>
                                 </td>
                                 <td>
-                                    <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
+                                    <h3 class="card-title h5">@(Context.Items["UIRealmTitle"] as string ?? userInterface.ApplicationTitle)</h3>
                                     <div>Sign in</div>
                                 </td>
                             </tr>

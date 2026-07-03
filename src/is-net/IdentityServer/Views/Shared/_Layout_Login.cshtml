@@ -1,7 +1,8 @@
 ﻿@using IdentityServerNET.Abstractions.UI
+@using IdentityServerNET.Models.Extensions
 @using IdentityServer4.Extensions
 @using Microsoft.Extensions.Configuration
-@using IdentityServerNET.Services.UI; 
+@using IdentityServerNET.Services.UI;
 
 @inject IConfiguration Configuration
 @inject IUserInterfaceService userInterface;
@@ -11,6 +12,10 @@
     {
         name = Context.User?.GetDisplayName();
     }
+
+    // UIRealmMiddleware pre-populates both items before any view or layout renders.
+    var uiRealm = Context.Items["UIRealm"] as string;
+    string uiRealmTitle = Context.Items["UIRealmTitle"] as string;
 }
 <!DOCTYPE html>
 <html>
@@ -18,12 +23,16 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Configuration["ApplicationTitle"]</title>
+    <title>@(uiRealmTitle ?? Configuration["ApplicationTitle"])</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/is-net.css?v=2" rel="stylesheet" />
     <link href="~/css/is-overrides.css?v=2" rel="stylesheet" />
     <link href="/ui/overrides.css" rel="stylesheet" />
+    @if (uiRealm is not null)
+    {
+        <link href="/ui/overrides.css?realm=@uiRealm" rel="stylesheet" />
+    }
 </head>
 <body class="body-layout-login var-@((1 + new Random().Next(12)).ToString()) @(userInterface.LoginLayoutBodyClass)">
 

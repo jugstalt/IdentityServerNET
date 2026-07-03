@@ -1,4 +1,6 @@
-﻿using IdentityServer.Net.Extensions.DependencyInjection;
+﻿#nullable enable
+
+using IdentityServer.Net.Extensions.DependencyInjection;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -431,21 +433,59 @@ app.UseIdentityServer();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Resolve realm for authenticated users so layouts can apply realm-specific CSS
+app.UseMiddleware<IdentityServer.Net.Middleware.UIRealmMiddleware>();
+
 app.MapRazorPages();
 
-// UI customization endpoints — served from in-memory cache, no filesystem required
-app.MapGet("/ui/overrides.css", async (UICustomizationService svc) =>
-    Results.Content(await svc.GetOverrideCssAsync(), "text/css"))
-    .AllowAnonymous();
-
-app.MapGet("/ui/logo", async (UICustomizationService svc) =>
+// UI customization endpoints — global or realm-specific (?realm=name)
+app.MapGet("/ui/overrides.css", async (
+    string? realm,
+    UICustomizationService svc,
+    IdentityServerNET.Abstractions.DbContext.IRealmDbContext? realmDb,
+    System.Threading.CancellationToken ct) =>
 {
+    if (realm is not null && realmDb is not null)
+    {
+        var realmModel = await realmDb.FindByNameAsync(realm, ct);
+        return Results.Content(svc.GenerateRealmCss(realmModel?.Appearance, realm), "text/css");
+    }
+    return Results.Content(await svc.GetOverrideCssAsync(), "text/css");
+}).AllowAnonymous();
+
+app.MapGet("/ui/logo", async (
+    string? realm,
+    UICustomizationService svc,
+    IdentityServerNET.Abstractions.DbContext.IRealmDbContext? realmDb,
+    System.Threading.CancellationToken ct) =>
+{
+    if (realm is not null && realmDb is not null)
+    {
+        var realmModel = await realmDb.FindByNameAsync(realm, ct);
+        var realmResult = svc.GetRealmLogo(realmModel?.Appearance);
+        if (realmResult is not null)
+            return Results.File(realmResult.Value.data, realmResult.Value.mime);
+        // Fall through to global logo
+    }
     var result = await svc.GetLogoAsync();
     return result is null ? Results.NotFound() : Results.File(result.Value.data, result.Value.mime);
 }).AllowAnonymous();
 
-app.MapGet("/ui/background/{index:int}", async (int index, UICustomizationService svc) =>
+app.MapGet("/ui/background/{index:int}", async (
+    int index,
+    string? realm,
+    UICustomizationService svc,
+    IdentityServerNET.Abstractions.DbContext.IRealmDbContext? realmDb,
+    System.Threading.CancellationToken ct) =>
 {
+    if (realm is not null && realmDb is not null)
+    {
+        var realmModel = await realmDb.FindByNameAsync(realm, ct);
+        var realmResult = svc.GetRealmBackground(index, realmModel?.Appearance);
+        if (realmResult is not null)
+            return Results.File(realmResult.Value.data, realmResult.Value.mime);
+        // Fall through to global background
+    }
     var result = await svc.GetBackgroundAsync(index);
     return result is null ? Results.NotFound() : Results.File(result.Value.data, result.Value.mime);
 }).AllowAnonymous();

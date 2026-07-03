@@ -2,6 +2,7 @@
 
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.UI;
+using IdentityServerNET.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -125,7 +126,60 @@ public class UICustomizationService
 
     // ── CSS generation ────────────────────────────────────────────────────────
 
-    private string GenerateOverrideCss(UICustomizationSettings settings)
+    // ── Realm helpers (no caching — generation is fast) ──────────────────────
+
+    /// <summary>Converts realm appearance to global settings format and generates CSS with realm-specific URLs.</summary>
+    public string GenerateRealmCss(RealmAppearanceSettings? appearance, string realmName)
+        => GenerateOverrideCss(ToUISettings(appearance), realmName);
+
+    /// <summary>Returns the realm logo bytes, or null if no logo is configured.</summary>
+    public (byte[] data, string mime)? GetRealmLogo(RealmAppearanceSettings? appearance)
+    {
+        if (string.IsNullOrEmpty(appearance?.LogoBase64)) return null;
+        return (Convert.FromBase64String(appearance.LogoBase64!), appearance.LogoMimeType ?? "image/png");
+    }
+
+    /// <summary>Returns realm background image bytes (1-based index), or null if not available.</summary>
+    public (byte[] data, string mime)? GetRealmBackground(int index, RealmAppearanceSettings? appearance)
+    {
+        var bg = appearance?.Backgrounds?.ElementAtOrDefault(index - 1);
+        if (bg is null || string.IsNullOrEmpty(bg.Base64)) return null;
+        return (Convert.FromBase64String(bg.Base64), bg.MimeType ?? "image/jpeg");
+    }
+
+    /// <summary>Converts <see cref="UICustomizationSettings"/> → <see cref="RealmAppearanceSettings"/> for persisting.</summary>
+    public static RealmAppearanceSettings FromUISettings(UICustomizationSettings s) => new()
+    {
+        ApplicationTitle = s.ApplicationTitle,
+        PrimaryColor     = s.PrimaryColor,
+        OnPrimaryColor   = s.OnPrimaryColor,
+        HeadingColor     = s.HeadingColor,
+        BodyTextColor    = s.BodyTextColor,
+        LogoBase64       = s.LogoBase64,
+        LogoMimeType     = s.LogoMimeType,
+        Backgrounds      = s.Backgrounds?.Select(b => new RealmAppearanceBackground { Base64 = b.Base64, MimeType = b.MimeType }).ToList()
+    };
+
+    /// <summary>Converts <see cref="RealmAppearanceSettings"/> → <see cref="UICustomizationSettings"/> for CSS generation.</summary>
+    public static UICustomizationSettings ToUISettings(RealmAppearanceSettings? s)
+    {
+        if (s is null) return new UICustomizationSettings();
+        return new UICustomizationSettings
+        {
+            ApplicationTitle = s.ApplicationTitle,
+            PrimaryColor     = s.PrimaryColor,
+            OnPrimaryColor   = s.OnPrimaryColor,
+            HeadingColor     = s.HeadingColor,
+            BodyTextColor    = s.BodyTextColor,
+            LogoBase64       = s.LogoBase64,
+            LogoMimeType     = s.LogoMimeType,
+            Backgrounds      = s.Backgrounds?.Select(b => new UIBackgroundImage { Base64 = b.Base64, MimeType = b.MimeType }).ToList()
+        };
+    }
+
+    // ── CSS generation ────────────────────────────────────────────────────────
+
+    private string GenerateOverrideCss(UICustomizationSettings settings, string? realm = null)
     {
         var sb = new StringBuilder();
         sb.AppendLine(_baseOverrideCss);
@@ -228,18 +282,20 @@ public class UICustomizationService
         if (hasBg)
         {
             int count = settings.BackgroundCount;
+            var bgBase = realm is not null ? $"/ui/background/{{0}}?realm={realm}" : "/ui/background/{0}";
             for (int slot = 1; slot <= 12; slot++)
             {
                 int imgIdx = ((slot - 1) % count) + 1;
-                // Endpoint URL — no filesystem dependency
-                sb.AppendLine($"body.var-{slot}.body-layout-login {{ background: url('/ui/background/{imgIdx}') center/cover no-repeat !important; }}");
+                var bgUrl = string.Format(bgBase, imgIdx);
+                sb.AppendLine($"body.var-{slot}.body-layout-login {{ background: url('{bgUrl}') center/cover no-repeat !important; }}");
             }
         }
 
         if (hasLogo)
         {
-            sb.AppendLine(".body-layout-login .panel-logo { background-image: url('/ui/logo') !important; }");
-            sb.AppendLine(".navbar-brand .icon-banner { content: url('/ui/logo') !important; }");
+            var logoUrl = realm is not null ? $"/ui/logo?realm={realm}" : "/ui/logo";
+            sb.AppendLine($".body-layout-login .panel-logo {{ background-image: url('{logoUrl}') !important; }}");
+            sb.AppendLine($".navbar-brand .icon-banner {{ content: url('{logoUrl}') !important; }}");
         }
 
         return sb.ToString();

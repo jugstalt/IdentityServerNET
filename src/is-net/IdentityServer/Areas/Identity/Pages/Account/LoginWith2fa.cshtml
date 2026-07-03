@@ -20,7 +20,7 @@
                             <div class="panel-logo"></div>
                         </td>
                         <td>
-                            <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
+                            <h3 class="card-title h5">@(HttpContext.Items["UIRealmTitle"] as string ?? userInterface.ApplicationTitle)</h3>
                             <div>@ViewData["Title"]</div>
                         </td>
                     </tr>

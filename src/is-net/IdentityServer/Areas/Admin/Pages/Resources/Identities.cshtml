@@ -45,7 +45,9 @@
                 <button id="new-client-button" type="submit" class="btn btn-primary">Create...</button>
             </form>
         </div>
-        <div class="row collapsable-tool">
+        @if (Model.CurrentRealm is null)
+        {
+            <div class="row collapsable-tool">
                 <h4>Add Standard Identity Resources</h4>
                 <ul class="nav nav-pills flex-column">
                     @foreach (var nestedType in typeof(IdentityServer4.Models.IdentityResources).GetNestedTypes())
@@ -53,7 +55,7 @@
                         try
                         {
                             var identityResource = (IdentityServer4.Models.IdentityResource)Activator.CreateInstance(nestedType);
-                            if (Model.IdentityResources.Where(r => r.Name.ToLower() == identityResource.Name.ToLower()).Count() == 0)
+                            if (!Model.AllIdentityResourceNames.Contains(identityResource.Name.ToLower()))
                             {
                                 <li>
                                     <a asp-page="./CreateStandardIdentityResource"
@@ -65,6 +67,16 @@
                     }
                 </ul>
             </div>
+        }
+        else
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                <strong>Standard resources are globally available.</strong><br />
+                Standard OIDC resources such as <code>openid</code>, <code>profile</code>, and <code>email</code>
+                are provided globally and are automatically accessible to all clients, including realm-scoped ones.
+                No action is required.
+            </div>
+        }
     </div>
 </div>
 
