@@ -19,4 +19,9 @@ public class LoginViewModel : LoginInputModel
 
     public bool IsExternalLoginOnly => EnableLocalLogin == false && ExternalProviders?.Count() == 1;
     public string ExternalLoginScheme => IsExternalLoginOnly ? ExternalProviders?.SingleOrDefault()?.AuthenticationScheme : null;
+
+    /// <summary>Client display name shown on the password step, or null for global clients.</summary>
+    public string ClientName { get; set; }
+    /// <summary>Client ID used to build the logo URL (/ui/client-logo/{ClientId}). Null if no client context.</summary>
+    public string ClientId { get; set; }
 }

@@ -84,63 +84,98 @@ public class AccountController : Controller
     }
 
     /// <summary>
-    /// Entry point into the login workflow
+    /// Step 1 — show the identifier (username) form.
     /// </summary>
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Login(string returnUrl, bool forceLocal = false)
     {
-        // build a model so we know what to show on the login page
-        var vm = await BuildLoginViewModelAsync(returnUrl, forceLocal);
+        var vm = await BuildIdentifierViewModelAsync(returnUrl, forceLocal);
 
         if (vm.IsExternalLoginOnly)
-        {
-            // we only have one option for logging in and it's an external provider
             return RedirectToAction("Challenge", "External", new { scheme = vm.ExternalLoginScheme, returnUrl });
-        }
-
-        vm.AllowRememberLogin = !_configuration.DenyRememberLogin();
-        vm.RememberLogin = _configuration.RememberLoginDefaultValue();
 
         return View(vm);
     }
 
     /// <summary>
-    /// Handle postback from username/password login
+    /// Step 1 POST — validate the identifier, check domain/realm access, then redirect to step 2.
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     [AllowAnonymous]
-    public async Task<IActionResult> Login(LoginInputModel model, string button)
+    public async Task<IActionResult> Login(LoginIdentifierInputModel model, string button)
     {
-        // check if we are in the context of an authorization request
         var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
 
-        // the user clicked the "cancel" button
+        if (button != "identify")
+        {
+            if (context != null)
+            {
+                await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+                if (context.IsNativeClient())
+                    return this.LoadingPage("Redirect", model.ReturnUrl);
+                return Redirect(model.ReturnUrl);
+            }
+            return Redirect("~/");
+        }
+
+        if (ModelState.IsValid)
+        {
+            // Domain-level realm check — no user lookup, so no username enumeration.
+            if (!await IsEmailDomainAllowedForClientAsync(model.Username, context))
+            {
+                ModelState.AddModelError(string.Empty, "Users from this domain are not permitted to access this application.");
+                var vmError = await BuildIdentifierViewModelAsync(model.ReturnUrl);
+                vmError.Username = model.Username;
+                return View(vmError);
+            }
+
+            return RedirectToAction("LoginPassword", new { username = model.Username, returnUrl = model.ReturnUrl });
+        }
+
+        var vm = await BuildIdentifierViewModelAsync(model.ReturnUrl);
+        vm.Username = model.Username;
+        return View(vm);
+    }
+
+    /// <summary>
+    /// Step 2 — show the password form with optional client branding.
+    /// </summary>
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginPassword(string username, string returnUrl, bool forceLocal = false)
+    {
+        if (string.IsNullOrEmpty(username))
+            return RedirectToAction("Login", new { returnUrl });
+
+        var vm = await BuildLoginViewModelAsync(returnUrl, forceLocal);
+        vm.Username = username;
+        vm.AllowRememberLogin = !_configuration.DenyRememberLogin();
+        vm.RememberLogin = _configuration.RememberLoginDefaultValue();
+        return View(vm);
+    }
+
+    /// <summary>
+    /// Step 2 POST — authenticate with username + password.
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginPassword(LoginInputModel model, string button)
+    {
+        var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+
         if (button != "login")
         {
             if (context != null)
             {
-                // if the user cancels, send a result back into IdentityServer as if they 
-                // denied the consent (even if this client does not require consent).
-                // this will send back an access denied OIDC error response to the client.
                 await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
-
-                // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
                 if (context.IsNativeClient())
-                {
-                    // The client is native, so this change in how to
-                    // return the response is for better UX for the end user.
                     return this.LoadingPage("Redirect", model.ReturnUrl);
-                }
-
                 return Redirect(model.ReturnUrl);
             }
-            else
-            {
-                // since we don't have a valid context, then we just go back to the home page
-                return Redirect("~/");
-            }
+            return Redirect("~/");
         }
 
         if (ModelState.IsValid)
@@ -150,33 +185,29 @@ public class AccountController : Controller
                 if (String.IsNullOrWhiteSpace(model.Password))
                     throw new Exception("Password is empty");
 
-                // Allow login with email address — resolve to the stored UserName
                 var loginUsername = await ResolveLoginUsernameAsync(model.Username);
 
                 bool suspicous = false;
                 if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
                 {
                     await _loginBotDetection.BlockSuspicousUser(model.Username);
-
                     if (_captchaCodeRenderer != null)
                     {
                         if (!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
-                        {
                             suspicous = true;
-                        }
                     }
                 }
 
-                var result = suspicous == true ?
-                    Microsoft.AspNetCore.Identity.SignInResult.Failed :
-                    await _signInManager.PasswordSignInAsync(loginUsername, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var result = suspicous == true
+                    ? Microsoft.AspNetCore.Identity.SignInResult.Failed
+                    : await _signInManager.PasswordSignInAsync(loginUsername, model.Password, model.RememberLogin, lockoutOnFailure: true);
 
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(loginUsername);
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
-                    // Realm guard: if the requested client is realm-scoped, ensure this user belongs to that realm.
+                    // Realm guard — also enforced here (in addition to step 1) for security.
                     if (!await IsUserAllowedForClientAsync(user, context))
                     {
                         await _signInManager.SignOutAsync();
@@ -186,33 +217,10 @@ public class AccountController : Controller
                         return View(vmDenied);
                     }
 
-                    // only set explicit expiration here if user chooses "remember me". 
-                    // otherwise we rely upon expiration configured in cookie middleware.
-                    //AuthenticationProperties props = null;
-                    //if (AccountOptions.AllowRememberLogin && model.RememberLogin)
-                    //{
-                    //    props = new AuthenticationProperties
-                    //    {
-                    //        IsPersistent = true,
-                    //        ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
-                    //    };
-                    //};
-
-                    // issue authentication cookie with subject ID and username
-                    //var isuser = new IdentityServerUser(user.SubjectId)
-                    //{
-                    //    DisplayName = user.Username
-                    //};
-
-                    //await HttpContext.SignInAsync(isuser, props);
-
                     if (_loginBotDetection != null)
-                    {
                         await _loginBotDetection.RemoveSuspiciousUserAsync(loginUsername);
-                    }
 
-                    // Passkey-only second factor: user has passkeys but app-2FA is not enabled.
-                    // Sign them back out and gate them behind passkey verification.
+                    // Passkey second factor.
                     if (_configuration.AllowPasskeySecondFactor()
                         && _passkeyStore != null
                         && (await _userManager.GetPasskeysAsync(user)).Count > 0)
@@ -220,55 +228,34 @@ public class AccountController : Controller
                         await _signInManager.SignOutAsync();
                         var tfIdentity = new ClaimsIdentity(IdentityConstants.TwoFactorUserIdScheme);
                         tfIdentity.AddClaim(new Claim(ClaimTypes.Name, user.Id));
-                        await HttpContext.SignInAsync(
-                            IdentityConstants.TwoFactorUserIdScheme,
-                            new ClaimsPrincipal(tfIdentity));
+                        await HttpContext.SignInAsync(IdentityConstants.TwoFactorUserIdScheme, new ClaimsPrincipal(tfIdentity));
                         var encodedReturnUrlPk = HttpUtility.UrlEncode(
                             (context != null || Url.IsLocalUrl(model.ReturnUrl)) ? model.ReturnUrl : "~/");
-                        return Redirect(string.Format(
-                            "~/Identity/Account/LoginWithPasskey?ReturnUrl={0}", encodedReturnUrlPk));
+                        return Redirect(string.Format("~/Identity/Account/LoginWithPasskey?ReturnUrl={0}", encodedReturnUrlPk));
                     }
 
                     if (context != null)
                     {
                         if (context.IsNativeClient())
-                        {
-                            // if the client is PKCE then we assume it's native, so this change in how to
-                            // return the response is for better UX for the end user.
                             return this.LoadingPage("Redirect", model.ReturnUrl);
-                        }
-
-                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
                         return Redirect(model.ReturnUrl);
                     }
 
-                    // request for a local page
                     if (Url.IsLocalUrl(model.ReturnUrl))
-                    {
                         return Redirect(model.ReturnUrl);
-                    }
                     else if (string.IsNullOrEmpty(model.ReturnUrl))
-                    {
                         return Redirect("~/");
-                    }
                     else
-                    {
-                        // user might have clicked on a malicious link - should be logged
                         throw new Exception("invalid return URL");
-                    }
                 }
                 else if (result.RequiresTwoFactor)
                 {
                     if (_loginBotDetection != null)
-                    {
                         await _loginBotDetection.RemoveSuspiciousUserAsync(loginUsername);
-                    }
 
                     var encodedReturnUrl = HttpUtility.UrlEncode(
                         (context != null || Url.IsLocalUrl(model.ReturnUrl)) ? model.ReturnUrl : "~/");
 
-                    // If passkey second-factor is configured and the user has passkeys,
-                    // redirect to the dedicated passkey 2FA page first.
                     if (_configuration.AllowPasskeySecondFactor())
                     {
                         var tfUser = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -279,8 +266,7 @@ public class AccountController : Controller
                         }
                     }
 
-                    string twoFactorUrl = "~/Identity/Account/LoginWith2fa?ReturnUrl={0}";
-                    return Redirect(string.Format(twoFactorUrl, encodedReturnUrl));
+                    return Redirect(string.Format("~/Identity/Account/LoginWith2fa?ReturnUrl={0}", encodedReturnUrl));
                 }
 
                 if (_loginBotDetection != null)
@@ -292,9 +278,8 @@ public class AccountController : Controller
                         {
                             byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
                             model.CaptchaImage = captchaImageBytes;
-
                             this.Response.Headers.Append("Content-Security-Policy",
-                                             "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+                                "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
                         }
                     }
                 }
@@ -314,7 +299,6 @@ public class AccountController : Controller
             }
         }
 
-        // something went wrong, show form with error
         var vm = await BuildLoginViewModelAsync(model);
         return View(vm);
     }
@@ -413,19 +397,19 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> PasskeySignIn(
         string returnUrl, string assertionJson,
-        LoginInputModel model, string button)
+        string button)
     {
         if (button == "login")
         {
-            return await Login(model, button);
+            // Fallback: send the user through the identifier-first flow.
+            return RedirectToAction("Login", new { returnUrl });
         }
 
         if (string.IsNullOrWhiteSpace(assertionJson))
         {
             ModelState.AddModelError(string.Empty, "No passkey response received.");
-            var vm = await BuildLoginViewModelAsync(returnUrl);
+            var vm = await BuildIdentifierViewModelAsync(returnUrl);
             return View("Login", vm);
-            //return RedirectToAction("Login");
         }
 
         var assertResult = await _signInManager.PerformPasskeyAssertionAsync(assertionJson);
@@ -434,9 +418,8 @@ public class AccountController : Controller
             var reason = assertResult.Failure?.Message ?? "unknown reason";
             _logger.LogWarning("Passkey assertion failed: {Reason}", reason);
             ModelState.AddModelError(string.Empty, $"Passkey sign-in failed: {reason}");
-            var vm = await BuildLoginViewModelAsync(returnUrl);
+            var vm = await BuildIdentifierViewModelAsync(returnUrl);
             return View("Login", vm);
-            //return RedirectToAction("Login");
         }
 
         await _signInManager.SignInAsync(assertResult.User, isPersistent: false);
@@ -514,6 +497,32 @@ public class AccountController : Controller
     /*****************************************/
 
     /// <summary>
+    /// Returns false when the client is realm-scoped and the email's domain does not map to
+    /// that realm. Works without a user record — avoids username enumeration in step 1.
+    /// Falls back to true for non-email input or global clients.
+    /// </summary>
+    private async Task<bool> IsEmailDomainAllowedForClientAsync(string input, AuthorizationRequest context)
+    {
+        var clientId = context?.Client?.ClientId;
+        if (_realmDb is null || !clientId.HasRealm())
+            return true;
+
+        if (string.IsNullOrEmpty(input))
+            return true;
+
+        int at = input.LastIndexOf('@');
+        if (at <= 0 || at == input.Length - 1)
+            return true; // not email-shaped — let auth step decide
+
+        var suffix = input.Substring(at + 1).ToLowerInvariant();
+        if (!suffix.Contains('.'))
+            return true; // realm slug shape, not an email domain — let auth step decide
+
+        var realm = await _realmDb.FindByDomainAsync(suffix, CancellationToken.None);
+        return clientId.ClientAllowsUserRealm(realm?.Name);
+    }
+
+    /// <summary>
     /// Returns false when the client is realm-scoped and the user's email domain does not belong
     /// to that realm. Global clients (no realm suffix) always return true.
     /// </summary>
@@ -552,12 +561,54 @@ public class AccountController : Controller
         return input;
     }
 
+    private async Task<LoginIdentifierViewModel> BuildIdentifierViewModelAsync(string returnUrl, bool forceLocal = false)
+    {
+        var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+        if (context?.IdP != null)
+        {
+            return new LoginIdentifierViewModel
+            {
+                EnableLocalLogin = false,
+                ReturnUrl = returnUrl,
+                Username = context?.LoginHint,
+                ExternalProviders = new ExternalProvider[] { new ExternalProvider { AuthenticationScheme = context.IdP } }
+            };
+        }
+
+        var schemes = await _schemeProvider.GetAllSchemesAsync();
+        var providers = schemes
+            .Where(x => x.DisplayName != null ||
+                        x.Name.Equals(AccountOptions.WindowsAuthenticationSchemeName, StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ExternalProvider { DisplayName = x.DisplayName, AuthenticationScheme = x.Name })
+            .ToList();
+
+        var allowLocal = true;
+        if (context?.Client.ClientId != null)
+        {
+            var client = await _clientStore.FindEnabledClientByIdAsync(context.Client.ClientId);
+            if (client != null)
+            {
+                allowLocal = client.EnableLocalLogin;
+                if (client.IdentityProviderRestrictions?.Any() == true)
+                    providers = providers.Where(p => client.IdentityProviderRestrictions.Contains(p.AuthenticationScheme)).ToList();
+            }
+        }
+
+        return new LoginIdentifierViewModel
+        {
+            EnableLocalLogin = (allowLocal && AccountOptions.AllowLocalLogin) || forceLocal,
+            AllowPasskeyLogin = _configuration.AllowPasskeyPasswordless(),
+            ReturnUrl = returnUrl,
+            Username = context?.LoginHint,
+            ExternalProviders = providers.ToArray()
+        };
+    }
+
     private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl, bool forceLocal = false)
     {
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
         if (context?.IdP != null)
         {
-            // this is meant to short circuit the UI and only trigger the one external IdP
             return new LoginViewModel
             {
                 EnableLocalLogin = false,
@@ -568,30 +619,26 @@ public class AccountController : Controller
         }
 
         var schemes = await _schemeProvider.GetAllSchemesAsync();
-
         var providers = schemes
             .Where(x => x.DisplayName != null ||
-                        (x.Name.Equals(AccountOptions.WindowsAuthenticationSchemeName, StringComparison.OrdinalIgnoreCase))
-            )
-            .Select(x => new ExternalProvider
-            {
-                DisplayName = x.DisplayName,
-                AuthenticationScheme = x.Name
-            }).ToList();
+                        x.Name.Equals(AccountOptions.WindowsAuthenticationSchemeName, StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ExternalProvider { DisplayName = x.DisplayName, AuthenticationScheme = x.Name })
+            .ToList();
 
         var allowLocal = true;
+        string clientId = null;
+        string clientName = null;
 
         if (context?.Client.ClientId != null)
         {
-            var client = await _clientStore.FindEnabledClientByIdAsync(context.Client.ClientId);
+            clientId = context.Client.ClientId;
+            clientName = context.Client.ClientName;
+            var client = await _clientStore.FindEnabledClientByIdAsync(clientId);
             if (client != null)
             {
                 allowLocal = client.EnableLocalLogin;
-
                 if (client.IdentityProviderRestrictions?.Any() == true)
-                {
-                    providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
-                }
+                    providers = providers.Where(p => client.IdentityProviderRestrictions.Contains(p.AuthenticationScheme)).ToList();
             }
         }
 
@@ -602,7 +649,9 @@ public class AccountController : Controller
             AllowPasskeyLogin = _configuration.AllowPasskeyPasswordless(),
             ReturnUrl = returnUrl,
             Username = context?.LoginHint,
-            ExternalProviders = providers.ToArray()
+            ExternalProviders = providers.ToArray(),
+            ClientId = clientId,
+            ClientName = clientName,
         };
     }
 

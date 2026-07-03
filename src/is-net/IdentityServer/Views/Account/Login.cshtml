@@ -1,13 +1,13 @@
-﻿@using IdentityServerNET.Abstractions.UI
+@using IdentityServerNET.Abstractions.UI
 @using IdentityServerNET.Extensions
 @using IdentityServerNET.Extensions.DependencyInjection;
 @using Microsoft.Extensions.Options;
-@using IdentityServerNET.Services.UI; 
+@using IdentityServerNET.Services.UI;
 
 @inject IUserInterfaceService userInterface;
-@inject Microsoft.Extensions.Configuration.IConfiguration configuration; 
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration;
 
-@model LoginViewModel
+@model LoginIdentifierViewModel
 @{
     Layout = "~/Views/Shared/_Layout_Login.cshtml";
 }
@@ -27,7 +27,7 @@
                                 </td>
                                 <td>
                                     <h3 class="card-title h5">@userInterface.ApplicationTitle</h3>
-                                    <div>Login</div>
+                                    <div>Sign in</div>
                                 </td>
                             </tr>
                         </table>
@@ -36,44 +36,21 @@
 
                         @if (Model.EnableLocalLogin)
                         {
-                            <form asp-route="/Login">
+                            <form method="post" asp-action="Login" asp-controller="Account">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" asp-for="ReturnUrl" />
 
                                 <fieldset>
                                     <div class="form-group">
                                         <label asp-for="Username"></label>
-                                        <input class="form-control" placeholder="Enter username or email..." asp-for="Username" autofocus>
+                                        <input class="form-control" placeholder="Enter username or email..." asp-for="Username" autofocus autocomplete="username">
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="Password"></label>
-                                        <input type="password" class="form-control" placeholder="Enter password..." asp-for="Password" autocomplete="off">
-                                    </div>
-                                    @if (Model.CaptchaImage != null)
-                                    {
-                                        <img src="data:image/png;base64,@Html.Raw(Convert.ToBase64String(Model.CaptchaImage))" />
-                                        <div class="form-group">
-                                            <label asp-for="CaptchaCode"></label>
-                                            <input asp-for="CaptchaCode" class="form-control captcha-input"
-                                                   placeholder="Enter the code from above..."
-                                                   autocomplete="off"
-                                                   style="text-transform: uppercase;" />
-                                        </div>
-                                    }
-                                    @if (Model.AllowRememberLogin)
-                                    {
-                                        <div class="form-group login-remember">
-                                            <label asp-for="RememberLogin">
-                                                <input asp-for="RememberLogin">
-                                                <strong>Remember My Login</strong>
-                                            </label>
-                                        </div>
-                                    }
-                                    <div class="form-group">
-                                        <button class="btn btn-primary" name="button" value="login">Login</button>
-                                        @*<button class="btn btn-primary" name="button" value="cancel">Cancel</button>*@
+                                        <button class="btn btn-primary w-100" name="button" value="identify">Continue</button>
                                     </div>
                                 </fieldset>
                             </form>
+
                             @if (Model.AllowPasskeyLogin)
                             {
                                 <hr />
@@ -84,21 +61,16 @@
                                         <input type="hidden" id="passkey-assertion-json" name="assertionJson" />
                                     </form>
                                     <button id="passkey-signin-btn"
-                                            class="btn btn-primary"
+                                            class="btn btn-outline-secondary w-100"
                                             data-challenge-url="@Url.Action("PasskeyChallenge","Account")">
                                         Sign in with Passkey
                                     </button>
                                 </div>
                             }
-                            @if (configuration.DenyForgotPasswordChallange() == false && userInterface.DenyForgotPasswordChallange == false)
-                            {
-                                <p>
-                                    <a href="~/Identity/Account/ForgotPassword">Forgot Password?</a>
-                                </p>
-                            }
+
                             @if (!configuration.DenyRegisterAccount())
                             {
-                                <p>
+                                <p class="mt-3">
                                     <a href="~/Identity/Account/Register">Register a new account...</a>
                                 </p>
                             }
@@ -106,7 +78,7 @@
 
                         @if (Model.VisibleExternalProviders.Any())
                         {
-                            <div>Login with identity provider:</div>
+                            <div class="mt-3">Login with identity provider:</div>
                             <br />
                             <ul class="list-inline">
                                 @foreach (var provider in Model.VisibleExternalProviders)
@@ -117,7 +89,7 @@
                                            asp-action="Challenge"
                                            asp-route-scheme="@provider.AuthenticationScheme"
                                            asp-route-returnUrl="@Model.ReturnUrl">
-                                                @provider.DisplayName
+                                            @provider.DisplayName
                                         </a>
                                     </li>
                                 }
