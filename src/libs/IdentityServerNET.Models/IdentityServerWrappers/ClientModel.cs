@@ -15,6 +15,7 @@ public class ClientModel
         this.IdentityProviderRestrictions = new List<string>();
         this.Claims = new List<Claim>();
         this.AllowedScopes = new List<string>();
+        this.AllowedUserDomains = new List<string>();
         this.Properties = new Dictionary<string, string>();
         this.ClientSecrets = new List<SecretModel>();
         this.AllowedCorsOrigins = new List<string>();
@@ -111,6 +112,10 @@ public class ClientModel
 
     [JsonProperty("AllowedScopes")]
     public ICollection<string> AllowedScopes { get; set; }
+
+    [JsonProperty("AllowedUserDomains")]
+    [Description("Additional user e-mail domains allowed to sign in to this (realm) client. '*' allows all users.")]
+    public ICollection<string> AllowedUserDomains { get; set; }
 
     [JsonProperty("Properties")]
     public IDictionary<string, string> Properties { get; set; }
@@ -236,7 +241,12 @@ public class ClientModel
                 DeviceCodeLifetime = this.DeviceCodeLifetime,
                 AlwaysIncludeUserClaimsInIdToken = this.AlwaysIncludeUserClaimsInIdToken,
                 AllowedScopes = this.AllowedScopes,
-                Properties = this.Properties,
+                Properties = this.AllowedUserDomains is { Count: > 0 }
+                    ? new Dictionary<string, string>(this.Properties ?? new Dictionary<string, string>())
+                      {
+                          [Extensions.RealmConventionExtensions.AllowedUserDomainsProperty] = string.Join(" ", this.AllowedUserDomains)
+                      }
+                    : this.Properties,
                 BackChannelLogoutSessionRequired = this.BackChannelLogoutSessionRequired,
                 Enabled = this.Enabled,
                 ClientId = this.ClientId,

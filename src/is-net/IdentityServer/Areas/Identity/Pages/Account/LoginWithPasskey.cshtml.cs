@@ -1,6 +1,7 @@
 #nullable enable
 
 using IdentityServer4.Events;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Models;
@@ -91,7 +92,7 @@ public class LoginWithPasskeyModel : PageModel
 
         // Realm guard — verify the user is allowed to access this client before signing in.
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-        if (!await IsUserAllowedForClientAsync(user, context?.Client?.ClientId))
+        if (!await IsUserAllowedForClientAsync(user, context?.Client))
         {
             // Sign out the two-factor cookie so the partial-auth state is cleaned up.
             await HttpContext.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
@@ -119,9 +120,9 @@ public class LoginWithPasskeyModel : PageModel
         return Content(json, "application/json");
     }
 
-    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, string? clientId)
+    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, Client? client)
     {
-        if (_realmDb is null || !clientId.HasRealm())
+        if (_realmDb is null || client?.ClientId.HasRealm() != true)
             return true;
 
         var email = string.IsNullOrEmpty(user.Email) ? user.UserName : user.Email;
@@ -132,6 +133,6 @@ public class LoginWithPasskeyModel : PageModel
 
         var domain = email.Substring(at + 1).ToLowerInvariant();
         var realm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
-        return clientId.ClientAllowsUserRealm(realm?.Name);
+        return client.ClientAllowsUser(realm?.Name, domain);
     }
 }

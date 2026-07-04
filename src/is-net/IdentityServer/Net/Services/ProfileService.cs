@@ -35,28 +35,30 @@ public class ProfileService : IProfileService
             return;
         }
 
-        // Cross-realm guard: a user may only obtain tokens for a client of its own realm. Global
+        // Cross-realm guard: a user may only obtain tokens for a client of its own realm, unless
+        // the client explicitly allows the user's e-mail domain (AllowedUserDomains). Global
         // clients (no realm suffix) are usable by everyone. The user's realm is derived from its
         // e-mail domain.
-        var userRealm = await GetUserRealmAsync(user);
-        context.IsActive = context.Client?.ClientId.ClientAllowsUserRealm(userRealm) ?? true;
+        var (userRealm, userDomain) = await GetUserRealmAndDomainAsync(user);
+        context.IsActive = context.Client?.ClientAllowsUser(userRealm, userDomain) ?? true;
     }
 
-    private async Task<string?> GetUserRealmAsync(ApplicationUser user)
+    private async Task<(string? realm, string? domain)> GetUserRealmAndDomainAsync(ApplicationUser user)
     {
         var email = string.IsNullOrEmpty(user.Email) ? user.UserName : user.Email;
         if (string.IsNullOrEmpty(email))
         {
-            return null;
+            return (null, null);
         }
 
         int at = email!.LastIndexOf('@');
         if (at < 0 || at == email.Length - 1)
         {
-            return null;
+            return (null, null);
         }
 
         var domain = email.Substring(at + 1).ToLowerInvariant();
-        return (await _realmDb.FindByDomainAsync(domain, CancellationToken.None))?.Name;
+        var realm = (await _realmDb.FindByDomainAsync(domain, CancellationToken.None))?.Name;
+        return (realm, domain);
     }
 }

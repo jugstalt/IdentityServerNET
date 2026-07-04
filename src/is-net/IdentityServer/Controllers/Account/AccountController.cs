@@ -555,7 +555,7 @@ public class AccountController : Controller
             return true; // realm slug shape, not an email domain — let auth step decide
 
         var realm = await _realmDb.FindByDomainAsync(suffix, CancellationToken.None);
-        return clientId.ClientAllowsUserRealm(realm?.Name);
+        return context.Client.ClientAllowsUser(realm?.Name, suffix);
     }
 
     /// <summary>
@@ -578,7 +578,7 @@ public class AccountController : Controller
 
         var domain = email.Substring(at + 1).ToLowerInvariant();
         var realm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
-        return clientId.ClientAllowsUserRealm(realm?.Name);
+        return context.Client.ClientAllowsUser(realm?.Name, domain);
     }
 
     /// <summary>

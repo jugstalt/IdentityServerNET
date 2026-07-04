@@ -156,7 +156,7 @@ public class ExternalController : Controller
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
 
         // Realm guard — verify the external user is allowed to access this client before signing in.
-        if (!await IsUserAllowedForClientAsync(user, context?.Client?.ClientId))
+        if (!await IsUserAllowedForClientAsync(user, context?.Client))
         {
             // Clean up the external auth cookies without issuing an app session cookie.
             await HttpContext.SignOutAsync($"{externalAuthScheme}");
@@ -212,9 +212,9 @@ public class ExternalController : Controller
         return Redirect(returnUrl);
     }
 
-    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, string? clientId)
+    private async Task<bool> IsUserAllowedForClientAsync(ApplicationUser user, Client? client)
     {
-        if (_realmDb is null || !clientId.HasRealm())
+        if (_realmDb is null || client?.ClientId.HasRealm() != true)
             return true;
 
         var email = string.IsNullOrEmpty(user.Email) ? user.UserName : user.Email;
@@ -225,7 +225,7 @@ public class ExternalController : Controller
 
         var domain = email.Substring(at + 1).ToLowerInvariant();
         var realm = await _realmDb.FindByDomainAsync(domain, CancellationToken.None);
-        return clientId.ClientAllowsUserRealm(realm?.Name);
+        return client.ClientAllowsUser(realm?.Name, domain);
     }
 
     async private Task<(ApplicationUser? user, string provider, string providerUserId, IEnumerable<Claim> claims)> FindUserFromExternalProvider(AuthenticateResult result)

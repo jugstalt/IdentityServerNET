@@ -1,3 +1,4 @@
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -142,5 +143,36 @@ public static class RealmConventionExtensions
 
         return clientRealm is null
             || string.Equals(clientRealm, userRealm, StringComparison.Ordinal);
+    }
+
+    /// <summary>IS4 Client.Properties key carrying the extra allowed user e-mail domains.</summary>
+    public const string AllowedUserDomainsProperty = "allowed_user_domains";
+
+    /// <summary>
+    /// Whether the user (realm + e-mail domain) may use this client. Extends the realm rule
+    /// (<see cref="ClientAllowsUserRealm"/>) by the per-client AllowedUserDomains list
+    /// (stored in <see cref="AllowedUserDomainsProperty"/>, space/comma/semicolon separated,
+    /// <c>*</c> allows everyone).
+    /// </summary>
+    public static bool ClientAllowsUser(this Client? client, string? userRealm, string? userEmailDomain)
+    {
+        if (client is null)
+            return true;
+
+        if (client.ClientId.ClientAllowsUserRealm(userRealm))
+            return true;
+
+        if (client.Properties is not null &&
+            client.Properties.TryGetValue(AllowedUserDomainsProperty, out var domains) &&
+            !string.IsNullOrEmpty(domains))
+        {
+            foreach (var d in domains.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (d == "*" || string.Equals(d, userEmailDomain, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+        }
+
+        return false;
     }
 }
