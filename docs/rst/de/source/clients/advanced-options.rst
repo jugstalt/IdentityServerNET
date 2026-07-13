@@ -102,6 +102,10 @@ der jeweiligen Liste steht, weist **IdentityServerNET** ihn ab.
      - Browser-Origins, die IdentityServerNET-Endpoints per CORS aufrufen dürfen. Relevant für SPA-/JavaScript-Clients.
    * - ``IdentityProviderRestrictions``
      - Schränkt ein, welche externen Identity Provider dieser Client verwenden darf. Leer bedeutet: alle konfigurierten Provider sind erlaubt.
+   * - ``AllowedUserDomains``
+     - Nur für Realm-gebundene Clients. Zusätzliche, über den eigenen Realm des Clients hinausgehende
+       E-Mail-Domains, die sich anmelden dürfen; ``*`` erlaubt jeden Benutzer. Siehe
+       :doc:`../realms/cross-realm-access`.
 
 .. note::
 

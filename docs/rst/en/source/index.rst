@@ -12,6 +12,7 @@ IdentityServerNET
 
    getting-started/index
    clients/index
+   realms/index
    accessories/index
    etc/index
 
