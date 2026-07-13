@@ -26,6 +26,12 @@ public class ApplicationUser : IdentityUser
 
     public bool IsLocked { get; set; }
 
+    /// <summary>
+    /// When true, the user is forced to change their password before any other action is allowed.
+    /// Used for one-time/temporary passwords, e.g. auto-generated realm admin credentials.
+    /// </summary>
+    public bool MustChangePassword { get; set; }
+
     #region Claims
 
     private ICollection<Claim>? _claims = null;

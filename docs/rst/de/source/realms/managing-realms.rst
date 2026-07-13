@@ -57,6 +57,10 @@ Beim Anlegen provisioniert **IdentityServerNET** automatisch:
     Statusmeldung auf der Realm-Liste. Es sollte sofort notiert werden — ein erneutes Abrufen ist nicht
     möglich (nur ein Zurücksetzen über die reguläre ``Set Password``-Funktion).
 
+    Es handelt sich außerdem um ein **Einmal-Passwort**: Meldet sich ``admin@{PrimaryDomain}`` das erste
+    Mal an, wird sofort ein neues Passwort verlangt, bevor irgendetwas anderes zugänglich ist. Siehe
+    :doc:`Einmal-Passwörter <../getting-started/admin-server>` für Details zu diesem Mechanismus.
+
 Realm-Admin — eingeschränkte Verwaltung
 ------------------------------------------
 

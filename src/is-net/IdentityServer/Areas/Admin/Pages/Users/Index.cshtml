@@ -84,6 +84,10 @@
                     <input asp-for="CreateInput.Password" class="form-control" placeholder="Strong password..." />
                     <span asp-validation-for="CreateInput.Password" class="text-danger"></span>
                 </div>
+                <div class="form-group form-check">
+                    <input asp-for="CreateInput.IsOneTimePassword" class="form-check-input" />
+                    <label asp-for="CreateInput.IsOneTimePassword" class="form-check-label"></label>
+                </div>
                 <button type="submit" class="btn btn-primary">Create</button>
             </form>
         </div>

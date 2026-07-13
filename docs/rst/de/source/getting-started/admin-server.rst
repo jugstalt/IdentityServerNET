@@ -41,7 +41,21 @@ Hier können durch Klick auf einen User in der Liste Eigenschaften aus dem Profi
     .. image:: img/admin-server3.png
 
     Eine spätere Anmeldung mit diesem User ist möglich, wenn die E-Mail-Adresse als ``confirmed`` markiert ist!
-   
+
+Einmal-Passwörter (One-time Passwords)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sowohl ``Create new user`` als auch die ``Set Password``-Seite eines Users bieten eine Checkbox
+**This is a one-time password — user must change it at next login**. Ist sie aktiviert, meldet sich der
+User zwar normal mit dem gesetzten Passwort an, wird danach aber sofort auf eine erzwungene
+*Change your password*-Seite umgeleitet und kann bis zur Vergabe eines neuen Passworts nichts anderes
+tun — auch nicht den Admin-Bereich aufrufen.
+
+.. note::
+
+    Dieser Mechanismus wird automatisch verwendet, sobald ein :doc:`Realm <../realms/managing-realms>`
+    angelegt wird: Das automatisch generierte Passwort des Realm-Admins ist immer ein Einmal-Passwort.
+
 
 Rollen
 ------

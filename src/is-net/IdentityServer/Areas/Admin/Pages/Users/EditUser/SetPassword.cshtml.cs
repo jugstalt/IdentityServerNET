@@ -46,6 +46,9 @@ public class SetPasswordModel : EditUserPageModel
         [Display(Name = "Confirm new password")]
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Display(Name = "This is a one-time password — user must change it at next login")]
+        public bool IsOneTimePassword { get; set; }
     }
 
     async public Task<IActionResult> OnGetAsync(string id)
@@ -69,7 +72,8 @@ public class SetPasswordModel : EditUserPageModel
         this.Input = new InputModel()
         {
             CurrentUserId = this.CurrentApplicationUser.Id,
-            CurrentPassword = passwordHash
+            CurrentPassword = passwordHash,
+            IsOneTimePassword = this.CurrentApplicationUser.MustChangePassword
         };
 
         return Page();
@@ -101,6 +105,7 @@ public class SetPasswordModel : EditUserPageModel
             string newPasswordhash = _passwordHasher.HashPassword(this.CurrentApplicationUser, Input.NewPassword);
 
             await _userDbContext.UpdatePropertyAsync<string>(this.CurrentApplicationUser, "PasswordHash", newPasswordhash, CancellationToken.None);
+            await _userDbContext.UpdatePropertyAsync<bool>(this.CurrentApplicationUser, "MustChangePassword", Input.IsOneTimePassword, CancellationToken.None);
         }
         , onFinally: () => RedirectToPage(new { id = Input.CurrentUserId })
         , successMessage: "Password changed");

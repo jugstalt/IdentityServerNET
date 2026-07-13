@@ -41,6 +41,19 @@ You can also create a new user by clicking `Create new user`.
 
     A future login with this user is possible once the email address is marked as ``confirmed``!
 
+One-time Passwords
+~~~~~~~~~~~~~~~~~~~
+
+Both ``Create new user`` and a user's ``Set Password`` page offer a checkbox **This is a one-time
+password — user must change it at next login**. When checked, the user signs in normally with the
+password you set, but is immediately redirected to a forced *Change your password* page and cannot
+access anything else — including the admin area — until a new password is chosen.
+
+.. note::
+
+    This mechanism is used automatically whenever a :doc:`realm <../realms/managing-realms>` is created:
+    the auto-generated realm admin password is always a one-time password.
+
 
 
 Roles

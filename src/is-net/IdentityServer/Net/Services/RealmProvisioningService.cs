@@ -77,7 +77,8 @@ public class RealmProvisioningService : IRealmProvisioningService
             UserName = adminUserName,
             Email = adminUserName,
             EmailConfirmed = true,
-            Roles = realmRoleNames
+            Roles = realmRoleNames,
+            MustChangePassword = true
         };
         adminUser.PasswordHash = _passwordHasher.HashPassword(adminUser, password);
 

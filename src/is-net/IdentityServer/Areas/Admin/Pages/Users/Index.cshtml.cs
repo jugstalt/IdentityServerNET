@@ -56,6 +56,9 @@ public class IndexModel : SecurePageModel
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
+
+        [Display(Name = "This is a one-time password — user must change it at next login")]
+        public bool IsOneTimePassword { get; set; }
     }
 
     async public Task<IActionResult> OnGetAsync(int skip = 0)
@@ -93,7 +96,8 @@ public class IndexModel : SecurePageModel
             var user = new ApplicationUser()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserName = CreateInput.Username
+                UserName = CreateInput.Username,
+                MustChangePassword = CreateInput.IsOneTimePassword
             };
 
             if ((await _userDb.FindByNameAsync(user.UserName, CancellationToken.None)) != null)

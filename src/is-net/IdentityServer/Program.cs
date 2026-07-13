@@ -436,6 +436,9 @@ app.UseAuthorization();
 // Resolve realm for authenticated users so layouts can apply realm-specific CSS
 app.UseMiddleware<IdentityServer.Net.Middleware.UIRealmMiddleware>();
 
+// Force a password change before granting access to any other page (one-time passwords)
+app.UseMiddleware<IdentityServer.Net.Middleware.MustChangePasswordMiddleware>();
+
 app.MapRazorPages();
 
 // UI customization endpoints — global or realm-specific (?realm=name)

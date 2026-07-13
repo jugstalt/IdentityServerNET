@@ -53,6 +53,10 @@ On creation, **IdentityServerNET** automatically provisions:
     message on the realm list page. Store it immediately — it cannot be retrieved again (only reset via
     the regular ``Set Password`` admin function).
 
+    It is also a **one-time password**: the first time ``admin@{PrimaryDomain}`` signs in, they are
+    immediately forced to choose a new password before they can access anything else. See
+    :doc:`One-time Passwords <../getting-started/admin-server>` for details on this mechanism.
+
 Realm Admin — Scoped Administration
 ------------------------------------
 
