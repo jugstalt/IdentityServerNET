@@ -118,7 +118,8 @@ static public class ApplicationUserExtensions
             return false;
         }
 
-        return user.Roles.Contains(KnownRoles.SecretsVaultAdministrator);
+        // Realm-aware: matches the global role (system admin) or role@realm (realm admin).
+        return user.Roles.Any(r => r.GetRealmScopedName() == KnownRoles.SecretsVaultAdministrator);
     }
 
     static public bool IsSignungUIAdministrator(this ApplicationUser user)

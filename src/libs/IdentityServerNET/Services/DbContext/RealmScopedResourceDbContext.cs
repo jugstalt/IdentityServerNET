@@ -24,6 +24,12 @@ namespace IdentityServerNET.Services.DbContext;
 /// </summary>
 public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbContextModify
 {
+    // System API resources with a hardcoded JWT audience (see Program.cs "Bearer-Secrets"/
+    // "Bearer-Signing"): a realm-scoped resource of the same base name (e.g. "secrets-vault@acme")
+    // would issue tokens with a mismatched audience and never actually validate. Block the confusing
+    // dead end instead of letting a realm admin create it.
+    private static readonly string[] ReservedApiResourceNames = { "secrets-vault", "signing-api" };
+
     private readonly IResourceDbContext _inner;
     private readonly IResourceDbContextModify _innerModify;
     private readonly IRealmContext _realmContext;
@@ -60,6 +66,15 @@ public class RealmScopedResourceDbContext : IResourceDbContext, IResourceDbConte
     {
         var modify = Modify();
         var realm = await CurrentRealmAsync();
+
+        var baseName = apiResource.Name.GetRealmScopedName();
+        if (realm is not null && Array.IndexOf(ReservedApiResourceNames, baseName) >= 0)
+        {
+            throw new StatusMessageException(
+                $"'{baseName}' is a system API resource managed by the system administrator. " +
+                $"Ask them to add the scope your client needs to the existing global resource instead " +
+                $"of creating your own.");
+        }
 
         apiResource.Name = ScopeName(apiResource.Name, realm);
 

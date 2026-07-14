@@ -1,4 +1,6 @@
+using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Exceptions;
+using IdentityServerNET.Models.Extensions;
 using IdentityServerNET.Servivces.DbContext;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -9,10 +11,12 @@ namespace IdentityServer.Areas.Admin.Pages.SecretsVault.EditLocker;
 
 public class DeleteModel : EditLockerPageModel
 {
-    public DeleteModel(ISecretsVaultDbContext secretsVaultDb)
+    private readonly IResourceDbContext _resourceDb;
+
+    public DeleteModel(ISecretsVaultDbContext secretsVaultDb, IResourceDbContext resourceDb = null)
         : base(secretsVaultDb)
     {
-
+        _resourceDb = resourceDb;
     }
 
     [BindProperty]
@@ -59,6 +63,11 @@ public class DeleteModel : EditLockerPageModel
             #endregion
 
             await _secretsVaultDb.RemoveLockerAsync(Input.CurrentLockerName, CancellationToken.None);
+
+            if (_resourceDb is not null && Input.CurrentLockerName.HasRealm())
+            {
+                await SecretsVaultScopeSync.RevokeLockerScopeAsync(_resourceDb, Input.CurrentLockerName);
+            }
         }
         , onFinally: () => RedirectToPage("../Index")
         , successMessage: ""

@@ -15,8 +15,8 @@ public class KnownRoles
     public const string RealmAdministrator = "identityserver-realm-administrator";
 
     /// <summary>
-    /// The administrator roles a realm admin receives for its own realm (user, role, resource and
-    /// client administration). Signing / secrets-vault / realm administration stay system-level.
+    /// The administrator roles a realm admin receives for its own realm (user, role, resource, client
+    /// and secrets-vault administration). Signing / realm administration stay system-level.
     /// </summary>
     public static readonly string[] RealmDelegatedRoles =
     {
@@ -24,6 +24,7 @@ public class KnownRoles
         RoleAdministrator,
         ResourceAdministrator,
         ClientAdministrator,
+        SecretsVaultAdministrator,
     };
 
     public ApplicationRole UserAdministratorRole()

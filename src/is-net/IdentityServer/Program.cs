@@ -177,12 +177,12 @@ builder.Services.AddAuthorization(options =>
             policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.ResourceAdministrator)));
         options.AddPolicy("admin-client-policy",
             policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.ClientAdministrator)));
-
-        // System-level capabilities (signing keys, secrets vault, certificate creation) are never
-        // realm-delegated: only the holder of the global role (the system admin) passes. Realm admins
-        // hold only role@realm variants, so RequireRole(<global>) excludes them by design.
         options.AddPolicy("admin-secretsvault-policy",
-           policy => policy.RequireRole(KnownRoles.SecretsVaultAdministrator));
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.SecretsVaultAdministrator)));
+
+        // System-level capabilities (signing keys, certificate creation) are never realm-delegated:
+        // only the holder of the global role (the system admin) passes. Realm admins hold only
+        // role@realm variants, so RequireRole(<global>) excludes them by design.
         options.AddPolicy("admin-signing-ui-policy",
            policy => policy.RequireRole(KnownRoles.SigningAdministrator));
         options.AddPolicy("admin-createcerts-policy",

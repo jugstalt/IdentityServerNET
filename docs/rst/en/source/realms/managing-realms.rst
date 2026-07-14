@@ -26,7 +26,7 @@ On creation, **IdentityServerNET** automatically provisions:
 
 * A **realm admin account**, ``admin@{PrimaryDomain}`` (e.g. ``admin@acme.com``), with a randomly
   generated password.
-* Four **delegated admin roles**, scoped to the new realm (``role@realm``, e.g.
+* Five **delegated admin roles**, scoped to the new realm (``role@realm``, e.g.
   ``identityserver-user-administrator@acme``), assigned to that admin account:
 
   .. list-table::
@@ -43,9 +43,17 @@ On creation, **IdentityServerNET** automatically provisions:
        - Manage identity/API resources scoped to the realm.
      * - Client Administrator
        - Manage clients scoped to the realm.
+     * - Secrets Vault Administrator
+       - Manage the realm's own lockers/secrets in the :doc:`Secrets Vault <../accessories/secretsvault>`.
 
-  Realm administration itself, the **Secrets Vault** and the **Payload Signing** tool remain system-level
-  and are **not** delegated to realm admins.
+  Realm administration itself and the **Payload Signing** tool remain system-level and are **not**
+  delegated to realm admins.
+
+.. note::
+
+    Realms created **before** Secrets Vault delegation was introduced do not retroactively get the
+    Secrets Vault Administrator role. Grant it manually once, via the realm admin's ``User Roles`` page,
+    by assigning the role ``identityserver-secretsvault-administrator@{realm}``.
 
 .. important::
 

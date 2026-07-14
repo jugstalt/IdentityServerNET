@@ -98,8 +98,22 @@ hinzuzufügen:
 
 .. image:: img/secretsvault9.png
 
+.. note::
+
+    ``Add existing resource scope`` listet nur Scopes, die dem Client tatsächlich zugewiesen werden
+    dürfen: den Basis-Scope ``secrets-vault`` (von jedem Secrets-Vault-Client benötigt) sowie die
+    Locker-Scopes des eigenen Realms — ein Realm-gebundener Client sieht hier weder Locker-Scopes anderer
+    Realms noch die des Systems, und auch ein manuell konstruierter Request wird serverseitig abgelehnt.
+
 Secret über HTTP Request abholen
 ++++++++++++++++++++++++++++++++
+
+.. note::
+
+    Die Audiences ``secrets-vault`` und ``signing-api`` werden gegen ``IdentityServer:PublicOrigin``
+    validiert (siehe :doc:`../getting-started/configuration`). Ist dieser Wert nicht konfiguriert, wird
+    jedes Bearer Token mit ``401`` / ``invalid_token`` ("issuer ... is invalid") abgelehnt — unabhängig
+    davon, wie Client und Scopes eingerichtet sind.
 
 Zuerst muss ein gültiger **Bearer Token** abgerufen werden:
 
@@ -143,8 +157,43 @@ um auf die **Secrets API** zuzugreifen:
     var secretResponse = await secretsVaultClient.GetSecret("db-connectionstring");
 
     Console.WriteLine(secretResponse.GetValue())
-    
 
+Realm-Admins und das Secrets Vault
+-----------------------------------
+
+Ein :doc:`Realm-Admin <../realms/managing-realms>` hat sein eigenes, vollständig self-service nutzbares
+Secrets Vault: Die ``Secrets Vault``-Kachel auf seiner Admin-Startseite führt zu einer Locker-Liste, die
+auf seinen Realm beschränkt ist. Von ihm angelegte Locker werden automatisch mit ``{name}@{realm}``
+benannt (der Admin gibt nur den lokalen Namen ein, genau wie beim Anlegen eines Clients) — in der
+Secrets-Vault-Liste des Systemadministrators tauchen die Locker eines Realms nie auf, und ein Realm-Admin
+sieht weder die Locker eines anderen Realms noch die des Systemadministrators, auch nicht durch Erraten
+der URL.
+
+Alles oben Beschriebene funktioniert für einen Realm-Admin identisch: Anlegen von Secrets und Versionen
+sowie Abrufen eines Werts über den Browser-Link (jetzt realm-beschränkt — ein Realm-Admin kann die
+Secrets seines eigenen Realms öffnen, aber nicht die eines anderen Realms oder die globalen; auch der
+Systemadministrator kann die Secrets eines Realms nicht öffnen).
+
+.. note::
+
+    Der Zugriff per Client Credentials (Maschine-zu-Maschine) wird **automatisch** eingerichtet: Beim
+    Anlegen eines Lockers wird dessen Scope (``secrets-vault.my-locker@acme``) auf der gemeinsamen,
+    globalen ``secrets-vault``-Ressource ergänzt, beim Löschen wieder entfernt — im Alltag ist dafür
+    keine Mitwirkung des Systemadministrators nötig. Das funktioniert nur, wenn die
+    ``secrets-vault``-Ressource bereits existiert; hat der Systemadministrator sie noch nicht angelegt
+    (siehe *API Resources anlegen* oben), wird dieser Schritt beim Anlegen des Lockers still
+    übersprungen — der Browser-Abruf ist davon unabhängig immer nutzbar, und der Scope kann auch später
+    noch manuell ergänzt werden.
+
+.. warning::
+
+    Als Realm-Admin **nicht** versuchen, eine eigene ``secrets-vault``-API-Ressource anzulegen — das
+    Anlegen von API-Ressourcen ist zwar delegiert, aber ``secrets-vault`` ist (wie ``signing-api``) ein
+    reservierter Systemname und wird abgelehnt. Selbst ohne diese Sperre würde es nicht funktionieren:
+    Der Abruf-Endpoint validiert Tokens gegen die feste Audience ``secrets-vault``, eine
+    Realm-gebundene Ressource würde jedoch Tokens mit Audience ``secrets-vault@{realm}`` ausstellen, was
+    nie passt. Immer den Systemadministrator bitten, den Scope des eigenen Lockers auf der
+    **bestehenden, globalen** ``secrets-vault``-Ressource zu ergänzen.
 
 
 

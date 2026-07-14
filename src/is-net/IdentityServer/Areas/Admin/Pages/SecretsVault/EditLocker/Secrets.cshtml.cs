@@ -38,6 +38,11 @@ public class SecretsModel : EditLockerPageModel
         {
             await LoadCurrentLockerAsync(Input.LockerName);
 
+            if (this.CurrentLocker == null)
+            {
+                throw new StatusMessageException("Unable to load locker.");
+            }
+
             if (!ModelState.IsValid)
             {
                 throw new StatusMessageException($"Type a valid secret name.");

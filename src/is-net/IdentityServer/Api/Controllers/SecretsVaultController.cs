@@ -2,6 +2,7 @@
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
+using IdentityServerNET.Models.Extensions;
 using IdentityServerNET.Services.SecretsVault;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,8 +31,14 @@ public class SecretsVaultController : ControllerBase
         {
             string[] pathParts = path.Split('/');
 
+            // The locker name itself carries its realm (e.g. "my-locker@acme") — the required role is
+            // derived directly from it, no extra lookup needed. For a global locker this is unchanged
+            // (AddRealmNamespace(null) is a no-op).
+            var lockerRealm = pathParts[0].GetRealm();
+            var requiredRole = KnownRoles.SecretsVaultAdministrator.AddRealmNamespace(lockerRealm);
+
             if (!this.User.GetScopes().Contains($"secrets-vault.{pathParts[0]}") &&
-                !this.User.IsInRole(KnownRoles.SecretsVaultAdministrator))
+                !this.User.IsInRole(requiredRole))
             {
                 throw new StatusMessageException($"Unauthorized user or client \"{this.User.GetUsernameOrClientId()}\"");
                 //return Unauthorized();

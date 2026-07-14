@@ -18,9 +18,13 @@ public class EditLockerPageModel : SecurePageModel, IEditLockerPageModel
 
     async protected Task LoadCurrentLockerAsync(string id)
     {
-        this.CurrentLocker = (await _secretsVaultDb.GetLockersAsync(CancellationToken.None))
+        var locker = (await _secretsVaultDb.GetLockersAsync(CancellationToken.None))
                                     .Where(l => l.Name == id)
                                     .FirstOrDefault();
+
+        this.CurrentLocker = locker != null && await this.IsInCurrentRealmAsync(locker.Name)
+            ? locker
+            : null;
     }
 
     public SecretsLocker CurrentLocker { get; set; }

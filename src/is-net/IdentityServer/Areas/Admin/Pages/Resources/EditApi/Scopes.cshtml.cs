@@ -75,13 +75,15 @@ public class ScopesModel : EditApiResourcePageModel
                 _ => $"{resoucePrefix}{Input.Scope.Name}"
             };
 
-            var regEx = new Regex(@"^[a-z0-9_\-\.]+$");
+            // '@' is allowed so a scope can name a realm-scoped resource, e.g. a Secrets Vault locker
+            // ("my-locker@acme").
+            var regEx = new Regex(@"^[a-z0-9_\-\.@]+$");
 
             if (String.IsNullOrWhiteSpace(Input.Scope?.Name) ||
                Input.Scope.Name.Trim().Length < 3 ||
                !regEx.IsMatch(Input.Scope.Name))
             {
-                throw new StatusMessageException("Invalid scope name: min. 3 letters, mumbers, . - _");
+                throw new StatusMessageException("Invalid scope name: min. 3 letters, numbers, . - _ @");
             }
 
             string scopeName = Input.Scope?.Name?.Trim().ToLower();
