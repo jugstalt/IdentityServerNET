@@ -25,7 +25,7 @@ Aufbau der Config-Datei:
             "Crypto": {
                 // ...
             },
-            "SigningCredential": {  // default: null => certs only in memory
+            "SigningCredential": {  // default: dateibasierte Speicherung unter <StorageRootPath>/storage/validation
                 // ...
             },
             "Login": {
@@ -201,16 +201,32 @@ Abschnitt ``SigningCredential``
 .. code:: javascript
 
     "SigningCredential": {
-      "Storage": "c:\\apps\\identityserver-net\\storage\\validation",  // any path
-      "CertPassword": "..."
+      "Storage": "c:\\apps\\identityserver-net\\storage\\validation",  // optional, default: <StorageRootPath>/storage/validation
+      "CertPassword": "...",                                          // optional, default: zufälliges Passwort pro Installation
+      "InMemoryOnly": true                                            // optional, default: false
     }
 
-Zum Signieren von **Tokens** benötigt **IdentityServerNET** Zertifikate mit privaten und öffentlichen Schlüsseln. Hier kann der Speicherort für diese 
-Zertifikate angegeben werden. Zusätzlich kann ein Passwort festgelegt werden, mit dem die Zertifikate verschlüsselt werden. Der private Schlüssel kann 
-dann nur von Anwendungen ausgelesen werden, die dieses Passwort kennen.
+Zum Signieren von **Tokens** benötigt **IdentityServerNET** Zertifikate mit privaten und öffentlichen Schlüsseln.
 
-Wird dieser Abschnitt nicht angegeben, werden die Zertifikate nur **InMemory** gespeichert.
-(Bei einem Neustart der Applikation sind alle Zertifikate verloren; dies sollte nur für Tests oder zur Entwicklung verwendet werden!).
+Standardmäßig werden diese Zertifikate als passwortgeschützte Dateien unter ``<StorageRootPath>/storage/validation``
+gespeichert (siehe ``StorageRootPath`` oben) — das ist der Standard, selbst wenn der Abschnitt ``SigningCredential``
+komplett weggelassen wird. Zertifikate werden automatisch im Hintergrund erneuert, alte, nicht mehr aktive
+Zertifikate werden nach einer Aufbewahrungsfrist automatisch gelöscht. Die vollständige Funktionsweise
+(Rotation, aktives Fenster, Aufräumen) sowie die erweiterten Einstellungen ``CheckInterval``/
+``RenewIfOlderThanDays``/``CacheDuration`` sind unter :doc:`../internals/signing-certificates`
+beschrieben.
+
+* **Storage:** Überschreibt den Speicherort für die Zertifikate. Optional — Standard ist
+  ``<StorageRootPath>/storage/validation``.
+
+* **CertPassword:** Das Passwort, mit dem die exportierten Zertifikatsdateien verschlüsselt werden. Optional —
+  wenn nicht gesetzt, wird einmal pro Installation ein zufälliges Passwort erzeugt und (verschlüsselt über die
+  .NET Data Protection API) zusammen mit den Zertifikaten gespeichert, statt sich auf ein festes, geteiltes
+  Standardpasswort zu verlassen.
+
+* **InMemoryOnly:** Wenn auf ``true`` gesetzt, werden die Zertifikate nur im Speicher gehalten statt auf der
+  Festplatte persistiert. Bei jedem Neustart der Applikation gehen dann alle Zertifikate verloren — nur für
+  Tests oder zur Entwicklung verwenden, niemals in Produktion.
 
 Abschnitt ``Login``
 -------------------

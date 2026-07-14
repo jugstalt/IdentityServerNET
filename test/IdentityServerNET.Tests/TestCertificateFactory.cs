@@ -15,7 +15,7 @@ internal sealed class TestCertificateFactory : ICertificateFactory
     public X509Certificate2 CreateNewX509Certificate(string cn, int expireDays)
         => Create(cn, expireDays);
 
-    public static X509Certificate2 Create(string cn, int expireDays = 365)
+    public static X509Certificate2 Create(string cn, int expireDays = 365, DateTimeOffset? notBefore = null)
     {
         using var rsa = RSA.Create(2048);
         var request = new CertificateRequest(
@@ -24,8 +24,10 @@ internal sealed class TestCertificateFactory : ICertificateFactory
             HashAlgorithmName.SHA256,
             RSASignaturePadding.Pkcs1);
 
+        var effectiveNotBefore = notBefore ?? DateTimeOffset.Now.AddMinutes(-5);
+
         return request.CreateSelfSigned(
-            DateTimeOffset.Now.AddMinutes(-5),
-            DateTimeOffset.Now.AddDays(expireDays));
+            effectiveNotBefore,
+            effectiveNotBefore.AddDays(expireDays));
     }
 }

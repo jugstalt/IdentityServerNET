@@ -28,6 +28,7 @@ using IdentityServerNET.Sqlite.Services.DbContext;
 using IdentityServerNET.SqlServer.Services.DbContext;
 using IdentityServerNET.Stores;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace IdentityServerNET.Extensions.DependencyInjection;
 
@@ -58,22 +60,50 @@ static public class ServiceCollectionExtensions
     {
         services.AddTransient<ICertificateFactory, CertificateFactory>();
 
-        if (String.IsNullOrEmpty(configuration.ValidationCertsPath()))
+        if (configuration.SigningCredentialInMemoryOnly())
         {
             // not recommended for production - you need to store your key material somewhere secure
             services.AddSingleton<ISigningCredentialCertificateStorage, SigningCredentialCertificateInMemoryStorage>();
         }
         else
         {
-            services.Configure<SigningCredentialCertificateStorageOptions>(storageOptions =>
-            {
-                storageOptions.Storage = configuration.ValidationCertsPath();
-                storageOptions.CertPassword = configuration["IdentityServer:SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
-            });
+            services.AddOptions<SigningCredentialCertificateStorageOptions>()
+                .Configure<IDataProtectionProvider, ILoggerFactory>((storageOptions, dataProtectionProvider, loggerFactory) =>
+                {
+                    storageOptions.Storage =
+                        configuration["IdentityServer:SigningCredential:Storage"] is { Length: > 0 } customStorage
+                            ? customStorage
+                            : configuration.ValidationCertsPath();
+                    storageOptions.CertPassword =
+                        configuration["IdentityServer:SigningCredential:CertPassword"]
+                        ?? ResolveOrCreateCertPassword(storageOptions.Storage, dataProtectionProvider, loggerFactory);
+                });
             services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
         }
 
         return services;
+    }
+
+    // No IdentityServer:SigningCredential:CertPassword configured: instead of falling back to a fixed,
+    // publicly-known password shared by every installation, generate a random password once per
+    // installation and persist it (Data Protection-protected) so it survives restarts.
+    private static string ResolveOrCreateCertPassword(string storagePath, IDataProtectionProvider dataProtectionProvider, ILoggerFactory loggerFactory)
+    {
+        Directory.CreateDirectory(storagePath);
+        var passwordFile = Path.Combine(storagePath, ".certpassword.protected");
+        var protector = dataProtectionProvider.CreateProtector("IdentityServerNET.SigningCredential.CertPassword");
+
+        if (File.Exists(passwordFile))
+        {
+            return protector.Unprotect(File.ReadAllText(passwordFile));
+        }
+
+        var newPassword = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        File.WriteAllText(passwordFile, protector.Protect(newPassword));
+        loggerFactory.CreateLogger("IdentityServer.Startup")
+            .LogInformation("Generated a new random per-installation certificate password (no IdentityServer:SigningCredential:CertPassword configured).");
+
+        return newPassword;
     }
 
     static public IServiceCollection ConfigureIdentityServerApplicationCookie(this IServiceCollection services, IConfiguration configuration)

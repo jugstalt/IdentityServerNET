@@ -11,6 +11,9 @@ namespace IdentityServerNET.Services.SigningCredential;
 
 public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCertificateStorage
 {
+    // Kept in sync with the 60-day filter in GetCertificatesAsync/GetRandomCertificateAsync.
+    private const int ActiveWindowDays = 60;
+
     private readonly ICertificateFactory _certificateFactory;
     private static ConcurrentDictionary<long, X509Certificate2> _certificates = null;
 
@@ -42,7 +45,7 @@ public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCer
 
     public Task<IEnumerable<X509Certificate2>> GetCertificatesAsync()
     {
-        var fromTicks = DateTime.Now.AddDays(-60).Ticks;
+        var fromTicks = DateTime.Now.AddDays(-ActiveWindowDays).Ticks;
 
         return Task.FromResult<IEnumerable<X509Certificate2>>(
             _certificates
@@ -54,7 +57,7 @@ public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCer
 
     public Task<X509Certificate2> GetRandomCertificateAsync(int maxAgeInDays)
     {
-        var fromTicks = DateTime.Now.AddDays(-60).Ticks;
+        var fromTicks = DateTime.Now.AddDays(-ActiveWindowDays).Ticks;
 
         var certsInTime =
             _certificates
@@ -91,6 +94,22 @@ public class SigningCredentialCertificateInMemoryStorage : ISigningCredentialCer
             _certificates.TryAdd(ticks, newestCert);
         }
 
+        RemoveExpiredCertificates(ifOlderThanDays);
+
         return Task.FromResult(newestCert);
+    }
+
+    // Entries outside the active window are no longer served (see GetCertificatesAsync). Kept around
+    // for a grace period beyond that, then pruned so the dictionary doesn't grow unbounded over the
+    // lifetime of a long-running process.
+    private void RemoveExpiredCertificates(int ifOlderThanDays)
+    {
+        var retentionDays = Math.Max(ifOlderThanDays, ActiveWindowDays) * 3;
+        var cutoffTicks = DateTime.Now.AddDays(-retentionDays).Ticks;
+
+        foreach (var key in _certificates.Keys.Where(k => k < cutoffTicks).ToArray())
+        {
+            _certificates.TryRemove(key, out _);
+        }
     }
 }

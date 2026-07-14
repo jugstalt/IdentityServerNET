@@ -147,4 +147,39 @@ public class CertificateSerializerTests : IDisposable
             }
         }
     }
+
+    // Mirrors SimpleCertificateSerializer.LegacyDefaultCertPassword. Kept as a separate literal here
+    // (rather than reflecting it out of the production type) so the test fails loudly if that legacy
+    // constant is ever changed or removed - both would be meaningful, reviewable events.
+    private const string LegacyDefaultPassword = "Secu4epas3wOrd";
+
+    [Fact]
+    public void LoadFromBytes_FallsBackToLegacyDefaultPassword_ForPreExistingFiles()
+    {
+        // Simulates a file written before per-installation random passwords were introduced.
+        var legacyProtectedBytes = _cert.Export(X509ContentType.Pfx, LegacyDefaultPassword);
+
+        // Configured with a freshly generated password, as a real upgraded installation would be.
+        var serializer = CreateSerializer("freshly-generated-password");
+
+        if (MachineKeySetSupported)
+        {
+            using var loaded = serializer.LoadFromBytes(legacyProtectedBytes, "name");
+            Assert.Equal(_cert.Thumbprint, loaded.Thumbprint);
+            Assert.True(loaded.HasPrivateKey);
+        }
+    }
+
+    [Fact]
+    public void LoadFromBytes_Throws_WhenNeitherConfiguredNorLegacyPasswordMatches()
+    {
+        var bytesWithUnrelatedPassword = _cert.Export(X509ContentType.Pfx, "some-unrelated-password");
+        var serializer = CreateSerializer("freshly-generated-password");
+
+        if (MachineKeySetSupported)
+        {
+            Assert.ThrowsAny<CryptographicException>(() =>
+                serializer.LoadFromBytes(bytesWithUnrelatedPassword, "name"));
+        }
+    }
 }

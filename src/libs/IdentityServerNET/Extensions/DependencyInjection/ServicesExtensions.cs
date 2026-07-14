@@ -1,10 +1,12 @@
-﻿using IdentityServerNET.Abstractions.Cryptography;
+﻿using IdentityServer4.Stores;
+using IdentityServerNET.Abstractions.Cryptography;
 using IdentityServerNET.Abstractions.DbContext;
 using IdentityServerNET.Abstractions.EventSinks;
 using IdentityServerNET.Abstractions.Security;
 using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Services.Cryptography;
+using IdentityServerNET.Services.SigningCredential;
 using IdentityServerNET.Services.UI;
 using IdentityServerNET.Servivces.DbContext;
 using Microsoft.Extensions.Configuration;
@@ -305,6 +307,24 @@ public static class ServicesExtensions
         };
 
         return GetCryptoService();
+    }
+
+    #endregion
+
+    #region SigningCredentialRenewal
+
+    public static IServiceCollection AddSigningCredentialRenewal(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<SigningCredentialRenewalOptions>()
+            .Configure(options => configuration.GetSection("IdentityServer:SigningCredential").Bind(options));
+
+        services.AddSingleton<DynamicSigningCredentialStore>();
+        services.AddSingleton<ISigningCredentialStore>(sp => sp.GetRequiredService<DynamicSigningCredentialStore>());
+        services.AddSingleton<IValidationKeysStore>(sp => sp.GetRequiredService<DynamicSigningCredentialStore>());
+
+        services.AddHostedService<SigningCredentialRenewalBackgroundService>();
+
+        return services;
     }
 
     #endregion

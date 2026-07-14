@@ -99,6 +99,14 @@ static public class ConfigurationExtensions
     static public string PasskeyRelyingPartyName(this IConfiguration configuration)
         => configuration["identityserver:Login:Passkey:RelyingPartyName"] ?? "IdentityServer";
 
+    /// <summary>
+    /// Returns true when signing certificates should be kept in memory only instead of persisted to
+    /// disk. Configured via <c>identityserver:SigningCredential:InMemoryOnly = true</c>. Certificates
+    /// are lost on every restart - only meant for testing/development, never production.
+    /// </summary>
+    static public bool SigningCredentialInMemoryOnly(this IConfiguration configuration)
+        => configuration["identityserver:SigningCredential:InMemoryOnly"]?.ToLower() == "true";
+
     static public IConfiguration SwitchCase(
             this IConfiguration configuration,
             IEnumerable<string> names,

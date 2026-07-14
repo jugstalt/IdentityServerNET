@@ -1,6 +1,7 @@
 ﻿using IdentityServerNET.Abstractions.SigningCredential;
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -8,6 +9,17 @@ namespace IdentityServerNET.Services.SigningCredential;
 
 public class SimpleCertificateSerializer : ICertificateSerializer
 {
+    // Certificates written before per-installation random passwords were introduced (see
+    // ServiceCollectionExtensions.AddSigningCredentialCertificateStorage) were protected with this
+    // fixed, publicly-known default. Kept only so pre-existing files stay readable after upgrading -
+    // never used to protect newly written files.
+    private const string LegacyDefaultCertPassword = "Secu4epas3wOrd";
+
+    private const X509KeyStorageFlags KeyStorageFlags =
+        X509KeyStorageFlags.MachineKeySet
+        | X509KeyStorageFlags.PersistKeySet
+        | X509KeyStorageFlags.Exportable;
+
     private readonly string _certPassword;
 
     public SimpleCertificateSerializer(SigningCredentialCertificateStorageOptions options)
@@ -31,16 +43,14 @@ public class SimpleCertificateSerializer : ICertificateSerializer
 
     public X509Certificate2 LoadFromBytes(byte[] bytes, string name)
     {
-        return X509CertificateLoader.LoadPkcs12(
-            bytes,
-            _certPassword,
-            X509KeyStorageFlags.MachineKeySet
-            | X509KeyStorageFlags.PersistKeySet
-            | X509KeyStorageFlags.Exportable);
-        //return new X509Certificate2(bytes, _certPassword,
-        //                       X509KeyStorageFlags.MachineKeySet
-        //                     | X509KeyStorageFlags.PersistKeySet
-        //                     | X509KeyStorageFlags.Exportable);
+        try
+        {
+            return X509CertificateLoader.LoadPkcs12(bytes, _certPassword, KeyStorageFlags);
+        }
+        catch (CryptographicException) when (_certPassword != LegacyDefaultCertPassword)
+        {
+            return X509CertificateLoader.LoadPkcs12(bytes, LegacyDefaultCertPassword, KeyStorageFlags);
+        }
     }
 
     async public Task WriteToFileAsync(string fileName, X509Certificate2 cert, X509ContentType type)

@@ -14,6 +14,7 @@ IdentityServerNET
    clients/index
    realms/index
    accessories/index
+   internals/index
    etc/index
 
 

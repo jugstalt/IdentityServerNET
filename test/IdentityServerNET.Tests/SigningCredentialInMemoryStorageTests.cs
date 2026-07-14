@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServerNET.Services.SigningCredential;
@@ -74,5 +77,35 @@ public class SigningCredentialInMemoryStorageTests
         var resolved = await storage.GetCertificateAsync("CN=1");
 
         Assert.Null(resolved);
+    }
+
+    [Fact]
+    public async Task RenewCertificatesAsync_PrunesEntries_OlderThanRetentionWindow()
+    {
+        // The backing dictionary is a private static field with no public way to inject an
+        // artificially old entry, so reflection is used to set up this one scenario.
+        var storage = CreateStorage();
+        await storage.RenewCertificatesAsync(); // ensures the static dictionary is initialized
+
+        var certificates = GetCertificatesField();
+        var staleKey = DateTime.Now.AddDays(-200).Ticks;
+        using var staleCert = TestCertificateFactory.Create("stale-entry");
+        certificates[staleKey] = staleCert;
+
+        await storage.RenewCertificatesAsync(ifOlderThanDays: 60);
+
+        Assert.False(
+            certificates.ContainsKey(staleKey),
+            "Entries past the retention window (ifOlderThanDays * 3 = 180 days) must be pruned.");
+    }
+
+    private static ConcurrentDictionary<long, X509Certificate2> GetCertificatesField()
+    {
+        var field = typeof(SigningCredentialCertificateInMemoryStorage)
+            .GetField("_certificates", BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.NotNull(field);
+
+        return (ConcurrentDictionary<long, X509Certificate2>)field!.GetValue(null)!;
     }
 }

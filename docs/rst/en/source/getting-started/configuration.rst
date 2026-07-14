@@ -26,7 +26,7 @@ Structure of the config file:
             "Crypto": {
                 // ...
             },
-            "SigningCredential": {  // default: null => certs only in memory
+            "SigningCredential": {  // default: file-based storage under <StorageRootPath>/storage/validation
                 // ...
             },
             "Login": {
@@ -200,15 +200,30 @@ Section ``SigningCredential``
 .. code:: javascript
 
     "SigningCredential": {
-      "Storage": "c:\\apps\\identityserver-net\\storage\\validation",  // any path
-      "CertPassword": "..."
+      "Storage": "c:\\apps\\identityserver-net\\storage\\validation",  // optional, default: <StorageRootPath>/storage/validation
+      "CertPassword": "...",                                          // optional, default: random per-installation password
+      "InMemoryOnly": true                                            // optional, default: false
     }
 
-To sign **tokens**, **IdentityServerNET** requires certificates with private and public keys. Here, you can specify the storage location for these 
-certificates. Additionally, a password can be provided to encrypt the certificates. The private key can then only be accessed by applications that know this password.
+To sign **tokens**, **IdentityServerNET** requires certificates with private and public keys.
 
-If this section is not specified, the certificates will be stored **in memory** only.
-(All certificates will be lost upon application restart; this should only be used for testing or development!).
+By default, these certificates are stored as password-protected files under ``<StorageRootPath>/storage/validation``
+(see ``StorageRootPath`` above) — this is the default even if the ``SigningCredential`` section is omitted entirely.
+Certificates are renewed automatically in the background and old, no-longer-active certificates are deleted
+automatically after a retention period. See :doc:`../internals/signing-certificates` for the full
+mechanism (rotation, active window, cleanup) and the advanced ``CheckInterval``/``RenewIfOlderThanDays``/
+``CacheDuration`` tuning options.
+
+* **Storage:** Overrides the storage location for the certificates. Optional — defaults to
+  ``<StorageRootPath>/storage/validation``.
+
+* **CertPassword:** The password used to encrypt the exported certificate files. Optional — if not set,
+  a random password is generated once per installation and persisted (encrypted via the .NET Data
+  Protection API) alongside the certificates, instead of relying on a fixed, shared default.
+
+* **InMemoryOnly:** If set to ``true``, certificates are kept in memory only instead of being persisted
+  to disk. All certificates are lost on every application restart — only use this for testing or
+  development, never in production.
 
 Section ``Login``
 -----------------

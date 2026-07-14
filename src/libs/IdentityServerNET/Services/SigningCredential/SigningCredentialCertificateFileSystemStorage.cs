@@ -17,6 +17,10 @@ public class SigningCredentialCertificateStorageOptions
 
 public class SigningCredentialCertificateFileSystemStorage : ISigningCredentialCertificateStorage
 {
+    // Kept in sync with the 60-day filter in GetCertificatesAsync: certificates older than this are no
+    // longer served for signing/validation.
+    private const int ActiveWindowDays = 60;
+
     private readonly SigningCredentialCertificateStorageOptions _options;
     private readonly ICertificateFactory _certificateFactory;
     private readonly ICertificateSerializer _certificateSerializer;
@@ -40,6 +44,7 @@ public class SigningCredentialCertificateFileSystemStorage : ISigningCredentialC
     async public Task RenewCertificatesAsync(int ifOlderThanDays = 60)
     {
         await UpdateValidationKeyStorageAsync(ifOlderThanDays);
+        DeleteExpiredCertificateFiles(ifOlderThanDays);
     }
 
     async public Task<IEnumerable<X509Certificate2>> GetCertificatesAsync()
@@ -48,7 +53,7 @@ public class SigningCredentialCertificateFileSystemStorage : ISigningCredentialC
         List<X509Certificate2> certs = new List<X509Certificate2>();
 
         foreach (var certFile in di.GetFiles("*.pfx")
-                                  .Where(f => f.CreationTime > DateTime.Now.AddDays(-60)))
+                                  .Where(f => f.CreationTime > DateTime.Now.AddDays(-ActiveWindowDays)))
         {
             X509Certificate2 cert = await _certificateSerializer.LoadFromFileAsync(certFile.FullName);
             certs.Add(cert);
@@ -121,6 +126,33 @@ public class SigningCredentialCertificateFileSystemStorage : ISigningCredentialC
             var cert = _certificateFactory.CreateNewX509Certificate(name, expireDays);
 
             await _certificateSerializer.WriteToFileAsync($@"{_options.Storage}/{name}.pfx", cert, X509ContentType.Pfx);
+        }
+    }
+
+    // Certificates outside the active window (see GetCertificatesAsync) are no longer used for signing
+    // or validation. Keep a generous grace period beyond that before deleting the files, in case a
+    // long-lived token still needs validating against a recently retired key.
+    private void DeleteExpiredCertificateFiles(int ifOlderThanDays)
+    {
+        var retentionDays = Math.Max(ifOlderThanDays, ActiveWindowDays) * 3;
+        var cutoff = DateTime.Now.AddDays(-retentionDays);
+
+        var di = new DirectoryInfo(_options.Storage);
+        if (!di.Exists)
+        {
+            return;
+        }
+
+        foreach (var certFile in di.GetFiles("*.pfx").Where(f => f.CreationTime < cutoff))
+        {
+            try
+            {
+                certFile.Delete();
+            }
+            catch (IOException)
+            {
+                // best-effort cleanup - a locked/in-use file is retried on the next renewal tick
+            }
         }
     }
 
