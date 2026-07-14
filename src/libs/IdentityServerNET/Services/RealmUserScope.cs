@@ -86,6 +86,17 @@ public class RealmUserScope : IRealmUserScope
         return null;
     }
 
+    public async Task<string> GetUserRealmAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        var domain = DomainOf(user);
+        if (string.IsNullOrEmpty(domain))
+        {
+            return null;
+        }
+
+        return (await _realmDb.FindByDomainAsync(domain, cancellationToken))?.Name;
+    }
+
     private static string DomainOf(ApplicationUser user)
         => DomainOf(user?.UserName ?? user?.Email);
 

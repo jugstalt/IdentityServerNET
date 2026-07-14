@@ -14,8 +14,9 @@ public class DeleteUserModel : EditUserPageModel
     public DeleteUserModel(
         IUserDbContext userDbContext,
         IOptions<UserDbContextConfiguration> userDbContextConfiguration,
-        IRoleDbContext roleDbContext = null)
-        : base(userDbContext, userDbContextConfiguration, roleDbContext)
+        IRoleDbContext roleDbContext = null,
+        IRealmUserScope realmUserScope = null)
+        : base(userDbContext, userDbContextConfiguration, roleDbContext, realmUserScope)
     {
     }
 

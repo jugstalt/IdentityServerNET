@@ -19,8 +19,9 @@ public class SetPasswordModel : EditUserPageModel
         IPasswordHasher<ApplicationUser> passwordHasher,
         IUserDbContext userDbContext,
         IOptions<UserDbContextConfiguration> userDbContextConfiguration,
-        IRoleDbContext roleDbContext = null)
-        : base(userDbContext, userDbContextConfiguration, roleDbContext)
+        IRoleDbContext roleDbContext = null,
+        IRealmUserScope realmUserScope = null)
+        : base(userDbContext, userDbContextConfiguration, roleDbContext, realmUserScope)
     {
         _passwordHasher = passwordHasher;
     }

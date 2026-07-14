@@ -24,4 +24,13 @@ public interface IRealmUserScope
     /// <c>null</c> when allowed, otherwise a human-readable reason for the denial.
     /// </summary>
     Task<string?> ValidateUserInCurrentRealmAsync(string userName, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The realm the user's e-mail domain belongs to, or <c>null</c> if the domain is global (owned by
+    /// no realm). This is the user's actual domain-derived realm — unlike <see cref="FilterToCurrentRealmAsync"/>,
+    /// it does not apply the "system admin may also see realm admin accounts" exception, so it is safe
+    /// to use for realm-neutral operations that must know precisely which realm's data a user's
+    /// operation should be scoped to (e.g. which role@realm names are valid for them).
+    /// </summary>
+    Task<string?> GetUserRealmAsync(ApplicationUser user, CancellationToken cancellationToken);
 }

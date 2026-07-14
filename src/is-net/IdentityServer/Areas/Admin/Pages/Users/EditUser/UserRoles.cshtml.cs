@@ -3,6 +3,7 @@ using IdentityServerNET.Abstractions.Services;
 using IdentityServerNET.Exceptions;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
+using IdentityServerNET.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -23,8 +24,9 @@ public class UserRolesModel : EditUserPageModel
         SignInManager<ApplicationUser> signInManager,
         IUserDbContext userDbContext,
         IOptions<UserDbContextConfiguration> userDbContextConfiguration,
-        IRoleDbContext roleDbContext = null)
-        : base(userDbContext, userDbContextConfiguration, roleDbContext)
+        IRoleDbContext roleDbContext = null,
+        IRealmUserScope realmUserScope = null)
+        : base(userDbContext, userDbContextConfiguration, roleDbContext, realmUserScope)
     {
         _userManager = userManager;
         //_signInManager = signInManager;
@@ -39,11 +41,17 @@ public class UserRolesModel : EditUserPageModel
         IsRoleAdministrator = (await _userManager.GetUserAsync(this.User)).IsRoleAdministrator();
 
         await LoadCurrentApplicationUserAsync(id);
-
-        if (IsRoleAdministrator && _roleDbContext is IAdminRoleDbContext)
+        if (CurrentApplicationUser == null)
         {
-            AddableRoles = (await ((IAdminRoleDbContext)_roleDbContext).GetRolesAsync(1000, 0, CancellationToken.None))
-                                .Where(r => CurrentApplicationUser.Roles?.Any() != true || !CurrentApplicationUser.Roles.Contains(r.Name));
+            return NotFound($"Unable to load user.");
+        }
+
+        if (IsRoleAdministrator && _roleDbContext is IAdminRoleDbContext adminRoleDb)
+        {
+            var realmRoles = await GetRolesForTargetRealmAsync(adminRoleDb);
+
+            AddableRoles = realmRoles
+                .Where(r => CurrentApplicationUser.Roles?.Any() != true || !CurrentApplicationUser.Roles.Contains(r.Name));
         }
 
         return Page();
@@ -59,6 +67,10 @@ public class UserRolesModel : EditUserPageModel
             }
 
             await LoadCurrentApplicationUserAsync(id);
+            if (CurrentApplicationUser == null)
+            {
+                throw new StatusMessageException("Unable to load user.");
+            }
 
             await ((IUserRoleDbContext)_userDbContext).RemoveFromRoleAsync(CurrentApplicationUser, roleName, CancellationToken.None);
             //await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
@@ -77,11 +89,46 @@ public class UserRolesModel : EditUserPageModel
             }
 
             await LoadCurrentApplicationUserAsync(id);
+            if (CurrentApplicationUser == null)
+            {
+                throw new StatusMessageException("Unable to load user.");
+            }
+
+            // Defense in depth: reject a role that isn't actually assignable for this user's realm, even
+            // if it was submitted directly (crafted URL) rather than picked from the filtered list —
+            // otherwise a realm admin could grant a global system role (e.g. realm-administrator) to
+            // any user they can edit.
+            if (_roleDbContext is IAdminRoleDbContext adminRoleDb)
+            {
+                var realmRoles = await GetRolesForTargetRealmAsync(adminRoleDb);
+                if (!realmRoles.Any(r => (r.Name ?? r.Id) == roleName))
+                {
+                    throw new StatusMessageException($"Role '{roleName}' is not available for this user.");
+                }
+            }
 
             await ((IUserRoleDbContext)_userDbContext).AddToRoleAsync(CurrentApplicationUser, roleName, CancellationToken.None);
             //await _signInManager.RefreshSignInAsync(CurrentApplicationUser);
         }
         , onFinally: () => RedirectToPage(new { id = id })
         , successMessage: $"Role {roleName} added");
+    }
+
+    // Roles must be listed/validated for the EDITED USER's realm, not the caller's own — otherwise a
+    // system admin editing a realm admin's roles (or a realm admin somehow reaching another realm's
+    // user) would see/grant the wrong realm's roles, including the global system ones.
+    private async Task<IEnumerable<ApplicationRole>> GetRolesForTargetRealmAsync(IAdminRoleDbContext adminRoleDb)
+    {
+        if (_realmUserScope == null)
+        {
+            return await adminRoleDb.GetRolesAsync(1000, 0, CancellationToken.None);
+        }
+
+        var targetRealm = await _realmUserScope.GetUserRealmAsync(CurrentApplicationUser, CancellationToken.None);
+
+        using (RealmScopeOverride.Begin(targetRealm))
+        {
+            return await adminRoleDb.GetRolesAsync(1000, 0, CancellationToken.None);
+        }
     }
 }

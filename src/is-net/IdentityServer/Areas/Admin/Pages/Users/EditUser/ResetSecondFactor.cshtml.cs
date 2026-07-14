@@ -23,8 +23,9 @@ public class ResetSecondFactorModel : EditUserPageModel
         IUserDbContext userDbContext,
         IOptions<UserDbContextConfiguration> userDbContextConfiguration,
         IUserPasskeyStore<ApplicationUser> passkeyStore = null,
-        IRoleDbContext roleDbContext = null)
-        : base(userDbContext, userDbContextConfiguration, roleDbContext)
+        IRoleDbContext roleDbContext = null,
+        IRealmUserScope realmUserScope = null)
+        : base(userDbContext, userDbContextConfiguration, roleDbContext, realmUserScope)
     {
         _userManager  = userManager;
         _logger       = logger;
