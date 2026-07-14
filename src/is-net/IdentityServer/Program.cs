@@ -6,7 +6,6 @@ using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using IdentityServerNET;
 using IdentityServerNET.Authorization;
-using IdentityServerNET.Abstractions.SigningCredential;
 using IdentityServerNET.Abstractions.UI;
 using IdentityServerNET.Extensions;
 using IdentityServerNET.Extensions.DependencyInjection;
@@ -140,23 +139,23 @@ builder.Services.AddAuthorization(options =>
         ApplicationUserExtensions.SetAdministratorUserName(builder.Environment, builder.Configuration);
 
         options.AddPolicy("admin-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-user-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-role-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-resource-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-client-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-secretsvault-policy",
-           policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+           policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-signing-ui-policy",
-           policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+           policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-createcerts-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-realm-policy",
-            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]));
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
     }
     else
     {
@@ -302,68 +301,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddSingleton<IEventSink, EventSinkProxy>();
 
-if (builder.Configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0 
-    || !String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:PublicOrigin"]))
-{
-    builder.Services.ConfigureApplicationCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-
-        if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:PublicOrigin"]))
-        {
-            var publicOrigin = new Uri(builder.Configuration["IdentityServer:PublicOrigin"]);
-
-            if (publicOrigin.Scheme == "http")
-            {
-                Log.Logger.Warning($"Public Origin Scheme is HTTP ({publicOrigin}). Cookie SecurePolicy is set to 'Always'!");
-                options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-            }
-        }
-
-        if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:Cookie:Name"]))
-        {
-            options.Cookie.Name = builder.Configuration["IdentityServer:Cookie:Name"];
-        }
-
-        if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:Cookie:Domain"]))
-        {
-            options.Cookie.Domain = builder.Configuration["IdentityServer:Cookie:Domain"];
-        }
-
-        if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:Cookie:Path"]))
-        {
-            options.Cookie.Path = builder.Configuration["IdentityServer:Cookie:Path"];
-        }
-
-        if (!String.IsNullOrWhiteSpace(builder.Configuration["IdentityServer:Cookie:ExpireDays"]))
-        {
-            options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(builder.Configuration["IdentityServer:Cookie:ExpireDays"]));
-        }
-    });
-}
+builder.Services.ConfigureIdentityServerApplicationCookie(builder.Configuration);
 
 builder.Services.AddCryptoServices(builder.Configuration);
 
-#region Register Certificate Store
-
-builder.Services.AddSigningCredentialCertificateStorage(builder.Configuration);
-
-#region Refresh Certificate Store and add SigningCredentials
-
-var sp = builder.Services.BuildServiceProvider();
-var signingCredentialCertificateStorage = sp.GetService<ISigningCredentialCertificateStorage>();
-signingCredentialCertificateStorage.RenewCertificatesAsync().Wait();
-foreach (var cert in signingCredentialCertificateStorage.GetCertificatesAsync().Result)
-{
-    identityServerBuilder.AddSigningCredential(cert);
-    //builder.AddValidationKey(cert);
-    //break;
-}
-
-#endregion
-
-#endregion
+identityServerBuilder.AddSigningCredentialsFromCertificateStorage(builder.Configuration);
 
 builder.Services
             .AddTransient<IEmailSender, EmailSenderProxy>()

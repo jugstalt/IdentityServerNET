@@ -27,9 +27,12 @@ using IdentityServerNET.Services.UI;
 using IdentityServerNET.Sqlite.Services.DbContext;
 using IdentityServerNET.SqlServer.Services.DbContext;
 using IdentityServerNET.Stores;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -68,6 +71,54 @@ static public class ServiceCollectionExtensions
                 storageOptions.CertPassword = configuration["IdentityServer:SigningCredential:CertPassword"] ?? "Secu4epas3wOrd";
             });
             services.AddTransient<ISigningCredentialCertificateStorage, SigningCredentialCertificateFileSystemStorage>();
+        }
+
+        return services;
+    }
+
+    static public IServiceCollection ConfigureIdentityServerApplicationCookie(this IServiceCollection services, IConfiguration configuration)
+    {
+        if (configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0
+            || !String.IsNullOrWhiteSpace(configuration["IdentityServer:PublicOrigin"]))
+        {
+            services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
+                .Configure<ILoggerFactory>((options, loggerFactory) =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+
+                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:PublicOrigin"]))
+                    {
+                        var publicOrigin = new Uri(configuration["IdentityServer:PublicOrigin"]!);
+
+                        if (publicOrigin.Scheme == "http")
+                        {
+                            loggerFactory.CreateLogger("IdentityServer.Startup")
+                                .LogWarning("Public Origin Scheme is HTTP ({PublicOrigin}). Cookie SecurePolicy is set to 'Always'!", publicOrigin);
+                            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                        }
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Name"]))
+                    {
+                        options.Cookie.Name = configuration["IdentityServer:Cookie:Name"];
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Domain"]))
+                    {
+                        options.Cookie.Domain = configuration["IdentityServer:Cookie:Domain"];
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Path"]))
+                    {
+                        options.Cookie.Path = configuration["IdentityServer:Cookie:Path"];
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:ExpireDays"]))
+                    {
+                        options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(configuration["IdentityServer:Cookie:ExpireDays"]!));
+                    }
+                });
         }
 
         return services;

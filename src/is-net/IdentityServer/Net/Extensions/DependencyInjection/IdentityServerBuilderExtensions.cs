@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityServerNET.Abstractions.SigningCredential;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using System;
@@ -7,6 +8,29 @@ namespace IdentityServerNET.Extensions.DependencyInjection;
 
 internal static class IdentityServerBuilderExtensions
 {
+    static public IIdentityServerBuilder AddSigningCredentialsFromCertificateStorage(
+            this IIdentityServerBuilder builder,
+            IConfiguration configuration)
+    {
+        builder.Services.AddSigningCredentialCertificateStorage(configuration);
+
+        // Own, isolated ServiceCollection instead of builder.Services: avoids ASP0000
+        // (a duplicate copy of every singleton already registered) and is disposed right after use.
+        var bootstrapServices = new ServiceCollection();
+        bootstrapServices.AddSigningCredentialCertificateStorage(configuration);
+
+        using var bootstrapProvider = bootstrapServices.BuildServiceProvider();
+        var certificateStorage = bootstrapProvider.GetRequiredService<ISigningCredentialCertificateStorage>();
+
+        certificateStorage.RenewCertificatesAsync().Wait();
+        foreach (var cert in certificateStorage.GetCertificatesAsync().Result)
+        {
+            builder.AddSigningCredential(cert);
+        }
+
+        return builder;
+    }
+
     static public IIdentityServerBuilder AddExternalIdentityProviders(
             this IIdentityServerBuilder builder,
             IConfiguration configuration)
