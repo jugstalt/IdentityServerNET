@@ -27,6 +27,7 @@ namespace IdentityServerNET.Host.Tests;
 public class RecoveryCodeFlowTests
 {
     private const string LoginPath           = "/Account/Login";
+    private const string LoginPasswordPath   = "/Account/LoginPassword";
     private const string RecoveryCodePath    = "/Identity/Account/LoginWithRecoveryCode";
     private const string IdentityCookiePrefix = ".AspNetCore.Identity.Application";
     private const string Password            = "Passw0rd!";
@@ -51,15 +52,18 @@ public class RecoveryCodeFlowTests
             AllowAutoRedirect = false
         });
 
-        // Step 1 – POST credentials; SignInManager sets the TwoFactorUserId cookie (RequiresTwoFactor).
-        var loginToken = await GetAntiforgeryTokenAsync(client, LoginPath);
-        using var loginResponse = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+        // Step 1 – POST the identifier, then the password; SignInManager sets the TwoFactorUserId
+        // cookie (RequiresTwoFactor).
+        await PostIdentifierStepAsync(client, userName);
+
+        var passwordToken = await GetAntiforgeryTokenAsync(client, LoginPasswordPath);
+        using var loginResponse = await client.PostAsync(LoginPasswordPath, new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
                 ["Username"]                   = userName,
                 ["Password"]                   = Password,
                 ["button"]                     = "login",
-                ["__RequestVerificationToken"] = loginToken
+                ["__RequestVerificationToken"] = passwordToken
             }));
 
         // Should redirect toward the 2FA page (the TwoFactorUserId cookie is now in the jar).
@@ -100,14 +104,16 @@ public class RecoveryCodeFlowTests
             AllowAutoRedirect = false
         });
 
-        var loginToken = await GetAntiforgeryTokenAsync(client, LoginPath);
-        using var _ = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+        await PostIdentifierStepAsync(client, userName);
+
+        var passwordToken = await GetAntiforgeryTokenAsync(client, LoginPasswordPath);
+        using var _ = await client.PostAsync(LoginPasswordPath, new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
                 ["Username"]                   = userName,
                 ["Password"]                   = Password,
                 ["button"]                     = "login",
-                ["__RequestVerificationToken"] = loginToken
+                ["__RequestVerificationToken"] = passwordToken
             }));
 
         var recoveryToken = await GetAntiforgeryTokenAsync(client, RecoveryCodePath);
@@ -171,6 +177,26 @@ public class RecoveryCodeFlowTests
         // Generate a fresh set of recovery codes and return the first one.
         var codes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 5);
         return codes!.First();
+    }
+
+    /// <summary>
+    /// Step 1 of the two-step login: posts the identifier and follows the redirect into
+    /// <see cref="LoginPasswordPath"/>, leaving the <c>LoginPendingUsername</c> TempData cookie
+    /// (and the antiforgery cookie for the password page) in the client's cookie jar.
+    /// </summary>
+    private static async Task PostIdentifierStepAsync(HttpClient client, string userName)
+    {
+        var identifierToken = await GetAntiforgeryTokenAsync(client, LoginPath);
+
+        using var identifierResponse = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["Username"] = userName,
+                ["button"] = "identify",
+                ["__RequestVerificationToken"] = identifierToken
+            }));
+
+        Assert.Equal(HttpStatusCode.Redirect, identifierResponse.StatusCode);
     }
 
     private static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string path)

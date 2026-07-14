@@ -14,12 +14,17 @@ namespace IdentityServerNET.Host.Tests;
 /// <summary>
 /// Approach B – interactive login flow: boots the <em>real</em> host (<see cref="Program"/>) and
 /// exercises the actual ASP.NET Core MVC login pipeline end-to-end, i.e. the
-/// <c>AccountController.Login</c> GET/POST actions including antiforgery protection and
-/// <c>SignInManager.PasswordSignInAsync</c>.
+/// <c>AccountController.Login</c> / <c>AccountController.LoginPassword</c> GET/POST actions
+/// including antiforgery protection and <c>SignInManager.PasswordSignInAsync</c>.
+///
+/// Login is a two-step flow (identifier, then password — see <c>AccountController.Login</c> /
+/// <c>LoginPassword</c>): step 1 posts <c>Username</c> + <c>button=identify</c> to
+/// <see cref="LoginPath"/> and redirects to <see cref="LoginPasswordPath"/>; step 2 posts
+/// <c>Username</c> + <c>Password</c> + <c>button=login</c> there.
 ///
 /// A known, e-mail-confirmed user is seeded through the host's own
 /// <see cref="UserManager{ApplicationUser}"/> (the in-memory user store is process-wide), so the
-/// test drives a genuine browser-style login: fetch the login page, read the antiforgery token,
+/// test drives a genuine browser-style login: fetch each page, read its antiforgery token,
 /// post the credentials and assert on the resulting redirect / authentication cookie.
 ///
 /// Like the rest of this project these tests boot the production host and are therefore kept
@@ -31,6 +36,7 @@ public class LoginFlowTests
     // The host maps the default MVC route ({controller=Home}/{action=Index}); the login form
     // posts back to the same URL it is served from.
     private const string LoginPath = "/Account/Login";
+    private const string LoginPasswordPath = "/Account/LoginPassword";
 
     // ASP.NET Core Identity's application cookie (issued by SignInManager on success).
     private const string IdentityCookiePrefix = ".AspNetCore.Identity.Application";
@@ -53,15 +59,17 @@ public class LoginFlowTests
             AllowAutoRedirect = false
         });
 
-        var token = await GetAntiforgeryTokenAsync(client, LoginPath);
+        await PostIdentifierStepAsync(client, userName);
 
-        using var response = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+        var passwordToken = await GetAntiforgeryTokenAsync(client, LoginPasswordPath);
+
+        using var response = await client.PostAsync(LoginPasswordPath, new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
                 ["Username"] = userName,
                 ["Password"] = Password,
                 ["button"] = "login",
-                ["__RequestVerificationToken"] = token
+                ["__RequestVerificationToken"] = passwordToken
             }));
 
         // A successful local login redirects (to ~/ when there is no OIDC auth context) ...
@@ -84,24 +92,46 @@ public class LoginFlowTests
             AllowAutoRedirect = false
         });
 
-        var token = await GetAntiforgeryTokenAsync(client, LoginPath);
+        await PostIdentifierStepAsync(client, userName);
 
-        using var response = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+        var passwordToken = await GetAntiforgeryTokenAsync(client, LoginPasswordPath);
+
+        using var response = await client.PostAsync(LoginPasswordPath, new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
                 ["Username"] = userName,
                 ["Password"] = "the-wrong-password",
                 ["button"] = "login",
-                ["__RequestVerificationToken"] = token
+                ["__RequestVerificationToken"] = passwordToken
             }));
 
-        // A failed login re-renders the login view (HTTP 200) ...
+        // A failed login re-renders the password view (HTTP 200) ...
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // ... and must NOT issue an authentication cookie.
         Assert.DoesNotContain(
             GetSetCookies(response),
             c => c.StartsWith(IdentityCookiePrefix, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Step 1 of the two-step login: posts the identifier and follows the redirect into
+    /// <see cref="LoginPasswordPath"/>, leaving the <c>LoginPendingUsername</c> TempData cookie
+    /// (and the antiforgery cookie for the password page) in the client's cookie jar.
+    /// </summary>
+    private static async Task PostIdentifierStepAsync(HttpClient client, string userName)
+    {
+        var identifierToken = await GetAntiforgeryTokenAsync(client, LoginPath);
+
+        using var identifierResponse = await client.PostAsync(LoginPath, new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["Username"] = userName,
+                ["button"] = "identify",
+                ["__RequestVerificationToken"] = identifierToken
+            }));
+
+        Assert.Equal(HttpStatusCode.Redirect, identifierResponse.StatusCode);
     }
 
     /// <summary>
