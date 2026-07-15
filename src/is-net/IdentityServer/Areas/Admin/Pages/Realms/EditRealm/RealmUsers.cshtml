@@ -13,17 +13,29 @@
 @if (Model.Users.Any())
 {
     <ul class="nav nav-pills flex-column">
-        @foreach (var user in Model.Users.OrderBy(u => u.UserName))
+        @foreach (var item in Model.Users)
         {
-            <li class="ui-list-item">
-                <a asp-area="Admin" asp-page="/Users/EditUser/Index"
-                   asp-route-id="@user.Id"
-                   asp-route-returnUrl="@returnUrl"
-                   asp-route-returnLabel="@returnLabel">
-                    <div class="@ColorScheme.LeftIcon("account")"></div>
-                    <strong>@user.UserName</strong>
-                </a>
-            </li>
+            @if (item.IsEditable)
+            {
+                <li class="ui-list-item">
+                    <a asp-area="Admin" asp-page="/Users/EditUser/Index"
+                       asp-route-id="@item.User.Id"
+                       asp-route-returnUrl="@returnUrl"
+                       asp-route-returnLabel="@returnLabel">
+                        <div class="@ColorScheme.LeftIcon("account")"></div>
+                        <strong>@item.User.UserName</strong>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="ui-list-item ui-list-item-disabled" title="Only the realm's admin account (or global users) can be opened by a system administrator.">
+                    <a href="#" tabindex="-1" aria-disabled="true" onclick="return false;">
+                        <div class="@ColorScheme.LeftIcon("account")"></div>
+                        <strong>@item.User.UserName</strong>
+                    </a>
+                </li>
+            }
         }
     </ul>
 }

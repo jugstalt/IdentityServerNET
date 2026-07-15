@@ -631,6 +631,21 @@ body:not(.body-layout-login) .form-group label {
     font-size: 0.8rem;
 }
 
+/* Non-clickable list item (e.g. a realm user the current admin isn't allowed to open) */
+.ui-list-item-disabled {
+    opacity: 0.5;
+}
+
+.ui-list-item-disabled:hover {
+    background-color: inherit !important;
+    box-shadow: none !important;
+}
+
+.ui-list-item-disabled > a {
+    pointer-events: none;
+    cursor: default;
+}
+
 /* ===== Collapsable tool list items (bare <li> without ui-list-item) ===== */
 .collapsable-tool .nav.nav-pills.flex-column > li:not(.ui-list-item),
 .col-md-6 > .row.collapsable-tool .nav.nav-pills.flex-column > li {

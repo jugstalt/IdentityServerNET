@@ -169,6 +169,11 @@ body.colorscheme-dark {
     color: #999;
 }
 
+.colorscheme-dark .ui-list-item-disabled:hover {
+    background-color: inherit !important;
+    box-shadow: none !important;
+}
+
 .colorscheme-dark .collapsable-tool h4 {
     color: #4cc2ff;
     border-bottom-color: #0072cc;
