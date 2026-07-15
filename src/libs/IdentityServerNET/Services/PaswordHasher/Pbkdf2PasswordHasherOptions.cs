@@ -31,6 +31,7 @@ public class Pbkdf2PasswordHasherOptions
 
     /// <summary>
     /// Size of the random salt in bytes. Default: 32 (256 bit).
+    /// Must be &lt;= 255 - Pbkdf2PasswordHasher stores it as a single byte in the hash format.
     /// </summary>
     public int SaltSize { get; set; }
 

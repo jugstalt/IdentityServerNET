@@ -1,4 +1,7 @@
-﻿using IdentityServerNET.Models;
+﻿using System;
+using System.Buffers.Binary;
+using System.Security.Cryptography;
+using IdentityServerNET.Models;
 using IdentityServerNET.Services.PasswordHasher;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -124,6 +127,74 @@ public class PasswordHasherTests
             .VerifyHashedPassword(NewUser(), hash, "portable-password");
 
         Assert.Equal(PasswordVerificationResult.Success, result);
+    }
+
+    [Fact]
+    public void Pbkdf2_HashPassword_EmbedsParametersInAVersionedFormat()
+    {
+        // Pins the on-disk format: [Version(1)][Iterations(4, BE)][AlgorithmId(1)][SaltSize(1)][salt][hash].
+        // This is what makes future changes to Pbkdf2PasswordHasherOptions (e.g. raising the
+        // iteration count) safe: verification reads the parameters back out of the hash itself
+        // instead of assuming the hasher's *current* options.
+        var options = Options.Create(new Pbkdf2PasswordHasherOptions { Iterations = 4_321 });
+        var hash = new Pbkdf2PasswordHasher(options).HashPassword(NewUser(), "versioned-password");
+
+        var bytes = Convert.FromBase64String(hash);
+
+        Assert.Equal(0x01, bytes[0]);
+        Assert.Equal(4_321, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(1, 4)));
+        Assert.Equal(3, bytes[5]); // SHA512
+        Assert.Equal(32, bytes[6]); // default SaltSize
+    }
+
+    [Fact]
+    public void Pbkdf2_VerifyHashedPassword_WithHigherCurrentIterationCount_StillVerifiesOldHash()
+    {
+        // The whole point of the versioned format: a hash created with one iteration count must
+        // still verify correctly against a hasher configured with a *different* (e.g. later
+        // increased) iteration count, because verification uses the count embedded in the hash.
+        var hash = new Pbkdf2PasswordHasher(Options.Create(new Pbkdf2PasswordHasherOptions { Iterations = 1_000 }))
+            .HashPassword(NewUser(), "raise-the-bar");
+
+        var laterHasher = new Pbkdf2PasswordHasher(Options.Create(new Pbkdf2PasswordHasherOptions { Iterations = 500_000 }));
+
+        var result = laterHasher.VerifyHashedPassword(NewUser(), hash, "raise-the-bar");
+
+        Assert.Equal(PasswordVerificationResult.Success, result);
+    }
+
+    [Fact]
+    public void Pbkdf2_VerifyHashedPassword_LegacyBareFormat_StillVerifiesAndRequestsRehash()
+    {
+        // Reproduces exactly what the pre-versioned Pbkdf2PasswordHasher wrote: a header-less
+        // Base64(salt[32] || hash[64]) blob, PBKDF2-HMAC-SHA512, 210,000 iterations. Hashes already
+        // stored in this format (from before the versioned format existed) must keep working.
+        var user = NewUser();
+        // The hasher below uses the default "{password}" template, which is a no-op substitution.
+        var salt = RandomNumberGenerator.GetBytes(32);
+        var derived = Rfc2898DeriveBytes.Pbkdf2("legacy-bare-password", salt, 210_000, HashAlgorithmName.SHA512, 64);
+        var legacyBareHash = Convert.ToBase64String([.. salt, .. derived]);
+
+        var hasher = new Pbkdf2PasswordHasher(FastOptions());
+
+        var correctResult = hasher.VerifyHashedPassword(user, legacyBareHash, "legacy-bare-password");
+        var wrongResult = hasher.VerifyHashedPassword(user, legacyBareHash, "wrong-password");
+
+        Assert.Equal(PasswordVerificationResult.SuccessRehashNeeded, correctResult);
+        Assert.Equal(PasswordVerificationResult.Failed, wrongResult);
+    }
+
+    [Fact]
+    public void Pbkdf2_VerifyHashedPassword_LegacyBareFormat_RehashProducesVersionedFormat()
+    {
+        // After the SuccessRehashNeeded round-trip, the newly written hash must be in the
+        // versioned format (not bare) - i.e. the migration actually completes.
+        var hasher = new Pbkdf2PasswordHasher(FastOptions());
+        var rehashed = hasher.HashPassword(NewUser(), "anything");
+
+        var bytes = Convert.FromBase64String(rehashed);
+
+        Assert.Equal(0x01, bytes[0]);
     }
 
     #endregion
@@ -252,21 +323,17 @@ public class PasswordHasherTests
     }
 
     [Fact]
-    public void Secure_FreshlyHashedPassword_VerifiesSuccessfully()
+    public void Secure_FreshlyHashedPassword_VerifiesAsSuccess_WithoutNeedingARehash()
     {
-        // NOTE: SecurePasswordHasher.HashPassword currently produces a legacy SHA-512 hash
-        // (not PBKDF2 as the XML doc states). A freshly hashed password therefore verifies
-        // as SuccessRehashNeeded. This test pins the *current* behavior so a future change
-        // to PBKDF2 hashing (returning Success) is a deliberate, visible decision.
+        // SecurePasswordHasher.HashPassword always produces a current-format PBKDF2 hash, so
+        // verifying it right back must succeed immediately - no rehash-needed round trip.
         var secure = new SecurePasswordHasher(FastOptions());
         var user = NewUser();
 
         var hash = secure.HashPassword(user, "brand-new-password");
         var result = secure.VerifyHashedPassword(user, hash, "brand-new-password");
 
-        Assert.True(
-            result is PasswordVerificationResult.Success or PasswordVerificationResult.SuccessRehashNeeded,
-            "A freshly hashed password must at least be verifiable.");
+        Assert.Equal(PasswordVerificationResult.Success, result);
         Assert.NotEqual("brand-new-password", hash);
     }
 
