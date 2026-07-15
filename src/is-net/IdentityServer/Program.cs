@@ -281,7 +281,26 @@ builder.Services.AddRazorPages()
         //options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
     });
 
+// Antiforgery cookie must match the same HttpOnly/SameSite/Secure posture as the auth cookie
+// (ConfigureIdentityServerApplicationCookie below) rather than relying on ASP.NET Core's current
+// implicit defaults (which already match these values today, but a future framework default change
+// must not be able to silently weaken it).
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    if (publicOriginIsHttp)
+    {
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    }
+});
+
 builder.Services.AddTransient<SecretsVaultManager>();
+
+// Overrides IdentityServer4's default ICorsPolicyService (which would otherwise silently never
+// enforce a client's AllowedCorsOrigins - see DynamicCorsPolicyService). Must be registered before
+// AddIdentityServer() below, whose internal TryAddTransient<ICorsPolicyService, ...>() is then a no-op.
+builder.Services.AddTransient<IdentityServer4.Services.ICorsPolicyService, DynamicCorsPolicyService>();
 
 var identityServerBuilder = builder.Services.AddIdentityServer(options =>
 {
@@ -390,6 +409,16 @@ if (builder.Configuration["IdentityServer:AddXForwardedProtoMiddleware"] == "tru
 {
     Log.Logger.Information("Using XForwardedProtoMiddleware");
     app.AddXForwardedProtoMiddleware();
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    // Tells the browser to remember to only ever contact this host over HTTPS, for future visits -
+    // UseHttpsRedirection below only redirects the *current* request, it doesn't protect against a
+    // stripped-to-HTTP first request or a misconfigured proxy on a later one. Skipped in Development
+    // so a local self-signed cert doesn't get the browser to "remember" HTTPS-only for localhost.
+    Log.Logger.Information("Using HSTS middleware");
+    app.UseHsts();
 }
 
 if (builder.Configuration["IdentityServer:UseHttpsRedirection"] != "false")

@@ -108,48 +108,51 @@ static public class ServiceCollectionExtensions
 
     static public IServiceCollection ConfigureIdentityServerApplicationCookie(this IServiceCollection services, IConfiguration configuration)
     {
-        if (configuration.GetSection("IdentityServer:Cookie").GetChildren().Count() > 0
-            || !String.IsNullOrWhiteSpace(configuration["IdentityServer:PublicOrigin"]))
-        {
-            services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
-                .Configure<ILoggerFactory>((options, loggerFactory) =>
+        // Always applied (not gated behind any IdentityServer:Cookie:* / PublicOrigin config being
+        // present) - HttpOnly/SameSite must be explicit regardless of whether anything else about the
+        // cookie is customized, rather than depending on ASP.NET Core Identity's current implicit
+        // defaults (which already match these values today, but a future framework default change
+        // must not be able to silently weaken this cookie).
+        services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
+            .Configure<ILoggerFactory>((options, loggerFactory) =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+
+                if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:PublicOrigin"]))
                 {
-                    options.LoginPath = "/Account/Login";
-                    options.LogoutPath = "/Account/Logout";
+                    var publicOrigin = new Uri(configuration["IdentityServer:PublicOrigin"]!);
 
-                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:PublicOrigin"]))
+                    if (publicOrigin.Scheme == "http")
                     {
-                        var publicOrigin = new Uri(configuration["IdentityServer:PublicOrigin"]!);
-
-                        if (publicOrigin.Scheme == "http")
-                        {
-                            loggerFactory.CreateLogger("IdentityServer.Startup")
-                                .LogWarning("Public Origin Scheme is HTTP ({PublicOrigin}). Cookie SecurePolicy is set to 'Always'!", publicOrigin);
-                            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                        }
+                        loggerFactory.CreateLogger("IdentityServer.Startup")
+                            .LogWarning("Public Origin Scheme is HTTP ({PublicOrigin}). Cookie SecurePolicy is set to 'Always'!", publicOrigin);
+                        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     }
+                }
 
-                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Name"]))
-                    {
-                        options.Cookie.Name = configuration["IdentityServer:Cookie:Name"];
-                    }
+                if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Name"]))
+                {
+                    options.Cookie.Name = configuration["IdentityServer:Cookie:Name"];
+                }
 
-                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Domain"]))
-                    {
-                        options.Cookie.Domain = configuration["IdentityServer:Cookie:Domain"];
-                    }
+                if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Domain"]))
+                {
+                    options.Cookie.Domain = configuration["IdentityServer:Cookie:Domain"];
+                }
 
-                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Path"]))
-                    {
-                        options.Cookie.Path = configuration["IdentityServer:Cookie:Path"];
-                    }
+                if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:Path"]))
+                {
+                    options.Cookie.Path = configuration["IdentityServer:Cookie:Path"];
+                }
 
-                    if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:ExpireDays"]))
-                    {
-                        options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(configuration["IdentityServer:Cookie:ExpireDays"]!));
-                    }
-                });
-        }
+                if (!String.IsNullOrWhiteSpace(configuration["IdentityServer:Cookie:ExpireDays"]))
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(configuration["IdentityServer:Cookie:ExpireDays"]!));
+                }
+            });
 
         return services;
     }

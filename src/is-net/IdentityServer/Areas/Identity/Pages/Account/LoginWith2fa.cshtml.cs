@@ -1,5 +1,7 @@
 ﻿using IdentityServer4.Events;
 using IdentityServer4.Services;
+using IdentityServerNET.Abstractions.Security;
+using IdentityServerNET.Exceptions;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,15 +20,18 @@ public class LoginWith2faModel : PageModel
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ILogger<LoginWith2faModel> _logger;
     private readonly IEventService _events;
+    private readonly ILoginBotDetection _loginBotDetection;
 
     public LoginWith2faModel(
         SignInManager<ApplicationUser> signInManager,
         ILogger<LoginWith2faModel> logger,
-        IEventService events)
+        IEventService events,
+        ILoginBotDetection loginBotDetection = null)
     {
         _signInManager = signInManager;
         _logger = logger;
         _events = events;
+        _loginBotDetection = loginBotDetection;
     }
 
     [BindProperty]
@@ -79,12 +84,32 @@ public class LoginWith2faModel : PageModel
             throw new InvalidOperationException($"Unable to load two-factor authentication user.");
         }
 
+        // Same username-based fail tracking as the password step (AccountController.LoginPassword) -
+        // repeated guesses against a 2FA code are already unlikely to succeed within Identity's own
+        // lockout window, but the tar-pit delay adds friction from the first few failures, not just
+        // after the lockout threshold.
+        if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(user.UserName))
+        {
+            try
+            {
+                await _loginBotDetection.BlockSuspicousUser(user.UserName);
+            }
+            catch (StatusMessageException sme)
+            {
+                ModelState.AddModelError(string.Empty, sme.Message);
+                return Page();
+            }
+        }
+
         var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
 
         var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
 
         if (result.Succeeded)
         {
+            if (_loginBotDetection != null)
+                await _loginBotDetection.RemoveSuspiciousUserAsync(user.UserName);
+
             _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
             await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
 
@@ -99,6 +124,9 @@ public class LoginWith2faModel : PageModel
         }
         else
         {
+            if (_loginBotDetection != null)
+                await _loginBotDetection.AddSuspiciousUserAsync(user.UserName);
+
             _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
             await _events.RaiseAsync(new UserLoginFailureEvent(user.UserName, "invalid authenticator code entered"));
 

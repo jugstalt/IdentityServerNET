@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using IdentityServerNET.Exceptions;
 using IdentityServerNET.Services.Security;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -124,5 +125,171 @@ public class LoginBotDetectionTests
         await detector.AddSuspicousUserAndGenerateCaptchaCodeAsync(user);
 
         Assert.False(await detector.VerifyCaptchaCodeAsync(user, "definitely-wrong"));
+    }
+
+    [Fact]
+    public async Task EnsureCaptchaCodeAsync_DoesNotCountAsAFailure()
+    {
+        // Regression test: redisplaying the password form on a plain GET must not itself push the
+        // user toward (or past) MaxFailCount - only an actual failed sign-in attempt may do that.
+        var options = new LoginBotDetectionOptions { MaxFailCount = 1 };
+        var detector = CreateDetector(options);
+        const string user = "get-redisplay-user";
+
+        await detector.EnsureCaptchaCodeAsync(user);
+        await detector.EnsureCaptchaCodeAsync(user);
+        await detector.EnsureCaptchaCodeAsync(user);
+
+        Assert.False(await detector.IsSuspiciousUserAsync(user));
+    }
+
+    [Fact]
+    public async Task EnsureCaptchaCodeAsync_ProducesAVerifiableCode()
+    {
+        var detector = CreateDetector();
+        const string user = "get-redisplay-verify-user";
+
+        var code = await detector.EnsureCaptchaCodeAsync(user);
+
+        Assert.True(await detector.VerifyCaptchaCodeAsync(user, code));
+    }
+
+    [Fact]
+    public async Task EnsureCaptchaCodeAsync_AfterAFailure_DoesNotResetTheFailCount()
+    {
+        // The GET redisplay path must only refresh the CAPTCHA - it must not touch CountFailes/
+        // TimeStamp, which are exclusively owned by the actual failure-tracking calls.
+        var options = new LoginBotDetectionOptions { MaxFailCount = 2 };
+        var detector = CreateDetector(options);
+        const string user = "get-redisplay-after-failure-user";
+
+        await detector.AddSuspiciousUserAsync(user);
+        await detector.AddSuspiciousUserAsync(user);
+        Assert.True(await detector.IsSuspiciousUserAsync(user));
+
+        await detector.EnsureCaptchaCodeAsync(user);
+
+        Assert.True(await detector.IsSuspiciousUserAsync(user));
+    }
+
+    [Fact]
+    public async Task IsSuspiciousUserAsync_TreatsUsernameCaseInsensitively()
+    {
+        // Varying the casing of the submitted username must not create an independent counter -
+        // otherwise an attacker trivially bypasses the fail-counter by cycling through casings.
+        var options = new LoginBotDetectionOptions { MaxFailCount = 2 };
+        var detector = CreateDetector(options);
+
+        await detector.AddSuspiciousUserAsync("Attacker@Example.com");
+        await detector.AddSuspiciousUserAsync("ATTACKER@EXAMPLE.COM");
+
+        Assert.True(await detector.IsSuspiciousUserAsync("attacker@example.com"));
+    }
+
+    [Fact]
+    public async Task RemoveSuspiciousUserAsync_IsCaseInsensitive()
+    {
+        var options = new LoginBotDetectionOptions { MaxFailCount = 1 };
+        var detector = CreateDetector(options);
+
+        await detector.AddSuspiciousUserAsync("MixedCase@Example.com");
+        Assert.True(await detector.IsSuspiciousUserAsync("mixedcase@example.com"));
+
+        await detector.RemoveSuspiciousUserAsync("MIXEDCASE@EXAMPLE.COM");
+
+        Assert.False(await detector.IsSuspiciousUserAsync("MixedCase@Example.com"));
+    }
+
+    [Fact]
+    public async Task BlockSuspicousUser_SecondConcurrentCall_ThrowsWithinBlockWindow()
+    {
+        var options = new LoginBotDetectionOptions { BlockSuspiciousUserSeconds = 2 };
+        var detector = CreateDetector(options);
+        const string user = "tarpit-user";
+
+        // No await before the dictionary write inside BlockSuspicousUser, so by the time this call
+        // returns a Task (at its first genuine await point) the block entry is already visible.
+        var firstCall = detector.BlockSuspicousUser(user);
+
+        await Assert.ThrowsAsync<StatusMessageException>(() => detector.BlockSuspicousUser(user));
+
+        await firstCall;
+    }
+
+    [Fact]
+    public async Task BlockSuspicousUser_TreatsUsernameCaseInsensitively_ForConcurrentCalls()
+    {
+        var options = new LoginBotDetectionOptions { BlockSuspiciousUserSeconds = 2 };
+        var detector = CreateDetector(options);
+
+        var firstCall = detector.BlockSuspicousUser("Blocked@Example.com");
+
+        await Assert.ThrowsAsync<StatusMessageException>(() => detector.BlockSuspicousUser("BLOCKED@EXAMPLE.COM"));
+
+        await firstCall;
+    }
+
+    [Fact]
+    public async Task IsSuspiciousIpAsync_ForUnknownIp_ReturnsFalse()
+    {
+        var detector = CreateDetector();
+
+        Assert.False(await detector.IsSuspiciousIpAsync("203.0.113.5"));
+    }
+
+    [Fact]
+    public async Task IsSuspiciousIpAsync_BecomesSuspicious_OnlyAfterReachingMaxIpFailCount()
+    {
+        var options = new LoginBotDetectionOptions { MaxIpFailCount = 3 };
+        var detector = CreateDetector(options);
+        const string ip = "203.0.113.10";
+
+        await detector.AddSuspiciousIpAsync(ip);
+        await detector.AddSuspiciousIpAsync(ip);
+        Assert.False(await detector.IsSuspiciousIpAsync(ip)); // 2 < 3
+
+        await detector.AddSuspiciousIpAsync(ip);
+        Assert.True(await detector.IsSuspiciousIpAsync(ip));  // 3 >= 3
+    }
+
+    [Fact]
+    public async Task IsSuspiciousIpAsync_ForgetsStaleEntries_AfterRememberWindow()
+    {
+        var options = new LoginBotDetectionOptions
+        {
+            MaxIpFailCount = 1,
+            RememberSuspiciousIpTotalMinutes = 0
+        };
+        var detector = CreateDetector(options);
+        const string ip = "203.0.113.20";
+
+        await detector.AddSuspiciousIpAsync(ip);
+
+        Assert.False(await detector.IsSuspiciousIpAsync(ip));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task IsSuspiciousIpAsync_WithEmptyAddress_Throws(string ipAddress)
+    {
+        var detector = CreateDetector();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => detector.IsSuspiciousIpAsync(ipAddress));
+    }
+
+    [Fact]
+    public async Task Username_And_Ip_Tracking_Use_Independent_Keyspaces()
+    {
+        // A cache-key collision between the username and IP namespaces would let an attacker's
+        // failed-login count leak into (or be masked by) unrelated state under the same literal string.
+        var options = new LoginBotDetectionOptions { MaxFailCount = 1, MaxIpFailCount = 1 };
+        var detector = CreateDetector(options);
+        const string value = "10.0.0.1";
+
+        await detector.AddSuspiciousUserAsync(value);
+
+        Assert.True(await detector.IsSuspiciousUserAsync(value));
+        Assert.False(await detector.IsSuspiciousIpAsync(value));
     }
 }

@@ -176,6 +176,23 @@ public class AccountController : Controller
         vm.Username = username;
         vm.AllowRememberLogin = !_configuration.DenyRememberLogin();
         vm.RememberLogin = _configuration.RememberLoginDefaultValue();
+
+        // A user who is already suspicious (e.g. from failed attempts on an earlier visit) must see
+        // the CAPTCHA again here, on the plain GET redisplay - otherwise the POST handler still demands
+        // a CaptchaCode the user was never shown, and rejects even a correct password.
+        if (_loginBotDetection != null)
+        {
+            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var usernameSuspicious = await _loginBotDetection.IsSuspiciousUserAsync(username);
+            var ipSuspicious = await _loginBotDetection.IsSuspiciousIpAsync(clientIp);
+
+            if (usernameSuspicious || ipSuspicious)
+            {
+                var captchaCode = await _loginBotDetection.EnsureCaptchaCodeAsync(username);
+                vm.CaptchaImage = RenderCaptchaImageWithCsp(captchaCode);
+            }
+        }
+
         return View(vm);
     }
 
@@ -209,14 +226,24 @@ public class AccountController : Controller
                     throw new Exception("Password is empty");
 
                 var loginUsername = await ResolveLoginUsernameAsync(model.Username);
+                var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
                 bool suspicous = false;
-                if (_loginBotDetection != null && await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
+                if (_loginBotDetection != null)
                 {
-                    await _loginBotDetection.BlockSuspicousUser(model.Username);
-                    if (_captchaCodeRenderer != null)
+                    var usernameSuspicious = await _loginBotDetection.IsSuspiciousUserAsync(loginUsername);
+                    var ipSuspicious = await _loginBotDetection.IsSuspiciousIpAsync(clientIp);
+
+                    if (usernameSuspicious)
                     {
-                        if (!await _loginBotDetection.VerifyCaptchaCodeAsync(model.Username, model.CaptchaCode))
+                        // Tar-pit delay only for a suspicious username - never for a suspicious IP alone,
+                        // since an IP can legitimately represent many unrelated users behind NAT/a proxy.
+                        await _loginBotDetection.BlockSuspicousUser(loginUsername);
+                    }
+
+                    if ((usernameSuspicious || ipSuspicious) && _captchaCodeRenderer != null)
+                    {
+                        if (!await _loginBotDetection.VerifyCaptchaCodeAsync(loginUsername, model.CaptchaCode))
                             suspicous = true;
                     }
                 }
@@ -298,16 +325,12 @@ public class AccountController : Controller
 
                 if (_loginBotDetection != null)
                 {
-                    string captcaCode = await _loginBotDetection.AddSuspicousUserAndGenerateCaptchaCodeAsync(model.Username);
-                    if (await _loginBotDetection.IsSuspiciousUserAsync(model.Username))
+                    await _loginBotDetection.AddSuspiciousIpAsync(clientIp);
+
+                    string captcaCode = await _loginBotDetection.AddSuspicousUserAndGenerateCaptchaCodeAsync(loginUsername);
+                    if (await _loginBotDetection.IsSuspiciousUserAsync(loginUsername) || await _loginBotDetection.IsSuspiciousIpAsync(clientIp))
                     {
-                        if (!String.IsNullOrEmpty(captcaCode) && _captchaCodeRenderer != null)
-                        {
-                            byte[] captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captcaCode);
-                            model.CaptchaImage = captchaImageBytes;
-                            this.Response.Headers.Append("Content-Security-Policy",
-                                "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
-                        }
+                        model.CaptchaImage = RenderCaptchaImageWithCsp(captcaCode);
                     }
                 }
 
@@ -637,6 +660,19 @@ public class AccountController : Controller
             Username = context?.LoginHint,
             ExternalProviders = providers.ToArray()
         };
+    }
+
+    // The captcha image is a data: URI, which needs the relaxed CSP below to render; shared by both the
+    // POST failure-redisplay path and the GET redisplay path so they stay in sync.
+    private byte[] RenderCaptchaImageWithCsp(string captchaCode)
+    {
+        if (String.IsNullOrEmpty(captchaCode) || _captchaCodeRenderer == null)
+            return null;
+
+        var captchaImageBytes = _captchaCodeRenderer.RenderCodeToImage(captchaCode);
+        this.Response.Headers.Append("Content-Security-Policy",
+            "default-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';");
+        return captchaImageBytes;
     }
 
     private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl, bool forceLocal = false)
