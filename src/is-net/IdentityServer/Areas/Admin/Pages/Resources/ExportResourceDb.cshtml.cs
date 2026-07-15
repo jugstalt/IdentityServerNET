@@ -1,4 +1,6 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Services;
+using IdentityServerNET.Models.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -10,19 +12,33 @@ public class ExportResourceDbModel : AdminPageModel
 {
     private IResourceDbContextModify _resourcetDb = null;
     private IExportResourceDbContext _exportResourceDb = null;
+    private readonly IRealmContext _realmContext = null;
 
     public ExportResourceDbModel(
         IResourceDbContext clientDbContext,
-        IExportResourceDbContext exportClientDbContext)
+        IExportResourceDbContext exportClientDbContext,
+        IRealmContext realmContext = null)
     {
         _resourcetDb = clientDbContext as IResourceDbContextModify;
         _exportResourceDb = exportClientDbContext;
+        _realmContext = realmContext;
     }
 
     async public Task<IActionResult> OnGetAsync()
     {
-        var apiResources = await _resourcetDb.GetAllApiResources();
-        var identityResources = await _resourcetDb.GetAllIdentityResources();
+        // Realm admins may only export their own realm's resources - a system admin (realmName ==
+        // null) exports everything, matching the pattern already used by DataTransfer/Index.
+        var realmName = _realmContext is null ? null : await _realmContext.GetCurrentRealmNameAsync();
+
+        var allApiResources = await _resourcetDb.GetAllApiResources();
+        var allIdentityResources = await _resourcetDb.GetAllIdentityResources();
+
+        var apiResources = realmName is null
+            ? allApiResources
+            : allApiResources.Where(a => a.Name.BelongsToRealm(realmName));
+        var identityResources = realmName is null
+            ? allIdentityResources
+            : allIdentityResources.Where(i => i.Name.BelongsToRealm(realmName));
 
         var count = apiResources.Count() + identityResources.Count();
 

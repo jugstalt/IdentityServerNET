@@ -21,6 +21,7 @@ public class SigningController : ControllerBase
     }
 
     [HttpPost]
+    [ValidateAntiforgeryTokenIfCookieAuthenticated]
     async public Task<IActionResult> Post(int lifeTime = 3600)
     {
         try
