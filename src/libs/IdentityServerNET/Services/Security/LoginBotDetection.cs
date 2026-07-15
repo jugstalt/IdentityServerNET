@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,12 @@ public class LoginBotDetection : ILoginBotDetection
     // IDistributedCache backend (e.g. Redis, also used by the PAR / authorization-parameter stores).
     private const string UsernameKeyPrefix = "loginbotdetection:user:";
     private const string IpKeyPrefix = "loginbotdetection:ip:";
+
+    // IDistributedCache has no key-enumeration API (Redis SCAN, SQL Server, in-memory all differ), so
+    // the set of currently-tracked usernames/IPs is maintained separately here - purely to let the admin
+    // UI (see Areas/Admin/Pages/BotDetection) list and clear entries without needing backend-specific code.
+    private const string UsernameIndexKey = "loginbotdetection:index:usernames";
+    private const string IpIndexKey = "loginbotdetection:index:ips";
 
     private readonly IDistributedCache _cache;
     private readonly LoginBotDetectionOptions _options;
@@ -35,15 +43,15 @@ public class LoginBotDetection : ILoginBotDetection
             throw new ArgumentException("Username required");
         }
 
-        var key = UsernameCacheKey(username);
-        var suspiciousUser = SuspiciousEntry.FromString(await _cache.GetStringAsync(key));
+        var normalized = NormalizeUsername(username);
+        var suspiciousUser = SuspiciousEntry.FromString(await _cache.GetStringAsync(UsernameKeyPrefix + normalized));
 
         if (suspiciousUser != null)
         {
             var lastSet = suspiciousUser.TimeStamp.ToUniversalTime();
             if ((DateTime.UtcNow - lastSet).TotalMinutes >= _options.RembemberSuspiciousUserTotalMinutes)
             {
-                await _cache.RemoveAsync(key);
+                await RemoveSuspiciousUserAsync(username);
                 return false;
             }
 
@@ -55,24 +63,26 @@ public class LoginBotDetection : ILoginBotDetection
 
     async public Task AddSuspiciousUserAsync(string username)
     {
-        var key = UsernameCacheKey(username);
-        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(key));
+        var normalized = NormalizeUsername(username);
+        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(UsernameKeyPrefix + normalized));
 
         suspiciousUser.TimeStamp = DateTime.Now;
         suspiciousUser.CountFailes++;
 
-        await _cache.SetStringAsync(key, suspiciousUser.ToString());
+        await SaveUsernameEntryAsync(normalized, suspiciousUser);
     }
 
     async public Task RemoveSuspiciousUserAsync(string username)
     {
-        await _cache.RemoveAsync(UsernameCacheKey(username));
+        var normalized = NormalizeUsername(username);
+        await _cache.RemoveAsync(UsernameKeyPrefix + normalized);
+        await RemoveFromIndexAsync(UsernameIndexKey, normalized);
     }
 
     async public Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username)
     {
-        var key = UsernameCacheKey(username);
-        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(key));
+        var normalized = NormalizeUsername(username);
+        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(UsernameKeyPrefix + normalized));
         suspiciousUser.CountFailes++;
 
         string code = GenerateCaptchaCode();
@@ -80,7 +90,7 @@ public class LoginBotDetection : ILoginBotDetection
         suspiciousUser.CaptchaCode = code;
         suspiciousUser.TimeStamp = DateTime.Now;
 
-        await _cache.SetStringAsync(key, suspiciousUser.ToString());
+        await SaveUsernameEntryAsync(normalized, suspiciousUser);
 
         return code;
     }
@@ -89,23 +99,30 @@ public class LoginBotDetection : ILoginBotDetection
     // just reloads the page) must still show a CAPTCHA if they're already suspicious - otherwise the
     // POST handler demands a CaptchaCode the user was never shown, and rejects even a correct password.
     // Unlike AddSuspicousUserAndGenerateCaptchaCodeAsync, this must NOT count as a failure: merely
-    // viewing the page is not a failed login attempt, so CountFailes/TimeStamp are left untouched.
+    // viewing the page is not a failed login attempt, so CountFailes/TimeStamp are left untouched, and
+    // the username is deliberately NOT added to the admin-facing index - only actual failures are.
     async public Task<string> EnsureCaptchaCodeAsync(string username)
     {
-        var key = UsernameCacheKey(username);
+        var key = UsernameKeyPrefix + NormalizeUsername(username);
         var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(key));
 
         var code = GenerateCaptchaCode();
         suspiciousUser.CaptchaCode = code;
 
-        await _cache.SetStringAsync(key, suspiciousUser.ToString());
+        // Not indexed (see class-level note on EnsureCaptchaCodeAsync) and CountFailes may be 0 here (a
+        // username that's only suspicious because its IP is), so nothing else would ever prune this
+        // entry - give it a real TTL instead of relying on someone re-checking this exact username later.
+        await _cache.SetStringAsync(key, suspiciousUser.ToString(), new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = CacheTtl(_options.RembemberSuspiciousUserTotalMinutes)
+        });
 
         return code;
     }
 
     async public Task<bool> VerifyCaptchaCodeAsync(string username, string code)
     {
-        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(UsernameCacheKey(username)));
+        var suspiciousUser = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(UsernameKeyPrefix + NormalizeUsername(username)));
 
         return code != null && code.Equals(suspiciousUser.CaptchaCode, StringComparison.InvariantCultureIgnoreCase);
     }
@@ -132,7 +149,7 @@ public class LoginBotDetection : ILoginBotDetection
 
     async public Task BlockSuspicousUser(string username)
     {
-        var key = UsernameCacheKey(username);
+        var key = UsernameKeyPrefix + NormalizeUsername(username);
 
         // TryGetValue instead of ContainsKey+indexer: those are two separate, non-atomic operations on
         // a ConcurrentDictionary - a concurrent call finishing its delay and removing the entry between
@@ -156,7 +173,7 @@ public class LoginBotDetection : ILoginBotDetection
     // Unlike the username counter, this is intentionally never cleared on a successful sign-in: a
     // credential-stuffing/password-spraying run is mostly failures with the occasional deliberate hit, and
     // clearing on any success would let that occasional hit reset the counter and defeat the detection. It
-    // only decays via RememberSuspiciousIpTotalMinutes.
+    // only decays via RememberSuspiciousIpTotalMinutes, or an explicit admin RemoveSuspiciousIpAsync call.
     async public Task<bool> IsSuspiciousIpAsync(string ipAddress)
     {
         if (String.IsNullOrWhiteSpace(ipAddress))
@@ -164,15 +181,15 @@ public class LoginBotDetection : ILoginBotDetection
             throw new ArgumentException("IP address required");
         }
 
-        var key = IpCacheKey(ipAddress);
-        var suspiciousIp = SuspiciousEntry.FromString(await _cache.GetStringAsync(key));
+        var normalized = NormalizeIp(ipAddress);
+        var suspiciousIp = SuspiciousEntry.FromString(await _cache.GetStringAsync(IpKeyPrefix + normalized));
 
         if (suspiciousIp != null)
         {
             var lastSet = suspiciousIp.TimeStamp.ToUniversalTime();
             if ((DateTime.UtcNow - lastSet).TotalMinutes >= _options.RememberSuspiciousIpTotalMinutes)
             {
-                await _cache.RemoveAsync(key);
+                await RemoveSuspiciousIpAsync(ipAddress);
                 return false;
             }
 
@@ -184,13 +201,41 @@ public class LoginBotDetection : ILoginBotDetection
 
     async public Task AddSuspiciousIpAsync(string ipAddress)
     {
-        var key = IpCacheKey(ipAddress);
-        var suspiciousIp = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(key));
+        var normalized = NormalizeIp(ipAddress);
+        var suspiciousIp = SuspiciousEntry.FromStringOrDefault(await _cache.GetStringAsync(IpKeyPrefix + normalized));
 
         suspiciousIp.TimeStamp = DateTime.Now;
         suspiciousIp.CountFailes++;
 
-        await _cache.SetStringAsync(key, suspiciousIp.ToString());
+        await SaveIpEntryAsync(normalized, suspiciousIp);
+    }
+
+    // Only meant for deliberate admin use (see Areas/Admin/Pages/BotDetection) - never called from the
+    // login flow itself, which would otherwise let an occasional successful credential-stuffing hit
+    // reset the counter and defeat the detection (see IsSuspiciousIpAsync above).
+    async public Task RemoveSuspiciousIpAsync(string ipAddress)
+    {
+        var normalized = NormalizeIp(ipAddress);
+        await _cache.RemoveAsync(IpKeyPrefix + normalized);
+        await RemoveFromIndexAsync(IpIndexKey, normalized);
+    }
+
+    async public Task<IReadOnlyCollection<LoginBotDetectionEntry>> GetSuspiciousUsersAsync()
+    {
+        return await ListEntriesAsync(
+            UsernameIndexKey,
+            UsernameKeyPrefix,
+            _options.RembemberSuspiciousUserTotalMinutes,
+            _options.MaxFailCount);
+    }
+
+    async public Task<IReadOnlyCollection<LoginBotDetectionEntry>> GetSuspiciousIpsAsync()
+    {
+        return await ListEntriesAsync(
+            IpIndexKey,
+            IpKeyPrefix,
+            _options.RememberSuspiciousIpTotalMinutes,
+            _options.MaxIpFailCount);
     }
 
     #endregion
@@ -201,9 +246,124 @@ public class LoginBotDetection : ILoginBotDetection
     // fresh, independent fail-counter - otherwise the fail-counter/tar-pit is trivially bypassed by an
     // attacker cycling through casings, and a legitimate user's own case-inconsistent typing keeps
     // stale "suspicious" entries alive under variants that never get cleared on success.
-    private static string UsernameCacheKey(string username) => UsernameKeyPrefix + username.Trim().ToUpperInvariant();
+    private static string NormalizeUsername(string username) => username.Trim().ToUpperInvariant();
 
-    private static string IpCacheKey(string ipAddress) => IpKeyPrefix + ipAddress.Trim();
+    private static string NormalizeIp(string ipAddress) => ipAddress.Trim();
+
+    private async Task SaveUsernameEntryAsync(string normalizedUsername, SuspiciousEntry entry)
+    {
+        await _cache.SetStringAsync(
+            UsernameKeyPrefix + normalizedUsername,
+            entry.ToString(),
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = CacheTtl(_options.RembemberSuspiciousUserTotalMinutes) });
+        await AddToIndexAsync(UsernameIndexKey, normalizedUsername);
+    }
+
+    private async Task SaveIpEntryAsync(string normalizedIp, SuspiciousEntry entry)
+    {
+        await _cache.SetStringAsync(
+            IpKeyPrefix + normalizedIp,
+            entry.ToString(),
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = CacheTtl(_options.RememberSuspiciousIpTotalMinutes) });
+        await AddToIndexAsync(IpIndexKey, normalizedIp);
+    }
+
+    // A configured remember-window of 0 (or, in theory, negative) minutes is a valid "treat as stale
+    // immediately" setting for the app-level staleness check above - but IDistributedCache implementations
+    // reject a non-positive AbsoluteExpirationRelativeToNow outright, so the cache TTL itself always needs
+    // at least a minimal positive floor regardless of what the configured window says.
+    private static TimeSpan CacheTtl(int rememberMinutes) => TimeSpan.FromMinutes(Math.Max(rememberMinutes, 1));
+
+    // Reads every key currently listed in the given index, drops the ones that expired or were removed
+    // (pruning the index as it goes, so stale entries don't accumulate forever if nobody ever clears
+    // them through the admin UI), and returns the rest as display-ready entries.
+    private async Task<IReadOnlyCollection<LoginBotDetectionEntry>> ListEntriesAsync(
+        string indexKey, string keyPrefix, int rememberMinutes, int maxFailCount)
+    {
+        var tracked = await LoadIndexAsync(indexKey);
+        if (tracked.Count == 0)
+        {
+            return Array.Empty<LoginBotDetectionEntry>();
+        }
+
+        var result = new List<LoginBotDetectionEntry>();
+        var stale = new List<string>();
+
+        foreach (var normalizedKey in tracked)
+        {
+            var entry = SuspiciousEntry.FromString(await _cache.GetStringAsync(keyPrefix + normalizedKey));
+            if (entry == null)
+            {
+                stale.Add(normalizedKey);
+                continue;
+            }
+
+            var lastFailureUtc = entry.TimeStamp.ToUniversalTime();
+            if ((DateTime.UtcNow - lastFailureUtc).TotalMinutes >= rememberMinutes)
+            {
+                await _cache.RemoveAsync(keyPrefix + normalizedKey);
+                stale.Add(normalizedKey);
+                continue;
+            }
+
+            result.Add(new LoginBotDetectionEntry
+            {
+                Key = normalizedKey,
+                FailCount = entry.CountFailes,
+                LastFailureUtc = lastFailureUtc,
+                IsSuspicious = entry.CountFailes >= maxFailCount
+            });
+        }
+
+        if (stale.Count > 0)
+        {
+            await RemoveFromIndexAsync(indexKey, stale);
+        }
+
+        return result.OrderByDescending(e => e.LastFailureUtc).ToList();
+    }
+
+    private async Task<HashSet<string>> LoadIndexAsync(string indexKey)
+    {
+        var json = await _cache.GetStringAsync(indexKey);
+        if (String.IsNullOrEmpty(json))
+        {
+            return new HashSet<string>();
+        }
+
+        return JsonConvert.DeserializeObject<HashSet<string>>(json) ?? new HashSet<string>();
+    }
+
+    // Best-effort, non-atomic read-modify-write, same as the rest of this class - a lost concurrent
+    // update just means an entry is briefly missing from (or lingers in) the admin list, not a security
+    // regression, since the authoritative suspicious/not-suspicious decision always reads the entry
+    // itself (see IsSuspiciousUserAsync/IsSuspiciousIpAsync), never the index.
+    private async Task AddToIndexAsync(string indexKey, string normalizedValue)
+    {
+        var set = await LoadIndexAsync(indexKey);
+        if (set.Add(normalizedValue))
+        {
+            await _cache.SetStringAsync(indexKey, JsonConvert.SerializeObject(set));
+        }
+    }
+
+    private Task RemoveFromIndexAsync(string indexKey, string normalizedValue) =>
+        RemoveFromIndexAsync(indexKey, new[] { normalizedValue });
+
+    private async Task RemoveFromIndexAsync(string indexKey, IEnumerable<string> normalizedValues)
+    {
+        var set = await LoadIndexAsync(indexKey);
+        var changed = false;
+        foreach (var value in normalizedValues)
+        {
+            changed |= set.Remove(value);
+        }
+
+        if (changed)
+        {
+            await _cache.SetStringAsync(indexKey, JsonConvert.SerializeObject(set));
+        }
+    }
 
     #endregion
 

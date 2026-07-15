@@ -137,4 +137,16 @@
             </a>
         </li>
     }
+    @if (!configuration.DenyAdminBotDetection() && Model.HasBotDetection && Model.ApplicationUser.IsUserAdministrator())
+    {
+        <li class="ui-tile">
+            <a asp-page="./BotDetection/Index">
+                <div class="@ColorScheme.TileIcon("warning")">
+                </div>
+                <div class="ui-tile-text">
+                    Bot Detection
+                </div>
+            </a>
+        </li>
+    }
 </ul>

@@ -1,4 +1,5 @@
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Abstractions.Security;
 using IdentityServerNET.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,7 +14,8 @@ public class IndexModel : PageModel
         IUserDbContext userDbContext = null,
         IRoleDbContext roleDbContext = null,
         IResourceDbContext resourceDbContxt = null,
-        IClientDbContext clientDbContext = null)
+        IClientDbContext clientDbContext = null,
+        ILoginBotDetection loginBotDetection = null)
     {
         _userManager = userManager;
 
@@ -21,6 +23,7 @@ public class IndexModel : PageModel
         this.HasRoleDb = roleDbContext != null;
         this.HasResourceDb = resourceDbContxt != null;
         this.HasClientDb = clientDbContext != null;
+        this.HasBotDetection = loginBotDetection != null;
     }
 
     private UserManager<ApplicationUser> _userManager;
@@ -29,6 +32,7 @@ public class IndexModel : PageModel
     public bool HasRoleDb { get; private set; }
     public bool HasResourceDb { get; private set; }
     public bool HasClientDb { get; private set; }
+    public bool HasBotDetection { get; private set; }
 
     public ApplicationUser ApplicationUser;
 

@@ -159,6 +159,8 @@ builder.Services.AddAuthorization(options =>
             policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
         options.AddPolicy("admin-realm-policy",
             policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
+        options.AddPolicy("admin-botdetection-policy",
+            policy => policy.RequireUserName(builder.Configuration["IdentityServer:AdminUsername"]!));
     }
     else
     {
@@ -181,6 +183,11 @@ builder.Services.AddAuthorization(options =>
             policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.ClientAdministrator)));
         options.AddPolicy("admin-secretsvault-policy",
             policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.SecretsVaultAdministrator)));
+
+        // Reuses the user-administrator role rather than introducing a new one - clearing a suspicious
+        // user/IP is a login-security action in the same spirit as the rest of user administration.
+        options.AddPolicy("admin-botdetection-policy",
+            policy => policy.AddRequirements(new RealmAdminRequirement(KnownRoles.UserAdministrator)));
 
         // System-level capabilities (signing keys, certificate creation) are never realm-delegated:
         // only the holder of the global role (the system admin) passes. Realm admins hold only
@@ -265,6 +272,7 @@ builder.Services.AddMvc(mvcOptions =>
                 options.Conventions.AuthorizeAreaFolder("Admin", "/signing", builder.Configuration.DenySigningUI() ? "_forbidden" : "admin-signing-ui-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/certificates", builder.Configuration.DenyAdminCreateCerts() ? "_forbidden" : "admin-createcerts-policy");
                 options.Conventions.AuthorizeAreaFolder("Admin", "/realms", "admin-realm-policy");
+                options.Conventions.AuthorizeAreaFolder("Admin", "/botdetection", builder.Configuration.DenyAdminBotDetection() ? "_forbidden" : "admin-botdetection-policy");
                 if (builder.Configuration.DenyManageAccount() == true)
                 {
                     options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage", "_forbidden");

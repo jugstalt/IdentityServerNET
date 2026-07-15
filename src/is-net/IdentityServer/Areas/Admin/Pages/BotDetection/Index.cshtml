@@ -1,0 +1,82 @@
+@page
+@model IdentityServer.Areas.Admin.Pages.BotDetection.IndexModel
+@{
+}
+@inject IdentityServerNET.Services.ColorSchemeService ColorScheme
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+@if (!Model.HasBotDetection)
+{
+    <div class="alert alert-warning">Bot detection is not enabled on this instance.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Suspicious users</h4>
+            @if (Model.SuspiciousUsers.Count == 0)
+            {
+                <p>No users are currently tracked.</p>
+            }
+            else
+            {
+                <ul class="nav nav-pills flex-column action-list">
+                    @foreach (var entry in Model.SuspiciousUsers)
+                    {
+                        <li class="action-list-item">
+                            <div class="@ColorScheme.LeftIcon("warning")"></div>
+                            <span class="action-list-text">
+                                <strong>@entry.Key</strong>
+                                <small>
+                                    @entry.FailCount fail@(entry.FailCount == 1 ? "" : "s")
+                                    &middot; last @entry.LastFailureUtc.ToString("u")
+                                    &middot; @(entry.IsSuspicious ? "CAPTCHA required" : "tracking")
+                                </small>
+                            </span>
+                            <a class="action-btn action-btn-remove"
+                               asp-page-handler="ClearUser"
+                               asp-route-key="@entry.Key"
+                               title="Clear">&#x2715;</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="col-md-6">
+            <h4>Suspicious IPs</h4>
+            @if (Model.SuspiciousIps.Count == 0)
+            {
+                <p>No IPs are currently tracked.</p>
+            }
+            else
+            {
+                <ul class="nav nav-pills flex-column action-list">
+                    @foreach (var entry in Model.SuspiciousIps)
+                    {
+                        <li class="action-list-item">
+                            <div class="@ColorScheme.LeftIcon("warning")"></div>
+                            <span class="action-list-text">
+                                <strong>@entry.Key</strong>
+                                <small>
+                                    @entry.FailCount fail@(entry.FailCount == 1 ? "" : "s")
+                                    &middot; last @entry.LastFailureUtc.ToString("u")
+                                    &middot; @(entry.IsSuspicious ? "CAPTCHA required" : "tracking")
+                                </small>
+                            </span>
+                            <a class="action-btn action-btn-remove"
+                               asp-page-handler="ClearIp"
+                               asp-route-key="@entry.Key"
+                               title="Clear">&#x2715;</a>
+                        </li>
+                    }
+                </ul>
+            }
+            <p class="text-muted">
+                <small>An IP only ever forces a CAPTCHA, never a lockout - it can represent many
+                unrelated users behind the same NAT or corporate proxy. Clearing it here removes that
+                requirement immediately.</small>
+            </p>
+        </div>
+    </div>
+}

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IdentityServerNET.Abstractions.Security;
 
@@ -7,6 +8,10 @@ public interface ILoginBotDetection
     Task<bool> IsSuspiciousUserAsync(string username);
     Task AddSuspiciousUserAsync(string username);
     Task RemoveSuspiciousUserAsync(string username);
+
+    // For the admin UI (see Areas/Admin/Pages/BotDetection) - lists every username currently tracked
+    // (not just the ones already over MaxFailCount), so an admin can see who's getting close too.
+    Task<IReadOnlyCollection<LoginBotDetectionEntry>> GetSuspiciousUsersAsync();
 
     Task<string> AddSuspicousUserAndGenerateCaptchaCodeAsync(string username);
 
@@ -25,4 +30,12 @@ public interface ILoginBotDetection
     // hard-block, which would collaterally lock out everyone sharing that IP.
     Task<bool> IsSuspiciousIpAsync(string ipAddress);
     Task AddSuspiciousIpAsync(string ipAddress);
+
+    // Only meant for deliberate admin use (see Areas/Admin/Pages/BotDetection) - never call this from
+    // the login flow itself; see IsSuspiciousIpAsync for why IP suspicion must not auto-clear.
+    Task RemoveSuspiciousIpAsync(string ipAddress);
+
+    // For the admin UI - lists every IP currently tracked (not just the ones already over
+    // MaxIpFailCount).
+    Task<IReadOnlyCollection<LoginBotDetectionEntry>> GetSuspiciousIpsAsync();
 }

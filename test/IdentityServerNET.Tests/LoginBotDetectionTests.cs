@@ -292,4 +292,119 @@ public class LoginBotDetectionTests
         Assert.True(await detector.IsSuspiciousUserAsync(value));
         Assert.False(await detector.IsSuspiciousIpAsync(value));
     }
+
+    [Fact]
+    public async Task GetSuspiciousUsersAsync_ForNoActivity_ReturnsEmpty()
+    {
+        var detector = CreateDetector();
+
+        Assert.Empty(await detector.GetSuspiciousUsersAsync());
+    }
+
+    [Fact]
+    public async Task GetSuspiciousUsersAsync_ListsTrackedUsers_EvenBelowThreshold()
+    {
+        // The admin list should show users who are just getting close, not only ones already suspicious.
+        var options = new LoginBotDetectionOptions { MaxFailCount = 3 };
+        var detector = CreateDetector(options);
+
+        await detector.AddSuspiciousUserAsync("below-threshold@example.com");
+        await detector.AddSuspiciousUserAsync("at-threshold@example.com");
+        await detector.AddSuspiciousUserAsync("at-threshold@example.com");
+        await detector.AddSuspiciousUserAsync("at-threshold@example.com");
+
+        var entries = await detector.GetSuspiciousUsersAsync();
+
+        var below = Assert.Single(entries, e => e.Key == "BELOW-THRESHOLD@EXAMPLE.COM");
+        Assert.Equal(1, below.FailCount);
+        Assert.False(below.IsSuspicious);
+
+        var at = Assert.Single(entries, e => e.Key == "AT-THRESHOLD@EXAMPLE.COM");
+        Assert.Equal(3, at.FailCount);
+        Assert.True(at.IsSuspicious);
+    }
+
+    [Fact]
+    public async Task GetSuspiciousUsersAsync_DoesNotInclude_EnsureCaptchaCodeAsync_Entries()
+    {
+        // EnsureCaptchaCodeAsync (GET-redisplay path) can create a 0-failure entry purely to hold a
+        // CAPTCHA code (e.g. when only the IP is suspicious) - that must not show up as a "suspicious
+        // user" in the admin list, since the user themselves never actually failed anything.
+        var detector = CreateDetector();
+
+        await detector.EnsureCaptchaCodeAsync("innocent-user@example.com");
+
+        Assert.Empty(await detector.GetSuspiciousUsersAsync());
+    }
+
+    [Fact]
+    public async Task RemoveSuspiciousUserAsync_RemovesFromTheAdminList()
+    {
+        var detector = CreateDetector();
+        const string user = "clear-me@example.com";
+
+        await detector.AddSuspiciousUserAsync(user);
+        Assert.Single(await detector.GetSuspiciousUsersAsync());
+
+        await detector.RemoveSuspiciousUserAsync(user);
+
+        Assert.Empty(await detector.GetSuspiciousUsersAsync());
+    }
+
+    [Fact]
+    public async Task GetSuspiciousIpsAsync_ListsTrackedIps_EvenBelowThreshold()
+    {
+        var options = new LoginBotDetectionOptions { MaxIpFailCount = 2 };
+        var detector = CreateDetector(options);
+
+        await detector.AddSuspiciousIpAsync("203.0.113.30");
+        await detector.AddSuspiciousIpAsync("203.0.113.31");
+        await detector.AddSuspiciousIpAsync("203.0.113.31");
+
+        var entries = await detector.GetSuspiciousIpsAsync();
+
+        var below = Assert.Single(entries, e => e.Key == "203.0.113.30");
+        Assert.False(below.IsSuspicious);
+
+        var at = Assert.Single(entries, e => e.Key == "203.0.113.31");
+        Assert.True(at.IsSuspicious);
+    }
+
+    [Fact]
+    public async Task RemoveSuspiciousIpAsync_ClearsSuspicionAndRemovesFromTheAdminList()
+    {
+        // This is the admin-only escape hatch for a wrongly-flagged shared IP (e.g. a whole company
+        // behind one NAT address) - unlike the login flow, an explicit admin action may clear it.
+        var options = new LoginBotDetectionOptions { MaxIpFailCount = 1 };
+        var detector = CreateDetector(options);
+        const string ip = "203.0.113.40";
+
+        await detector.AddSuspiciousIpAsync(ip);
+        Assert.True(await detector.IsSuspiciousIpAsync(ip));
+        Assert.Single(await detector.GetSuspiciousIpsAsync());
+
+        await detector.RemoveSuspiciousIpAsync(ip);
+
+        Assert.False(await detector.IsSuspiciousIpAsync(ip));
+        Assert.Empty(await detector.GetSuspiciousIpsAsync());
+    }
+
+    [Fact]
+    public async Task GetSuspiciousUsersAsync_PrunesStaleEntries_FromTheIndex()
+    {
+        var options = new LoginBotDetectionOptions
+        {
+            MaxFailCount = 1,
+            RembemberSuspiciousUserTotalMinutes = 0
+        };
+        var detector = CreateDetector(options);
+
+        await detector.AddSuspiciousUserAsync("stale-listed-user@example.com");
+
+        // Immediately stale under a 0-minute remember window - listing must prune it from the index.
+        Assert.Empty(await detector.GetSuspiciousUsersAsync());
+
+        // Listing again must not error or resurrect the already-pruned entry.
+        Assert.Empty(await detector.GetSuspiciousUsersAsync());
+    }
 }

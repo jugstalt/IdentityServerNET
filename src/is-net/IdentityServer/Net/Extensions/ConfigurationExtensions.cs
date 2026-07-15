@@ -40,6 +40,9 @@ static public class ConfigurationExtensions
     static public bool DenyAdminCreateCerts(this IConfiguration configuration)
         => configuration["identityserver:admin:DenyAdminCreateCerts"]?.ToLower() == "true";
 
+    static public bool DenyAdminBotDetection(this IConfiguration configuration)
+        => configuration["identityserver:admin:DenyAdminBotDetection"]?.ToLower() == "true";
+
     static public bool AllowDataTransfer(this IConfiguration configuration)
         => configuration["identityserver:Admin:AllowDataTransfer"]?.ToLower() == "true";
 
