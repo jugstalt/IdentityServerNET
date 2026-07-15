@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace IdentityServer;
 
-[SecurityHeaders]
 [AllowAnonymous]
 public class HomeController : Controller
 {

@@ -620,6 +620,27 @@ unter *Clients → Options* wird dazu ``RequirePushedAuthorization = true`` gese
 Aufruf von ``/connect/authorize`` ohne vorherigen PAR-Request wird dann mit ``invalid_request``
 abgewiesen.
 
+Abschnitt ``RateLimiting``
+---------------------------
+
+.. code:: javascript
+
+    "RateLimiting": {
+        "TokenEndpoint": {
+            "PermitLimit": 30,      // optional, Standard: 30
+            "WindowSeconds": 60     // optional, Standard: 60
+        }
+    }
+
+Die interaktive Login-Seite hat eine eigene Bot-Erkennung/CAPTCHA, aber der OAuth-Token-Endpoint
+(``/connect/token`` — Password Grant, Client Credentials, ...) ist eine eigene Angriffsfläche, die
+davon komplett unberührt bleibt. Anfragen an ``/connect/token`` werden pro Client-IP-Adresse über ein
+gleitendes Zeitfenster begrenzt; alle anderen Endpoints sind davon nicht betroffen.
+
+* **PermitLimit:** Maximale Anzahl an Anfragen an ``/connect/token`` pro IP-Adresse innerhalb von
+  ``WindowSeconds``. Weitere Anfragen erhalten ``429 Too Many Requests``.
+* **WindowSeconds:** Länge des gleitenden Zeitfensters in Sekunden.
+
 Abschnitt ``Configure``
 -----------------------
 

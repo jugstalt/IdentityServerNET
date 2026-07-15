@@ -21,7 +21,6 @@ namespace IdentityServer;
 /// <summary>
 /// This controller processes the consent UI
 /// </summary>
-[SecurityHeaders]
 [Authorize]
 public class ConsentController : Controller
 {

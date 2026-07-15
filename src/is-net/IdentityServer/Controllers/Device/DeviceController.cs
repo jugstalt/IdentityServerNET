@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 namespace IdentityServer.Device;
 
 [Authorize]
-[SecurityHeaders]
 public class DeviceController : Controller
 {
     private readonly IDeviceFlowInteractionService _interaction;

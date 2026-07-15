@@ -100,6 +100,16 @@ static public class ConfigurationExtensions
         => configuration["identityserver:Login:Passkey:RelyingPartyName"] ?? "IdentityServer";
 
     /// <summary>
+    /// True only when <c>IdentityServer:PublicOrigin</c> is set and its scheme is literally "http".
+    /// Used to decide whether the self-referencing JWT bearer metadata fetch (Bearer-Secrets/
+    /// Bearer-Signing) may relax RequireHttpsMetadata - a bare "false" would silently weaken every
+    /// deployment with a real HTTPS PublicOrigin for no functional benefit.
+    /// </summary>
+    static public bool PublicOriginIsHttp(this IConfiguration configuration)
+        => Uri.TryCreate(configuration["IdentityServer:PublicOrigin"], UriKind.Absolute, out var publicOriginUri)
+           && publicOriginUri.Scheme == Uri.UriSchemeHttp;
+
+    /// <summary>
     /// Returns true when signing certificates should be kept in memory only instead of persisted to
     /// disk. Configured via <c>identityserver:SigningCredential:InMemoryOnly = true</c>. Certificates
     /// are lost on every restart - only meant for testing/development, never production.

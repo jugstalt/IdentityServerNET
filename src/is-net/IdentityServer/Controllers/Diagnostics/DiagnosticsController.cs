@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace IdentityServer;
 
-[SecurityHeaders]
 [Authorize]
 public class DiagnosticsController : Controller
 {

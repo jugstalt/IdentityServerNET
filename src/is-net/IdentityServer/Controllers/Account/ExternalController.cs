@@ -26,7 +26,6 @@ using IdentityServerNET.Models.Extensions;
 
 namespace IdentityServer;
 
-[SecurityHeaders]
 [AllowAnonymous]
 public class ExternalController : Controller
 {

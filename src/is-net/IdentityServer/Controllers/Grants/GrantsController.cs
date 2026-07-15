@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace IdentityServer;
 
-[SecurityHeaders]
 [Authorize]
 public class GrantsController : Controller
 {

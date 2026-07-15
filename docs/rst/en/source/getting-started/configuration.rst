@@ -613,6 +613,27 @@ Individual clients can be required to use PAR exclusively. In the Admin UI under
 ``/connect/authorize`` without a prior PAR request will then be rejected with
 ``invalid_request``.
 
+Section ``RateLimiting``
+-------------------------
+
+.. code:: javascript
+
+    "RateLimiting": {
+        "TokenEndpoint": {
+            "PermitLimit": 30,      // optional, default: 30
+            "WindowSeconds": 60     // optional, default: 60
+        }
+    }
+
+The interactive login page has its own bot-detection/CAPTCHA, but the OAuth token endpoint
+(``/connect/token`` — password grant, client credentials, ...) is a separate attack surface that
+bypasses it entirely. Requests to ``/connect/token`` are rate limited per client IP address using a
+sliding window; every other endpoint is unaffected.
+
+* **PermitLimit:** Maximum number of requests to ``/connect/token`` allowed per IP address within
+  ``WindowSeconds``. Additional requests receive ``429 Too Many Requests``.
+* **WindowSeconds:** Length of the sliding window, in seconds.
+
 Section ``Configure``
 ---------------------
 

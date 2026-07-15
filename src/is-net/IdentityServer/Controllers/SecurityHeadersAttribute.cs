@@ -5,15 +5,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer;
 
+// Registered as a global MVC filter in Program.cs (options.Filters.Add<SecurityHeadersAttribute>()),
+// so it applies to every MVC view AND every Razor Page automatically - Razor Pages render a
+// PageResult rather than a ViewResult, which is why this previously needed to be added by hand to
+// each controller and never covered the Admin area or the Identity account pages at all.
 public class SecurityHeadersAttribute : ActionFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
         var result = context.Result;
-        if (result is ViewResult)
+        if (result is ViewResult || result is PageResult)
         {
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
             if (!context.HttpContext.Response.Headers.ContainsKey("X-Content-Type-Options"))

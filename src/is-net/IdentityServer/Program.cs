@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
+using IdentityServer;
 using IdentityServer.Net.Extensions.DependencyInjection;
+using IdentityServer.RateLimiting;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -21,6 +23,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -200,23 +203,56 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddTransient<Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
     IdentityServerNET.Authorization.RealmAdminAuthorizationHandler>();
 
+// Only relax HTTPS metadata validation when PublicOrigin genuinely isn't HTTPS (local dev, or a
+// deliberately-insecure deployment) - a plain "false" here would silently weaken every production
+// deployment with a real HTTPS PublicOrigin for no functional benefit.
+var publicOriginIsHttp = builder.Configuration.PublicOriginIsHttp();
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer-Secrets", options =>
     {
         options.Authority = builder.Configuration["IdentityServer:PublicOrigin"];
-        options.RequireHttpsMetadata = false;
+        options.RequireHttpsMetadata = !publicOriginIsHttp;
 
         options.Audience = "secrets-vault";
     })
     .AddJwtBearer("Bearer-Signing", options =>
     {
         options.Authority = builder.Configuration["IdentityServer:PublicOrigin"];
-        options.RequireHttpsMetadata = false;
+        options.RequireHttpsMetadata = !publicOriginIsHttp;
 
         options.Audience = "signing-api";
     });
 
-builder.Services.AddMvc()
+#region Rate limiting for /connect/token
+
+// The interactive login page has its own bot-detection/CAPTCHA (LoginBotDetection), but the OAuth
+// token endpoint is a separate attack surface (password grant, client_credentials) that bypasses it
+// entirely. Scoped to just this path via a no-op limiter for everything else, so it doesn't affect
+// any other endpoint.
+var tokenEndpointPermitLimit = builder.Configuration.GetValue<int?>("IdentityServer:RateLimiting:TokenEndpoint:PermitLimit") ?? 30;
+var tokenEndpointWindow = TimeSpan.FromSeconds(builder.Configuration.GetValue<int?>("IdentityServer:RateLimiting:TokenEndpoint:WindowSeconds") ?? 60);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        return ValueTask.CompletedTask;
+    };
+
+    options.GlobalLimiter = TokenEndpointRateLimiterFactory.Create("/connect/token", tokenEndpointPermitLimit, tokenEndpointWindow);
+});
+
+#endregion
+
+builder.Services.AddMvc(mvcOptions =>
+            {
+                // Applies X-Content-Type-Options/X-Frame-Options/CSP/Referrer-Policy to every MVC
+                // view and every Razor Page (Admin area, Identity account pages, ...) without
+                // needing [SecurityHeaders] on each controller/page individually.
+                mvcOptions.Filters.Add<SecurityHeadersAttribute>();
+            })
             .AddRazorPagesOptions(options =>
             {
                 // _forbidden => unknown policy will cause an exception => denies access for everyone!!
@@ -300,6 +336,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddSingleton<IEventSink, EventSinkProxy>();
+builder.Services.AddIdentityEventSink<LoggingIdentityEventSink>();
 
 builder.Services.ConfigureIdentityServerApplicationCookie(builder.Configuration);
 
@@ -364,6 +401,8 @@ if (builder.Configuration["IdentityServer:UseHttpsRedirection"] != "false")
 #endregion
 
 app.UseForwardedHeaders();
+
+app.UseRateLimiter();
 
 app.UseIdentityServerAppBasePath();
 app.UseStaticFiles();
