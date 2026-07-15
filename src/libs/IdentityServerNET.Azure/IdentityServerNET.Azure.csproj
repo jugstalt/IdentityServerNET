@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
 	  <LangVersion>10</LangVersion>
-	  <Version>7.26.2702</Version>
+	  <Version>7.26.2901</Version>
   </PropertyGroup>
 
   <ItemGroup>
