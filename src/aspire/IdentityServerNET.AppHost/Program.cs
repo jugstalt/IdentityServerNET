@@ -4,7 +4,7 @@
 //#define STORAGE_LITEDB
 //#define STORAGE_SQLSERVER
 //#define STORAGE_POSTGRE
-#define STORAGE_SQLITE
+//#define STORAGE_SQLITE
 
 //#define DBCONTEXT_API   // experimental
 
@@ -104,8 +104,8 @@ builder.AddProject<Projects.IdentityServerWebClient>("identityserverwebclient")
        .WithEnvironment("TestClient__Authority", "https://localhost:44300")
        .WithEnvironment("TestClient__ApiClientId", "is-webclient-api")
        .WithEnvironment("TestClient__ApiClientSecret", "secret")
-       .WithEnvironment("TestClient__ApiScopes", "is-nova-webapi")
-       .WithEnvironment("TestClient__IntrospectionClientId", "is-nova-webapi")
+       .WithEnvironment("TestClient__ApiScopes", "is-net-webapi")
+       .WithEnvironment("TestClient__IntrospectionClientId", "is-net-webapi")
        .WithEnvironment("TestClient__IntrospectionClientSecret", "apisecret")
        .WaitFor(identityServer);
 

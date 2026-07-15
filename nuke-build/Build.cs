@@ -134,7 +134,8 @@ class Build : NukeBuild
                 foreach (var pdbFile in (RootDirectory / "publish" / Platform).GlobFiles(pattern))
                 { 
                     if (pdbFile.Name.Contains("IdentityServer.", StringComparison.OrdinalIgnoreCase)
-                        || pdbFile.Name.Contains("IdentityServerNET.", StringComparison.OrdinalIgnoreCase))
+                        || pdbFile.Name.Contains("IdentityServerNET.", StringComparison.OrdinalIgnoreCase)
+                        || pdbFile.Name.Contains("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
                     {
                         //Log.Information($"Skipping {pdbFile}");
                         continue;
