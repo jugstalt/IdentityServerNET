@@ -33,7 +33,14 @@ public class SecurityHeadersAttribute : ActionFilterAttribute
             }
 
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-            var csp = "default-src 'self'; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
+            // script-src/style-src need 'unsafe-inline': this app's Razor views rely throughout on
+            // inline <script> blocks (e.g. the 2FA QR code setup, the admin user search/filter) and
+            // inline style="..." attributes (e.g. the ASP.NET Core validation-summary placeholder
+            // <li style="display:none">). Without an explicit 'unsafe-inline' here they silently
+            // inherit the stricter default-src 'self' instead - browsers then ignore every inline
+            // style/script rather than erroring, so the breakage isn't obvious: it looks like a rendering
+            // bug (a hidden validation-summary <li> reappearing as a bullet) rather than a CSP block.
+            var csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
             // also consider adding upgrade-insecure-requests once you have HTTPS in place for production
             //csp += "upgrade-insecure-requests;";
             // also an example if you need client images to be displayed from twitter
