@@ -20,19 +20,18 @@ var identityServer = builder.AddIdentityServerNET("is-net-dev")
                 .AllowPasskeyPasswordless()
               
                 .WithApplicationTitle("xxx")
-
                 ;
        })
        .WithMigrations(migrations =>
             migrations
                .AddAdminPassword("admin")
                .AddIdentityResources(["openid", "profile", "role"])
-               .AddApiResource("is-nova-webapi", ["query", "command"])
+               .AddApiResource("is-net-webapi", ["query", "command"])
                .AddApiResource("proc-server", ["list", "execute"])
                .AddUserRoles(["custom-role1", "custom-role2", "custom-role2"])
                .WithUser("test@is.net", "test", ["custom-role2", "custom-role3"])
                .AddClient(ClientType.WebApplication,
-                             "is-nova-webclient", "secret",
+                             "is-net-webclient", "secret",
                             webApp.Resource,
                             [
                                 "openid", "profile", "role"
@@ -44,12 +43,12 @@ var identityServer = builder.AddIdentityServerNET("is-net-dev")
                                 "openid", "profile",
                           ])
                .AddClient(ClientType.ApiClient,
-                            "is-nova-webapi-commands", "secret",
+                            "is-net-webapi-commands", "secret",
                             webApi.Resource,
                             [
-                                "is-nova-webapi",
-                                "is-nova-webapi.query",
-                                "is-nova-webapi.command"
+                                "is-net-webapi",
+                                "is-net-webapi.query",
+                                "is-net-webapi.command"
                            ])
                .AddClient(ClientType.WebApplication,
                             "is-webclient-test", "secret",
@@ -61,9 +60,9 @@ var identityServer = builder.AddIdentityServerNET("is-net-dev")
                             "is-webclient-api", "secret",
                             testClient.Resource,
                             [
-                                "is-nova-webapi",
-                                "is-nova-webapi.query",
-                                "is-nova-webapi.command"
+                                "is-net-webapi",
+                                "is-net-webapi.query",
+                                "is-net-webapi.command"
                            ])
        )
        .WithExternalProviders(external =>

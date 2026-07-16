@@ -10,6 +10,7 @@
     <Project Path="src/aspire/IdentityServerNET.ServiceDefaults/IdentityServerNET.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/src/clients/">
+    <Project Path="src/clients/Clients.ServiceDefaults/Clients.ServiceDefaults.csproj" />
     <Project Path="src/clients/IdentityServerWebClient/IdentityServerWebClient.csproj" />
   </Folder>
   <Folder Name="/src/customize/" Id="f3a74df7-d413-42a0-a26e-e5355cc27ef5">

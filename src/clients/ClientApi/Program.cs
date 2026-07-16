@@ -15,7 +15,7 @@ builder.Services.AddAuthentication("Bearer")
         options.Authority = builder.Configuration["Authorization:Authority"];
         options.RequireHttpsMetadata = false;
 
-        options.Audience = "is-nova-webapi";
+        options.Audience = "is-net-webapi";
         options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
@@ -29,10 +29,10 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("query",
         policy =>
-        policy.RequireClaim("scope", "is-nova-webapi.query"));
+        policy.RequireClaim("scope", "is-net-webapi.query"));
     options.AddPolicy("command",
         policy =>
-        policy.RequireClaim("scope", "is-nova-webapi.command"));
+        policy.RequireClaim("scope", "is-net-webapi.command"));
 });
 
 var app = builder.Build();

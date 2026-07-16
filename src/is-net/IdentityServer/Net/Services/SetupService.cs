@@ -41,20 +41,22 @@ public class SetupService
         // => only autocreate user/roles if supported
         if (!String.IsNullOrEmpty(userDb.DefaultAdminLogin))  
         {
+            // always try to create all the default roles
+            // there my be new ones (eg. Realm) 
+            if (roleDb is not null)
+            {
+                foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
+                {
+                    var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
+
+                    TryCreateRole(roleDb, knownRole).GetAwaiter().GetResult();
+                }
+            }
+
             var adminUser = userDb.FindByNameAsync(userDb.DefaultAdminLogin, CancellationToken.None).GetAwaiter().GetResult();
 
             if (adminUser is null)
             {
-                if (roleDb is not null)
-                {
-                    foreach (var methodInfo in typeof(KnownRoles).GetMethods().Where(m => m.ReturnType == typeof(ApplicationRole)))
-                    {
-                        var knownRole = (ApplicationRole)methodInfo.Invoke(Activator.CreateInstance<KnownRoles>(), null);
-
-                        TryCreateRole(roleDb, knownRole).GetAwaiter().GetResult();
-                    }
-                }
-
                 adminUser = new ApplicationUser()
                 {
                     UserName = userDb.DefaultAdminLogin,
@@ -105,6 +107,12 @@ public class SetupService
     {
         try
         {
+            var existingRole = await roleDb.FindByNameAsync(role.Name, CancellationToken.None);
+            if(existingRole is not null)
+            {
+                return true;
+            }
+
             var result = await roleDb.CreateAsync(
                     new ApplicationRole()
                     {
