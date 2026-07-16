@@ -8,7 +8,9 @@
   <img alt="Version" src="https://img.shields.io/badge/Version-7.26-green?style=flat-square" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat-square" />
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet" />
-  <img alt="Docker" src="https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker" />
+  <a href="https://hub.docker.com/r/gstalt/identityserver-net">
+    <img alt="Docker" src="https://img.shields.io/badge/Docker-gstalt%2Fidentityserver--net-2496ED?style=flat-square&logo=docker" />
+  </a>
 </p>
 
 A fully self-hosted **OpenID Connect** and **OAuth 2.0** identity provider built on top of [IdentityServer4](https://github.com/IdentityServer/IdentityServer4), packaged as a ready-to-run ASP.NET Core application with a built-in administration UI.
@@ -71,24 +73,32 @@ dotnet run
 
 ### Run in Docker
 
-```bash
-# Build the image (publish first)
-cd publish/linux-x64/identityserver
-docker build -t identityserver-net-base .
+Pre-built images are available on Docker Hub:
 
-# Start a development container
-cd dev
-docker build -t identityserver-net-dev .
-docker run -p 8080:8080 -p 8443:8443 identityserver-net-dev
+| Image | Purpose |
+|---|---|
+| [`gstalt/identityserver-net:latest`](https://hub.docker.com/r/gstalt/identityserver-net) | Production base image |
+| [`gstalt/identityserver-net-dev:latest`](https://hub.docker.com/r/gstalt/identityserver-net-dev) | Development image (HTTPS, hot-reload config) |
+
+```bash
+# Production
+docker pull gstalt/identityserver-net:latest
+docker run -p 8080:8080 gstalt/identityserver-net:latest
+
+# Development (requires a local HTTPS certificate)
+docker pull gstalt/identityserver-net-dev:latest
+docker run -p 8080:8080 -p 8443:8443 gstalt/identityserver-net-dev:latest
 ```
 
-A development HTTPS certificate is required. Export it once:
+A development HTTPS certificate is required for the dev image. Export it once:
 
 ```powershell
 dotnet dev-certs https --clean
 dotnet dev-certs https --trust
 dotnet dev-certs https -ep ./is-net-dev-https.pfx -p is-net-dev
 ```
+
+To build your own images from source, see [`publish/linux-x64/identityserver/`](publish/linux-x64/identityserver/).
 
 ---
 
