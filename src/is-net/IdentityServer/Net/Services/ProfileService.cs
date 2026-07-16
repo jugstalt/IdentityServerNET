@@ -1,10 +1,15 @@
-#nullable enable
+﻿#nullable enable
+using Duende.IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServerNET.Abstractions.DbContext;
+using IdentityServerNET.Extensions;
 using IdentityServerNET.Models;
 using IdentityServerNET.Models.Extensions;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +26,55 @@ public class ProfileService : IProfileService
         _realmDb = realmDb;
     }
 
-    public Task GetProfileDataAsync(ProfileDataRequestContext context)
+    // Claim sets per IdentityServerConstants.StandardScopes: profile, email, phone, address, role.
+    async public Task GetProfileDataAsync(ProfileDataRequestContext context)
     {
-        return Task.FromResult(0);
+        var user = await _userManager.GetUserAsync(context.Subject);
+        if (user is null)
+        {
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new Claim(JwtClaimTypes.Name, user.ApplicationUserName()),
+            // shorthand display handle, distinct from the full name - Keycloak et al. default this to the login username
+            new Claim(JwtClaimTypes.PreferredUserName,
+                user.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.PreferredUserName)?.Value ?? user.UserName ?? "")
+        };
+
+        // profile
+        claims.AddRange(user.Claims.Where(c => c.Type is
+            JwtClaimTypes.GivenName or JwtClaimTypes.FamilyName or JwtClaimTypes.MiddleName or
+            JwtClaimTypes.NickName or JwtClaimTypes.Profile or
+            JwtClaimTypes.Picture or JwtClaimTypes.WebSite or JwtClaimTypes.Gender or
+            JwtClaimTypes.BirthDate or JwtClaimTypes.ZoneInfo or JwtClaimTypes.Locale or
+            JwtClaimTypes.UpdatedAt));
+
+        // email
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            claims.Add(new Claim(JwtClaimTypes.Email, user.Email));
+            claims.Add(new Claim(JwtClaimTypes.EmailVerified, user.EmailConfirmed ? "true" : "false", ClaimValueTypes.Boolean));
+        }
+
+        // address
+        claims.AddRange(user.Claims.Where(c => c.Type == JwtClaimTypes.Address));
+
+        // phone
+        if (!string.IsNullOrEmpty(user.PhoneNumber))
+        {
+            claims.Add(new Claim(JwtClaimTypes.PhoneNumber, user.PhoneNumber));
+            claims.Add(new Claim(JwtClaimTypes.PhoneNumberVerified, user.PhoneNumberConfirmed ? "true" : "false", ClaimValueTypes.Boolean));
+        }
+
+        // role - realm suffix stripped, clients only see the plain role name
+        if (user.Roles is not null)
+        {
+            claims.AddRange(user.Roles.Select(r => new Claim(JwtClaimTypes.Role, r.GetRealmScopedName())));
+        }
+
+        context.AddRequestedClaims(claims);
     }
 
     async public Task IsActiveAsync(IsActiveContext context)
