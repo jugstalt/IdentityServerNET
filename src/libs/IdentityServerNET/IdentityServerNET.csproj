@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>45936590-d798-4c10-bbda-57acb544051f</UserSecretsId>
-    <AssemblyVersion>7.26.2901</AssemblyVersion>
+    <AssemblyVersion>7.26.2902</AssemblyVersion>
 	 
   </PropertyGroup>
 

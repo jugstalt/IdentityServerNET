@@ -4,7 +4,7 @@
 //#define STORAGE_LITEDB
 //#define STORAGE_SQLSERVER
 //#define STORAGE_POSTGRE
-#define STORAGE_SQLITE
+//#define STORAGE_SQLITE
 
 //#define DBCONTEXT_API   // experimental
 
