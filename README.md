@@ -8,8 +8,8 @@
   <img alt="Version" src="https://img.shields.io/badge/Version-7.26-green?style=flat-square" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat-square" />
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet" />
-  <a href="https://hub.docker.com/r/gstalt/identityserver-net">
-    <img alt="Docker" src="https://img.shields.io/badge/Docker-gstalt%2Fidentityserver--net-2496ED?style=flat-square&logo=docker" />
+  <a href="https://github.com/jugstalt/IdentityServerNET/pkgs/container/identityserver-net">
+    <img alt="Docker" src="https://img.shields.io/badge/Docker-ghcr.io%2Fjugstalt-2496ED?style=flat-square&logo=docker" />
   </a>
 </p>
 
@@ -77,17 +77,17 @@ Pre-built images are available on Docker Hub:
 
 | Image | Purpose |
 |---|---|
-| [`gstalt/identityserver-net:latest`](https://hub.docker.com/r/gstalt/identityserver-net) | Production base image |
-| [`gstalt/identityserver-net-dev:latest`](https://hub.docker.com/r/gstalt/identityserver-net-dev) | Development image (HTTPS, hot-reload config) |
+| [`ghcr.io/jugstalt/identityserver-net:latest`](https://github.com/jugstalt/IdentityServerNET/pkgs/container/identityserver-net) | Production base image |
+| [`ghcr.io/jugstalt/identityserver-net-dev:latest`](https://github.com/jugstalt/IdentityServerNET/pkgs/container/identityserver-net-dev) | Development image (HTTPS, hot-reload config) |
 
 ```bash
 # Production
-docker pull gstalt/identityserver-net:latest
-docker run -p 8080:8080 gstalt/identityserver-net:latest
+docker pull ghcr.io/jugstalt/identityserver-net:latest
+docker run -p 8080:8080 ghcr.io/jugstalt/identityserver-net:latest
 
 # Development (requires a local HTTPS certificate)
-docker pull gstalt/identityserver-net-dev:latest
-docker run -p 8080:8080 -p 8443:8443 gstalt/identityserver-net-dev:latest
+docker pull ghcr.io/jugstalt/identityserver-net-dev:latest
+docker run -p 8080:8080 -p 8443:8443 ghcr.io/jugstalt/identityserver-net-dev:latest
 ```
 
 A development HTTPS certificate is required for the dev image. Export it once:
