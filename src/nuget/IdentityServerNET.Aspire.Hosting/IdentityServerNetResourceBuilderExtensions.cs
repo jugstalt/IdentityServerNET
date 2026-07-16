@@ -199,8 +199,8 @@ public enum ClientType
 
 internal static class IdentityServerNetContainerImageTags
 {
-    internal const string Registry = "docker.io";
-    internal const string Image = "gstalt/identityserver-net-dev";
+    internal const string Registry = "ghcr.io";
+    internal const string Image = "jugstalt/identityserver-net-dev";
     internal const string Tag = "latest";
 }
 
