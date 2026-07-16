@@ -40,7 +40,8 @@ public class SecurityHeadersAttribute : ActionFilterAttribute
             // inherit the stricter default-src 'self' instead - browsers then ignore every inline
             // style/script rather than erroring, so the breakage isn't obvious: it looks like a rendering
             // bug (a hidden validation-summary <li> reappearing as a bullet) rather than a CSP block.
-            var csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
+            // img-src data: is required for Bootstrap SVG checkmarks and inline SVG icons used in CSS background-image
+            var csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
             // also consider adding upgrade-insecure-requests once you have HTTPS in place for production
             //csp += "upgrade-insecure-requests;";
             // also an example if you need client images to be displayed from twitter
