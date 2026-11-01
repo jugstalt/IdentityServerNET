@@ -11,4 +11,4 @@ docker build -t identityserver-net:%version% .
 
 cd ./../dev
 
-docker build -t identityserver-net-dev:%version% .
+docker build --build-arg CERT_BUILD=%version% -t identityserver-net-dev:%version% .

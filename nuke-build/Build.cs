@@ -193,7 +193,7 @@ class Build : NukeBuild
                    .AssertZeroExitCode();
 
                 ProcessTasks.StartProcess("docker",
-                   $"build -t identityserver-net-dev:{Version} -f Dockerfile .",
+                   $"build --build-arg CERT_BUILD={Version} -t identityserver-net-dev:{Version} -f Dockerfile .",
                    workingDirectory: Path.Combine(platformDir, "identityserver", "dev"),
                    logger: (oType, txt) =>
                    {
